@@ -2,7 +2,7 @@ package model
 
 import com.ftel.bigdata.db.slick.SlickTrait
 
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.PostgresProfile.api._
 import slick.lifted.ProvenShape
 import slick.lifted.ProvenShape.proveShapeOf
 

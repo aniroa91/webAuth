@@ -18,26 +18,38 @@ import com.ftel.bigdata.db.slick.PostgresSlick
 
 // DB
 //slick.driver.PostgresDriver
-import slick.driver.PostgresDriver.api.Database
-import slick.driver.PostgresDriver.api.columnExtensionMethods
-import slick.driver.PostgresDriver.api.intColumnType
-import slick.driver.PostgresDriver.api.queryInsertActionExtensionMethods
-import slick.driver.PostgresDriver.api.streamableQueryActionExtensionMethods
-import slick.driver.PostgresDriver.api.stringColumnType
+//import slick.jdbc.PostgresProfile.api._
+//import slick.driver.PostgresDriver
+import slick.driver.PostgresDriver.api._
+//import slick.driver.PostgresDriver.api.columnExtensionMethods
+//import slick.driver.PostgresDriver.api.intColumnType
+//import slick.driver.PostgresDriver.api.queryInsertActionExtensionMethods
+//import slick.driver.PostgresDriver.api.streamableQueryActionExtensionMethods
+//import slick.driver.PostgresDriver.api.stringColumnType
 import slick.lifted.Query
 import slick.lifted.TableQuery
 import com.typesafe.config.Config
+import slick.basic.DatabaseConfig
+import play.api.db.slick.DatabaseConfigProvider
+import play.api.db.slick.HasDatabaseConfig
+import slick.jdbc.JdbcProfile
+import slick.jdbc.PostgresProfile
+import javax.inject.Inject
+import play.db.NamedDatabase
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+import model.MalwareTable
+import model.LabelTable
+import model.ServerNameTable
+import model.DomainServerNameTable
+import model.RegistrarTable
+import model.StatusTable
+import model.WhoisObject
+import services.Connection._
+
 
 object DomainService {
-  private val ES_HOST = ConfigFactory.load().getString("es.host")
-  private val ES_PORT = ConfigFactory.load().getString("es.port").toInt
   
-  private val ES_INDEX = "dns-service-domain-"
-  private val ES_INDEX_ALL = ES_INDEX + "*"
-  
-  private val SIZE_DAY = 7
-
-  private val client = HttpClient(ElasticsearchClientUri(ES_HOST, ES_PORT))
   
   def getDomainInfo(domain: String): JsonObject = {
     val multiSearchResponse = client.execute(
@@ -51,13 +63,17 @@ object DomainService {
     val secondResponse = multiSearchResponse.responses(0)
     val answerResponse = multiSearchResponse.responses(1)
     val domainResponse = multiSearchResponse.responses(2)
-    //val domain = multiSearchResponse.responses(1)
-    
+    val whoisInfo = getWhoisInfo(db, domain)
+    println(whoisInfo)
     val jo = new JsonObject()
     val ja = new JsonArray()
     val gson = new Gson()
     val current = secondResponse.hits.hits.head
+
+    val jsonObjectCurrent = gson.fromJson(current.sourceAsString, classOf[JsonObject])
+    jsonObjectCurrent.addProperty("num_of_domain", SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
     
+    // Convert History to JsonArray
     secondResponse.hits.hits.map(x => {
       //val jsonObject = new JsonObject();
       //jsonObject.add(property, value)
@@ -66,46 +82,74 @@ object DomainService {
       //json.toString()
       ja.add(json)
     })
+
     
-    val jsonObjectCurrent = gson.fromJson(current.sourceAsString, classOf[JsonObject])
-    jsonObjectCurrent.addProperty("num_of_domain", SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
+//    registrar: String,
+//    whoisServer: String,
+//    referral: String,
+//    nameServer: Array[String],
+//    status: String,
+//    update: String,
+//    create: String,
+//    expire: String,
+    
+    // Add whois Info
+    jsonObjectCurrent.addProperty("registrar", whoisInfo.registrar)
+    jsonObjectCurrent.addProperty("whoisServer", whoisInfo.whoisServer)
+    jsonObjectCurrent.addProperty("referral", whoisInfo.referral)
+    jsonObjectCurrent.addProperty("nameServer", whoisInfo.nameServer.mkString(" "))
+    jsonObjectCurrent.addProperty("status", whoisInfo.status)
+    jsonObjectCurrent.addProperty("create", whoisInfo.create)
+    jsonObjectCurrent.addProperty("update", whoisInfo.update)
+    jsonObjectCurrent.addProperty("expire", whoisInfo.expire)
+    
+    
     jo.add("current", jsonObjectCurrent)
     jo.add("history", ja)
     val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
     jo.addProperty("answer", answers.mkString(" "))
-    
-//    println(answerResponse.totalHits)
-    //val second = second.hits.hits
-    //domainResponse.aggregations.get(key)
-//    secondResponse.hits.hits.foreach(x => println(x.sourceAsString))
-    //println(SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
-    //println(domainResponse.aggregations.get("num_of_domain").get.asInstanceOf[Map[String, String]].get("value"))
-    //client.close()
-    //null
-    
-    //JsonprettyJson()
+
     jo
+    
+    /*
+     *     
+
+     */
   }
   
-  def close() = client.close()
+  
+
+  private def getWhoisInfo(db: Database, domain: String): WhoisObject = {
+    val domains = TableQuery[DomainTable]
+    val domainServerName = TableQuery[DomainServerNameTable]
+    val label = TableQuery[LabelTable]
+    val malware = TableQuery[MalwareTable]
+    val registrar = TableQuery[RegistrarTable]
+    val serverName = TableQuery[ServerNameTable]
+    val status = TableQuery[StatusTable]
+    
+    val q = for {
+      d <- domains if d.name === domain
+      ds <- domainServerName if d.id === ds.domainId
+      l <- label if d.labelId === l.id
+      m <- malware if d.malwareId === m.id
+      r <- registrar if d.registrarId === r.id
+      s <- serverName if ds.serverId === s.id
+      st <- status if d.statusId === st.id
+    } yield (d.name, r.name, r.server, r.url, s.name, st.name, d.create, d.update, d.expire, l.name, m.name)
+    val result = Await.result(db.run(q.result), Duration.Inf)
+    val servers = result.map(x => x._5).toArray
+    val head = result.head
+    val whois = WhoisObject(head._1, head._2, head._3, head._4, servers, head._6, head._8.toString(), head._7.toString(), head._9.toString(), head._10, head._11)
+    whois
+    
+  }
 
   def main(args: Array[String]) {
-    //getDomainInfo("google.com")
-    //close()
+    val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
+    val whoisInfo = getWhoisInfo(db, "google.com")
     
-//    val db: Database = Database.forConfig("postgres_dns")
-//    
-//    val domains = TableQuery[DomainTable]
-////    val q = domains.filter(_.name === "")
-//    val all = db.run(domains.result).await
-//    
-//    println(all)
-//    //val action = q.result
-//    //val result: Future[Seq[Double]] = db.run(action)
-//    //val sql = action.statements.head
-//    
-//    db.close()
-    
-    DAO.
+    println(whoisInfo)
   }
 }
+

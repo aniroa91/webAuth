@@ -3,7 +3,7 @@ package model
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.PostgresProfile.api._
 import slick.lifted.ProvenShape
 import slick.lifted.ProvenShape.proveShapeOf
 

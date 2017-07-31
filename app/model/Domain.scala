@@ -6,7 +6,7 @@ import java.sql.Timestamp
 import com.ftel.bigdata.db.slick.SlickTrait
 import com.ftel.bigdata.utils.DateTimeUtil
 
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.PostgresProfile.api._
 import slick.lifted.ProvenShape
 import slick.lifted.ProvenShape.proveShapeOf
 
