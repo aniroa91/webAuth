@@ -46,12 +46,29 @@ import model.RegistrarTable
 import model.StatusTable
 import model.WhoisObject
 import services.Connection._
+import model.Response
+//import model.HistoryInfo
+import model.BaicInfo
+import com.sksamuel.elastic4s.http.search.SearchHit
+import com.ftel.bigdata.utils.HttpUtil
 
 
 object DomainService {
   
+  private val ES_HOST = ConfigFactory.load().getString("es.host")
+  private val ES_PORT = ConfigFactory.load().getString("es.port").toInt
   
-  def getDomainInfo(domain: String): JsonObject = {
+  val ES_INDEX = "dns-service-domain-"
+  val ES_INDEX_ALL = ES_INDEX + "*"
+  
+  val SIZE_DAY = 7
+
+  val client = HttpClient(ElasticsearchClientUri(ES_HOST, ES_PORT))
+  val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
+  
+  def close() = client.close()
+  
+  def getDomainInfo(domain: String): Response = {
     val multiSearchResponse = client.execute(
       multi( 
         search(ES_INDEX_ALL / "second") query {must(termQuery("second", domain))} sortBy {fieldSort("day") order SortOrder.DESC} limit SIZE_DAY,
@@ -63,53 +80,76 @@ object DomainService {
     val secondResponse = multiSearchResponse.responses(0)
     val answerResponse = multiSearchResponse.responses(1)
     val domainResponse = multiSearchResponse.responses(2)
-    val whoisInfo = getWhoisInfo(db, domain)
-    println(whoisInfo)
-    val jo = new JsonObject()
-    val ja = new JsonArray()
-    val gson = new Gson()
+    
+    def searchHit2BasicInfo = (x: SearchHit) => {
+      val map = x.sourceAsMap
+      val label = map.getOrElse("label", "").toString()
+      val numOfClient = map.getOrElse("number_of_ip", "0").toString().toInt
+      val second = map.getOrElse("second", "").toString()
+      val rankAlexa = map.getOrElse("rank_alexa", "0").toString().toInt
+      val rankFtel = map.getOrElse("rank_ftel", "0").toString().toInt
+      val numOfQuery = map.getOrElse("number_of_record", "0").toString().toInt
+      val malware = map.getOrElse("malware", "").toString()
+      val day = map.getOrElse("day", "").toString()
+      BaicInfo(day, numOfQuery, numOfClient, label, malware, rankFtel, rankAlexa)
+    }
+    val whois = getWhoisInfo(db, domain)
+    
+    //println("==============")
+    val history = secondResponse.hits.hits.map(searchHit2BasicInfo)
     val current = secondResponse.hits.hits.head
-
-    val jsonObjectCurrent = gson.fromJson(current.sourceAsString, classOf[JsonObject])
-    jsonObjectCurrent.addProperty("num_of_domain", SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
-    
-    // Convert History to JsonArray
-    secondResponse.hits.hits.map(x => {
-      //val jsonObject = new JsonObject();
-      //jsonObject.add(property, value)
-      
-      val json = gson.fromJson(x.sourceAsString, classOf[JsonObject])
-      //json.toString()
-      ja.add(json)
-    })
-
-    
-//    registrar: String,
-//    whoisServer: String,
-//    referral: String,
-//    nameServer: Array[String],
-//    status: String,
-//    update: String,
-//    create: String,
-//    expire: String,
-    
-    // Add whois Info
-    jsonObjectCurrent.addProperty("registrar", whoisInfo.registrar)
-    jsonObjectCurrent.addProperty("whoisServer", whoisInfo.whoisServer)
-    jsonObjectCurrent.addProperty("referral", whoisInfo.referral)
-    jsonObjectCurrent.addProperty("nameServer", whoisInfo.nameServer.mkString(" "))
-    jsonObjectCurrent.addProperty("status", whoisInfo.status)
-    jsonObjectCurrent.addProperty("create", whoisInfo.create)
-    jsonObjectCurrent.addProperty("update", whoisInfo.update)
-    jsonObjectCurrent.addProperty("expire", whoisInfo.expire)
-    
-    
-    jo.add("current", jsonObjectCurrent)
-    jo.add("history", ja)
+    val basicInfo = searchHit2BasicInfo(current)
     val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
-    jo.addProperty("answer", answers.mkString(" "))
-
-    jo
+    Response(whois, basicInfo, answers, history, SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
+    //null
+//    Response(whois,)
+//    
+//    println(whoisInfo)
+//    val jo = new JsonObject()
+//    val ja = new JsonArray()
+//    val gson = new Gson()
+//    val current = secondResponse.hits.hits.head
+//
+//    val jsonObjectCurrent = gson.fromJson(current.sourceAsString, classOf[JsonObject])
+//    jsonObjectCurrent.addProperty("num_of_domain", SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
+//    
+//    // Convert History to JsonArray
+//    secondResponse.hits.hits.map(x => {
+//      //val jsonObject = new JsonObject();
+//      //jsonObject.add(property, value)
+//      
+//      val json = gson.fromJson(x.sourceAsString, classOf[JsonObject])
+//      //json.toString()
+//      ja.add(json)
+//    })
+//
+//    
+////    registrar: String,
+////    whoisServer: String,
+////    referral: String,
+////    nameServer: Array[String],
+////    status: String,
+////    update: String,
+////    create: String,
+////    expire: String,
+//    
+//    // Add whois Info
+//    jsonObjectCurrent.addProperty("registrar", whoisInfo.registrar)
+//    jsonObjectCurrent.addProperty("whoisServer", whoisInfo.whoisServer)
+//    jsonObjectCurrent.addProperty("referral", whoisInfo.referral)
+//    jsonObjectCurrent.addProperty("nameServer", whoisInfo.nameServer.mkString(" "))
+//    jsonObjectCurrent.addProperty("status", whoisInfo.status)
+//    jsonObjectCurrent.addProperty("create", whoisInfo.create)
+//    jsonObjectCurrent.addProperty("update", whoisInfo.update)
+//    jsonObjectCurrent.addProperty("expire", whoisInfo.expire)
+//    
+//    
+//    jo.add("current", jsonObjectCurrent)
+//    jo.add("history", ja)
+//    val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
+//    jo.addProperty("answer", answers.mkString(" "))
+//
+//    jo
     
     /*
      *     
@@ -119,7 +159,7 @@ object DomainService {
   
   
 
-  private def getWhoisInfo(db: Database, domain: String): WhoisObject = {
+  def getWhoisInfo(db: Database, domain: String): WhoisObject = {
     val domains = TableQuery[DomainTable]
     val domainServerName = TableQuery[DomainServerNameTable]
     val label = TableQuery[LabelTable]
@@ -140,16 +180,21 @@ object DomainService {
     val result = Await.result(db.run(q.result), Duration.Inf)
     val servers = result.map(x => x._5).toArray
     val head = result.head
-    val whois = WhoisObject(head._1, head._2, head._3, head._4, servers, head._6, head._8.toString(), head._7.toString(), head._9.toString(), head._10, head._11)
+    val whois = WhoisObject(head._1, head._2, head._3, head._4, servers, head._6, head._8.toString().split(" ")(0), head._7.toString().split(" ")(0), head._9.toString(), head._10, head._11)
     whois
-    
   }
 
+  def formatNumber(number: Int): String = {
+    val formatter = java.text.NumberFormat.getIntegerInstance
+    formatter.format(number)
+  }
   def main(args: Array[String]) {
-    val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
-    val whoisInfo = getWhoisInfo(db, "google.com")
+    //DomainService.getDomainInfo("google.com")
+    //val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
+    //val whoisInfo = getWhoisInfo(db, "google.com")
     
-    println(whoisInfo)
+    //println(whoisInfo)
+    HttpUtil.download("https://logo.clearbit.com/" + "google.com", "public/images/" + "google.com" + ".png", "172.30.45.220", 80)
   }
 }
 
