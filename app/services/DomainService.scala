@@ -80,7 +80,7 @@ object DomainService {
       val basicInfo = searchHit2BasicInfo(current)
       val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
       Response(whois, basicInfo, answers, history, SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
-    } else Response(new WhoisObject(), null, null, null, 0)
+    } else null
   }
   
   

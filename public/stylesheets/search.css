@@ -21,8 +21,8 @@ body{
 #searchForm{
 	/* The search form. */
 	background-color:#4C5A65;
-	padding:50px 50px 30px;
-	margin:80px 0;
+	padding:20px 50px 20px;
+	margin:40px 0;
 	position:relative;
 
 	-moz-border-radius:16px;
