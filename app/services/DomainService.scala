@@ -1,56 +1,33 @@
 package services
 
-import com.sksamuel.elastic4s.ElasticsearchClientUri
-import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.http.search.MultiSearchResponse
-import com.typesafe.config.ConfigFactory
-import org.elasticsearch.search.sort.SortOrder
-import utils.SearchReponseUtil
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.google.gson.JsonElement
-import com.google.gson.Gson
-import model.DomainTable
-import slick.lifted.TableQuery
-import com.ftel.bigdata.db.slick.PostgresSlick
-
-// DB
-//slick.driver.PostgresDriver
-//import slick.jdbc.PostgresProfile.api._
-//import slick.driver.PostgresDriver
-import slick.driver.PostgresDriver.api._
-//import slick.driver.PostgresDriver.api.columnExtensionMethods
-//import slick.driver.PostgresDriver.api.intColumnType
-//import slick.driver.PostgresDriver.api.queryInsertActionExtensionMethods
-//import slick.driver.PostgresDriver.api.streamableQueryActionExtensionMethods
-//import slick.driver.PostgresDriver.api.stringColumnType
-import slick.lifted.Query
-import slick.lifted.TableQuery
-import com.typesafe.config.Config
-import slick.basic.DatabaseConfig
-import play.api.db.slick.DatabaseConfigProvider
-import play.api.db.slick.HasDatabaseConfig
-import slick.jdbc.JdbcProfile
-import slick.jdbc.PostgresProfile
-import javax.inject.Inject
-import play.db.NamedDatabase
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import model.MalwareTable
-import model.LabelTable
-import model.ServerNameTable
-import model.DomainServerNameTable
-import model.RegistrarTable
-import model.StatusTable
-import model.WhoisObject
-import services.Connection._
-import model.Response
-//import model.HistoryInfo
-import model.BaicInfo
-import com.sksamuel.elastic4s.http.search.SearchHit
+
+import org.elasticsearch.search.sort.SortOrder
+
 import com.ftel.bigdata.utils.HttpUtil
+import com.sksamuel.elastic4s.ElasticsearchClientUri
+import com.sksamuel.elastic4s.http.ElasticDsl._
+import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.search.SearchHit
+import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
+
+import slick.driver.PostgresDriver.api._
+import slick.lifted.Query
+import slick.lifted.TableQuery
+import utils.SearchReponseUtil
+import com.ftel.bigdata.dns.model.table.MalwareTable
+import com.ftel.bigdata.dns.model.table.WhoisObject
+import com.ftel.bigdata.dns.model.table.LabelTable
+import com.ftel.bigdata.dns.model.table.ServerNameTable
+import com.ftel.bigdata.dns.model.table.DomainTable
+import com.ftel.bigdata.dns.model.table.DomainServerNameTable
+import com.ftel.bigdata.dns.model.table.RegistrarTable
+import com.ftel.bigdata.dns.model.table.StatusTable
+import model.BaicInfo
+import model.Response
 
 
 object DomainService {
@@ -61,100 +38,49 @@ object DomainService {
   val ES_INDEX = "dns-service-domain-"
   val ES_INDEX_ALL = ES_INDEX + "*"
   
-  val SIZE_DAY = 7
+  val SIZE_DAY = 30
 
   val client = HttpClient(ElasticsearchClientUri(ES_HOST, ES_PORT))
-  val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
+  //val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
   
   def close() = client.close()
-  
+
   def getDomainInfo(domain: String): Response = {
     val multiSearchResponse = client.execute(
-      multi( 
-        search(ES_INDEX_ALL / "second") query {must(termQuery("second", domain))} sortBy {fieldSort("day") order SortOrder.DESC} limit SIZE_DAY,
-        search(ES_INDEX_ALL / "answer") query {must(termQuery("second", domain))} limit 1000,
-        search(ES_INDEX_ALL / "domain") query {must(termQuery("second", domain))}  aggregations (
-          cardinalityAgg("num_of_domain", "domain")
-        )
-    )).await
+      multi(
+        search(ES_INDEX_ALL / "second") query { must(termQuery("second", domain)) } sortBy { fieldSort("day") order SortOrder.DESC } limit SIZE_DAY,
+        search(ES_INDEX_ALL / "answer") query { must(termQuery("second", domain)) } limit 1000,
+        search(ES_INDEX_ALL / "domain") query { must(termQuery("second", domain)) } aggregations (
+          cardinalityAgg("num_of_domain", "domain")),
+        search((ES_INDEX + "whois") / "whois") query { must(termQuery("domain", domain)) })).await
     val secondResponse = multiSearchResponse.responses(0)
     val answerResponse = multiSearchResponse.responses(1)
     val domainResponse = multiSearchResponse.responses(2)
-    
-    def searchHit2BasicInfo = (x: SearchHit) => {
-      val map = x.sourceAsMap
-      val label = map.getOrElse("label", "").toString()
-      val numOfClient = map.getOrElse("number_of_ip", "0").toString().toInt
-      val second = map.getOrElse("second", "").toString()
-      val rankAlexa = map.getOrElse("rank_alexa", "0").toString().toInt
-      val rankFtel = map.getOrElse("rank_ftel", "0").toString().toInt
-      val numOfQuery = map.getOrElse("number_of_record", "0").toString().toInt
-      val malware = map.getOrElse("malware", "").toString()
-      val day = map.getOrElse("day", "").toString()
-      BaicInfo(day, numOfQuery, numOfClient, label, malware, rankFtel, rankAlexa)
-    }
-    val whois = getWhoisInfo(db, domain)
-    
-    //println("==============")
-    val history = secondResponse.hits.hits.map(searchHit2BasicInfo)
-    val current = secondResponse.hits.hits.head
-    val basicInfo = searchHit2BasicInfo(current)
-    val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
-    Response(whois, basicInfo, answers, history, SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
-    //null
-//    Response(whois,)
-//    
-//    println(whoisInfo)
-//    val jo = new JsonObject()
-//    val ja = new JsonArray()
-//    val gson = new Gson()
-//    val current = secondResponse.hits.hits.head
-//
-//    val jsonObjectCurrent = gson.fromJson(current.sourceAsString, classOf[JsonObject])
-//    jsonObjectCurrent.addProperty("num_of_domain", SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
-//    
-//    // Convert History to JsonArray
-//    secondResponse.hits.hits.map(x => {
-//      //val jsonObject = new JsonObject();
-//      //jsonObject.add(property, value)
-//      
-//      val json = gson.fromJson(x.sourceAsString, classOf[JsonObject])
-//      //json.toString()
-//      ja.add(json)
-//    })
-//
-//    
-////    registrar: String,
-////    whoisServer: String,
-////    referral: String,
-////    nameServer: Array[String],
-////    status: String,
-////    update: String,
-////    create: String,
-////    expire: String,
-//    
-//    // Add whois Info
-//    jsonObjectCurrent.addProperty("registrar", whoisInfo.registrar)
-//    jsonObjectCurrent.addProperty("whoisServer", whoisInfo.whoisServer)
-//    jsonObjectCurrent.addProperty("referral", whoisInfo.referral)
-//    jsonObjectCurrent.addProperty("nameServer", whoisInfo.nameServer.mkString(" "))
-//    jsonObjectCurrent.addProperty("status", whoisInfo.status)
-//    jsonObjectCurrent.addProperty("create", whoisInfo.create)
-//    jsonObjectCurrent.addProperty("update", whoisInfo.update)
-//    jsonObjectCurrent.addProperty("expire", whoisInfo.expire)
-//    
-//    
-//    jo.add("current", jsonObjectCurrent)
-//    jo.add("history", ja)
-//    val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
-//    jo.addProperty("answer", answers.mkString(" "))
-//
-//    jo
-    
-    /*
-     *     
+    val whoisResponse = multiSearchResponse.responses(3)
+    if (secondResponse.totalHits > 0) {
+      def searchHit2BasicInfo = (x: SearchHit) => {
+        val map = x.sourceAsMap
+        val label = map.getOrElse("label", "").toString()
+        val numOfClient = map.getOrElse("number_of_ip", "0").toString().toInt
+        val second = map.getOrElse("second", "").toString()
+        val rankAlexa = map.getOrElse("rank_alexa", "0").toString().toInt
+        val rankFtel = map.getOrElse("rank_ftel", "0").toString().toInt
+        val numOfQuery = map.getOrElse("number_of_record", "0").toString().toInt
+        val malware = map.getOrElse("malware", "").toString()
+        val day = map.getOrElse("day", "").toString()
+        BaicInfo(day, numOfQuery, numOfClient, label, malware, rankFtel, rankAlexa)
+      }
 
-     */
+      //val whois = getWhoisInfo(db, domain)
+      val whois = getWhoisInfo(whoisResponse)
+
+      //println("==============")
+      val history = secondResponse.hits.hits.map(searchHit2BasicInfo)
+      val current = secondResponse.hits.hits.head
+      val basicInfo = searchHit2BasicInfo(current)
+      val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
+      Response(whois, basicInfo, answers, history, SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
+    } else Response(new WhoisObject(), null, null, null, 0)
   }
   
   
@@ -184,6 +110,25 @@ object DomainService {
     whois
   }
 
+  def getWhoisInfo(whoisResponse: SearchResponse): WhoisObject = {
+    if (whoisResponse.totalHits > 0) {
+    val map = whoisResponse.hits.hits.head.sourceAsMap
+    val whois = WhoisObject(
+        map.getOrElse("domain", "").toString(),
+        map.getOrElse("registrar", "").toString(),
+        map.getOrElse("whoisServer", "").toString(),
+        map.getOrElse("referral", "").toString(),
+        map.getOrElse("servername", "").toString().split(" "),
+        map.getOrElse("status", "").toString(),
+        map.getOrElse("update", "").toString(),
+        map.getOrElse("create", "").toString(),
+        map.getOrElse("expire", "").toString(),
+        map.getOrElse("label", "").toString(),
+        map.getOrElse("malware", "").toString())
+    whois 
+    } else new WhoisObject()
+  }
+  
   def formatNumber(number: Int): String = {
     val formatter = java.text.NumberFormat.getIntegerInstance
     formatter.format(number)

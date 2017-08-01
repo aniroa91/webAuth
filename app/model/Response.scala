@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonArray
 import com.google.gson.Gson
 import services.DomainService
+//import com.ftel.bigdata.dns.model.table.WhoisObject
 
 case class BaicInfo(day: String, numOfQuery: Int, numOfClient: Int, /*numOfDomain: String,*/ label: String, malware: String, rankFtel: Int, rankAlexa: Int) {
   def getNumOfQuery(): String = {
@@ -14,8 +15,8 @@ case class BaicInfo(day: String, numOfQuery: Int, numOfClient: Int, /*numOfDomai
     }
 }
 //case class HistoryInfo(day: String, baicInfos: Array[String])
-case class Response(whois: WhoisObject, basicInfo: BaicInfo, answers: Array[String], history: Array[BaicInfo], numOfDomain: Int) {
-  def toJsonObject: JsonObject = {
+case class Response(whois: com.ftel.bigdata.dns.model.table.WhoisObject, basicInfo: BaicInfo, answers: Array[String], history: Array[BaicInfo], numOfDomain: Int) {
+  def toJsonObject: JsonObject = if (basicInfo != null) {
     val jo = new JsonObject()
     val ja = new JsonArray()
     val gson = new Gson()
@@ -32,19 +33,7 @@ case class Response(whois: WhoisObject, basicInfo: BaicInfo, answers: Array[Stri
       json.addProperty("rankAlexa", x.rankAlexa)
       ja.add(json)
     })
-    
-  
-//
-//    
-////    registrar: String,
-////    whoisServer: String,
-////    referral: String,
-////    nameServer: Array[String],
-////    status: String,
-////    update: String,
-////    create: String,
-////    expire: String,
-//    
+
     // Add whois Info
     jsonObjectCurrent.addProperty("registrar", whois.registrar)
     jsonObjectCurrent.addProperty("whoisServer", whois.whoisServer)
@@ -55,16 +44,12 @@ case class Response(whois: WhoisObject, basicInfo: BaicInfo, answers: Array[Stri
     jsonObjectCurrent.addProperty("update", whois.update)
     jsonObjectCurrent.addProperty("expire", whois.expire)
     jsonObjectCurrent.addProperty("numOfDomain", numOfDomain)
-    
-//    
-//    
+
     jo.add("current", jsonObjectCurrent)
     jo.add("history", ja)
-//    val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
     jo.addProperty("answer", answers.mkString(" "))
-//
     jo
-  }
+  } else new JsonObject()
   
   def getNumOfDomain(): String = {
       DomainService.formatNumber(numOfDomain)

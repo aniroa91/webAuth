@@ -17,7 +17,7 @@
 <body>
     <!--
 	<div id="page">
-		<form id="searchForm" method="post" action="/search/google.com">
+		<form id="searchForm" method="post">
 			<fieldset>
 				<input id="s" type="text" />
 				<input type="submit" value="Submit" id="submitButton" />
@@ -27,89 +27,11 @@
 				</div>
 			</fieldset>
 		</form>
-    -->
 	</div>
-
+    -->
 	<div id="resultsDiv">
-		<div id="container">
-			<div id="content" data-easytabs="true">
-				<div id="profile" style="display: block;">
-					<div class="about">
-						<div class="profile-photo">
-							<img src=@logo width="154"
-								height="154">
-							<h2>@domain</h2>
-							>
-							<!--<h1>@domain</h1>-->
-						</div>
-						<!-- <h3>
-						<i>Web Search</i>
-					</h3>
-					<p>An American multinational technology company that specializes in Internet-related services and products.
-					 These include online advertising technologies, search, cloud computing, software, and hardware</p> -->
-					</div>
-					<ul class="basic-info">
-						<li><h3>Whois Info</h3></li>
-						<li><label>Registrar</label><span>@response.whois.registrar</span></li>
-						<li><label>Whois Server</label><span>@response.whois.whoisServer</span></li>
-						<li><label>Server Name</label><span>@response.whois.nameServer.mkString("")</span></li>
-						<li><label>Date Create</label><span>@response.whois.create</span></li>
-						<li><label>Date Update</label><span>@response.whois.update</span></li>
-						<li><label>Date Expire</label><span>@response.whois.expire</span></li>
-					</ul>
-					<ul class="basic-info">
-						<li><h3>Basic Info</h3></li>
-						<li><label>Num Query</label><span>@response.basicInfo.getNumOfQuery()</span></li>
-						<li><label>Num Client</label><span>@response.basicInfo.getNumOfClient()</span></li>
-						<li><label>Num Domain</label><span>@response.getNumOfDomain()</span></li>
-						<li><label>Label</label><span>@response.basicInfo.label</span></li>
-						<li><label>Malware</label><span>@response.basicInfo.malware</span></li>
-						<li><label>Rank Ftel</label><span>@response.basicInfo.rankFtel</span></li>
-						<li><label>Rank Alexa</label><span>@response.basicInfo.rankAlexa</span></li>
-					</ul>
-				</div>
-
-
-			</div>
-		</div>
-
-		<table class="container-table">
-			<thead>
-				<tr>
-					<th><h1>Day</h1></th>
-					<th><h1>Num Of Query</h1></th>
-					<th><h1>Num Of Client</h1></th>
-					<th><h1>Rank FTel</h1></th>
-					<th><h1>Rank Alexa</h1></th>
-					<th><h1>Label</h1></th>
-					<th><h1>Malware</h1></th>
-				</tr>
-			</thead>
-			<tbody>
-				@for(baicInfo <- response.history) {
-				<tr>
-					<td>@baicInfo.day</td>
-					<td>@baicInfo.getNumOfQuery()</td>
-					<td>@baicInfo.getNumOfClient()</td>
-					<td>@baicInfo.rankFtel</td>
-					<td>@baicInfo.rankAlexa</td>
-					<td>@baicInfo.label</td>
-					<td>@baicInfo.malware</td>
-				</tr>
-				}
-			</tbody>
-		</table>
-
-		<div id="container">
-			<div id="content" data-easytabs="true">
-				<div id="profile" style="display: block;">
-					<div id="resume" style="display: none;">
-						<h3 class="main-heading">List Answer</h3>
-						<div class="answer">@response.answers.mkString(" ")</div>
-					</div>
-				</div>
-			</div>
-		</div>
+	    @searchresult(domain, response, logo)
+	</div>
 		<!-- It would be great if you leave the link back to the tutorial. Thanks! -->
 		<!-- <p class="credit">
 		<a
@@ -118,6 +40,6 @@
 	</p> -->
 
 		<script src="../assets/javascripts/jquery.min.js"></script>
-		<script src="../assets/javascripts/search.js"></script>
+		<!--<script src="../assets/javascripts/search.js"></script>-->
 </body>
 </html>

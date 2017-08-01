@@ -47,7 +47,9 @@ $(document).ready(function(){
 	$('#s').focus();
 
 	$('#searchForm').submit(function(){
-		googleSearch();
+		val domain = $('#s').val()
+		//alert(domain);
+		window.location.href="http://localhost:9000/search/google.com";
 		return false;
 	});
 	
