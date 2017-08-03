@@ -1,0 +1,54 @@
+
+@(title: String, headers: Array[String], rows: Array[Array[Any]], page: Int)
+<h1>
+  <!--<span class="blue"></span>Top Main Domain By<span class="blue"></span>-->
+  <span class="yellow">@title</pan>
+</h1>
+<!--<h2>Created with love by <a href="http://pablogarciafernandez.com" target="_blank">Pablo García Fernández</a></h2>-->
+
+
+<table class="container-table">
+  <thead>
+    <tr>
+      @for(header <- headers) {
+        <th><h1>@header</h1></th>
+      }
+	</tr>
+  </thead>
+  <tbody>
+	<!-- for(row <- rows.slice(page * 10, 10)) -->
+	@for(row <- rows) {
+	<tr>
+      @for(c <- row) {
+        <td>@c</td>
+      }
+	</tr>
+	}
+	</tbody>
+</table>
+
+<!--
+<div class="paginate paginate-dark wrapper">
+    <ul>
+        <li><a href="">&lang;</a></li>
+        if(page < 6) {
+        	@for(index <- 1 until 7) {
+        		@if(page+1 == index) {
+        			<li><a href="" class="active">@{index}</a></li>
+        		} else {
+        			<li><a href="">@{index}</a></li>
+        		}
+          	}
+        } else {
+        	<li><a href="">{page-1}</a></li>
+          	<li><a href="">{page}</a></li>
+            <li><a href="" class="active">{page + 1}</a></li>
+            <li><a href="">{page + 2}</a></li>
+            <li><a href="">{page + 3}</a></li>
+            <li><a href="">{page + 4}</a></li>
+        }
+       
+        <li><a href="">&rang;</a></li>
+    </ul>
+</div>
+-->

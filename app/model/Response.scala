@@ -4,18 +4,26 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonArray
 import com.google.gson.Gson
 import services.DomainService
+import com.ftel.bigdata.dns.parameters.Label
+
 //import com.ftel.bigdata.dns.model.table.WhoisObject
 
-case class BaicInfo(day: String, numOfQuery: Int, numOfClient: Int, /*numOfDomain: String,*/ label: String, malware: String, rankFtel: Int, rankAlexa: Int) {
+case class BasicInfo(day: String, numOfQuery: Int, numOfClient: Int, /*numOfDomain: String,*/ label: String, malware: String, rankFtel: Int, rankAlexa: Int) {
   def getNumOfQuery(): String = {
       DomainService.formatNumber(numOfQuery)
     }
   def getNumOfClient(): String = {
       DomainService.formatNumber(numOfClient)
     }
+  def getQueryPerClient(): String = {
+      DomainService.formatNumber(numOfQuery / numOfClient)
+    }
+  def this(day: String, numOfQuery: Int, numOfClient: Int, malware: String, rankFtel: Int, rankAlexa: Int) = 
+    this(day, numOfQuery, numOfClient, Label.getLabelFrom(malware), malware, rankFtel, rankAlexa)
 }
+
 //case class HistoryInfo(day: String, baicInfos: Array[String])
-case class Response(whois: com.ftel.bigdata.dns.model.table.WhoisObject, basicInfo: BaicInfo, answers: Array[String], history: Array[BaicInfo], numOfDomain: Int) {
+case class Response(whois: com.ftel.bigdata.dns.model.table.WhoisObject, basicInfo: BasicInfo, answers: Array[String], history: Array[BasicInfo], numOfDomain: Int) {
   def toJsonObject: JsonObject = if (basicInfo != null) {
     val jo = new JsonObject()
     val ja = new JsonArray()

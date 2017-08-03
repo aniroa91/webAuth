@@ -52,6 +52,11 @@ h2 a {
 	  font-size: 1em;
   text-align: left;
   color: #185875;
+  /*
+  -ms-transform: rotate(45deg); /* IE 9 *
+  -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera *
+  transform: rotate(-20deg);
+  */
 }
 
 .container-table td {

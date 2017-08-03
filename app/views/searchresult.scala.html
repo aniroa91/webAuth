@@ -4,7 +4,7 @@
 		<div id="container">
 			<div id="content" data-easytabs="true">
 				<div id="profile" style="display: block;">
-					<div class="about">
+					<div class="logo">
 						<div class="profile-photo">
 							<img src=@logo width="154"
 								height="154">
@@ -56,15 +56,15 @@
 				</tr>
 			</thead>
 			<tbody>
-				@for(baicInfo <- response.history) {
+				@for(basicInfo <- response.history) {
 				<tr>
-					<td>@baicInfo.day</td>
-					<td>@baicInfo.getNumOfQuery()</td>
-					<td>@baicInfo.getNumOfClient()</td>
-					<td>@baicInfo.rankFtel</td>
-					<td>@baicInfo.rankAlexa</td>
-					<td>@baicInfo.label</td>
-					<td>@baicInfo.malware</td>
+					<td>@basicInfo.day</td>
+					<td>@basicInfo.getNumOfQuery()</td>
+					<td>@basicInfo.getNumOfClient()</td>
+					<td>@basicInfo.rankFtel</td>
+					<td>@basicInfo.rankAlexa</td>
+					<td>@basicInfo.label</td>
+					<td>@basicInfo.malware</td>
 				</tr>
 				}
 			</tbody>

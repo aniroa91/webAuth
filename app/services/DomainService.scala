@@ -26,8 +26,10 @@ import com.ftel.bigdata.dns.model.table.DomainTable
 import com.ftel.bigdata.dns.model.table.DomainServerNameTable
 import com.ftel.bigdata.dns.model.table.RegistrarTable
 import com.ftel.bigdata.dns.model.table.StatusTable
-import model.BaicInfo
+import model.BasicInfo
 import model.Response
+import com.ftel.bigdata.dns.parameters.Label
+import com.ftel.bigdata.utils.FileUtil
 
 
 object DomainService {
@@ -39,6 +41,7 @@ object DomainService {
   val ES_INDEX_ALL = ES_INDEX + "*"
   
   val SIZE_DAY = 30
+  private val MAX_SIZE_RETURN = 100
 
   val client = HttpClient(ElasticsearchClientUri(ES_HOST, ES_PORT))
   //val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
@@ -60,7 +63,6 @@ object DomainService {
     if (secondResponse.totalHits > 0) {
       def searchHit2BasicInfo = (x: SearchHit) => {
         val map = x.sourceAsMap
-        val label = map.getOrElse("label", "").toString()
         val numOfClient = map.getOrElse("number_of_ip", "0").toString().toInt
         val second = map.getOrElse("second", "").toString()
         val rankAlexa = map.getOrElse("rank_alexa", "0").toString().toInt
@@ -68,7 +70,7 @@ object DomainService {
         val numOfQuery = map.getOrElse("number_of_record", "0").toString().toInt
         val malware = map.getOrElse("malware", "").toString()
         val day = map.getOrElse("day", "").toString()
-        BaicInfo(day, numOfQuery, numOfClient, label, malware, rankFtel, rankAlexa)
+        new BasicInfo(day, numOfQuery, numOfClient, malware, rankFtel, rankAlexa)
       }
 
       //val whois = getWhoisInfo(db, domain)
@@ -128,18 +130,153 @@ object DomainService {
     whois 
     } else new WhoisObject()
   }
-  
+
   def formatNumber(number: Int): String = {
     val formatter = java.text.NumberFormat.getIntegerInstance
     formatter.format(number)
   }
+
+  def getTopRank(from: Int, day: String): Array[(String, BasicInfo)] = {
+    val response = client.execute(
+        search(ES_INDEX_ALL / "second") query {
+          boolQuery().must(rangeQuery("rank_ftel").gt(from-1).lt(MAX_SIZE_RETURN),termQuery("day", day))
+          } sortBy { fieldSort("rank_ftel") 
+        } limit MAX_SIZE_RETURN
+    ).await
+    convert(response)
+  }
+
+//  def getTopRank(from: Int, to: Int, day: String, label: String): Array[(String, BasicInfo)] = {
+//    val malware = if (label == Label.White) Label.None else if (label == Label.Unknow) "null" else null
+//    val response = if (malware == null) {
+//      client.execute(
+//        search(ES_INDEX_ALL / "second") query {
+//          must(
+//            rangeQuery("rank_ftel").gt(from - 1).lt(to + 1),
+//            termQuery("day", day)
+//            )
+//          not(
+//              termQuery("malware", "none"),
+//              termQuery("malware", "null")
+//          )
+//        } sortBy {
+//          fieldSort("rank_ftel")
+//        } limit (to - from + 1)).await
+//    } else {
+//      client.execute(
+//        search(ES_INDEX_ALL / "second") query {
+//          must(
+//            rangeQuery("rank_ftel").gt(from - 1).lt(to + 1),
+//            termQuery("day", day),
+//            termQuery("malware", malware))
+//        } sortBy {
+//          fieldSort("rank_ftel")
+//        } limit MAX_SIZE_RETURN).await
+//    }
+//    
+//    response.hits.hits.map(x => {
+//      val map = x.sourceAsMap
+//      val day: String = map.getOrElse("day", "").toString()
+//      val numOfQuery: Int = map.getOrElse("number_of_record", "0").toString().toInt
+//      val numOfClient: Int = map.getOrElse("number_of_ip", "0").toString().toInt
+//      val malware: String = map.getOrElse("malware", "null").toString()
+//      val label: String = Label.getLabelFrom(malware)
+//      val rankFtel: Int = map.getOrElse("rank_ftel", "0").toString().toInt
+//      val rankAlexa: Int = map.getOrElse("rank_alexa", "0").toString().toInt
+//      val domain = map.getOrElse("second", "").toString()
+//      domain -> new BasicInfo(day, numOfQuery, numOfClient, malware, rankFtel, rankAlexa)
+//    })
+//  }
+
+  def getTopByNumOfQuery(day: String, label: String): Array[(String, BasicInfo)] = {
+    val malware = if (label == Label.White) Label.None else if (label == Label.Unknow) "null" else ???
+    val response = client.execute (
+        search(ES_INDEX_ALL / "second") query {
+          boolQuery().must(termQuery("day", day), termQuery("malware", malware))
+        }  sortBy {
+          fieldSort("number_of_record") order(SortOrder.DESC)
+        } limit MAX_SIZE_RETURN).await
+    convert(response)
+  }
+  
+  def getTopBlackByNumOfQuery(day: String): Array[(String, BasicInfo)] = {
+    val response = client.execute (
+        search(ES_INDEX_ALL / "second") query {
+          boolQuery()
+            .must(termQuery("day", day))
+            .not(termQuery("malware", "none"),termQuery("malware", "null"))
+        }  sortBy {
+          fieldSort("number_of_record") order(SortOrder.DESC)
+        } limit MAX_SIZE_RETURN).await
+    convert(response)
+  }
+  
+  private def convert(response: SearchResponse): Array[(String, BasicInfo)] = {
+    response.hits.hits.map(x => {
+      val map = x.sourceAsMap
+      val day: String = map.getOrElse("day", "").toString()
+      val numOfQuery: Int = map.getOrElse("number_of_record", "0").toString().toInt
+      val numOfClient: Int = map.getOrElse("number_of_ip", "0").toString().toInt
+      val malware: String = map.getOrElse("malware", "null").toString()
+      val label: String = Label.getLabelFrom(malware)
+      val rankFtel: Int = map.getOrElse("rank_ftel", "0").toString().toInt
+      val rankAlexa: Int = map.getOrElse("rank_alexa", "0").toString().toInt
+      val domain = map.getOrElse("second", "").toString()
+      domain -> new BasicInfo(day, numOfQuery, numOfClient, malware, rankFtel, rankAlexa)
+    })
+  }
+
+  def getLatestDay(): String = {
+    val response = client.execute(
+        search(ES_INDEX_ALL / "second") sortBy { fieldSort("day") order SortOrder.DESC } limit 1
+    ).await
+    response.hits.hits.head.sourceAsMap.getOrElse("day", "").toString()
+  }
+  
+  private val URL_DOMAIN_DEFAULT = "../assets/images/logo/domain.png"
+  val STORAGE_PATH = ConfigFactory.load().getString("storage") + "/"
+  private val LOGO_URL = "https://logo.clearbit.com/"
+  def getLogoPath(secondDomain: String): String = {
+    val logoUrl = LOGO_URL + secondDomain
+    val path = STORAGE_PATH + secondDomain + ".png"
+    val logo = "../extassets/" + secondDomain + ".png"
+    if (!FileUtil.isExist(path)) {
+      println("Don't exist " + path)
+      HttpUtil.download(logoUrl, path, "172.30.45.220", 80)
+    }
+    if (FileUtil.isExist(path)) {
+      logo
+    } else URL_DOMAIN_DEFAULT
+  }
+  
+  def getImgTag(domain: String): String = {
+    val logo = getLogoPath(domain)
+    "<a href=\"/search?domain=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
+  }
+  
+  def getLinkTag(domain: String): String = {
+    "<a href=\"/search?domain=" + domain + "\">" + domain + "</a>"
+  }
+//  def toArray(pair: (String, BasicInfo)): Array[String] = {
+//    val info = pair._2
+//    Array(info.rankFtel, pair._1, 
+//  }
+  
   def main(args: Array[String]) {
     //DomainService.getDomainInfo("google.com")
     //val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
     //val whoisInfo = getWhoisInfo(db, "google.com")
     
     //println(whoisInfo)
-    HttpUtil.download("https://logo.clearbit.com/" + "google.com", "public/images/" + "google.com" + ".png", "172.30.45.220", 80)
+    //HttpUtil.download("https://logo.clearbit.com/" + "google.com", "public/images/" + "google.com" + ".png", "172.30.45.220", 80)
+    
+//    getTopDomain()
+    val latest = getLatestDay()
+    //println(latest)
+    //getTopRank(1, 1000, latest)
+//    getTopBlackByNumOfQuery(latest).foreach(x => println(x._1 -> x._2.day))
+    getTopByNumOfQuery(latest, Label.White).take(100).foreach(println)
+    close()
   }
 }
 

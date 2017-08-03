@@ -12,10 +12,14 @@
 <link rel="stylesheet" type="text/css" href="../assets/stylesheets/info/css.css">
 <link rel="stylesheet" type="text/css" href="../assets/stylesheets/search.css" />
 <link rel="stylesheet" type="text/css" href="../assets/stylesheets/table/style.css" />
+<link rel="stylesheet" type="text/css" href="../assets/stylesheets/menu/styles.css" />
 
 </head>
 
 <body>
+    @menu()
+    @formSearch(form, domain, response)
+    <!--
     <div id="page">
 		@helper.form(action = routes.DnsController.search, 'id -> "searchForm") {
 			<fieldset>
@@ -23,16 +27,17 @@
 				<input type="submit" value="Submit" id="submitButton" />
 				@if(response == null && domain != null) {
 				<div id="searchInContainer">
-					<!--
+					
 					<input type="radio" name="check" value="site" id="searchSite" checked /> <label for="searchSite" id="siteNameLabel">Search</label>
 					<input type="radio" name="check" value="web" id="searchWeb" /> <label for="searchWeb">Search The Web</label>
-					-->
+					
 					<span> <font color="red">Not Found: @domain</font> </span>
 				</div>
 				}
 			</fieldset>
 		}
 	</div>
+	-->
 	<div id="resultsDiv">
 	    @searchresult(domain, response, logo)
 	</div>

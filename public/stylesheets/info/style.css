@@ -119,24 +119,25 @@ h1 {
 	overflow: hidden;
 }
 
-.about {
+
+.logo {
 	width: 200px;
 	float: left;
 	margin: 30px 0 0 20px;
 }
 
-.about .profile-photo {
+.logo .profile-photo {
 	float: left;
 	padding: 24px 15px 0 20px;
 }
 
-.about h1 {
+.logo h1 {
 	margin: 31px 0 0 0;
 	color: #ffef6a;
 	font-weight: bold;
 	line-height: 30px;
 }
-.about h2 {
+.logo h2 {
 	font-size: 18px;
 	color: #fff;
 	margin-top: 11px;
@@ -144,7 +145,7 @@ h1 {
 	line-height: 18px;
 }
 
-.about h3 {
+.logo h3 {
 	font-size: 16px;
 	color: #fff;
 	margin-top: 11px;
@@ -152,7 +153,7 @@ h1 {
 	line-height: 18px;
 }
 
-.about p {
+.logo p {
 	font-size: 13px;
 	color: #fff;
 	margin: 15px 0 0 0;
