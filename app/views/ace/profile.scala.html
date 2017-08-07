@@ -1,0 +1,345 @@
+@(form: Form[SearchData], domain: String, response: model.Response, logo: String)(implicit messages: Messages)
+
+<!--
+@@(form: Form[SearchData], domain: String, response: model.Response, logo: String)(implicit messages: Messages)
+-->
+
+@top("..", "Profile")
+
+<div class="page-header">
+	<h1>
+		Domain Detail Page
+		<small>
+			<i class="ace-icon fa fa-angle-double-right"></i>
+		</small>
+	</h1>
+</div><!-- /.page-header -->
+
+<div class="row">
+	<div class="col-xs-4"></div>
+	<div class="col-xs-4">
+	    <!--
+		<div class="input-group">
+			<input type="text" class="form-control" name="keywords" placeholder="Look within results" />
+			<div class="input-group-btn">
+				<button type="button" class="btn btn-default no-border btn-sm">
+					<i class="ace-icon fa fa-search icon-on-right bigger-110"></i>
+				</button>
+			</div>
+		</div>
+		-->
+		@domainSearch(form, domain, response)
+	</div>
+	<div class="col-xs-4"></div>
+
+	<div class="clearfix"></div>
+	<div class="hr hr12 dotted"></div>
+		
+</div>
+
+@if(response != null) {
+<div class="row">
+
+	<div class="col-xs-12">
+		<!-- PAGE CONTENT BEGINS 
+		<div class="clearfix">
+			<div class="pull-left alert alert-success no-margin alert-dismissable">
+				<button type="button" class="close" data-dismiss="alert">
+					<i class="ace-icon fa fa-times"></i>
+				</button>
+
+				<i class="ace-icon fa fa-umbrella bigger-120 blue"></i>
+				Click on the image below or on profile fields to edit them ...
+			</div>
+
+			<div class="pull-right">
+				<span class="green middle bolder">Choose profile: &nbsp;</span>
+
+				<div class="btn-toolbar inline middle no-margin">
+					<div data-toggle="buttons" class="btn-group no-margin">
+						<label class="btn btn-sm btn-yellow active">
+							<span class="bigger-110">1</span>
+
+							<input type="radio" value="1" />
+						</label>
+
+						<label class="btn btn-sm btn-yellow">
+							<span class="bigger-110">2</span>
+
+							<input type="radio" value="2" />
+						</label>
+
+						<label class="btn btn-sm btn-yellow">
+							<span class="bigger-110">3</span>
+
+							<input type="radio" value="3" />
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="hr dotted"></div>
+		-->
+
+		
+
+		<div>
+			<div id="user-profile-1" class="user-profile row">
+				<div class="col-xs-12 col-sm-3 center">
+					<div>
+						<span class="profile-picture">
+						<img id="avatar" class="editable img-responsive" alt="Alex's Avatar" src="@logo" />
+						</span>
+
+						<div class="space-4"></div>
+
+						<div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
+							<div class="inline position-relative">
+								<a href="#" class="user-title-label dropdown-toggle" data-toggle="dropdown">
+									<i class="ace-icon fa fa-circle light-green"></i>
+									&nbsp;
+									<span class="white">@domain</span>
+								</a>
+								<!--
+								<ul class="align-left dropdown-menu dropdown-caret dropdown-lighter">
+									<li class="dropdown-header"> Change Status </li>
+
+									<li>
+										<a href="#">
+											<i class="ace-icon fa fa-circle green"></i>&nbsp;
+											<span class="green">Available</span>
+										</a>
+									</li>
+
+									<li>
+										<a href="#">
+											<i class="ace-icon fa fa-circle red"></i>&nbsp;
+											<span class="red">Busy</span>
+										</a>
+									</li>
+
+									<li>
+										<a href="#">
+											<i class="ace-icon fa fa-circle grey"></i>&nbsp;
+											<span class="grey">Invisible</span>
+										</a>
+									</li>
+								</ul>
+								-->
+							</div>
+						</div>
+					</div>
+
+					<div class="space-6"></div>
+					<!--
+					<div class="profile-contact-info">
+						<div class="profile-contact-links align-left">
+							<a href="#" class="btn btn-link">
+								<i class="ace-icon fa fa-plus-circle bigger-120 green"></i>
+								Add as a friend
+							</a>
+
+							<a href="#" class="btn btn-link">
+								<i class="ace-icon fa fa-envelope bigger-120 pink"></i>
+								Send a message
+							</a>
+
+							<a href="#" class="btn btn-link">
+								<i class="ace-icon fa fa-globe bigger-125 blue"></i>
+								www.alexdoe.com
+							</a>
+						</div>
+
+						<div class="space-6"></div>
+
+						<div class="profile-social-links align-center">
+							<a href="#" class="tooltip-info" title="" data-original-title="Visit my Facebook">
+								<i class="middle ace-icon fa fa-facebook-square fa-2x blue"></i>
+							</a>
+
+							<a href="#" class="tooltip-info" title="" data-original-title="Visit my Twitter">
+								<i class="middle ace-icon fa fa-twitter-square fa-2x light-blue"></i>
+							</a>
+
+							<a href="#" class="tooltip-error" title="" data-original-title="Visit my Pinterest">
+								<i class="middle ace-icon fa fa-pinterest-square fa-2x red"></i>
+							</a>
+						</div>
+					</div>
+					-->
+					<div class="hr hr12 dotted"></div>
+
+					<div class="clearfix">
+						<div class="grid2">
+							<span class="bigger-175 blue">@response.basicInfo.getNumOfQuery()</span>
+
+							<br />
+							Queries
+						</div>
+
+						<div class="grid2">
+							<span class="bigger-175 blue">@response.basicInfo.getNumOfClient()</span>
+
+							<br />
+							Client
+						</div>
+						<!--
+						<div class="grid2">
+							<span class="bigger-175 blue">@response.basicInfo.getQueryPerClient()</span>
+
+							<br />
+							Queries Per Client
+						</div>
+						-->
+					</div>
+
+					<div class="hr hr16 dotted"></div>
+				</div>
+
+				<div class="col-xs-12 col-sm-9">
+					<div class="center">
+						<span class="btn btn-app btn-sm btn-light no-hover">
+							<span class="line-height-1 bigger-80 blue"> @response.basicInfo.rankFtel </span>
+
+							<br />
+							<span class="line-height-1 smaller-100"> FTel </span>
+						</span>
+
+						<span class="btn btn-app btn-sm btn-yellow no-hover">
+							<span class="line-height-1 bigger-80"> @response.basicInfo.rankAlexa </span>
+
+							<br />
+							<span class="line-height-1 smaller-100"> Alexa </span>
+						</span>
+						<!--
+						<span class="btn btn-app btn-sm btn-pink no-hover">
+							<span class="line-height-1 bigger-170"> @@response.basicInfo.getNumOfDomain() </span>
+
+							<br />
+							<span class="line-height-1 smaller-90"> Domains </span>
+						</span>
+						
+						<span class="btn btn-app btn-sm btn-grey no-hover">
+							<span class="line-height-1 bigger-80"> @response.basicInfo.getQueryPerClient() </span>
+
+							<br />
+							<span class="line-height-1 smaller-100"> Average </span>
+						</span>
+						-->
+						<span class="btn btn-app btn-sm btn-success no-hover">
+							<span class="line-height-1 bigger-80"> @response.basicInfo.label </span>
+
+							<br />
+							<span class="line-height-1 smaller-100"> Label </span>
+						</span>
+
+						<span class="btn btn-app btn-sm btn-primary no-hover">
+							<span class="line-height-1 bigger-80"> @response.basicInfo.malware </span>
+
+							<br />
+							<span class="line-height-1 smaller-100"> Malware </span>
+						</span>
+					</div>
+
+					<div class="space-12"></div>
+
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Registrar </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="username">@response.whois.registrar</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Whois Server </div>
+
+							<div class="profile-info-value">
+								<!--<i class="fa fa-map-marker light-orange bigger-110"></i>-->
+								<span class="editable" id="country">@response.whois.whoisServer</span>
+								<!--<span class="editable" id="city">Amsterdam</span>-->
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Name Server </div>
+
+							<div class="profile-info-value">
+								@for(nameserver <- response.whois.nameServer) {
+									<span class="editable">@nameserver</span>
+								}
+								
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Create </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="signup">@response.whois.create</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Update </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="login">@response.whois.update</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Expire </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="about">@response.whois.expire</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="space-20"></div>
+
+					<div class="widget-box transparent">
+						<div class="widget-header widget-header-small">
+							<h4 class="widget-title blue smaller">
+								<i class="ace-icon fa fa-rss orange"></i>
+								Recent Activities
+							</h4>
+
+							<div class="widget-toolbar action-buttons">
+								<a href="#" data-action="reload">
+									<i class="ace-icon fa fa-refresh blue"></i>
+								</a>
+&nbsp;
+								<a href="#" class="pink">
+									<i class="ace-icon fa fa-trash-o"></i>
+								</a>
+							</div>
+						</div>
+						@detailTable(response.history)
+					</div>
+
+					<div class="hr hr2 hr-double"></div>
+
+					<div class="space-6"></div>
+					<!--
+					<div class="center">
+						<button type="button" class="btn btn-sm btn-primary btn-white btn-round">
+							<i class="ace-icon fa fa-rss bigger-150 middle orange2"></i>
+							<span class="bigger-110">View more activities</span>
+
+							<i class="icon-on-right ace-icon fa fa-arrow-right"></i>
+						</button>
+					</div>
+					-->
+				</div>
+			</div>
+		</div>
+		
+
+		<!-- PAGE CONTENT ENDS -->
+	</div><!-- /.col -->
+</div><!-- /.row -->
+}
+@bottom("..")

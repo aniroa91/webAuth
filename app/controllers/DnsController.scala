@@ -35,6 +35,10 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     )(SearchData.apply)(SearchData.unapply)
   )
 
+  def index = Action {
+    Ok(views.html.ace.index())
+  }
+  
   def getDomainDetail(domain: String) = Action {
     val secondDomain = DomainUtil.getSecondTopLevel(domain)
     val response = DomainService.getDomainInfo(secondDomain)
@@ -55,6 +59,22 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
+  def profilePage = Action { implicit request: Request[AnyContent] =>
+    
+    println("ABC")
+    
+    val formValidationResult = form.bindFromRequest
+    println(formValidationResult.hasErrors)
+    if (!formValidationResult.hasErrors) {
+      val domain = formValidationResult.get.domain
+      println(domain)
+      val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
+      val response = DomainService.getDomainInfo(secondDomain)
+      Ok(views.html.ace.profile(form, secondDomain.toUpperCase(), response, DomainService.getLogoPath(secondDomain)))
+    } else {
+      Ok(views.html.ace.profile(form, null, null, null))
+    }
+  }
   
   def getImage(file: String) = Action {
     val source = scala.io.Source.fromFile(DomainService.STORAGE_PATH + file)(scala.io.Codec.ISO8859)
