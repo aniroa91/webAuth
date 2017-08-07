@@ -21,11 +21,11 @@
     @formSearch(form, domain, response)
     <!--
     <div id="page">
-		@helper.form(action = routes.DnsController.search, 'id -> "searchForm") {
+		@@helper.form(action = routes.DnsController.search, 'id -> "searchForm") {
 			<fieldset>
-				@helper.inputText(form("domain"), 'id -> "s")
+				@@helper.inputText(form("domain"), 'id -> "s")
 				<input type="submit" value="Submit" id="submitButton" />
-				@if(response == null && domain != null) {
+				@@if(response == null && domain != null) {
 				<div id="searchInContainer">
 					
 					<input type="radio" name="check" value="site" id="searchSite" checked /> <label for="searchSite" id="siteNameLabel">Search</label>

@@ -6,9 +6,12 @@
 			<div class="footer">
 				<div class="footer-inner">
 					<div class="footer-content">
+					<!--
 						<span class="bigger-120">
+							
 							<span class="blue bolder">Ace</span>
 							Application &copy; 2013-2014
+
 						</span>
 
 						&nbsp; &nbsp;
@@ -25,6 +28,7 @@
 								<i class="ace-icon fa fa-rss-square orange bigger-150"></i>
 							</a>
 						</span>
+						-->
 					</div>
 				</div>
 			</div>
@@ -99,8 +103,84 @@
 					}
 			    } );
 			
-				
-				
+				$('#dynamic-table-all')
+				//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+				.DataTable( {
+					bAutoWidth: false,
+					"aoColumns": [
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false }
+					],
+					"aaSorting": [],
+					select: {
+						style: 'multi'
+					}
+			    } );
+				$('#dynamic-table-white')
+				//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+				.DataTable( {
+					bAutoWidth: false,
+					"aoColumns": [
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false }
+					],
+					"aaSorting": [],
+					select: {
+						style: 'multi'
+					}
+			    } );
+
+				$('#dynamic-table-black')
+				//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+				.DataTable( {
+					bAutoWidth: false,
+					"aoColumns": [
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false }
+					],
+					"aaSorting": [],
+					select: {
+						style: 'multi'
+					}
+			    } );
+			    $('#dynamic-table-unknow')
+				//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+				.DataTable( {
+					bAutoWidth: false,
+					"aoColumns": [
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false },
+					  { "bSortable": false }
+					],
+					"aaSorting": [],
+					select: {
+						style: 'multi'
+					}
+			    } );
+
 				$.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons btn-overlap btn-group btn-overlap';
 				
 				new $.fn.dataTable.Buttons( myTable, {

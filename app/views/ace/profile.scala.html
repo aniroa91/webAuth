@@ -4,14 +4,16 @@
 @@(form: Form[SearchData], domain: String, response: model.Response, logo: String)(implicit messages: Messages)
 -->
 
-@top("..", "Profile")
+@top("..", "Detail", 1)
 
 <div class="page-header">
 	<h1>
 		Domain Detail Page
+		<!--
 		<small>
 			<i class="ace-icon fa fa-angle-double-right"></i>
 		</small>
+		-->
 	</h1>
 </div><!-- /.page-header -->
 
@@ -341,5 +343,11 @@
 		<!-- PAGE CONTENT ENDS -->
 	</div><!-- /.col -->
 </div><!-- /.row -->
+} else {
+	<div class="row">
+		<div class="col-xs-12">
+			<p>We looked everywhere but we couldn't find result for <font color="red">@domain</font></p>
+		</div>
+	</div>
 }
 @bottom("..")

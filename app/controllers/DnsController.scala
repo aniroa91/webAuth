@@ -20,6 +20,7 @@ import com.typesafe.config.ConfigFactory
 import play.api.data._
 import play.api.i18n._
 import play.api.mvc._
+import com.ftel.bigdata.dns.parameters.Label
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -67,13 +68,22 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     println(formValidationResult.hasErrors)
     if (!formValidationResult.hasErrors) {
       val domain = formValidationResult.get.domain
-      println(domain)
+      //println(domain)
       val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
       val response = DomainService.getDomainInfo(secondDomain)
       Ok(views.html.ace.profile(form, secondDomain.toUpperCase(), response, DomainService.getLogoPath(secondDomain)))
     } else {
       Ok(views.html.ace.profile(form, null, null, null))
     }
+  }
+  
+  def rankPage = Action { implicit request: Request[AnyContent] =>
+      val latestDay = DomainService.getLatestDay()
+      val all = DomainService.getTopRank(1, latestDay)
+      val white = DomainService.getTopByNumOfQuery(latestDay, Label.White)
+      val black = DomainService.getTopBlackByNumOfQuery(latestDay)
+      val unknow = DomainService.getTopByNumOfQuery(latestDay, Label.Unknow)
+      Ok(views.html.ace.rank(all, white, black, unknow))
   }
   
   def getImage(file: String) = Action {

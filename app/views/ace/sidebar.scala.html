@@ -1,4 +1,6 @@
+@(id: Int)
 <div id="sidebar" class="sidebar                  responsive                    ace-save-state">
+				<!--
 				<script type="text/javascript">
 					try{ace.settings.loadState('sidebar')}catch(e){}
 				</script>
@@ -31,16 +33,35 @@
 
 						<span class="btn btn-danger"></span>
 					</div>
-				</div><!-- /.sidebar-shortcuts -->
+				</div>-->
+				<!-- /.sidebar-shortcuts -->
 
 				<ul class="nav nav-list">
-					<li class="">
-						<a href="ace/profile">
-							<i class="menu-icon fa fa-caret-right"></i>
-									Profile
+					<!--
+					<li @@if(id==0) {class="active"} >
+						<a href="/">
+							<i class="menu-icon fa fa-tachometer"></i>
+							<span class="menu-text"> Dashboard </span>
+						</a>
+
+						<b class="arrow"></b>
+					</li>
+					-->
+					<li @if(id==1) {class="active"}>
+						<a href="/search">
+							<i class="menu-icon fa fa-search"></i>
+									Search
 								</a>
 							<b class="arrow"></b>
 					</li>
+					<li @if(id==2) {class="active"}>
+						<a href="/rank">
+							<i class="menu-icon fa fa-star-o" ></i>
+									Rank
+								</a>
+							<b class="arrow"></b>
+					</li>
+					
 					<!--
 					<li class="active">
 						<a href="index.html">

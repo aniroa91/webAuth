@@ -3,7 +3,7 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
+#GET     /                           controllers.HomeController.index
 # An example controller showing how to use dependency injection
 GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
@@ -18,7 +18,7 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 # Domain Service
 GET     /domain/detail/:domain      controllers.DnsController.getDomainDetail(domain: String)
 #GET     /search2/:domain            controllers.DnsController.index(domain)
-GET     /search                     controllers.DnsController.search
+#GET     /search                     controllers.DnsController.search
 
 GET     /extassets/*file            controllers.DnsController.getImage(file: String)
 #GET     /formview                       controllers.DnsController.formview
@@ -26,6 +26,7 @@ GET     /extassets/*file            controllers.DnsController.getImage(file: Str
 GET     /malware                     controllers.MalwareController.index
 
 #######################################################################
-GET     /ace                         controllers.DnsController.index
-GET     /ace/profile                 controllers.DnsController.profilePage
+GET     /                         controllers.DnsController.rankPage
+GET     /search                   controllers.DnsController.profilePage
+GET     /rank                     controllers.DnsController.rankPage
 #GET     /ace/tables                 controllers.ACEController.tables

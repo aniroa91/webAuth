@@ -115,6 +115,7 @@ object DomainService {
   def getWhoisInfo(whoisResponse: SearchResponse): WhoisObject = {
     if (whoisResponse.totalHits > 0) {
     val map = whoisResponse.hits.hits.head.sourceAsMap
+    println(map)
     val whois = WhoisObject(
         map.getOrElse("domain", "").toString(),
         map.getOrElse("registrar", "").toString(),
