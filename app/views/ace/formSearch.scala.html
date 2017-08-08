@@ -1,6 +1,6 @@
-@(form: Form[SearchData], domain: String, response: model.Response)(implicit messages: Messages)
+@(form: Form[SearchData], route: Call)(implicit messages: Messages)
 
-@helper.form(action = routes.DnsController.profilePage, 'class -> "input-group") {
+@helper.form(action = route, 'class -> "input-group") {
 	<!--
 		@@helper.inputText(form("domain"), 'class -> "form-control") will tranform to
 		{
@@ -12,9 +12,9 @@
 			</dl>
 		}
 	-->
-	<dl class=" " id="domain_field">
+	<dl class=" " id="value_field">
     	<dd>
-    		<input type="text" id="domain" name="domain" value="" class="form-control"/>
+    		<input type="text" id="value" name="value" value="" class="form-control"/>
 		</dd>
 	</dl>
 

@@ -26,7 +26,7 @@ GET     /extassets/*file            controllers.DnsController.getImage(file: Str
 GET     /malware                     controllers.MalwareController.index
 
 #######################################################################
-GET     /                         controllers.DnsController.rankPage
+GET     /                         controllers.DnsController.index
 GET     /search                   controllers.DnsController.profilePage
 GET     /rank                     controllers.DnsController.rankPage
 #GET     /ace/tables                 controllers.ACEController.tables

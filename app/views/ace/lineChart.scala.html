@@ -1,0 +1,127 @@
+@(rows: Array[model.DailyResponse])
+@import play.api.libs.json.Json
+
+<script type="text/javascript">
+$(function () {
+
+    var categories = @Html(Json.stringify(Json.toJson(rows.map(x => x.day))));
+    var queries = @Html(Json.stringify(Json.toJson(rows.map(x => x.queries))));
+    var domains = @Html(Json.stringify(Json.toJson(rows.map(x => x.domains))));
+    var clients = @Html(Json.stringify(Json.toJson(rows.map(x => x.clients))));
+
+    Highcharts.chart('overview-line-chart', {
+        chart: {
+            type: 'line',
+            zoomType: 'xy'
+        },
+        title: {
+            text: 'Daily Query'
+        },
+        subtitle: {
+            text: 'Source: DNS LOG FTEL'
+        },
+        plotOptions: {
+        line: {
+            dataLabels: {
+                enabled: true
+            },
+                enableMouseTracking: false
+            }
+        },
+        xAxis: [{
+            categories: categories,
+            crosshair: true
+        }],
+        yAxis: [{ // Primary yAxis
+            labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[2]
+                }
+            },
+            title: {
+                text: 'Clients',
+                style: {
+                    color: Highcharts.getOptions().colors[2]
+                }
+            },
+            opposite: true
+
+        }, { // Secondary yAxis
+            gridLineWidth: 0,
+            title: {
+                text: 'Queries',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            }
+
+        }, { // Tertiary yAxis
+            gridLineWidth: 0,
+            title: {
+                text: 'Domains',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            },
+            labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            },
+            opposite: true
+        }],
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'left',
+            x: 80,
+            verticalAlign: 'top',
+            y: 55,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+        },
+        series: [{
+            name: 'Queries',
+            type: 'spline',
+            yAxis: 1,
+            data: queries,
+            tooltip: {
+                valueSuffix: ' '
+            }
+
+        }, {
+            name: 'Domains',
+            type: 'spline',
+            yAxis: 2,
+            data: domains,
+            marker: {
+                enabled: false
+            },
+            dashStyle: 'shortdot',
+            tooltip: {
+                valueSuffix: ' '
+            }
+
+        }, {
+            name: 'Clients',
+            type: 'spline',
+            data: clients,
+            tooltip: {
+                valueSuffix: ' '
+            }
+        }]
+    });
+
+
+});
+</script>

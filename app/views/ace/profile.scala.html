@@ -30,7 +30,7 @@
 			</div>
 		</div>
 		-->
-		@domainSearch(form, domain, response)
+		@formSearch(form, routes.DnsController.profilePage)
 	</div>
 	<div class="col-xs-4"></div>
 
@@ -98,7 +98,18 @@
 						<div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
 							<div class="inline position-relative">
 								<a href="#" class="user-title-label dropdown-toggle" data-toggle="dropdown">
-									<i class="ace-icon fa fa-circle light-green"></i>
+									@{
+										if (response.basicInfo.label == "white") {
+											<i class="ace-icon fa fa-circle light-green"></i>
+										} else if (response.basicInfo.label == "black") {
+											<i class="ace-icon fa fa-circle light-red"></i>
+										} else {
+											<i class="ace-icon fa fa-circle light-grey"></i>
+										}
+										
+									}
+									
+
 									&nbsp;
 									<span class="white">@domain</span>
 								</a>
@@ -350,4 +361,5 @@
 		</div>
 	</div>
 }
-@bottom("..")
+
+@bottom("..", "profile")

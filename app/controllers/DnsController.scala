@@ -21,6 +21,8 @@ import play.api.data._
 import play.api.i18n._
 import play.api.mvc._
 import com.ftel.bigdata.dns.parameters.Label
+import com.ftel.bigdata.utils.DateTimeUtil
+import scala.util.Try
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -32,12 +34,23 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
 
   val form = Form(
     mapping(
-      "domain" -> text
+      "value" -> text
     )(SearchData.apply)(SearchData.unapply)
   )
 
-  def index = Action {
-    Ok(views.html.ace.index())
+  def index = Action { implicit request: Request[AnyContent] =>
+    val formValidationResult = form.bindFromRequest
+    if (!formValidationResult.hasErrors) {
+      val day = formValidationResult.get.value.trim()
+      val isValid = Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
+      val response = if (isValid) DomainService.getStatsByDay(day) else DomainService.getStatsByDay(DomainService.getLatestDay())
+      Ok(views.html.ace.index(form, response))
+    } else {
+      val latestDay = DomainService.getLatestDay()
+      val response = DomainService.getStatsByDay(latestDay)
+      Ok(views.html.ace.index(form, response))
+    }
+
   }
   
   def getDomainDetail(domain: String) = Action {
@@ -48,26 +61,24 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     } else Ok("{}")
   }
 
-  def search = Action { implicit request: Request[AnyContent] =>
-    val formValidationResult = form.bindFromRequest
-    if (!formValidationResult.hasErrors) {
-      val domain = formValidationResult.get.domain
-      val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
-      val response = DomainService.getDomainInfo(secondDomain)
-      Ok(views.html.search(form, secondDomain.toUpperCase(), response, DomainService.getLogoPath(secondDomain)))
-    } else {
-      Ok(views.html.search(form, null, null, null))
-    }
-  }
+//  def search = Action { implicit request: Request[AnyContent] =>
+//    val formValidationResult = form.bindFromRequest
+//    if (!formValidationResult.hasErrors) {
+//      val domain = formValidationResult.get.domain
+//      val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
+//      val response = DomainService.getDomainInfo(secondDomain)
+//      Ok(views.html.search(form, secondDomain.toUpperCase(), response, DomainService.getLogoPath(secondDomain)))
+//    } else {
+//      Ok(views.html.search(form, null, null, null))
+//    }
+//  }
 
   def profilePage = Action { implicit request: Request[AnyContent] =>
-    
-    println("ABC")
-    
     val formValidationResult = form.bindFromRequest
     println(formValidationResult.hasErrors)
+    println(formValidationResult.errors)
     if (!formValidationResult.hasErrors) {
-      val domain = formValidationResult.get.domain
+      val domain = formValidationResult.get.value
       //println(domain)
       val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
       val response = DomainService.getDomainInfo(secondDomain)
@@ -94,4 +105,4 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   }
 }
 
-case class SearchData(domain: String)
+case class SearchData(value: String)

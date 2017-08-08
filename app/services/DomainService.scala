@@ -30,6 +30,12 @@ import model.BasicInfo
 import model.Response
 import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.FileUtil
+import model.StatsResponse
+import model.LabelResponse
+import model.MalwareResponse
+import model.DomainResponse
+import com.ftel.bigdata.utils.DateTimeUtil
+import model.DailyResponse
 
 
 object DomainService {
@@ -135,6 +141,11 @@ object DomainService {
   def formatNumber(number: Int): String = {
     val formatter = java.text.NumberFormat.getIntegerInstance
     formatter.format(number)
+  }
+  
+  def percent(number: Int, prev: Int): Double = {
+    val value = ((number - prev) / (prev * 1.0)) / 100.0
+    BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 
   def getTopRank(from: Int, day: String): Array[(String, BasicInfo)] = {
@@ -252,16 +263,123 @@ object DomainService {
   
   def getImgTag(domain: String): String = {
     val logo = getLogoPath(domain)
-    "<a href=\"/search?domain=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
+    "<a href=\"/search?value=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
   }
   
   def getLinkTag(domain: String): String = {
-    "<a href=\"/search?domain=" + domain + "\">" + domain + "</a>"
+    "<a href=\"/search?value=" + domain + "\">" + domain + "</a>"
   }
-//  def toArray(pair: (String, BasicInfo)): Array[String] = {
-//    val info = pair._2
-//    Array(info.rankFtel, pair._1, 
-//  }
+  //  def toArray(pair: (String, BasicInfo)): Array[String] = {
+  //    val info = pair._2
+  //    Array(info.rankFtel, pair._1, 
+  //  }
+
+  def getStatsByDay(day: String): StatsResponse = {
+    val prev = getPreviousDay(day)
+
+    val multiSearchResponse = client.execute(
+      multi( // label:black AND _type:top
+        search(s"dns-stats-${day}" / "count") query { not(termQuery("label", "total")) },
+        search(s"dns-stats-${day}" / "malware") query { must(termQuery("label", "black")) } sortBy { fieldSort("number_of_record") order SortOrder.DESC } limit 100,
+        search(s"dns-stats-${day}" / "top") query { must(termQuery("label", "black")) } sortBy { fieldSort("number_of_record") order SortOrder.DESC } limit 1000,
+        search(s"dns-stats-${prev}" / "count") query { not(termQuery("label", "total")) },
+        search(s"dns-overview-*" / "overview") sortBy { fieldSort("day") order SortOrder.DESC } limit 30
+
+        //search(ES_INDEX_ALL / "domain") query { must(termQuery("second", domain)) } aggregations (
+        //  cardinalityAgg("num_of_domain", "domain")),
+        //search((ES_INDEX + "whois") / "whois") query { must(termQuery("domain", domain)) }
+        )).await
+    val labelResponse = multiSearchResponse.responses(0)
+    val malwareResponse = multiSearchResponse.responses(1)
+    val domainResponse = multiSearchResponse.responses(2)
+    val labelResponsePrev = multiSearchResponse.responses(3)
+    val dailyResponse = multiSearchResponse.responses(4)
+    
+//    println("=========")
+//    println(labelResponse.hits)
+//    println("=========")
+    if (labelResponse.hits == null) {
+      getStatsByDay(getLatestDay())
+    } else {
+      val arrayLabelResponse = labelResponse.hits.hits.map(x => {
+        val map = x.sourceAsMap
+        val label = map.getOrElse("label", "").toString()
+        val malwares = if (label == Label.Black) map.getOrElse("number_of_malware", "0").toString().toInt else 0
+        LabelResponse(
+          label,
+          map.getOrElse("number_of_record", "0").toString().toInt,
+          map.getOrElse("number_of_domain", "0").toString().toInt,
+          map.getOrElse("number_of_ip", "0").toString().toInt,
+          malwares,
+          map.getOrElse("success", "0").toString().toInt,
+          map.getOrElse("failed", "0").toString().toInt,
+          map.getOrElse("number_of_second_domain", "0").toString().toInt)
+      })
+
+      val arrayMalwareResponse = malwareResponse.hits.hits.map(x => {
+        val map = x.sourceAsMap
+        MalwareResponse(
+          map.getOrElse("malware", "").toString(),
+          map.getOrElse("number_of_record", "0").toString().toInt,
+          map.getOrElse("number_of_domain", "0").toString().toInt,
+          map.getOrElse("number_of_ip", "0").toString().toInt)
+      })
+
+      val arrayDomainResponse = domainResponse.hits.hits.map(x => {
+        val map = x.sourceAsMap
+        //println(map)
+        DomainResponse(
+          map.getOrElse("domain", "").toString(),
+          map.getOrElse("malware", "0").toString(),
+          map.getOrElse("number_of_record", "0").toString().toInt,
+          map.getOrElse("number_of_ip", "0").toString().toInt)
+      })
+
+      val total = getTotalFrom(labelResponse)
+      val totalPrev = getTotalFrom(labelResponsePrev)
+
+      val daily = dailyResponse.hits.hits.reverse.map(x => {
+        val map = x.sourceAsMap
+         DailyResponse(
+          map.getOrElse("day", "").toString(),
+          map.getOrElse("number_of_record", "0").toString().toInt,
+          map.getOrElse("number_of_domain", "0").toString().toInt,
+          map.getOrElse("number_of_ip", "0").toString().toInt)
+      })
+      StatsResponse(day, total, totalPrev, arrayLabelResponse, arrayMalwareResponse, arrayDomainResponse, daily)
+    }
+  }
+  
+  private def getTotalFrom(response: SearchResponse): LabelResponse = {
+    val arrayLabelResponse = response.hits.hits.map(x => {
+      val map = x.sourceAsMap
+      val label = map.getOrElse("label", "").toString()
+      val malwares = if (label == Label.Black) map.getOrElse("number_of_malware", "0").toString().toInt else 0
+      LabelResponse(
+          label,
+          map.getOrElse("number_of_record", "0").toString().toInt,
+          map.getOrElse("number_of_domain", "0").toString().toInt,
+          map.getOrElse("number_of_ip", "0").toString().toInt,
+          malwares,
+          map.getOrElse("success", "0").toString().toInt,
+          map.getOrElse("failed", "0").toString().toInt,
+          map.getOrElse("number_of_second_domain", "0").toString().toInt)
+    })
+    arrayLabelResponse.reduce((x,y) => LabelResponse("total",
+        x.queries + y.queries,
+        x.domains + y.domains,
+        x.clients + y.clients,
+        x.malwares + y.malwares,
+        x.success + y.success,
+        x.failed + y.failed,
+        x.seconds + y.seconds))
+    
+  }
+  
+  def getPreviousDay(day: String): String = {
+    val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
+    prev.minusDays(1).toString(DateTimeUtil.YMD)
+  }
   
   def main(args: Array[String]) {
     //DomainService.getDomainInfo("google.com")
@@ -276,8 +394,14 @@ object DomainService {
     //println(latest)
     //getTopRank(1, 1000, latest)
 //    getTopBlackByNumOfQuery(latest).foreach(x => println(x._1 -> x._2.day))
-    getTopByNumOfQuery(latest, Label.White).take(100).foreach(println)
+//    getTopByNumOfQuery(latest, Label.White).take(100).foreach(println)
+    //getStatsByDay(latest)
+    val prev = getPreviousDay(latest)
+    
+    println(prev)
     close()
   }
+  
+  
 }
 

@@ -53,6 +53,14 @@ case class Response(whois: com.ftel.bigdata.dns.model.table.WhoisObject, basicIn
     jsonObjectCurrent.addProperty("expire", whois.expire)
     jsonObjectCurrent.addProperty("numOfDomain", numOfDomain)
 
+    jsonObjectCurrent.addProperty("day", basicInfo.day)
+    jsonObjectCurrent.addProperty("label", basicInfo.label)
+    jsonObjectCurrent.addProperty("malware", basicInfo.malware)
+    jsonObjectCurrent.addProperty("numOfQuery", basicInfo.numOfQuery)
+    jsonObjectCurrent.addProperty("numOfClient", basicInfo.numOfClient)
+    jsonObjectCurrent.addProperty("rankFtel", basicInfo.rankFtel)
+    jsonObjectCurrent.addProperty("rankAlexa", basicInfo.rankAlexa)
+
     jo.add("current", jsonObjectCurrent)
     jo.add("history", ja)
     jo.addProperty("answer", answers.mkString(" "))
