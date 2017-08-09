@@ -12,8 +12,7 @@ case class StatsResponse (
     totalPrev: LabelResponse,
     labels: Array[LabelResponse],
     malwares: Array[MalwareResponse],
-    domainBlacks: Array[DomainResponse],
-    daily: Array[DailyResponse]) {
+    domainBlacks: Array[DomainResponse]) {
 }
 
 case class DashboardResponse (

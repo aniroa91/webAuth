@@ -56,169 +56,17 @@
 			</strong>
 		</div>
 		<div class="row">
-			<div class="col-sm-1 infobox-container"></div>
-			<div class="col-sm-2 infobox-container">
-				<div class="infobox infobox-orange2">
-					<div class="infobox-data">
-						<span class="infobox-data-number">
-						@{
-							if (response.total.queries > 1000000000) {
-								<font size="3">{formatNumber(response.total.queries)}</font>
-							} else {
-								<font size="4">{formatNumber(response.total.queries)}</font>
-							}
-						}
-						</span>
-						<div class="infobox-content">
-							<font size="4" color="orange">
-							Num Of Query
-							</font>
-						</div>
-					</div>
-					@{
-						val diff = response.total.queries - response.totalPrev.queries
-						val percentVal = percent(response.total.queries, response.totalPrev.queries)
-						if (diff >= 0) {
-							<div class="stat stat-success">{percentVal}%</div>
-						} else {
-							<div class="stat stat-important">{percentVal}%</div>
-							
-						}
-					}
-				</div>
-				<div class="space-6"></div>
-				<div class="infobox infobox-blue">
-					<div class="infobox-data">
-						<span class="infobox-data-number">
-						@{
-							if (response.total.domains > 1000000000) {
-								<font size="3">{formatNumber(response.total.domains)}</font>
-							} else {
-								<font size="4">{formatNumber(response.total.domains)}</font>
-							}
-						}
-						</span>
-						<div class="infobox-content">
-							<font size="4" color="blue">
-							Num Of Domain
-							</font>
-						</div>
-					</div>
-					@{
-						val diff = response.total.queries - response.totalPrev.queries
-						val percentVal = percent(response.total.domains, response.totalPrev.domains)
-						if (diff >= 0) {
-							<div class="stat stat-success">{percentVal}%</div>
-						} else {
-							<div class="stat stat-important">{percentVal}%</div>
-							
-						}
-					}
-				</div>
-				<div class="space-6"></div>
-				<div class="infobox infobox-grey">
-					<div class="infobox-data">
-						@{
-							if (response.total.clients > 1000000000) {
-								<font size="3">{formatNumber(response.total.clients)}</font>
-							} else {
-								<font size="4">{formatNumber(response.total.clients)}</font>
-							}
-						}
-						<div class="infobox-content">
-							<font size="4" color="grey">
-							Num Of Client
-							</font>
-						</div>
-					</div>
-					@{
-						val diff = response.total.queries - response.totalPrev.queries
-						val percentVal = percent(response.total.clients, response.totalPrev.clients)
-						if (diff >= 0) {
-							<div class="stat stat-success">{percentVal}%</div>
-						} else {
-							<div class="stat stat-important">{percentVal}%</div>
-							
-						}
-					}
-				</div>
+			<div class="row">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-2">
+				@total(response.total, response.totalPrev)
 			</div>
-			<div class="col-sm-1 infobox-container"></div>
+			<div class="col-sm-1"></div>
 			<div class="col-sm-7">
-				<div class="widget-box transparent">
-					<div class="widget-header widget-header-flat">
-						<h4 class="widget-title lighter">
-							<i class="ace-icon fa fa-star orange"></i>
-							Classify Labels
-						</h4>
-						<!--
-						<div class="widget-toolbar">
-							<a href="#" data-action="collapse">
-								<i class="ace-icon fa fa-chevron-up"></i>
-							</a>
-						</div>
-						-->
-					</div>
-
-					<div class="widget-body">
-						<div class="widget-main no-padding">
-							<table class="table table-bordered table-striped">
-								<thead class="thin-border-bottom">
-									<tr>
-										<th><i class="ace-icon fa fa-caret-right blue"></i>Label</th>
-										<th><i class="ace-icon fa fa-caret-right blue"></i>Queries</th>
-										<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Domain</th>
-										<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Client</th>
-										<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Malware</th>
-										<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Success</th>
-										<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Failed</th>
-										<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Second Domain</th>
-									</tr>
-								</thead>
-
-								<tbody>
-								    @for(row <- response.labels) {
-									<tr>
-										@{
-											if (row.label == "black") {
-												<td class="hidden-480"><span class="label label-danger arrowed">Black</span></td>
-											} else if (row.label == "white") {
-												<td><span class="label label-success arrowed-in arrowed-in-right">White</span></td>
-											} else {
-												<td><span class="label label-default arrowed">Unknow</span></td>
-											}
-										}
-										
-
-										<td><b class="orange">@services.DomainService.formatNumber(row.queries)</b></td>
-										<td><b class="blue">@services.DomainService.formatNumber(row.domains)</b></td>
-										<td><b class="grey">@services.DomainService.formatNumber(row.clients)</b></td>
-										<td><b>@services.DomainService.formatNumber(row.malwares)</b></td>
-										<td><b>@services.DomainService.formatNumber(row.success)</b></td>
-										<td><b>@services.DomainService.formatNumber(row.failed)</b></td>
-										<td><b>@services.DomainService.formatNumber(row.seconds)</b></td>
-									</tr>
-								    }
-									<tr>
-										
-										<td class="hidden-480">
-											<span class="label label-info"><b>== Total ==</b></span>
-										</td>
-										<td><b class="orange">@services.DomainService.formatNumber(response.total.queries)</b></td>
-										<td><b class="blue">@services.DomainService.formatNumber(response.total.domains)</b></td>
-										<td><b class="grey">@services.DomainService.formatNumber(response.total.clients)</b></td>
-										<td><b>@services.DomainService.formatNumber(response.total.malwares)</b></td>
-										<td><b>@services.DomainService.formatNumber(response.total.success)</b></td>
-										<td><b>@services.DomainService.formatNumber(response.total.failed)</b></td>
-										<td><b>@services.DomainService.formatNumber(response.total.seconds)</b></td>
-									</tr>
-
-								</tbody>
-							</table>
-						</div><!-- /.widget-main -->
-					</div><!-- /.widget-body -->
-				</div>
+				@classify(response.total, response.labels)
 			</div><!-- /.widget-box -->
+			
+		</div><!-- /.col -->
 		</div><!-- /.col -->
 
 		<div class="hr hr32 hr-dotted"></div>

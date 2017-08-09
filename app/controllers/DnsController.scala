@@ -38,32 +38,43 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     )(SearchData.apply)(SearchData.unapply)
   )
 
-  /*
-  def index = Action { implicit request: Request[AnyContent] =>
-    val formValidationResult = form.bindFromRequest
-    if (!formValidationResult.hasErrors) {
-      val day = formValidationResult.get.value.trim()
-      val isValid = Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
-      val response = if (isValid) DomainService.getStatsByDay(day) else DomainService.getStatsByDay(DomainService.getLatestDay())
-      Ok(views.html.ace.index(form, response))
-    } else {
-      val latestDay = DomainService.getLatestDay()
-      val response = DomainService.getStatsByDay(latestDay)
-      Ok(views.html.ace.index(form, response))
-    }
+
+//  def index = Action { implicit request: Request[AnyContent] =>
+//    val formValidationResult = form.bindFromRequest
+//    if (!formValidationResult.hasErrors) {
+//      val day = formValidationResult.get.value.trim()
+//      val isValid = Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
+//      val response = if (isValid) DomainService.getStatsByDay(day) else DomainService.getStatsByDay(DomainService.getLatestDay())
+//      Ok(views.html.ace.index(form, response))
+//    } else {
+//      val latestDay = DomainService.getLatestDay()
+//      val response = DomainService.getStatsByDay(latestDay)
+//      Ok(views.html.ace.index(form, response))
+//    }
+//  }
+  
+  def reportPage(day: String) = Action { implicit request: Request[AnyContent] =>
+    val isValid = Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
+    val response = if (isValid) DomainService.getStatsByDay(day) else DomainService.getStatsByDay(DomainService.getLatestDay())
+    Ok(views.html.ace.report(form, response))
   }
-  */
+  
+  def reportBody(day: String) = Action {
+    val isValid = Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
+    val response = if (isValid) DomainService.getStatsByDay(day) else DomainService.getStatsByDay(DomainService.getLatestDay())
+    Ok(views.html.ace.reportBody(response))
+  }
   
   def dashboardPage = Action { implicit request: Request[AnyContent] =>
     val formValidationResult = form.bindFromRequest
     if (!formValidationResult.hasErrors) {
       val day = formValidationResult.get.value.trim()
       val isValid = Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
-      val response = if (isValid) DomainService.getStatsByDay(day) else DomainService.getStatsByDay(DomainService.getLatestDay())
+      val response = if (isValid) DomainService.getDashboard(day) else DomainService.getDashboard(DomainService.getLatestDay())
       Ok(views.html.ace.dashboard(form, response))
     } else {
       val latestDay = DomainService.getLatestDay()
-      val response = DomainService.getStatsByDay(latestDay)
+      val response = DomainService.getDashboard(latestDay)
       Ok(views.html.ace.dashboard(form, response))
     }
 

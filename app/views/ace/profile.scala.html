@@ -435,7 +435,24 @@
 					</div>
 
 					<div class="space-20"></div>
+					<div class="widget-box transparent">
+						<div class="widget-header widget-header-small">
+							<h4 class="widget-title blue smaller">
+								<i class="ace-icon fa fa-line-chart green"></i>
+								Daily Queries
+							</h4>
+							<div class="widget-toolbar">
+								<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+							</div>
+						</div>
+						<div class="widget-body" style="display: block;">
+							<div class="widget-main no-padding">
+								<div id="daily-line-chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+							</div>
+						</div>
+					</div>
 
+					<div class="space-20"></div>
 					<div class="widget-box transparent">
 						<div class="widget-header widget-header-small">
 							<h4 class="widget-title blue smaller">
@@ -485,4 +502,133 @@
 	</div>
 }
 
-@bottom("..", "profile")
+@scripts = {
+	@if(response == null) {
+		<script type="text/javascript"></script>
+	} else {
+		<script type="text/javascript">
+			$(function () {
+
+			    var categories = @Html(Json.stringify(Json.toJson(response.history.map(x => x.day).reverse)));
+			    var queries = @Html(Json.stringify(Json.toJson(response.history.map(x => x.numOfQuery).reverse)));
+			    var qpc = @Html(Json.stringify(Json.toJson(response.history.map(x => x.getQueryPerClientVal()).reverse)));
+			    var clients = @Html(Json.stringify(Json.toJson(response.history.map(x => x.numOfClient).reverse)));
+
+			    Highcharts.chart('daily-line-chart', {
+			        chart: {
+			            type: 'line',
+			            zoomType: 'xy'
+			        },
+			        title: {
+			            text: 'Daily Query'
+			        },
+			        subtitle: {
+			            text: 'Source: DNS LOG FTEL'
+			        },
+			        plotOptions: {
+			        line: {
+			            dataLabels: {
+			                enabled: true
+			            },
+			                enableMouseTracking: false
+			            }
+			        },
+			        xAxis: [{
+			            categories: categories,
+			            crosshair: true
+			        }],
+			        yAxis: [{ // Primary yAxis
+			            labels: {
+			                format: '{value}',
+			                style: {
+			                    color: Highcharts.getOptions().colors[2]
+			                }
+			            },
+			            title: {
+			                text: 'Clients',
+			                style: {
+			                    color: Highcharts.getOptions().colors[2]
+			                }
+			            },
+			            opposite: true
+
+			        }, { // Secondary yAxis
+			            gridLineWidth: 0,
+			            title: {
+			                text: 'Queries',
+			                style: {
+			                    color: Highcharts.getOptions().colors[0]
+			                }
+			            },
+			            labels: {
+			                format: '{value}',
+			                style: {
+			                    color: Highcharts.getOptions().colors[0]
+			                }
+			            }
+
+			        }, { // Tertiary yAxis
+			            gridLineWidth: 0,
+			            title: {
+			                text: 'Queries per Client',
+			                style: {
+			                    color: Highcharts.getOptions().colors[1]
+			                }
+			            },
+			            labels: {
+			                format: '{value}',
+			                style: {
+			                    color: Highcharts.getOptions().colors[1]
+			                }
+			            },
+			            opposite: true
+			        }],
+			        tooltip: {
+			            shared: true
+			        },
+			        legend: {
+			            layout: 'vertical',
+			            align: 'left',
+			            x: 80,
+			            verticalAlign: 'top',
+			            y: 55,
+			            floating: true,
+			            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+			        },
+			        series: [{
+			            name: 'Queries',
+			            type: 'spline',
+			            yAxis: 1,
+			            data: queries,
+			            tooltip: {
+			                valueSuffix: ''
+			            }
+
+			        }, {
+			            name: 'Queries per Client',
+			            type: 'spline',
+			            yAxis: 2,
+			            data: qpc,
+			            marker: {
+			                enabled: false
+			            },
+			            dashStyle: 'shortdot',
+			            tooltip: {
+			                valueSuffix: ''
+			            }
+
+			        }, {
+			            name: 'Clients',
+			            type: 'spline',
+			            data: clients,
+			            tooltip: {
+			                valueSuffix: ''
+			            }
+			        }]
+			    });
+			});
+		</script>
+	}
+}
+
+@bottom("..", "profile", scripts)

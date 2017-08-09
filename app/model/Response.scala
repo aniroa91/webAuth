@@ -18,6 +18,9 @@ case class BasicInfo(day: String, numOfQuery: Int, numOfClient: Int, /*numOfDoma
   def getQueryPerClient(): String = {
       DomainService.formatNumber(numOfQuery / numOfClient)
     }
+  def getQueryPerClientVal(): Int = {
+      numOfQuery / numOfClient
+  }
   def this(day: String, numOfQuery: Int, numOfClient: Int, malware: String, rankFtel: Int, rankAlexa: Int) = 
     this(day, numOfQuery, numOfClient, Label.getLabelFrom(malware), malware, rankFtel, rankAlexa)
 }

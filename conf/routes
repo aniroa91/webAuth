@@ -29,4 +29,6 @@ GET     /malware                     controllers.MalwareController.index
 GET     /                         controllers.DnsController.dashboardPage
 GET     /search                   controllers.DnsController.profilePage
 GET     /rank                     controllers.DnsController.rankPage
+GET     /report              controllers.DnsController.reportPage(day: String ?= "")
+#GET     /report/:day              controllers.DnsController.reportBody(day: String)
 #GET     /ace/tables                 controllers.ACEController.tables
