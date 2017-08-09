@@ -1,12 +1,12 @@
-@(rows: Array[model.MalwareResponse])
+@(title: String, yTitle: String, name: String, rows: Array[(String, Int)])
 @import play.api.libs.json.Json
 
 <script type="text/javascript">
 $(function () {
-    var categories = @Html(Json.stringify(Json.toJson(rows.map(x => x.malware))));
-    var queries = @Html(Json.stringify(Json.toJson(rows.map(x => x.queries))));
-    var domains = @Html(Json.stringify(Json.toJson(rows.map(x => x.domains))));
-    var clients = @Html(Json.stringify(Json.toJson(rows.map(x => x.clients))));
+    var categories = @Html(Json.stringify(Json.toJson(rows.map(x => x._1))));
+    var values = @Html(Json.stringify(Json.toJson(rows.map(x => x._2))));
+    //var domains = @@Html(Json.stringify(Json.toJson(rows.map(x => x.domains))));
+    //var clients = @@Html(Json.stringify(Json.toJson(rows.map(x => x.clients))));
 
     var myChart = Highcharts.chart('bar-chart', {
         chart: {
@@ -14,25 +14,19 @@ $(function () {
             height: '600px'
         },
         title: {
-            text: 'Malicious'
+            text: title
         },
         xAxis: {
             categories: categories
         },
         yAxis: {
             title: {
-                text: 'Queries/Domains/Clients'
+                text: yTitle
             }
         },
         series: [{
-            name: 'Queries',
-            data: queries
-        }, {
-            name: 'Domains',
-            data: domains
-        }, {
-            name: 'Clients',
-            data: clients
+            name: name,
+            data: values
         }]
     });
 });

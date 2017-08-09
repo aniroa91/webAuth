@@ -36,6 +36,10 @@ import model.MalwareResponse
 import model.DomainResponse
 import com.ftel.bigdata.utils.DateTimeUtil
 import model.DailyResponse
+import model.DashboardResponse
+import model.SecondResponse
+import com.ftel.bigdata.utils.WhoisUtil
+import com.ftel.bigdata.dns.utils.WhoisParserUtil
 
 
 object DomainService {
@@ -78,14 +82,16 @@ object DomainService {
         val day = map.getOrElse("day", "").toString()
         new BasicInfo(day, numOfQuery, numOfClient, malware, rankFtel, rankAlexa)
       }
-
-      //val whois = getWhoisInfo(db, domain)
-      val whois = getWhoisInfo(whoisResponse)
-
+      
       //println("==============")
       val history = secondResponse.hits.hits.map(searchHit2BasicInfo)
       val current = secondResponse.hits.hits.head
       val basicInfo = searchHit2BasicInfo(current)
+
+      //val whois = getWhoisInfo(db, domain)
+      val whois = getWhoisInfo(whoisResponse, domain, basicInfo.label, basicInfo.malware)
+      //println(whois)
+
       val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
       Response(whois, basicInfo, answers, history, SearchReponseUtil.getCardinality(domainResponse, "num_of_domain"))
     } else null
@@ -118,11 +124,13 @@ object DomainService {
     whois
   }
 
-  def getWhoisInfo(whoisResponse: SearchResponse): WhoisObject = {
+  def getWhoisInfo(whoisResponse: SearchResponse, domain: String, label: String, malware: String): WhoisObject = {
+    //println(whoisResponse.totalHits)
     if (whoisResponse.totalHits > 0) {
-    val map = whoisResponse.hits.hits.head.sourceAsMap
-    println(map)
-    val whois = WhoisObject(
+      
+      val map = whoisResponse.hits.hits.head.sourceAsMap
+      //println(map)
+      val whois = WhoisObject(
         map.getOrElse("domain", "").toString(),
         map.getOrElse("registrar", "").toString(),
         map.getOrElse("whoisServer", "").toString(),
@@ -134,8 +142,11 @@ object DomainService {
         map.getOrElse("expire", "").toString(),
         map.getOrElse("label", "").toString(),
         map.getOrElse("malware", "").toString())
-    whois 
-    } else new WhoisObject()
+      whois
+    } else {
+      
+      getWhoisFromWeb(domain, label, malware)
+    }
   }
 
   def formatNumber(number: Int): String = {
@@ -156,6 +167,33 @@ object DomainService {
         } limit MAX_SIZE_RETURN
     ).await
     convert(response)
+  }
+
+  def getWhoisFromWeb(domain: String, label: String, malware: String): WhoisObject = {
+    //val url = "http://whois.domaintools.com/" + domain
+    //println()
+    val esIndex = s"dns-service-domain-whois"
+    val esType = "whois"
+    val content = try {
+      WhoisUtil.whoisService(domain, 0, "172.30.45.220", 80)
+    } catch {
+      case e: Exception => {
+        e.printStackTrace()
+        ""
+      }
+    }
+    //println(content)
+    val beginIndex = content.indexOf("<pre>") + 5
+    val endIndex = content.indexOf("</pre>")
+    if (endIndex > beginIndex && beginIndex > 0) {
+      val result = WhoisParserUtil.getWhoisObject(content.substring(beginIndex, endIndex), domain, label, malware)
+//      println(result.isValid())
+      if (result.isValid()) {
+        //println("Index Whois Object to ES: " + result)
+        indexWhois(esIndex, esType, result)
+      }
+      result
+    } else new WhoisObject()
   }
 
 //  def getTopRank(from: Int, to: Int, day: String, label: String): Array[(String, BasicInfo)] = {
@@ -274,7 +312,7 @@ object DomainService {
   //    Array(info.rankFtel, pair._1, 
   //  }
 
-  def getStatsByDay(day: String): StatsResponse = {
+  def getStatsByDay(day: String): DashboardResponse = {
     val prev = getPreviousDay(day)
 
     val multiSearchResponse = client.execute(
@@ -346,7 +384,12 @@ object DomainService {
           map.getOrElse("number_of_domain", "0").toString().toInt,
           map.getOrElse("number_of_ip", "0").toString().toInt)
       })
-      StatsResponse(day, total, totalPrev, arrayLabelResponse, arrayMalwareResponse, arrayDomainResponse, daily)
+      
+      val secondBlack = getTopBlackByNumOfQuery(day)
+      val arraySecondBlackResponse = secondBlack.map(x => SecondResponse(x._1, x._2.label, x._2.malware, x._2.numOfQuery, 0, x._2.numOfClient))
+      val second = getTopRank(1, day)
+      val arraySecondResponse = second.map(x => SecondResponse(x._1, x._2.label, x._2.malware, x._2.numOfQuery, 0, x._2.numOfClient))
+      DashboardResponse(day, total, totalPrev, arrayLabelResponse, arrayMalwareResponse, arraySecondBlackResponse, arraySecondResponse, daily)
     }
   }
   
@@ -381,6 +424,27 @@ object DomainService {
     prev.minusDays(1).toString(DateTimeUtil.YMD)
   }
   
+  
+  def indexWhois(esIndex: String, esType: String, whois: WhoisObject) {
+    // indexInto("bands" / "artists") doc Artist("Coldplay") refresh(RefreshPolicy.IMMEDIATE)
+    // domain:bmwsociety.com servername:ns18.worldnic.com ns17.worldnic.com label:white create:2002-01-11 referral:networksolutions.com registrar:network solutions, llc. expire:2020-01-11 update:2014-11-12 malware:none _id:bmwsociety.com 
+    client.execute(
+      indexInto(esIndex / esType) fields (
+        "domain" -> whois.domainName,
+        "registrar" -> whois.registrar,
+        "whoisServer" -> whois.whoisServer,
+        "referral" -> whois.referral,
+        "servername" -> whois.nameServer.mkString(" "),
+        "status" -> whois.status,
+        "create" -> whois.create.substring(0, 10),
+        "update" -> whois.update.substring(0, 10),
+        "expire" -> (if (whois.expire.isEmpty()) "2999-12-31" else whois.expire.substring(0, 10)),
+        "label" -> whois.label,
+        "malware" -> whois.malware)
+    id whois.domainName).await
+  }
+  
+  
   def main(args: Array[String]) {
     //DomainService.getDomainInfo("google.com")
     //val db = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.default").db
@@ -398,7 +462,8 @@ object DomainService {
     //getStatsByDay(latest)
     val prev = getPreviousDay(latest)
     
-    println(prev)
+//    println(prev)
+    println(getWhoisFromWeb("activum.nu", null, null))
     close()
   }
   

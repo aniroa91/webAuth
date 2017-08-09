@@ -38,6 +38,7 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     )(SearchData.apply)(SearchData.unapply)
   )
 
+  /*
   def index = Action { implicit request: Request[AnyContent] =>
     val formValidationResult = form.bindFromRequest
     if (!formValidationResult.hasErrors) {
@@ -49,6 +50,21 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
       val latestDay = DomainService.getLatestDay()
       val response = DomainService.getStatsByDay(latestDay)
       Ok(views.html.ace.index(form, response))
+    }
+  }
+  */
+  
+  def dashboardPage = Action { implicit request: Request[AnyContent] =>
+    val formValidationResult = form.bindFromRequest
+    if (!formValidationResult.hasErrors) {
+      val day = formValidationResult.get.value.trim()
+      val isValid = Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
+      val response = if (isValid) DomainService.getStatsByDay(day) else DomainService.getStatsByDay(DomainService.getLatestDay())
+      Ok(views.html.ace.dashboard(form, response))
+    } else {
+      val latestDay = DomainService.getLatestDay()
+      val response = DomainService.getStatsByDay(latestDay)
+      Ok(views.html.ace.dashboard(form, response))
     }
 
   }
@@ -75,14 +91,14 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
 
   def profilePage = Action { implicit request: Request[AnyContent] =>
     val formValidationResult = form.bindFromRequest
-    println(formValidationResult.hasErrors)
-    println(formValidationResult.errors)
+    //println(formValidationResult.hasErrors)
+    //println(formValidationResult.errors)
     if (!formValidationResult.hasErrors) {
       val domain = formValidationResult.get.value
       //println(domain)
       val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
       val response = DomainService.getDomainInfo(secondDomain)
-      Ok(views.html.ace.profile(form, secondDomain.toUpperCase(), response, DomainService.getLogoPath(secondDomain)))
+      Ok(views.html.ace.profile(form, secondDomain.toLowerCase(), response, DomainService.getLogoPath(secondDomain)))
     } else {
       Ok(views.html.ace.profile(form, null, null, null))
     }

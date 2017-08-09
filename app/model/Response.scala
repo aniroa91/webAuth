@@ -23,7 +23,12 @@ case class BasicInfo(day: String, numOfQuery: Int, numOfClient: Int, /*numOfDoma
 }
 
 //case class HistoryInfo(day: String, baicInfos: Array[String])
-case class Response(whois: com.ftel.bigdata.dns.model.table.WhoisObject, basicInfo: BasicInfo, answers: Array[String], history: Array[BasicInfo], numOfDomain: Int) {
+case class Response(
+    whois: com.ftel.bigdata.dns.model.table.WhoisObject,
+    basicInfo: BasicInfo,
+    answers: Array[String],
+    history: Array[BasicInfo],
+    numOfDomain: Int) {
   def toJsonObject: JsonObject = if (basicInfo != null) {
     val jo = new JsonObject()
     val ja = new JsonArray()
