@@ -1,42 +1,20 @@
-/*package model
+package model
 
+import com.ftel.bigdata.whois.Whois
 import com.google.gson.JsonObject
 import com.google.gson.JsonArray
 import com.google.gson.Gson
-import services.DomainService
-import com.ftel.bigdata.dns.parameters.Label
-import com.ftel.bigdata.whois.Whois
 
-//import com.ftel.bigdata.dns.model.table.WhoisObject
-
-case class BasicInfo(day: String, numOfQuery: Int, numOfClient: Int, numOfDomain: String, label: String, malware: String, rankFtel: Int, rankAlexa: Int) {
-  def getNumOfQuery(): String = {
-      DomainService.formatNumber(numOfQuery)
-    }
-  def getNumOfClient(): String = {
-      DomainService.formatNumber(numOfClient)
-    }
-  def getQueryPerClient(): String = {
-      DomainService.formatNumber(numOfQuery / numOfClient)
-    }
-  def getQueryPerClientVal(): Int = {
-      numOfQuery / numOfClient
-  }
-  def this(day: String, numOfQuery: Int, numOfClient: Int, malware: String, rankFtel: Int, rankAlexa: Int) = 
-    this(day, numOfQuery, numOfClient, Label.getLabelFrom(malware), malware, rankFtel, rankAlexa)
-}
-
-//case class HistoryInfo(day: String, baicInfos: Array[String])
-case class Response(
+case class ProfileResponse (
     whois: Whois,
-    basicInfo: BasicInfo,
-    answers: Array[String],
-    history: Array[BasicInfo],
-    numOfDomain: Int) {
-  def toJsonObject: JsonObject = if (basicInfo != null) {
+    current: MainDomainInfo,
+    history: Array[MainDomainInfo],
+    answers: Array[String]) extends AbstractResponse {
+  def toJsonObject: JsonObject = ???
+  /*
+  def toJsonObject: JsonObject = if (current != null) {
     val jo = new JsonObject()
     val ja = new JsonArray()
-    val gson = new Gson()
     val jsonObjectCurrent = new JsonObject()
     // Convert History to JsonArray
     history.map(x => {
@@ -75,8 +53,5 @@ case class Response(
     jo.addProperty("answer", answers.mkString(" "))
     jo
   } else new JsonObject()
-  
-  def getNumOfDomain(): String = {
-      DomainService.formatNumber(numOfDomain)
-    }
-}*/
+  */
+}

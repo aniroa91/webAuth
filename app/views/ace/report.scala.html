@@ -1,9 +1,10 @@
-@(form: Form[SearchData], response: model.StatsResponse)(implicit messages: Messages)
-@import services.DomainService.formatNumber
-@import services.DomainService.percent
+@(response: model.ReportResponse)
+@import services.AppGlobal.formatNumber
+@import services.AppGlobal.percent
 
 @top("..", "Dashboard", 3)
 
+@if(response != null) {
 <div class="page-header">
 	<h1>
 		Dashboard
@@ -12,8 +13,18 @@
 			@response.day
 		</small>
 	</h1>
-</div><!-- /.page-header -->
-
+</div><!-- /.page-header -->	
+} else {
+	<div class="page-header">
+	<h1>
+		Dashboard
+		<small>
+			<i class="ace-icon fa fa-angle-double-right"></i>
+			
+		</small>
+	</h1>
+</div><!-- /.page-header -->	
+}
 
 <div class="row">
 	<div class="col-xs-10">
@@ -30,7 +41,7 @@
 	<div class="hr hr12 dotted"></div>
 		
 </div>
-
+@if(response != null) {
 <div class="row">
 	<div class="col-xs-12">
 		<!-- PAGE CONTENT BEGINS -->
@@ -38,11 +49,11 @@
 		<div class="row">
 			<div class="col-sm-1"></div>
 			<div class="col-sm-2">
-				@total(response.total, response.totalPrev)
+				@total(response.current, response.previous)
 			</div>
 			<div class="col-sm-1"></div>
 			<div class="col-sm-7">
-				@classify(response.total, response.labels)
+				@classify(response.current, response.labels)
 			</div><!-- /.widget-box -->
 			
 		</div><!-- /.col -->
@@ -61,9 +72,9 @@
 	    				Array[String]("Name", "Queries", "Domains", "Clients"),
 	      				response.malwares.map(x => Array[Any](
 	        				x.malware,
-	        				services.DomainService.formatNumber(x.queries),
-	        				services.DomainService.formatNumber(x.domains),
-	        				services.DomainService.formatNumber(x.clients))
+	        				formatNumber(x.queries),
+	        				formatNumber(x.domains),
+	        				formatNumber(x.clients))
 	        			).toArray,
 	        			"top-malware-table"
 	    			)
@@ -74,16 +85,16 @@
 					<div class="widget-header widget-header-small">
 						<h4 class="widget-title blue smaller">
 							<i class="ace-icon fa fa-asterisk orange"></i>
-							Top 1000 Domain Black
+							Top 100 Main Domain Black
 						</h4>
 					</div>
 					@topRankTable(
 	    				Array[String]("Domain", "Malware", "Queries", "Clients"),
-	      				response.domainBlacks.map(x => Array[Any](
-	        				x.domain,
+	      				response.blacks.map(x => Array[Any](
+	        				x.name,
 	        				x.malware,
-	        				services.DomainService.formatNumber(x.queries),
-	        				services.DomainService.formatNumber(x.clients))
+	        				formatNumber(x.queries),
+	        				formatNumber(x.clients))
 	        			).toArray,
 	        			"top-1000-domain-black"
 	    			)
@@ -91,32 +102,12 @@
 			</div>
 		</div><!-- /.row -->
 		<div class="hr hr32 hr-dotted"></div>
-		<!--
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="widget-box transparent">
-					<div class="widget-header widget-header-small">
-						<h4 class="widget-title blue smaller">
-							<i class="ace-icon fa fa-line-chart green"></i>
-							Daily Report
-						</h4>
-						<div class="widget-toolbar">
-							<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
-						</div>
-					</div>
-					<div class="widget-body" style="display: block;">
-						<div class="widget-main no-padding">
-							<div id="overview-line-chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><!-- /.row --
-		-->
 	</div><!-- /.col -->
 </div><!-- /.row -->
+}
 
 @scripts = {
+@if(response != null) {
 <script type="text/javascript">
 	$(function () {
 		$('#datetimepicker').datetimepicker({
@@ -130,7 +121,20 @@
 		});
 	});
 </script>
-}
+} else {
+	<script type="text/javascript">
+	$(function () {
+		$('#datetimepicker').datetimepicker({
+    		format: 'YYYY-MM-DD'
+		}).on("dp.change", function(e) {
+			//$('#total').load("/");
+			var day = e.date.format('YYYY-MM-DD')
+			//window.location = "/report?day=" + day;
+			// alert(e.date.format('YYYY-MM-DD'))
+		});
+	});
+</script>
+}}
 
 @bottom("..", "index", scripts)
 

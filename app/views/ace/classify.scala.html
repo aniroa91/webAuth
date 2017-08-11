@@ -1,5 +1,5 @@
-@(total: model.LabelResponse, labels: Array[model.LabelResponse])
-@import services.DomainService.formatNumber
+@(total: model.TotalInfo, labels: Array[(String, model.TotalInfo)])
+@import services.AppGlobal.formatNumber
 
 <div class="widget-box transparent">
 	<div class="widget-header widget-header-flat">
@@ -35,21 +35,22 @@
 				    @for(row <- labels) {
 					<tr>
 						@{
-							if (row.label == "black") {
+							val label = row._1
+							if (label == "black") {
 								<td class="hidden-480"><span class="label label-danger arrowed">Black</span></td>
-							} else if (row.label == "white") {
+							} else if (label == "white") {
 								<td><span class="label label-success arrowed-in arrowed-in-right">White</span></td>
 							} else {
 								<td><span class="label label-default arrowed">Unknow</span></td>
 							}
 						}
-						<td><b class="orange">@formatNumber(row.queries)</b></td>
-						<td><b class="blue">@formatNumber(row.domains)</b></td>
-						<td><b class="grey">@formatNumber(row.clients)</b></td>
-						<td><b>@formatNumber(row.malwares)</b></td>
-						<td><b>@formatNumber(row.success)</b></td>
-						<td><b>@formatNumber(row.failed)</b></td>
-						<td><b>@formatNumber(row.seconds)</b></td>
+						<td><b class="orange">@formatNumber(row._2.queries)</b></td>
+						<td><b class="blue">@formatNumber(row._2.domains)</b></td>
+						<td><b class="grey">@formatNumber(row._2.clients)</b></td>
+						<td><b>@formatNumber(row._2.malwares)</b></td>
+						<td><b>@formatNumber(row._2.success)</b></td>
+						<td><b>@formatNumber(row._2.failed)</b></td>
+						<td><b>@formatNumber(row._2.seconds)</b></td>
 					</tr>
 				    }
 					<tr>

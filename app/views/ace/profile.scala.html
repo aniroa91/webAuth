@@ -1,11 +1,7 @@
-@(form: Form[SearchData], domain: String, response: model.Response, logo: String)(implicit messages: Messages)
-@import services.DomainService.formatNumber
-@import services.DomainService.percent
+@(form: Form[SearchData], domain: String, response: model.ProfileResponse, logo: String)(implicit messages: Messages)
+@import services.AppGlobal.formatNumber
+@import services.AppGlobal.percent
 @import play.api.libs.json.Json
-
-<!--
-@@(form: Form[SearchData], domain: String, response: model.Response, logo: String)(implicit messages: Messages)
--->
 
 @top("..", "Detail", 1)
 
@@ -33,7 +29,7 @@
 			</div>
 		</div>
 		-->
-		@formSearch(form, routes.DnsController.profilePage)
+		@formSearch(form, routes.ProfileController.index)
 	</div>
 	<div class="col-xs-4"></div>
 
@@ -46,48 +42,6 @@
 <div class="row">
 
 	<div class="col-xs-12">
-		<!-- PAGE CONTENT BEGINS 
-		<div class="clearfix">
-			<div class="pull-left alert alert-success no-margin alert-dismissable">
-				<button type="button" class="close" data-dismiss="alert">
-					<i class="ace-icon fa fa-times"></i>
-				</button>
-
-				<i class="ace-icon fa fa-umbrella bigger-120 blue"></i>
-				Click on the image below or on profile fields to edit them ...
-			</div>
-
-			<div class="pull-right">
-				<span class="green middle bolder">Choose profile: &nbsp;</span>
-
-				<div class="btn-toolbar inline middle no-margin">
-					<div data-toggle="buttons" class="btn-group no-margin">
-						<label class="btn btn-sm btn-yellow active">
-							<span class="bigger-110">1</span>
-
-							<input type="radio" value="1" />
-						</label>
-
-						<label class="btn btn-sm btn-yellow">
-							<span class="bigger-110">2</span>
-
-							<input type="radio" value="2" />
-						</label>
-
-						<label class="btn btn-sm btn-yellow">
-							<span class="bigger-110">3</span>
-
-							<input type="radio" value="3" />
-						</label>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="hr dotted"></div>
-		-->
-
-		
-
 		<div>
 			<div id="user-profile-1" class="user-profile row">
 				<div class="col-xs-12 col-sm-3 center">
@@ -102,114 +56,50 @@
 							<div class="inline position-relative">
 								<a href="#" class="user-title-label dropdown-toggle" data-toggle="dropdown">
 									@{
-										if (response.basicInfo.label == "white") {
+										if (response.current.label == "white") {
 											<i class="ace-icon fa fa-circle light-green"></i>
-										} else if (response.basicInfo.label == "black") {
+										} else if (response.current.label == "black") {
 											<i class="ace-icon fa fa-circle light-red"></i>
 										} else {
 											<i class="ace-icon fa fa-circle light-grey"></i>
 										}
 										
 									}
-									
-
 									&nbsp;
 									<span class="white">@domain</span>
 								</a>
-								<!--
-								<ul class="align-left dropdown-menu dropdown-caret dropdown-lighter">
-									<li class="dropdown-header"> Change Status </li>
-
-									<li>
-										<a href="#">
-											<i class="ace-icon fa fa-circle green"></i>&nbsp;
-											<span class="green">Available</span>
-										</a>
-									</li>
-
-									<li>
-										<a href="#">
-											<i class="ace-icon fa fa-circle red"></i>&nbsp;
-											<span class="red">Busy</span>
-										</a>
-									</li>
-
-									<li>
-										<a href="#">
-											<i class="ace-icon fa fa-circle grey"></i>&nbsp;
-											<span class="grey">Invisible</span>
-										</a>
-									</li>
-								</ul>
-								-->
 							</div>
 						</div>
 					</div>
 
 					<div class="space-6"></div>
-					<!--
-					<div class="profile-contact-info">
-						<div class="profile-contact-links align-left">
-							<a href="#" class="btn btn-link">
-								<i class="ace-icon fa fa-plus-circle bigger-120 green"></i>
-								Add as a friend
-							</a>
-
-							<a href="#" class="btn btn-link">
-								<i class="ace-icon fa fa-envelope bigger-120 pink"></i>
-								Send a message
-							</a>
-
-							<a href="#" class="btn btn-link">
-								<i class="ace-icon fa fa-globe bigger-125 blue"></i>
-								www.alexdoe.com
-							</a>
-						</div>
-
-						<div class="space-6"></div>
-
-						<div class="profile-social-links align-center">
-							<a href="#" class="tooltip-info" title="" data-original-title="Visit my Facebook">
-								<i class="middle ace-icon fa fa-facebook-square fa-2x blue"></i>
-							</a>
-
-							<a href="#" class="tooltip-info" title="" data-original-title="Visit my Twitter">
-								<i class="middle ace-icon fa fa-twitter-square fa-2x light-blue"></i>
-							</a>
-
-							<a href="#" class="tooltip-error" title="" data-original-title="Visit my Pinterest">
-								<i class="middle ace-icon fa fa-pinterest-square fa-2x red"></i>
-							</a>
-						</div>
-					</div>
-					-->
 					<div class="hr hr12 dotted"></div>
 
 					<div class="clearfix">
-						<div class="grid2">
-							<span class="bigger-175 blue">@response.basicInfo.getNumOfQuery()</span>
+						<div class="grid3">
+							<span class="bigger-175 blue">@formatNumber(response.current.queries)</span>
 
 							<br />
 							Queries
 						</div>
 
-						<div class="grid2">
-							<span class="bigger-175 blue">@response.basicInfo.getNumOfClient()</span>
+						<div class="grid3">
+							<span class="bigger-175 blue">@formatNumber(response.current.domains)</span>
+							<br />
+							Domains
+						</div>
+
+						<div class="grid3">
+							<span class="bigger-175 blue">@formatNumber(response.current.clients)</span>
 
 							<br />
 							Client
 						</div>
-						<!--
-						<div class="grid2">
-							<span class="bigger-175 blue">@response.basicInfo.getQueryPerClient()</span>
 
-							<br />
-							Queries Per Client
-						</div>
-						-->
 					</div>
 
 					<div class="hr hr16 dotted"></div>
+					
 
 					<div class="clearfix">
 						<div class="grid2">
@@ -221,7 +111,7 @@
 								<div class="infobox-data">
 									<span class="infobox-data-number">
 									@{
-										val value = response.basicInfo.rankFtel
+										val value = response.current.rankFtel
 										if (value == 0) {
 											"1M+"
 										} else if (value > 999999) {
@@ -235,7 +125,7 @@
 								</div>
 								@{
 									val prev = if (response.history.size > 1) response.history(1) else response.history(0)
-									val value = response.basicInfo.rankFtel
+									val value = response.current.rankFtel
 									val valuePrev = prev.rankFtel
 									val diff = valuePrev - value
 									if (diff >= 0) {
@@ -257,7 +147,7 @@
 								<div class="infobox-data">
 									<span class="infobox-data-number">
 									@{
-										val value = response.basicInfo.rankAlexa
+										val value = response.current.rankAlexa
 										if (value == 0) {
 											"1M+"
 										} else if (value > 999999) {
@@ -271,7 +161,7 @@
 								</div>
 								@{
 									val prev = if (response.history.size > 1) response.history(1) else response.history(0)
-									val value = response.basicInfo.rankAlexa
+									val value = response.current.rankAlexa
 									val valuePrev = prev.rankAlexa
 									val diff = valuePrev - value
 									if (diff >= 0) {
@@ -279,50 +169,39 @@
 									} else {
 										<div class="stat stat-important">{diff}</div>
 									}
-									
 								}
 							</div>
 						</div>
-						<!--
-						<div class="grid2">
-							<span class="bigger-175 blue">@response.basicInfo.getQueryPerClient()</span>
-
-							<br />
-							Queries Per Client
-						</div>
-						-->
 					</div>
 
 					<div class="hr hr16 dotted"></div>
 
 					<div class="clearfix">
-						<div class="grid2">
-							<span class="btn btn-app btn-sm btn-success no-hover">
-							<span class="line-height-1 bigger-80"> @response.basicInfo.label.toUpperCase() </span>
-
-							<br />
-							<span class="line-height-1 smaller-100"> Label </span>
+						<div class="grid1">
+							@{
+								if (response.current.label == "black") {
+									<span class="fa fa-bug" style="font-size:48px;color:red">
+										<br/>
+										{response.current.malware.toUpperCase()}
+									</span>
+								} else if (response.current.label == "white") {
+									<span class="fa fa-check" style="font-size:48px;color:green">
+										<br/>
+										SAFE
+									</span>
+								} else {
+									<span class="fa fa-question-circle" style="font-size:48px;color:grey">
+										<br/>
+										UNKNOW
+									</span>
+								}
+							}
+							
 						</span>
 
 						
 						</div>
 						
-						<div class="grid2">
-							<span class="btn btn-app btn-sm btn-primary no-hover">
-							<span class="line-height-1 bigger-80"> @response.basicInfo.malware.toUpperCase() </span>
-
-							<br />
-							<span class="line-height-1 smaller-100"> Malware </span>
-						</span>
-						</div>
-						<!--
-						<div class="grid2">
-							<span class="bigger-175 blue">@response.basicInfo.getQueryPerClient()</span>
-
-							<br />
-							Queries Per Client
-						</div>
-						-->
 					</div>
 
 										
@@ -332,51 +211,7 @@
 				</div>
 
 				<div class="col-xs-12 col-sm-9">
-					<!--
-					<div class="center">
-						<span class="btn btn-app btn-sm btn-light no-hover">
-							<span class="line-height-1 bigger-80 blue"> @response.basicInfo.rankFtel </span>
-
-							<br />
-							<span class="line-height-1 smaller-100"> FTel </span>
-						</span>
-
-						<span class="btn btn-app btn-sm btn-yellow no-hover">
-							<span class="line-height-1 bigger-80"> 1,000,000 </span>
-
-							<br />
-							<span class="line-height-1 smaller-100"> Alexa </span>
-						</span>
-						<!--
-						<span class="btn btn-app btn-sm btn-pink no-hover">
-							<span class="line-height-1 bigger-170"> @@response.basicInfo.getNumOfDomain() </span>
-
-							<br />
-							<span class="line-height-1 smaller-90"> Domains </span>
-						</span>
-						
-						<span class="btn btn-app btn-sm btn-grey no-hover">
-							<span class="line-height-1 bigger-80"> @response.basicInfo.getQueryPerClient() </span>
-
-							<br />
-							<span class="line-height-1 smaller-100"> Average </span>
-						</span>
-						--
-						<span class="btn btn-app btn-sm btn-success no-hover">
-							<span class="line-height-1 bigger-80"> @response.basicInfo.label </span>
-
-							<br />
-							<span class="line-height-1 smaller-100"> Label </span>
-						</span>
-
-						<span class="btn btn-app btn-sm btn-primary no-hover">
-							<span class="line-height-1 bigger-80"> @response.basicInfo.malware </span>
-
-							<br />
-							<span class="line-height-1 smaller-100"> Malware </span>
-						</span>
-					</div>
-					-->
+					
 					<div class="space-12"></div>
 
 					<div class="profile-user-info profile-user-info-striped">
@@ -476,16 +311,7 @@
 					<div class="hr hr2 hr-double"></div>
 
 					<div class="space-6"></div>
-					<!--
-					<div class="center">
-						<button type="button" class="btn btn-sm btn-primary btn-white btn-round">
-							<i class="ace-icon fa fa-rss bigger-150 middle orange2"></i>
-							<span class="bigger-110">View more activities</span>
-
-							<i class="icon-on-right ace-icon fa fa-arrow-right"></i>
-						</button>
-					</div>
-					-->
+					
 				</div>
 			</div>
 		</div>
@@ -510,9 +336,9 @@
 			$(function () {
 
 			    var categories = @Html(Json.stringify(Json.toJson(response.history.map(x => x.day).reverse)));
-			    var queries = @Html(Json.stringify(Json.toJson(response.history.map(x => x.numOfQuery).reverse)));
-			    var qpc = @Html(Json.stringify(Json.toJson(response.history.map(x => x.getQueryPerClientVal()).reverse)));
-			    var clients = @Html(Json.stringify(Json.toJson(response.history.map(x => x.numOfClient).reverse)));
+			    var queries = @Html(Json.stringify(Json.toJson(response.history.map(x => x.queries).reverse)));
+			    var qpc = @Html(Json.stringify(Json.toJson(response.history.map(x => x.getQueryPerClient()).reverse)));
+			    var clients = @Html(Json.stringify(Json.toJson(response.history.map(x => x.clients).reverse)));
 
 			    Highcharts.chart('daily-line-chart', {
 			        chart: {

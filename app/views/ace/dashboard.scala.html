@@ -1,6 +1,6 @@
-@(form: Form[SearchData], response: model.DashboardResponse)(implicit messages: Messages)
-@import services.DomainService.formatNumber
-@import services.DomainService.percent
+@(response: model.DashboardResponse)
+@import services.AppGlobal.formatNumber
+@import services.AppGlobal.percent
 @import play.api.libs.json.Json
 
 @top(".", "Dashboard", 0)
@@ -10,34 +10,10 @@
 		Dashboard
 		<small>
 			<i class="ace-icon fa fa-angle-double-right"></i>
-			@response.day
+			@response.report.day
 		</small>
 	</h1>
-</div><!-- /.page-header -->
-
-<!--
-<div class="row">
-	<div class="col-xs-4"></div>
-	<div class="col-xs-4">
-	    <!--
-		<div class="input-group">
-			<input type="text" class="form-control" name="keywords" placeholder="Look within results" />
-			<div class="input-group-btn">
-				<button type="button" class="btn btn-default no-border btn-sm">
-					<i class="ace-icon fa fa-search icon-on-right bigger-110"></i>
-				</button>
-			</div>
-		</div>
-		--
-		@@formSearch(form, routes.DnsController.dashboardPage)
-	</div>
-	<div class="col-xs-4"></div>
-
-	<div class="clearfix"></div>
-	<div class="hr hr12 dotted"></div>
-		
 </div>
--->
 
 <div class="row">
 	<div class="col-xs-12">
@@ -49,7 +25,7 @@
 			<i class="ace-icon fa fa-check green"></i>
 			Statistics for
 			<strong class="green">
-				@response.day
+				@response.report.day
 				<!--
 				<small>(v1.4)</small>
 				-->
@@ -59,12 +35,12 @@
 			<div class="row">
 			<div class="col-sm-1"></div>
 			<div class="col-sm-2">
-				@total(response.total, response.totalPrev)
+				@total(response.report.current, response.report.previous)
 			</div>
 			<div class="col-sm-1"></div>
 			<div class="col-sm-7">
-				@classify(response.total, response.labels)
-			</div><!-- /.widget-box -->
+				@classify(response.report.current, response.report.labels)
+			</div>
 			
 		</div><!-- /.col -->
 		</div><!-- /.col -->
@@ -90,28 +66,6 @@
 				</div>
 			</div>
 			<div class="col-sm-4">
-				<!--
-				<div class="widget-box transparent">
-					<div class="widget-header widget-header-small">
-						<h4 class="widget-title blue smaller">
-							<i class="ace-icon fa fa-asterisk orange"></i>
-							Top 10 Domain Black
-						</h4>
-					</div>
-					@*
-					@topRankTable(
-	    				Array[String]("Domain", "Malware", "Queries", "Clients"),
-	      				response.domainBlacks.map(x => Array[Any](
-	        				x.domain,
-	        				x.malware,
-	        				services.DomainService.formatNumber(x.queries),
-	        				services.DomainService.formatNumber(x.clients))
-	        			).toArray,
-	        			"top-1000-domain-black"
-	    			)
-	    			*@
-				</div>
-				-->
 				<div class="widget-box transparent">
 					<div class="widget-header widget-header-small">
 						<h4 class="widget-title blue smaller">
@@ -176,10 +130,10 @@
 @scripts = {
 <script type="text/javascript">
 	$(function () {
-	    var categories = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.day))));
-	    var queries = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.queries))));
-	    var domains = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.domains))));
-	    var clients = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.clients))));
+	    var categories = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._1))));
+	    var queries = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._2.queries))));
+	    var domains = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._2.domains))));
+	    var clients = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._2.clients))));
 
 	    Highcharts.chart('daily-line-chart', {
 	        chart: {
@@ -294,9 +248,9 @@
 	        }]
 	    });
 
-	    categories = @Html(Json.stringify(Json.toJson(response.malwares.take(10).map(x => x.malware))));
-	    queries = @Html(Json.stringify(Json.toJson(response.malwares.take(10).map(x => x.queries))));
-	    domains = @Html(Json.stringify(Json.toJson(response.malwares.take(10).map(x => x.domains))));
+	    categories = @Html(Json.stringify(Json.toJson(response.report.malwares.take(10).map(x => x.malware))));
+	    queries = @Html(Json.stringify(Json.toJson(response.report.malwares.take(10).map(x => x.queries))));
+	    domains = @Html(Json.stringify(Json.toJson(response.report.malwares.take(10).map(x => x.domains))));
 	    var title = "Top 10 Malwares"
 
 
@@ -334,9 +288,9 @@
 	        }]
 	    });
 
-	    categories = @Html(Json.stringify(Json.toJson(response.secondBlacks.take(10).map(x => x.second + " [" + x.malware + "]"))));
-	    queries = @Html(Json.stringify(Json.toJson(response.secondBlacks.take(10).map(x => x.queries))));
-	    clients = @Html(Json.stringify(Json.toJson(response.secondBlacks.take(10).map(x => x.clients))));
+	    categories = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => x.name + " [" + x.malware + "]"))));
+	    queries = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => x.queries))));
+	    clients = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => x.clients))));
 	    var title = "Top 10 Malwares"
 
 
@@ -374,9 +328,9 @@
 	        }]
 	    });
 
-	    categories = @Html(Json.stringify(Json.toJson(response.seconds.take(10).map(x => x.second))));
-	    queries = @Html(Json.stringify(Json.toJson(response.seconds.take(10).map(x => x.queries))));
-	    clients = @Html(Json.stringify(Json.toJson(response.seconds.take(10).map(x => x.clients))));
+	    categories = @Html(Json.stringify(Json.toJson(response.report.seconds.take(10).map(x => x.name))));
+	    queries = @Html(Json.stringify(Json.toJson(response.report.seconds.take(10).map(x => x.queries))));
+	    clients = @Html(Json.stringify(Json.toJson(response.report.seconds.take(10).map(x => x.clients))));
 	    var title = "Top 10 Main Domain"
 
 

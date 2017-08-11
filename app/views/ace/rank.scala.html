@@ -1,4 +1,5 @@
-@(all: Array[(String, model.BasicInfo)], white: Array[(String, model.BasicInfo)], black: Array[(String, model.BasicInfo)], unknow: Array[(String, model.BasicInfo)])
+@(all: Array[model.MainDomainInfo], white: Array[model.MainDomainInfo], black: Array[model.MainDomainInfo], unknow: Array[model.MainDomainInfo])
+@import services.AppGlobal.formatNumber
 
 @top("..", "Top Rank", 2)
 
@@ -41,22 +42,22 @@
 						@topRankTable(
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Alexa Rank", "Label", "Malware"),
               				all.map(x => Array[Any](
-                				x._2.rankFtel.toString,
-                				Html.apply(services.DomainService.getImgTag(x._1)),
-                				Html.apply(services.DomainService.getLinkTag(x._1)),
-                				x._2.getNumOfQuery(),
-                				x._2.getNumOfClient(),
-                				x._2.getQueryPerClient(),
-                				x._2.rankAlexa,
+                				formatNumber(x.rankFtel),
+                				Html.apply(services.AppGlobal.getImgTag(x.name)),
+                				Html.apply(services.AppGlobal.getLinkTag(x.name)),
+                				formatNumber(x.queries),
+                				formatNumber(x.clients),
+                				formatNumber(x.getQueryPerClient()),
+                				formatNumber(x.rankAlexa),
                 				Html.apply(
-                				if (x._2.label == "white") {
+                				if (x.label == "white") {
 									"<span class='center label label-sm label-success arrowed'>WHITE</span>"
-								} else if (x._2.label == "black") {
+								} else if (x.label == "black") {
 									"<span class='center label label-sm label label-danger arrowed'>BLACK</span>"
 								} else {
 									"<span class='center label label-sm arrowed'>UNKNOW</span>"
 								}),
-                				x._2.malware)
+                				x.malware)
                 			).toArray,
                 			"dynamic-table-all"
             			)
@@ -66,17 +67,17 @@
 						@topRankTable(
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Alexa Rank", "Label"),
               				white.map(x => Array[Any](
-                				x._2.rankFtel.toString,
-                				Html.apply(services.DomainService.getImgTag(x._1)),
-                				Html.apply(services.DomainService.getLinkTag(x._1)),
-                				x._2.getNumOfQuery(),
-                				x._2.getNumOfClient(),
-                				x._2.getQueryPerClient(),
-                				x._2.rankAlexa,
+                				formatNumber(x.rankFtel),
+                				Html.apply(services.AppGlobal.getImgTag(x.name)),
+                				Html.apply(services.AppGlobal.getLinkTag(x.name)),
+                				formatNumber(x.queries),
+                				formatNumber(x.clients),
+                				formatNumber(x.getQueryPerClient()),
+                				formatNumber(x.rankAlexa),
                 				Html.apply(
-                				if (x._2.label == "white") {
+                				if (x.label == "white") {
 									"<span class='center label label-sm label-success arrowed'>WHITE</span>"
-								} else if (x._2.label == "black") {
+								} else if (x.label == "black") {
 									"<span class='center label label-sm label label-danger arrowed'>BLACK</span>"
 								} else {
 									"<span class='center label label-sm arrowed'>UNKNOW</span>"
@@ -90,21 +91,21 @@
 						@topRankTable(
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Label", "Malware"),
               				black.map(x => Array[Any](
-                				x._2.rankFtel.toString,
-                				Html.apply(services.DomainService.getImgTag(x._1)),
-                				Html.apply(services.DomainService.getLinkTag(x._1)),
-                				x._2.getNumOfQuery(),
-                				x._2.getNumOfClient(),
-                				x._2.getQueryPerClient(),
+                				formatNumber(x.rankFtel),
+                				Html.apply(services.AppGlobal.getImgTag(x.name)),
+                				Html.apply(services.AppGlobal.getLinkTag(x.name)),
+                				formatNumber(x.queries),
+                				formatNumber(x.clients),
+                				formatNumber(x.getQueryPerClient()),
                 				Html.apply(
-                				if (x._2.label == "white") {
+                				if (x.label == "white") {
 									"<span class='center label label-sm label-success arrowed'>WHITE</span>"
-								} else if (x._2.label == "black") {
+								} else if (x.label == "black") {
 									"<span class='center label label-sm label label-danger arrowed'>BLACK</span>"
 								} else {
 									"<span class='center label label-sm arrowed'>UNKNOW</span>"
 								}),
-								x._2.malware)
+								x.malware)
 							).toArray,
 							"dynamic-table-black"
             			)
@@ -113,16 +114,16 @@
 						@topRankTable(
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Label"),
               				unknow.map(x => Array[Any](
-                				x._2.rankFtel.toString,
-                				Html.apply(services.DomainService.getImgTag(x._1)),
-                				Html.apply(services.DomainService.getLinkTag(x._1)),
-                				x._2.getNumOfQuery(),
-                				x._2.getNumOfClient(),
-                				x._2.getQueryPerClient(),
+                				formatNumber(x.rankFtel),
+                				Html.apply(services.AppGlobal.getImgTag(x.name)),
+                				Html.apply(services.AppGlobal.getLinkTag(x.name)),
+                				formatNumber(x.queries),
+                				formatNumber(x.clients),
+                				formatNumber(x.getQueryPerClient()),
                 				Html.apply(
-                				if (x._2.label == "white") {
+                				if (x.label == "white") {
 									"<span class='center label label-sm label-success arrowed'>WHITE</span>"
-								} else if (x._2.label == "black") {
+								} else if (x.label == "black") {
 									"<span class='center label label-sm label label-danger arrowed'>BLACK</span>"
 								} else {
 									"<span class='center label label-sm arrowed'>UNKNOW</span>"
