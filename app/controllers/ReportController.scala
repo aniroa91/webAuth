@@ -24,6 +24,8 @@ import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.DateTimeUtil
 import scala.util.Try
 import services.domain.ReportService
+import services.CacheService
+import services.domain.CommonService
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -33,8 +35,15 @@ import services.domain.ReportService
 class ReportController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
 
   def index(day: String) = Action {
-//    val isValid = Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
-//    val response = if (isValid) DomainService.getStatsByDay(day) else DomainService.getStatsByDay(DomainService.getLatestDay())
-    Ok(views.html.ace.report(ReportService.get(day)))
+    val key = if (CommonService.isDayValid(day)) {
+      day
+    } else {
+      CommonService.getLatestDay()
+    }
+    //println(key)
+    
+    val response = CacheService.getReport(key)
+    
+    Ok(views.html.ace.report(key, response))
   }
 }

@@ -21,6 +21,7 @@ import play.api.mvc._
 import com.ftel.bigdata.utils.DateTimeUtil
 import scala.util.Try
 import services.domain.DashboardService
+import services.CacheService
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -30,7 +31,7 @@ import services.domain.DashboardService
 class DashboardController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
   def index = Action {
-    Ok(views.html.ace.dashboard(DashboardService.get()))
+    Ok(views.html.ace.dashboard(CacheService.getDaskboard()))
   }
 }
 

@@ -1,4 +1,4 @@
-@(all: Array[model.MainDomainInfo], white: Array[model.MainDomainInfo], black: Array[model.MainDomainInfo], unknow: Array[model.MainDomainInfo])
+@(response: model.RankResponse)
 @import services.AppGlobal.formatNumber
 
 @top("..", "Top Rank", 2)
@@ -41,7 +41,7 @@
 					<div id="all" class="tab-pane in active">
 						@topRankTable(
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Alexa Rank", "Label", "Malware"),
-              				all.map(x => Array[Any](
+              				response.all.map(x => Array[Any](
                 				formatNumber(x.rankFtel),
                 				Html.apply(services.AppGlobal.getImgTag(x.name)),
                 				Html.apply(services.AppGlobal.getLinkTag(x.name)),
@@ -66,7 +66,7 @@
 					<div id="white" class="tab-pane">
 						@topRankTable(
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Alexa Rank", "Label"),
-              				white.map(x => Array[Any](
+              				response.white.map(x => Array[Any](
                 				formatNumber(x.rankFtel),
                 				Html.apply(services.AppGlobal.getImgTag(x.name)),
                 				Html.apply(services.AppGlobal.getLinkTag(x.name)),
@@ -90,7 +90,7 @@
 					<div id="black" class="tab-pane">
 						@topRankTable(
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Label", "Malware"),
-              				black.map(x => Array[Any](
+              				response.black.map(x => Array[Any](
                 				formatNumber(x.rankFtel),
                 				Html.apply(services.AppGlobal.getImgTag(x.name)),
                 				Html.apply(services.AppGlobal.getLinkTag(x.name)),
@@ -113,7 +113,7 @@
 					<div id="unknow" class="tab-pane">
 						@topRankTable(
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Label"),
-              				unknow.map(x => Array[Any](
+              				response.unknow.map(x => Array[Any](
                 				formatNumber(x.rankFtel),
                 				Html.apply(services.AppGlobal.getImgTag(x.name)),
                 				Html.apply(services.AppGlobal.getLinkTag(x.name)),
