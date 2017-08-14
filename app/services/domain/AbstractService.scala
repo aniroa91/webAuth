@@ -6,7 +6,7 @@ import com.sksamuel.elastic4s.http.search.SearchResponse
 import model.MainDomainInfo
 import model.MalwareInfo
 import model.TotalInfo
-import services.AppGlobal
+import services.Configure
 
 abstract class AbstractService {
   
@@ -31,7 +31,7 @@ abstract class AbstractService {
   val SIZE_DAY = 30
   val MAX_SIZE_RETURN = 100
   
-  val client = AppGlobal.client // HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
+  val client = Configure.client // HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
 
    /*******************************
     * 

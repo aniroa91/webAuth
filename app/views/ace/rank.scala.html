@@ -1,5 +1,7 @@
 @(response: model.RankResponse)
-@import services.AppGlobal.formatNumber
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.getImageTag
+@import services.domain.CommonService.getLinkTag
 
 @top("..", "Top Rank", 2)
 
@@ -43,8 +45,8 @@
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Alexa Rank", "Label", "Malware"),
               				response.all.map(x => Array[Any](
                 				formatNumber(x.rankFtel),
-                				Html.apply(services.AppGlobal.getImgTag(x.name)),
-                				Html.apply(services.AppGlobal.getLinkTag(x.name)),
+                				Html.apply(getImageTag(x.name)),
+                				Html.apply(getLinkTag(x.name)),
                 				formatNumber(x.queries),
                 				formatNumber(x.clients),
                 				formatNumber(x.getQueryPerClient()),
@@ -68,8 +70,8 @@
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Alexa Rank", "Label"),
               				response.white.map(x => Array[Any](
                 				formatNumber(x.rankFtel),
-                				Html.apply(services.AppGlobal.getImgTag(x.name)),
-                				Html.apply(services.AppGlobal.getLinkTag(x.name)),
+                				Html.apply(getImageTag(x.name)),
+                				Html.apply(getLinkTag(x.name)),
                 				formatNumber(x.queries),
                 				formatNumber(x.clients),
                 				formatNumber(x.getQueryPerClient()),
@@ -92,8 +94,8 @@
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Label", "Malware"),
               				response.black.map(x => Array[Any](
                 				formatNumber(x.rankFtel),
-                				Html.apply(services.AppGlobal.getImgTag(x.name)),
-                				Html.apply(services.AppGlobal.getLinkTag(x.name)),
+                				Html.apply(getImageTag(x.name)),
+                				Html.apply(getLinkTag(x.name)),
                 				formatNumber(x.queries),
                 				formatNumber(x.clients),
                 				formatNumber(x.getQueryPerClient()),
@@ -115,8 +117,8 @@
             				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Label"),
               				response.unknow.map(x => Array[Any](
                 				formatNumber(x.rankFtel),
-                				Html.apply(services.AppGlobal.getImgTag(x.name)),
-                				Html.apply(services.AppGlobal.getLinkTag(x.name)),
+                				Html.apply(getImageTag(x.name)),
+                				Html.apply(getLinkTag(x.name)),
                 				formatNumber(x.queries),
                 				formatNumber(x.clients),
                 				formatNumber(x.getQueryPerClient()),

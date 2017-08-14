@@ -1,6 +1,6 @@
 @(form: Form[SearchData], domain: String, response: model.ProfileResponse, logo: String)(implicit messages: Messages)
-@import services.AppGlobal.formatNumber
-@import services.AppGlobal.percent
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.percent
 @import play.api.libs.json.Json
 
 @top("..", "Detail", 1)

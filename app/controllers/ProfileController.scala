@@ -1,33 +1,24 @@
 package controllers
 
-import javax.inject._
-import play.api.mvc._
-import play.api._
-//import play.api.mvc._
-//import services.DomainService
-import utils.JsonUtil
+import com.ftel.bigdata.utils.DomainUtil
+
+import javax.inject.Inject
+import javax.inject.Singleton
+import play.api.data.Form
+import play.api.data.Forms.mapping
+import play.api.data.Forms.text
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.db.slick.HasDatabaseConfigProvider
+import play.api.i18n.I18nSupport
+import play.api.mvc.AbstractController
+import play.api.mvc.AnyContent
+import play.api.mvc.ControllerComponents
+import play.api.mvc.Request
+import services.CacheService
+import services.domain.CommonService
 import slick.jdbc.JdbcProfile
-//import model.Response
-import com.ftel.bigdata.utils.HttpUtil
-import com.ftel.bigdata.utils.FileUtil
-import com.ftel.bigdata.utils.DomainUtil
-import play.api.data._
-import play.api.data.Forms._
-import play.api.data.format.Formats._
-import com.typesafe.config.ConfigFactory
-import play.api.data._
-import play.api.i18n._
-import play.api.mvc._
-import com.ftel.bigdata.dns.parameters.Label
-import com.ftel.bigdata.utils.DateTimeUtil
-import scala.util.Try
-import services.domain.ProfileService
-import services.domain.AbstractService
-import services.AppGlobal
 
-case class SearchData(value: String)
+case class SearchData(q: String)
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -39,17 +30,18 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
 
   val form = Form(
     mapping(
-      "value" -> text
+      "q" -> text
     )(SearchData.apply)(SearchData.unapply)
   )
 
   def index = Action { implicit request: Request[AnyContent] =>
     val formValidationResult = form.bindFromRequest
     if (!formValidationResult.hasErrors) {
-      val domain = formValidationResult.get.value
+      val domain = formValidationResult.get.q
       val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
-      val response = ProfileService.get(secondDomain)
-      Ok(views.html.ace.profile(form, secondDomain.toLowerCase(), response, AppGlobal.getLogoPath(secondDomain)))
+      val logo = CommonService.getImageTag(secondDomain)
+      val response = CacheService.getDomain(secondDomain)
+      Ok(views.html.ace.profile(form, secondDomain, response, logo))
     } else {
       Ok(views.html.ace.profile(form, null, null, null))
     }

@@ -10,7 +10,6 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import services.CacheService
-import model.StatsResponse
 import com.ftel.bigdata.utils.DateTimeUtil
 import scala.util.Try
 import model.ReportResponse

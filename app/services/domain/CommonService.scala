@@ -20,6 +20,9 @@ import com.sksamuel.elastic4s.http.search.SearchResponse
 
 import model.MainDomainInfo
 import scala.util.Try
+import services.Configure
+import com.ftel.bigdata.utils.FileUtil
+import com.ftel.bigdata.utils.HttpUtil
 
 object CommonService extends AbstractService {
 
@@ -67,11 +70,15 @@ object CommonService extends AbstractService {
   private def getWhoisFromWeb(domain: String, label: String, malware: String): Whois = {
     val esIndex = s"dns-service-domain-whois"
     val esType = "whois"
-    val whois = WhoisUtil.whoisService(domain, label, malware, "172.30.45.220", 80)
-    if (whois.isValid()) {
-      indexWhois(esIndex, esType, whois)
-      whois
-    } else new Whois()
+    try {
+      val whois = WhoisUtil.whoisService(domain, label, malware, Configure.PROXY_HOST, Configure.PROXY_PORT)
+      if (whois.isValid()) {
+        indexWhois(esIndex, esType, whois)
+        whois
+      } else new Whois()
+    } catch {
+      case e: Exception => e.printStackTrace(); new Whois()
+    }
   }
   private def indexWhois(esIndex: String, esType: String, whois: Whois) {
     client.execute(
@@ -127,8 +134,51 @@ object CommonService extends AbstractService {
   }
 
   /**
+   * Utils
+   */
+  def formatNumber(number: Int): String = {
+    val formatter = java.text.NumberFormat.getIntegerInstance
+    formatter.format(number)
+  }
+  
+  def percent(number: Int, prev: Int): Double = {
+    val value = ((number - prev) / (prev * 1.0)) / 100.0
+    BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+  
+  /**
+   * Create html tag
+   */
+  def getImageTag(domain: String): String = {
+    val logo = downloadLogo(domain)
+    "<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
+  }
+  
+  def getLinkTag(domain: String): String = {
+    "<a href=\"/search?q=" + domain + "\">" + domain + "</a>"
+  }
+
+  /**
+   * Download image
+   */
+  private def downloadLogo(secondDomain: String): String = {
+    val logoUrl = Configure.LOGO_API_URL + secondDomain
+    val path = Configure.LOGO_PATH + secondDomain + ".png"
+    val logo = "../extassets/" + secondDomain + ".png"
+    if (!FileUtil.isExist(path)) {
+      println("Download logo to " + path)
+      Try(HttpUtil.download(logoUrl, path, Configure.PROXY_HOST, Configure.PROXY_PORT))
+    }
+    if (FileUtil.isExist(path)) {
+      logo
+    } else Configure.LOGO_DEFAULT
+  }
+  
+  /**
    * ********************************************************************************
    * ********************************************************************************
    * ********************************************************************************
    */
+  
+  
 }
