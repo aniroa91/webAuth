@@ -39,7 +39,7 @@ abstract class AbstractService {
     * 
     * ****************************/
   def getTotalInfo(searchResponse: SearchResponse): Array[(String, TotalInfo)] = {
-    val result = searchResponse.hits.hits.map(x => {
+    searchResponse.hits.hits.map(x => {
       val sourceAsMap = x.sourceAsMap
       val label = sourceAsMap.getOrElse("label", "").toString()
       val malwares = if (label == BLACK_VALUE) sourceAsMap.getOrElse(NUM_MALWARE_FIELD, "0").toString().toInt else 0
@@ -52,7 +52,6 @@ abstract class AbstractService {
          getValueAsInt(sourceAsMap, "failed"),
          getValueAsInt(sourceAsMap, NUM_SECOND_FIELD))
      })
-    result
   }
 
   def getTotalInfoDaily(searchResponse: SearchResponse): Array[(String, TotalInfo)] = {
@@ -112,5 +111,14 @@ abstract class AbstractService {
           x.failed   + y.failed,
           x.seconds  + y.seconds)
     })
+  }
+  
+  def printTime(times: Long*) {
+    val size = times.size
+    if (size > 1) {
+      for (i <- 0 until size-1) {
+        println(s"Time[$i] - Time[${i + 1}]: " + (times(i + 1) - times(i)))
+      }
+    }
   }
 }

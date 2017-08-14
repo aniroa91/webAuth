@@ -72,6 +72,7 @@ object CommonService extends AbstractService {
     val esType = "whois"
     try {
       val whois = WhoisUtil.whoisService(domain, label, malware, Configure.PROXY_HOST, Configure.PROXY_PORT)
+      //println(whois)
       if (whois.isValid()) {
         indexWhois(esIndex, esType, whois)
         whois
@@ -161,7 +162,7 @@ object CommonService extends AbstractService {
   /**
    * Download image
    */
-  private def downloadLogo(secondDomain: String): String = {
+  def downloadLogo(secondDomain: String): String = {
     val logoUrl = Configure.LOGO_API_URL + secondDomain
     val path = Configure.LOGO_PATH + secondDomain + ".png"
     val logo = "../extassets/" + secondDomain + ".png"

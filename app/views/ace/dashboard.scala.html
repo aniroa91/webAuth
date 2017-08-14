@@ -2,6 +2,8 @@
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
 @import play.api.libs.json.Json
+@import services.domain.CommonService.getLinkTag
+
 
 @top(".", "Dashboard", 0)
 
@@ -288,7 +290,7 @@
 	        }]
 	    });
 
-	    categories = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => x.name + " [" + x.malware + "]"))));
+	    categories = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => getLinkTag(x.name) + " [" + x.malware + "]"))));
 	    queries = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => x.queries))));
 	    clients = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => x.clients))));
 	    var title = "Top 10 Malwares"

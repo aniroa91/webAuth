@@ -9,7 +9,8 @@ case class ProfileResponse (
     whois: Whois,
     current: MainDomainInfo,
     history: Array[MainDomainInfo],
-    answers: Array[String]) extends AbstractResponse {
+    answers: Array[String],
+    hourly: Array[(Int, Long)]) extends AbstractResponse {
   def toJsonObject: JsonObject = ???
   /*
   def toJsonObject: JsonObject = if (current != null) {

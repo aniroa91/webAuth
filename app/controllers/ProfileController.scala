@@ -39,7 +39,8 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
     if (!formValidationResult.hasErrors) {
       val domain = formValidationResult.get.q
       val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
-      val logo = CommonService.getImageTag(secondDomain)
+      val logo = CommonService.downloadLogo(secondDomain)
+      //println(logo)
       val response = CacheService.getDomain(secondDomain)
       Ok(views.html.ace.profile(form, secondDomain, response, logo))
     } else {

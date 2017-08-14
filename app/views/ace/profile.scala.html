@@ -273,6 +273,24 @@
 					<div class="widget-box transparent">
 						<div class="widget-header widget-header-small">
 							<h4 class="widget-title blue smaller">
+								<i class="ace-icon fa fa-bar-chart orange"></i>
+								Hourly Queries
+							</h4>
+							<div class="widget-toolbar">
+								<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+							</div>
+						</div>
+						<div class="widget-body" style="display: block;">
+							<div class="widget-main no-padding">
+								<div id="hourly-column-chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+							</div>
+						</div>
+					</div>
+
+					<div class="space-20"></div>
+					<div class="widget-box transparent">
+						<div class="widget-header widget-header-small">
+							<h4 class="widget-title blue smaller">
 								<i class="ace-icon fa fa-line-chart green"></i>
 								Daily Queries
 							</h4>
@@ -452,6 +470,40 @@
 			            }
 			        }]
 			    });
+
+			    var hours = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._1))));
+			    var values = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._2))));
+
+
+			    Highcharts.chart('hourly-column-chart', {
+				    chart: {
+				        type: 'column'
+				    },
+				    title: {
+				        text: 'Hourly queries'
+				    },
+				    xAxis: {
+				        categories: hours,
+				        crosshair: true
+				    },
+				    yAxis: {
+				        min: 0,
+				        title: {
+				            text: 'Num Of Queries'
+				        }
+				    },
+				    plotOptions: {
+				        column: {
+				            pointPadding: 0.2,
+				            borderWidth: 0
+				        }
+				    },
+				    series: [{
+				        name: 'Queries',
+				        data: values
+
+				    }]
+				});
 			});
 		</script>
 	}
