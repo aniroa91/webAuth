@@ -9,28 +9,27 @@ import model.TotalInfo
 import services.Configure
 
 abstract class AbstractService {
-  
+
   protected val LABEL_FIELD = "label"
   protected val BLACK_VALUE = Label.Black
   protected val TOTAL_VALUE = "total"
-  protected val NUM_QUERY_FIELD = "number_of_record"
-  protected val NUM_DOMAIN_FIELD = "number_of_domain"
-  protected val NUM_SECOND_FIELD = "number_of_second_domain"
-  protected val NUM_IP_FIELD = "number_of_ip"
-  protected val NUM_MALWARE_FIELD = "number_of_malware"
+  protected val NUM_QUERY_FIELD = "queries"
+  protected val NUM_DOMAIN_FIELD = "domains"
+  protected val NUM_SECOND_FIELD = "seconds"
+  protected val NUM_IP_FIELD = "clients"
+  protected val NUM_MALWARE_FIELD = "malwares"
   protected val DAY_FIELD = "day"
-  
+
   protected val MALWARE_FIELD = "malware"
   protected val DOMAIN_FIELD = "domain"
   protected val SECOND_FIELD = "second"
-  
 
   val ES_INDEX = "dns-service-domain-"
   val ES_INDEX_ALL = ES_INDEX + "*"
-  
+
   val SIZE_DAY = 30
   val MAX_SIZE_RETURN = 100
-  
+
   val client = Configure.client // HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
 
    /*******************************
@@ -68,12 +67,24 @@ abstract class AbstractService {
   def getMalwareInfo(searchResponse: SearchResponse): Array[MalwareInfo] = {
     searchResponse.hits.hits.map(x => {
       val sourceAsMap = x.sourceAsMap
+      println()
       MalwareInfo(
           getValueAsString(sourceAsMap, MALWARE_FIELD),
           getValueAsInt(sourceAsMap, NUM_QUERY_FIELD),
           getValueAsInt(sourceAsMap, NUM_DOMAIN_FIELD),
           getValueAsInt(sourceAsMap, NUM_IP_FIELD))
     })
+  }
+  
+  def getMalwareInfo2(searchResponse: SearchResponse): Array[MalwareInfo] = {
+    val terms = getTerm(searchResponse, "top", Array("sum", "unique-second", "unique-client"))
+    terms.map(x => 
+      MalwareInfo(
+        x._1,
+        x._2.getOrElse("sum", 0L).toInt,
+        x._2.getOrElse("unique-second", 0L).toInt,
+        x._2.getOrElse("unique-client", 0L).toInt)
+      ).sortWith((x,y) => x.queries > y.queries)
   }
 
   def getMainDomainInfo(searchResponse: SearchResponse): Array[MainDomainInfo] = {
@@ -87,16 +98,24 @@ abstract class AbstractService {
         getValueAsInt(sourceAsMap, NUM_QUERY_FIELD),
         //getValueAsInt(sourceAsMap, NUM_DOMAIN_FIELD),
         getValueAsInt(sourceAsMap, NUM_IP_FIELD),
-        getValueAsInt(sourceAsMap, "rank_ftel"),
+        getValueAsInt(sourceAsMap, "rank"),
         getValueAsInt(sourceAsMap, "rank_alexa"))
     })
   }
 
-  private def getValueAsString(map: Map[String, Any], key: String): String = {
+  def getMainDomainInfo2(searchResponse: SearchResponse): Array[MainDomainInfo] = {
+    val mapLabel = searchResponse.hits.hits.map(x => x.sourceAsMap).map(x => x.getOrElse("second", "") -> x.getOrElse("label", "")).toMap
+    val terms = getTerm(searchResponse, "top", "sum")
+    terms.map(x => MainDomainInfo("day", x._1, mapLabel.getOrElse(x._1, "label").toString(), "malware", x._2.toInt, 1, 1, 1, 1))
+      .sortWith((x,y) => x.queries > y.queries)
+      .zipWithIndex.map { case (x,i) => MainDomainInfo(x.day, x.name, x.label, x.malware, x.queries, 1, 1, (i+1), 0)}
+  }
+  
+  def getValueAsString(map: Map[String, Any], key: String): String = {
     map.getOrElse(key, "").toString()
   }
   
-  private def getValueAsInt(map: Map[String, Any], key: String): Int = {
+  def getValueAsInt(map: Map[String, Any], key: String): Int = {
     map.getOrElse(key, "0").toString().toInt
   }
   
@@ -119,6 +138,42 @@ abstract class AbstractService {
       for (i <- 0 until size-1) {
         println(s"Time[$i] - Time[${i + 1}]: " + (times(i + 1) - times(i)))
       }
+    }
+  }
+  
+  def getTerm(response: SearchResponse, nameTerm: String, nameSubTerm: String): Array[(String, Long)] = {
+    if (response.aggregations != null) {
+    response.aggregations
+      .getOrElse(nameTerm, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => x.getOrElse("key", "key").toString() -> x.getOrElse(nameSubTerm, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]])
+      .map(x => x._1 -> x._2.get("value").getOrElse("0").asInstanceOf[Double])
+      .map(x => x._1 -> x._2.toLong).sorted
+      .toArray
+    } else {
+      Array[(String, Long)]()
+    }
+  }
+
+  def getTerm(response: SearchResponse, nameTerm: String, nameSubTerms: Array[String]): Array[(String, Map[String, Long])] = {
+    if (response.aggregations != null) {
+    response.aggregations
+      .getOrElse(nameTerm, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "key").toString()
+        val value = nameSubTerms
+          .map(y => y -> x.getOrElse(y, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]])
+          .map(y => y._1 -> y._2.get("value").getOrElse("0").toString().toDouble)
+          .map(y => y._1 -> y._2.toLong)
+          .toMap
+        key -> value
+        })
+      .toArray
+    } else {
+      Array[(String, Map[String, Long])]()
     }
   }
 }

@@ -14,7 +14,7 @@ import services.CacheService
 class DashboardController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
   def index = Action {
-    Ok(views.html.ace.dashboard(CacheService.getDaskboard()))
+    Ok(views.html.ace.dashboard(CacheService.getDaskboard()._1))
   }
 }
 

@@ -20,10 +20,7 @@ class ReportController @Inject() (cc: ControllerComponents) extends AbstractCont
     } else {
       CommonService.getLatestDay()
     }
-    //println(key)
-    
     val response = CacheService.getReport(key)
-    
-    Ok(views.html.ace.report(key, response))
+    Ok(views.html.ace.report(key, response._1))
   }
 }

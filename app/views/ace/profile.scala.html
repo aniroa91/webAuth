@@ -93,7 +93,7 @@
 							<span class="bigger-175 blue">@formatNumber(response.current.clients)</span>
 
 							<br />
-							Client
+							Clients
 						</div>
 
 					</div>
@@ -112,7 +112,7 @@
 									<span class="infobox-data-number">
 									@{
 										val value = response.current.rankFtel
-										if (value == 0) {
+										if (value == 0 || value > 999999) {
 											"1M+"
 										} else if (value > 999999) {
 											<font size="4">{formatNumber(value)}</font>
@@ -148,7 +148,7 @@
 									<span class="infobox-data-number">
 									@{
 										val value = response.current.rankAlexa
-										if (value == 0) {
+										if (value == 0 || value > 999999) {
 											"1M+"
 										} else if (value > 999999) {
 											<font size="4">{formatNumber(value)}</font>
@@ -268,7 +268,7 @@
 							</div>
 						</div>
 					</div>
-
+					<!--
 					<div class="space-20"></div>
 					<div class="widget-box transparent">
 						<div class="widget-header widget-header-small">
@@ -286,7 +286,7 @@
 							</div>
 						</div>
 					</div>
-
+					-->
 					<div class="space-20"></div>
 					<div class="widget-box transparent">
 						<div class="widget-header widget-header-small">

@@ -17,6 +17,6 @@ import services.CacheService
 class RankController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
 
   def index = Action {
-      Ok(views.html.ace.rank(CacheService.getRank()))
+      Ok(views.html.ace.rank(CacheService.getRank()._1))
   }
 }

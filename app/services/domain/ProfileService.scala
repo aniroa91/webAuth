@@ -22,12 +22,53 @@ import com.sksamuel.elastic4s.http.search.SearchResponse
 object ProfileService extends AbstractService {
 
   def get(domain: String): ProfileResponse = {
+    get2(domain)
+  }
+
+  def get2(domain: String): ProfileResponse = {
+//    val latestDay = CommonService.getLatestDay()
     val time0 = System.currentTimeMillis()
     val multiSearchResponse = client.execute(
       multi(
-        search(ES_INDEX_ALL / "second") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } limit SIZE_DAY,
-        search(ES_INDEX_ALL / "answer") query { must(termQuery(SECOND_FIELD, domain)) } limit 1000,
-        search(ES_INDEX_ALL / "domain") query { must(termQuery(SECOND_FIELD, domain)) } aggregations (
+        search(s"dns-second-*" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } limit SIZE_DAY,
+//        search("dns-service-domain-*" / "answer") query { must(termQuery(SECOND_FIELD, domain)) } limit 1000,
+        search("dns-domain-*" / "docs") query { must(termQuery(SECOND_FIELD, domain)) }
+          aggregations (cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
+        search(("dns-service-domain-whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) }
+        )).await
+
+    val time1 = System.currentTimeMillis()
+    val secondResponse = multiSearchResponse.responses(0)
+    //val answerResponse = multiSearchResponse.responses(1)
+    val domainResponse = multiSearchResponse.responses(1)
+    val whoisResponse = multiSearchResponse.responses(2)
+
+    if (secondResponse.totalHits > 0) {
+      val time2 = System.currentTimeMillis()
+      val numOfDomain = SearchReponseUtil.getCardinality(domainResponse, NUM_DOMAIN_FIELD)
+      val history = getMainDomainInfo(secondResponse)
+      val current = new MainDomainInfo(history.head, numOfDomain)
+      val time3 = System.currentTimeMillis()
+      val whois = CommonService.getWhoisInfo(whoisResponse, domain, current.label, current.malware)
+      val time4 = System.currentTimeMillis()
+      val answers = null//answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
+      val time5 = System.currentTimeMillis()
+      val hourly = getHourly(domain, current)
+      val time6 = System.currentTimeMillis()
+      //printTime(time0,time1,time2,time3,time4,time5, time6)
+      ProfileResponse(whois, current, history, answers, hourly)
+      //ProfileResponse(whois, current, history, hourly)
+    } else null
+  }
+
+  @deprecated("","")
+  def get1(domain: String): ProfileResponse = {
+    val time0 = System.currentTimeMillis()
+    val multiSearchResponse = client.execute(
+      multi(
+        search("dns-service-domain-*" / "second") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } limit SIZE_DAY,
+        search("dns-service-domain-*" / "answer") query { must(termQuery(SECOND_FIELD, domain)) } limit 1000,
+        search("dns-service-domain-*" / "domain") query { must(termQuery(SECOND_FIELD, domain)) } aggregations (
           cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
         search((ES_INDEX + "whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) }
         )).await
@@ -47,13 +88,13 @@ object ProfileService extends AbstractService {
       val time4 = System.currentTimeMillis()
       val answers = answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
       val time5 = System.currentTimeMillis()
-      val hourly = getHourly(domain, current)
+      val hourly = Array[(Int, Long)]()//getHourly(domain, current)
       val time6 = System.currentTimeMillis()
       //printTime(time0,time1,time2,time3,time4,time5, time6)
       ProfileResponse(whois, current, history, answers, hourly)
     } else null
   }
-
+  
   private def getHourly(domain: String, current: MainDomainInfo): Array[(Int, Long)] = {
     val day = current.day
     val multiSearchResponse = client.execute(
@@ -66,6 +107,7 @@ object ProfileService extends AbstractService {
   }
   
   private def getHourly(response: SearchResponse): Array[(Int, Long)] = {
+    if (response.aggregations != null) {
     response.aggregations
       .getOrElse("hourly", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
@@ -74,5 +116,9 @@ object ProfileService extends AbstractService {
       .map(x => x._1 -> x._2.get("value").getOrElse("0").asInstanceOf[Double])
       .map(x => x._1 -> x._2.toLong).sorted
       .toArray
+    } else {
+      Array[(Int, Long)]()
+    }
+    
   }
 }

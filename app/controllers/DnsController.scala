@@ -24,6 +24,7 @@ import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.DateTimeUtil
 import scala.util.Try
 import services.Configure
+import services.CacheService
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -33,6 +34,10 @@ import services.Configure
 class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigProvider,
     cc: ControllerComponents) extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile]  with I18nSupport {
 
+  def refresh = Action {
+    CacheService.refresh()
+    Ok("")
+  }
 //  val form = Form(
 //    mapping(
 //      "value" -> text

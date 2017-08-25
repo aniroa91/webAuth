@@ -38,6 +38,121 @@
 				<!-- /.sidebar-shortcuts -->
 
 				<ul class="nav nav-list">
+					<li @if(id<10) {class="active open"}>
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon fa fa-globe"></i>
+							<span class="menu-text">
+								DNS
+							</span>
+
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+
+						<b class="arrow"></b>
+
+						<ul class="submenu">
+							<li @if(id==0) {class="active"} >
+								<a href="/">
+									<i class="menu-icon fa fa-tachometer"></i>
+									Dashboard
+								</a>
+
+								<b class="arrow"></b>
+							</li>
+							<li @if(id==1) {class="active"}>
+								<a href="/search">
+									<i class="menu-icon fa fa-search"></i>
+									<span class="menu-text"> Search </span>
+								</a>
+									<b class="arrow"></b>
+							</li>
+							<li @if(id==2) {class="active"}>
+								<a href="/rank">
+									<i class="menu-icon fa fa-star-o" ></i>
+									<span class="menu-text"> Rank </span>
+								</a>
+								<b class="arrow"></b>
+							</li>
+							<li @if(id==3) {class="active"}>
+								<a href="/report">
+									<i class="menu-icon glyphicon glyphicon-list-alt" ></i>
+									<span class="menu-text"> Report </span>
+								</a>
+								<b class="arrow"></b>
+							</li>
+							<!--
+							<li @if(id==4) {class="active"}>
+								<a href="/search">
+									<i class="menu-icon fa fa-bug" ></i>
+									<span class="menu-text"> Malicious </span>		
+								</a>
+								<b class="arrow"></b>
+							</li>
+							-->
+							
+							
+						</ul>
+					</li>
+
+					<li @if(id>=10 && id<20) {class="active open"}>
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon fa fa-user"></i>
+							<span class="menu-text">
+								Profile
+							</span>
+
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+
+						<b class="arrow"></b>
+
+						<ul class="submenu">
+							<!--
+							<li @if(id==10) {class="active"} >
+								<a href="#">
+									<i class="menu-icon fa fa-tachometer"></i>
+									Dashboard
+								</a>
+
+								<b class="arrow"></b>
+							</li>
+							<li @if(id==11) {class="active"}>
+								<a href="/client">
+									<i class="menu-icon fa fa-search" ></i>
+									<span class="menu-text"> Search </span>		
+								</a>
+								<b class="arrow"></b>
+							</li>
+							-->
+						</ul>
+					</li>
+
+					<li @if(id>=20) {class="active open"}>
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon fa fa-server"></i>
+							<span class="menu-text">
+								Device
+							</span>
+
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+
+						<b class="arrow"></b>
+
+						<ul class="submenu">
+							<!--
+							<li @if(id==20) {class="active"} >
+								<a href="#">
+									<i class="menu-icon fa fa-tachometer"></i>
+									Dashboard
+								</a>
+								<b class="arrow"></b>
+							</li>
+							-->
+						</ul>
+					</li>
+
+					<!--
 					<li @if(id==0) {class="active"} >
 						<a href="/">
 							<i class="menu-icon fa fa-tachometer"></i>
@@ -75,7 +190,16 @@
 						</a>
 						<b class="arrow"></b>
 					</li>
+					--
+					<li @if(id==5) {class="active"}>
+						<a href="/client">
+							<i class="menu-icon fa fa-user" ></i>
+							<span class="menu-text"> Client </span>		
+						</a>
+						<b class="arrow"></b>
+					</li>
 					-->
+
 					<!--
 					<li class="active">
 						<a href="index.html">

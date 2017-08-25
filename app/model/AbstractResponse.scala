@@ -29,6 +29,8 @@ case class MainDomainInfo(
     
   def this(that: MainDomainInfo, domains: Int) = 
     this(that.day, that.name, that.label, that.malware, that.queries, domains, that.clients, that.rankFtel, that.rankAlexa)
+  
+  def this(name: String, queries: Int) = this("", name, "", "", queries, 0, 0, 0, 0)
 }
 
 case class TotalInfo(
@@ -38,7 +40,10 @@ case class TotalInfo(
     malwares: Int,
     success: Int,
     failed: Int,
-    seconds: Int)
+    seconds: Int) {
+  def clone(numOfClients: Int) = TotalInfo(queries, domains, numOfClients, malwares, success, failed, seconds)
+  def this() = this(0,0,0,0,0,0,0)
+}
 
 case class MalwareInfo(malware: String, queries: Int, domains: Int, clients: Int)
     

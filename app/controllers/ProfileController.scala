@@ -26,7 +26,7 @@ case class SearchData(q: String)
  */
 @Singleton
 class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)
-      extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile]  with I18nSupport {
+      extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] with I18nSupport {
 
   val form = Form(
     mapping(
@@ -38,11 +38,10 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
     val formValidationResult = form.bindFromRequest
     if (!formValidationResult.hasErrors) {
       val domain = formValidationResult.get.q
-      val secondDomain = DomainUtil.getSecondTopLevel(domain).toLowerCase()
-      val logo = CommonService.downloadLogo(secondDomain)
-      //println(logo)
-      val response = CacheService.getDomain(secondDomain)
-      Ok(views.html.ace.profile(form, secondDomain, response, logo))
+      val second = DomainUtil.extract(domain).second
+      val logo = CommonService.getLogo(second, true)
+      val response = CacheService.getDomain(second)
+      Ok(views.html.ace.profile(form, second, response._1, logo))
     } else {
       Ok(views.html.ace.profile(form, null, null, null))
     }

@@ -7,15 +7,7 @@ import com.ftel.bigdata.utils.DateTimeUtil
 import com.ftel.bigdata.utils.WhoisUtil
 import com.ftel.bigdata.whois.Whois
 import com.sksamuel.elastic4s.http.ElasticDsl.IndexHttpExecutable
-import com.sksamuel.elastic4s.http.ElasticDsl.RichFuture
-import com.sksamuel.elastic4s.http.ElasticDsl.RichString
-import com.sksamuel.elastic4s.http.ElasticDsl.SearchHttpExecutable
-import com.sksamuel.elastic4s.http.ElasticDsl.boolQuery
-import com.sksamuel.elastic4s.http.ElasticDsl.fieldSort
-import com.sksamuel.elastic4s.http.ElasticDsl.indexInto
-import com.sksamuel.elastic4s.http.ElasticDsl.rangeQuery
-import com.sksamuel.elastic4s.http.ElasticDsl.search
-import com.sksamuel.elastic4s.http.ElasticDsl.termQuery
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.search.SearchResponse
 
 import model.MainDomainInfo
@@ -23,21 +15,29 @@ import scala.util.Try
 import services.Configure
 import com.ftel.bigdata.utils.FileUtil
 import com.ftel.bigdata.utils.HttpUtil
+import org.elasticsearch.search.aggregations.bucket.terms.Terms
 
 object CommonService extends AbstractService {
+
+  val SIZE_DEFAULT = 20
 
   /**
    * Service for Get Information about day
    */
   def getLatestDay(): String = {
     val response = client.execute(
-      search(ES_INDEX_ALL / "second") sortBy { fieldSort("day") order SortOrder.DESC } limit 1).await
+      search("dns-daily-*" / "docs") sortBy { fieldSort("day") order SortOrder.DESC } limit 1).await
     response.hits.hits.head.sourceAsMap.getOrElse("day", "").toString()
   }
 
   def getPreviousDay(day: String): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(1).toString(DateTimeUtil.YMD)
+  }
+  
+  def getPreviousDay(day: String, num: Int): String = {
+    val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
+    prev.minusDays(num).toString(DateTimeUtil.YMD)
   }
   
   def isDayValid(day: String): Boolean = {
@@ -101,35 +101,53 @@ object CommonService extends AbstractService {
   /**
    * Get Top
    */
-  def getTopBlackByNumOfQuery(day: String): Array[MainDomainInfo] = {
-    val response = client.execute(
-      search(ES_INDEX_ALL / "second") query {
-        boolQuery()
-          .must(termQuery("day", day))
-          .not(termQuery("malware", "none"), termQuery("malware", "null"))
-      } sortBy {
-        fieldSort("number_of_record") order (SortOrder.DESC)
-      } limit MAX_SIZE_RETURN).await
-    getMainDomainInfo(response)
-  }
+//  def getTopBlackByNumOfQuery(day: String): Array[MainDomainInfo] = {
+//    val response = client.execute(
+//      search(s"dns-second-${day}" / "docs") query {
+//        boolQuery()
+//          .must(termQuery("day", day))
+//          .not(termQuery("malware", "none"), termQuery("malware", "null"))
+//      } sortBy {
+//        fieldSort("queries") order (SortOrder.DESC)
+//      } limit MAX_SIZE_RETURN).await
+//    getMainDomainInfo(response)
+//  }
 
   def getTopByNumOfQuery(day: String, label: String): Array[MainDomainInfo] = {
-    val malware = if (label == Label.White) Label.None else if (label == Label.Unknow) "null" else ???
     val response = client.execute(
-      search(ES_INDEX_ALL / "second") query {
-        boolQuery().must(termQuery("day", day), termQuery("malware", malware))
+      search(s"dns-second-${day}" / "docs") query {
+        boolQuery().must(termQuery("day", day), termQuery("label", label))
       } sortBy {
-        fieldSort("number_of_record") order (SortOrder.DESC)
+        fieldSort("queries") order (SortOrder.DESC)
       } limit MAX_SIZE_RETURN).await
     getMainDomainInfo(response)
   }
 
+  def getTopByNumOfQueryWithRange(fromDay: String, endDay: String): Array[MainDomainInfo] = {
+    val response = client.execute(
+      search(s"dns-second-*" / "docs") query {
+        boolQuery()
+          .must(
+              rangeQuery("day").gte(fromDay).lte(endDay),
+              rangeQuery("rank").gt(0).lte(10000)
+              )
+      } aggregations (
+          termsAggregation("top")
+            .field("second")
+            .subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size MAX_SIZE_RETURN
+      ) sortBy {
+        fieldSort("queries") order (SortOrder.DESC)
+      } limit MAX_SIZE_RETURN).await
+    println("Hits Total: " + response.totalHits)
+    getMainDomainInfo2(response)
+  }
+  
   def getTopRank(from: Int, day: String): Array[MainDomainInfo] = {
     val response = client.execute(
-      search(ES_INDEX_ALL / "second") query {
-        boolQuery().must(rangeQuery("rank_ftel").gt(from - 1).lt(MAX_SIZE_RETURN), termQuery("day", day))
+      search(s"dns-second-${day}" / "docs") query {
+        boolQuery().must(rangeQuery("rank").gt(from - 1).lt(MAX_SIZE_RETURN), termQuery("day", day))
       } sortBy {
-        fieldSort("rank_ftel")
+        fieldSort("rank")
       } limit MAX_SIZE_RETURN).await
     getMainDomainInfo(response)
   }
@@ -151,8 +169,10 @@ object CommonService extends AbstractService {
    * Create html tag
    */
   def getImageTag(domain: String): String = {
-    val logo = downloadLogo(domain)
-    "<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
+    val logo = getLogo(domain, false)
+    //"<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
+    //<img id="currentPhoto" src="SomeImage.jpg" onerror="this.src='Default.jpg'" width="100" height="120">
+    "<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='../assets/images/logo/default.png'\" width=\"30\" height=\"30\"></a>"
   }
   
   def getLinkTag(domain: String): String = {
@@ -162,19 +182,36 @@ object CommonService extends AbstractService {
   /**
    * Download image
    */
-  def downloadLogo(secondDomain: String): String = {
+//  def downloadLogo(secondDomain: String): String = {
+//    val logoUrl = Configure.LOGO_API_URL + secondDomain
+//    val path = Configure.LOGO_PATH + secondDomain + ".png"
+//    val logo = "../extassets/" + secondDomain + ".png"
+//    if (!FileUtil.isExist(path)) {
+//      println("Download logo to " + path)
+//      Try(HttpUtil.download(logoUrl, path, Configure.PROXY_HOST, Configure.PROXY_PORT))
+//    }
+//    if (FileUtil.isExist(path)) {
+//      logo
+//    } else Configure.LOGO_DEFAULT
+//  }
+
+  def getLogo(secondDomain: String, download: Boolean): String = {
     val logoUrl = Configure.LOGO_API_URL + secondDomain
     val path = Configure.LOGO_PATH + secondDomain + ".png"
     val logo = "../extassets/" + secondDomain + ".png"
-    if (!FileUtil.isExist(path)) {
-      println("Download logo to " + path)
-      Try(HttpUtil.download(logoUrl, path, Configure.PROXY_HOST, Configure.PROXY_PORT))
+    if (download) {
+      if (!FileUtil.isExist(path)) {
+        println("Download logo to " + path)
+        Try(HttpUtil.download(logoUrl, path, Configure.PROXY_HOST, Configure.PROXY_PORT))
+      }
     }
     if (FileUtil.isExist(path)) {
       logo
-    } else Configure.LOGO_DEFAULT
+    } else {
+      Configure.LOGO_DEFAULT
+    }
   }
-  
+
   /**
    * ********************************************************************************
    * ********************************************************************************
