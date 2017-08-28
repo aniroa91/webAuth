@@ -83,6 +83,7 @@
 									
 									<div class="space space-4"></div>
 
+									<!--
 									<div class="row">
 										<div class="progress pos-rel" style="height: 30px; width: 275px; margin:0 auto;">
 												<div class="progress-bar progress-bar-success" style="width: 80%;">80%</div>
@@ -96,14 +97,14 @@
 									
 									<div class="clearfix">
 										<div class="grid2">
-											<span class="bigger-175 blue">1</span>
+											<span class="bigger-175 blue">@formatNumber(response.current.queries)</span>
 											<br />
 											Queries
 										</div>
 										<div class="grid2">
-											<span class="bigger-175 blue">2</span>
+											<span class="bigger-175 blue">@response.current.malwares</span>
 											<br />
-											Domains
+											Malwares
 										</div>
 									</div>
 									<div class="hr hr16 dotted"></div>
@@ -116,20 +117,20 @@
 												<div class="infobox-data">
 													<span class="infobox-data-number">
 													@{
-														val value = 1
+														val value = response.current.rank
 														if (value == 0) {
 															"1M+"
 														} else if (value > 999999) {
 															<font size="4">1</font>
 														} else {
-															1
+															value
 														}
 													}
 													</span>
-													<div class="infobox-content">Alexa</div>
+													<div class="infobox-content">Rank</div>
 												</div>
 												@{
-													val diff = 10
+													val diff = response.current.rank - response.prev.rank
 													if (diff >= 0) {
 														<div class="stat stat-success">{diff}</div>
 													} else {
@@ -233,8 +234,32 @@
 											</div>
 										</div>
 									</div>
+
+									<div class="hr hr-8 dotted"></div>
+
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="widget-box transparent">
+												<div class="widget-header widget-header-small">
+													<h4 class="widget-title blue smaller">
+														<i class="ace-icon fa fa-bar-chart orange"></i>
+														Hourly
+													</h4>
+													<div class="widget-toolbar">
+														<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+													</div>
+												</div>
+												<div class="widget-body" style="display: block;">
+													<div class="widget-main no-padding">
+														<div id="hourly-column-chart"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div><!-- /.col -->
 							</div><!-- /.row -->
+
 
 							<div class="space-20"></div>
 							
@@ -302,24 +327,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-sm-4">
-									<div class="widget-box transparent">
-										<div class="widget-header widget-header-small">
-											<h4 class="widget-title blue smaller">
-												<i class="ace-icon fa fa-bar-chart orange"></i>
-												Hourly
-											</h4>
-											<div class="widget-toolbar">
-												<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
-											</div>
-										</div>
-										<div class="widget-body" style="display: block;">
-											<div class="widget-main no-padding">
-												<div id="hourly-column-chart"></div>
-											</div>
-										</div>
-									</div>
-								</div>
+								
 							</div><!-- /.row -->
 							<div class="row">
 								<div class="col-sm-12">
@@ -587,7 +595,7 @@
 			<div class="profile-activity clearfix">
 				@for(i <- 0 until 25) {
 				<div>
-					@i
+					<font size="4px" color="green">@(i + 1)</font>
 					<a class="user" href="/client?q=@topClient(i)._1"> @topClient(i)._1 </a>
 					<div class="time">
 						<i class="ace-icon fa fa-clock-o bigger-110"></i>
@@ -613,8 +621,8 @@
 			<div class="profile-activity clearfix">
 				@for(i <- 25 until 50) {
 				<div>
-					@i
-					<a class="user" href="#"> @topClient(i)._1 </a>
+					<font size="4px" color="green">@(i + 1)</font>
+					<a class="user" href="/client?q=@topClient(i)._1"> @topClient(i)._1 </a>
 					<div class="time">
 						<i class="ace-icon fa fa-clock-o bigger-110"></i>
 						@formatNumber(topClient(i)._2)
@@ -639,8 +647,8 @@
 			<div class="profile-activity clearfix">
 				@for(i <- 50 until 75) {
 				<div>
-					@i
-					<a class="user" href="#"> @topClient(i)._1 </a>
+					<font size="4px" color="green">@(i + 1)</font>
+					<a class="user" href="/client?q=@topClient(i)._1"> @topClient(i)._1 </a>
 					<div class="time">
 						<i class="ace-icon fa fa-clock-o bigger-110"></i>
 						@formatNumber(topClient(i)._2)
@@ -665,8 +673,8 @@
 			<div class="profile-activity clearfix">
 				@for(i <- 75 until 100) {
 				<div>
-					@i
-					<a class="user" href="#"> @topClient(i)._1 </a>
+					<font size="4px" color="green">@(i + 1)</font>
+					<a class="user" href="/client?q=@topClient(i)._1"> @topClient(i)._1 </a>
 					<div class="time">
 						<i class="ace-icon fa fa-clock-o bigger-110"></i>
 						@formatNumber(topClient(i)._2)
@@ -766,9 +774,9 @@
 	            data: queries
 	        }]
 	    });
-
-	    var hours = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._1))));
-	    var values = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._2))));
+	    /*
+	    var hours = @@Html(Json.stringify(Json.toJson(response.hourly.map(x => x._1))));
+	    var values = @@Html(Json.stringify(Json.toJson(response.hourly.map(x => x._2))));
 	    Highcharts.chart('hourly-column-chart', {
 		    chart: {
 		        type: 'column',
@@ -799,9 +807,10 @@
 
 		    }]
 		});
-
-		var days = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._1))));
-	    values = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._2))));
+		*/
+		var days = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.day))));
+	    values = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.queries))));
+	    domains = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.domains))));
 	    Highcharts.chart('daily-line-chart', {
 		    chart: {
 		        type: 'line',
@@ -824,11 +833,22 @@
 		        column: {
 		            pointPadding: 0.2,
 		            borderWidth: 0
-		        }
+		        },
+		        line: {
+	            	dataLabels: {
+	                	enabled: true
+	            	},
+	                enableMouseTracking: false
+	            }
 		    },
 		    series: [{
 		        name: 'Queries',
+		        type: 'spline',
 		        data: values
+		    },{
+		        name: 'Domains',
+		        type: 'spline',
+		        data: domains
 		    }]
 		});
 	    
@@ -923,26 +943,28 @@
 	        }
 	        */
 	        nodeStructure: {
-	            text: { name: "Domain", value: "1,123,985" },
+	            text: { name: "Domain", value: "@formatNumber(response.current.domains)"},
 	            collapsable: true,
 	            children: [
 	                {
-	                    text: { name: "Valid", value: "1,123,985"  },
+	                    text: { name: "Valid", value: "@formatNumber(response.current.valid)"  },
 	                    childrenDropLevel: 1,
 	                    collapsable: true,
 	                    children: [
 	                        {
-	                            text: { name: "Main", value: "1,123,985"  },
+	                            text: { name: "Main", value: "@formatNumber(response.current.seconds)"  }
+	                            /*
 	                            children: [
 	                            	{text: { name: "Black", value: "1,123,985"  }},
 	                            	{text: { name: "White", value: "1,123,985"  }},
 	                            	{text: { name: "Unknow", value: "1,123,985"  }}
 	                            ]
+	                            */
 	                        }
 	                    ]
 	                },
 	                {
-	                    text: { name: "inValid", value: "1,123,985"  },
+	                    text: { name: "inValid", value: "@formatNumber(response.current.domains - response.current.valid)"  },
 	                    collapsable: true
 	                }
 	            ]

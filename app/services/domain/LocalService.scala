@@ -21,7 +21,7 @@ object LocalService extends AbstractService {
     
     //res.daily.foreach(x => println(x._1 -> (x._2.queries + "|" + x._2.domains + "|" + x._2.clients)))
     //println(res)
-    val res = CacheService.getDaskboard()
+    val res = ClientService.get("210.245.24.101", "2017-08-27")
     //res._1.unknow.foreach(println)
     client.close()
 //    

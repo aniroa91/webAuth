@@ -7,6 +7,7 @@ import model.MainDomainInfo
 import model.MalwareInfo
 import model.TotalInfo
 import services.Configure
+import model.ClientInfo
 
 abstract class AbstractService {
 
@@ -109,6 +110,25 @@ abstract class AbstractService {
     terms.map(x => MainDomainInfo("day", x._1, mapLabel.getOrElse(x._1, "label").toString(), "malware", x._2.toInt, 1, 1, 1, 1))
       .sortWith((x,y) => x.queries > y.queries)
       .zipWithIndex.map { case (x,i) => MainDomainInfo(x.day, x.name, x.label, x.malware, x.queries, 1, 1, (i+1), 0)}
+  }
+  
+  //success:26,633,777  rank:1 seconds:3,374,760 failed:1,575,321 domains:6,676,954 valid:6,747,003 day:2017-08-25 malwares:43 _id:AV4b7KCr2f2KIIB2YFFT _type:docs _index:dns-client-2017-08-25 _score:11.689
+  // (day: String, client: String, queries: Int, seconds: Int, domains: Int, success: Int, failed: Int, malwares: Int, valid: Int, rank: Int)
+  def getClientInfo(searchResponse: SearchResponse, valid: Int): Array[ClientInfo] = {
+    searchResponse.hits.hits.map(x => {
+      val sourceAsMap = x.sourceAsMap
+      ClientInfo(
+        getValueAsString(sourceAsMap, DAY_FIELD),
+        getValueAsString(sourceAsMap, "client"),
+        getValueAsInt(sourceAsMap, NUM_QUERY_FIELD),
+        getValueAsInt(sourceAsMap, NUM_SECOND_FIELD),
+        getValueAsInt(sourceAsMap, NUM_DOMAIN_FIELD),
+        getValueAsInt(sourceAsMap, "success"),
+        getValueAsInt(sourceAsMap, "failed"),
+        getValueAsInt(sourceAsMap, NUM_MALWARE_FIELD),
+        valid,
+        getValueAsInt(sourceAsMap, "rank"))
+    })
   }
   
   def getValueAsString(map: Map[String, Any], key: String): String = {

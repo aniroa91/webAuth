@@ -30,12 +30,14 @@ object ReportService extends AbstractService {
       multi(
         search(s"dns-daily-${day}" / "docs"),
         search(s"dns-daily-${prev}" / "docs"),
-        search(s"dns-statslog-${day}" / "docs") query { must(termQuery(LABEL_FIELD, BLACK_VALUE)) }
+        search(s"dns-malware-${day}" / "docs")// query { must(termQuery(LABEL_FIELD, BLACK_VALUE)) }
           aggregations (
             termsAggregation("top")
               .field("malware")
               .subaggs(
-                  sumAgg("sum", "queries"),cardinalityAgg("unique-second", "second"),cardinalityAgg("unique-client", "client")
+                  sumAgg("sum", "queries"),
+                  cardinalityAgg("unique-second", "second"),
+                  cardinalityAgg("unique-client", "client")
               ) size 100
           ),
         search(s"dns-client-${day}" / "docs"),

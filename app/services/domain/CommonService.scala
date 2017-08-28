@@ -64,7 +64,11 @@ object CommonService extends AbstractService {
         map.getOrElse("malware", "").toString())
       whois
     } else {
-      getWhoisFromWeb(domain, label, malware)
+      CommonService.backgroupJob(
+          getWhoisFromWeb(domain, label, malware),
+          "Download Whois for " + domain)
+      //getWhoisFromWeb(domain, label, malware)
+      new Whois()
     }
   }
   private def getWhoisFromWeb(domain: String, label: String, malware: String): Whois = {
@@ -120,6 +124,7 @@ object CommonService extends AbstractService {
       } sortBy {
         fieldSort("queries") order (SortOrder.DESC)
       } limit MAX_SIZE_RETURN).await
+    println(s"Time(${day} ${label}): " + response.took)
     getMainDomainInfo(response)
   }
 
@@ -129,7 +134,7 @@ object CommonService extends AbstractService {
         boolQuery()
           .must(
               rangeQuery("day").gte(fromDay).lte(endDay),
-              rangeQuery("rank").gt(0).lte(10000)
+              rangeQuery("rank").gt(0).lte(MAX_SIZE_RETURN * 10)
               )
       } aggregations (
           termsAggregation("top")
@@ -138,7 +143,7 @@ object CommonService extends AbstractService {
       ) sortBy {
         fieldSort("queries") order (SortOrder.DESC)
       } limit MAX_SIZE_RETURN).await
-    println("Hits Total: " + response.totalHits)
+    println(s"Time(${fromDay} ${endDay}): " + response.took)
     getMainDomainInfo2(response)
   }
   
@@ -217,6 +222,16 @@ object CommonService extends AbstractService {
    * ********************************************************************************
    * ********************************************************************************
    */
-  
-  
+
+  def backgroupJob(f: => Unit, msg: String) {
+    val thread = new Thread {
+      override def run {
+        println("Start " +  msg)
+        //all.map(x => x.name).map(x => CommonService.getLogo(x, true))
+        f
+        println("End " +  msg)
+      }
+    }
+    thread.start()
+  }
 }

@@ -48,6 +48,7 @@ object CacheService {
     }
     val time1 = System.currentTimeMillis()
     val elapse = time1 - time0
+    println("Daskboard: " + elapse)
     res -> elapse
   }
 
@@ -61,15 +62,11 @@ object CacheService {
       val black = CommonService.getTopByNumOfQuery(day, Label.Black)
       val white = CommonService.getTopByNumOfQuery(day, Label.White)
       val unknow = CommonService.getTopByNumOfQuery(day, Label.Unknow)
-      
-      val thread = new Thread {
-        override def run {
-            println("Start Download")
-            all.map(x => x.name).map(x => CommonService.getLogo(x, true))
-            println("Finish Download")
-        }
-      }
-      thread.start()
+
+      CommonService.backgroupJob(
+          all.map(x => x.name).map(x => CommonService.getLogo(x, true)),
+          "Download Logo"
+          )
 
       val last7Days = CommonService.getPreviousDay(day, 7)
       val last30Days = CommonService.getPreviousDay(day, 30)
@@ -83,6 +80,7 @@ object CacheService {
     }
     val time1 = System.currentTimeMillis()
     val elapse = time1 - time0
+    println("Rank: " + elapse)
     res -> elapse
   }
 
@@ -116,6 +114,7 @@ object CacheService {
     }
     val time1 = System.currentTimeMillis()
     val elapse = time1 - time0
+    println(s"Profile: ${domain} [${elapse}]")
     res -> elapse
   }
   
@@ -137,4 +136,6 @@ object CacheService {
     val elapse = time1 - time0
     res -> elapse
   }
+  
+  
 }

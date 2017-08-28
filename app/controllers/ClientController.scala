@@ -45,7 +45,7 @@ class ClientController @Inject() (cc: ControllerComponents) extends AbstractCont
       if (ip == "") {
         Ok("")
       } else {
-        val history = ClientService.historyJson(ip, offset, CommonService.SIZE_DEFAULT)
+        val history = ClientService.historyJsonWithoutHout(ip, offset, CommonService.SIZE_DEFAULT)
          Ok(views.html.ace.timeline(history))
       }
 //      println(history.size)

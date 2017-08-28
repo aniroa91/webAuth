@@ -26,14 +26,14 @@ object ProfileService extends AbstractService {
   }
 
   def get2(domain: String): ProfileResponse = {
-//    val latestDay = CommonService.getLatestDay()
+    val latestDay = CommonService.getLatestDay()
     val time0 = System.currentTimeMillis()
     val multiSearchResponse = client.execute(
       multi(
         search(s"dns-second-*" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } limit SIZE_DAY,
 //        search("dns-service-domain-*" / "answer") query { must(termQuery(SECOND_FIELD, domain)) } limit 1000,
-        search("dns-domain-*" / "docs") query { must(termQuery(SECOND_FIELD, domain)) }
-          aggregations (cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
+        search(s"dns-domain-${latestDay}" / "docs") query { must(termQuery(SECOND_FIELD, domain)) },
+          //aggregations (cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
         search(("dns-service-domain-whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) }
         )).await
 
@@ -43,9 +43,13 @@ object ProfileService extends AbstractService {
     val domainResponse = multiSearchResponse.responses(1)
     val whoisResponse = multiSearchResponse.responses(2)
 
+    println(secondResponse.took)
+    println(domainResponse.took)
+    println(whoisResponse.took)
+    
     if (secondResponse.totalHits > 0) {
       val time2 = System.currentTimeMillis()
-      val numOfDomain = SearchReponseUtil.getCardinality(domainResponse, NUM_DOMAIN_FIELD)
+      val numOfDomain = domainResponse.totalHits//SearchReponseUtil.getCardinality(domainResponse, NUM_DOMAIN_FIELD)
       val history = getMainDomainInfo(secondResponse)
       val current = new MainDomainInfo(history.head, numOfDomain)
       val time3 = System.currentTimeMillis()
@@ -53,9 +57,9 @@ object ProfileService extends AbstractService {
       val time4 = System.currentTimeMillis()
       val answers = null//answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
       val time5 = System.currentTimeMillis()
-      val hourly = getHourly(domain, current)
+      val hourly = Array[(Int, Long)]()//getHourly(domain, current)
       val time6 = System.currentTimeMillis()
-      //printTime(time0,time1,time2,time3,time4,time5, time6)
+      printTime(time0,time1,time2,time3,time4,time5, time6)
       ProfileResponse(whois, current, history, answers, hourly)
       //ProfileResponse(whois, current, history, hourly)
     } else null

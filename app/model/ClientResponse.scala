@@ -30,11 +30,15 @@ case class HistoryInfo(daily: Array[HistoryDay]) {
   }
 }
 
+case class ClientInfo(day: String, client: String, queries: Int, seconds: Int, domains: Int, success: Int, failed: Int, malwares: Int, valid: Int, rank: Int)
+
 case class ClientResponse (
+    current: ClientInfo,
+    prev: ClientInfo,
     topDomain: Array[MainDomainInfo],
     topSecond: Array[MainDomainInfo],
     hourly: Array[(Int, Long)],
-    daily: Array[(String, Long)],
+    daily: Array[ClientInfo],
     history: HistoryInfo) extends AbstractResponse {
   def toJsonObject: JsonObject = ???
 }
