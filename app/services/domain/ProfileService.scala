@@ -12,7 +12,7 @@ import com.sksamuel.elastic4s.http.ElasticDsl.must
 import com.sksamuel.elastic4s.http.ElasticDsl.search
 import com.sksamuel.elastic4s.http.ElasticDsl.termQuery
 import com.sksamuel.elastic4s.http.ElasticDsl.termsAggregation
-import com.sksamuel.elastic4s.http.ElasticDsl.sumAgg
+import com.sksamuel.elastic4s.http.ElasticDsl._
 
 import model.MainDomainInfo
 import model.ProfileResponse
@@ -59,8 +59,11 @@ object ProfileService extends AbstractService {
       val time5 = System.currentTimeMillis()
       val hourly = Array[(Int, Long)]()//getHourly(domain, current)
       val time6 = System.currentTimeMillis()
-      printTime(time0,time1,time2,time3,time4,time5, time6)
-      ProfileResponse(whois, current, history, answers, hourly)
+      val category = CommonService.getCategory(domain)
+      CommonService.backgroupJob(CommonService.getLogo(domain, true), "Download Logo")
+      val time7 = System.currentTimeMillis()
+      printTime(time0,time1,time2,time3,time4,time5, time6, time7)
+      ProfileResponse(whois, current, history, answers, hourly, category)
       //ProfileResponse(whois, current, history, hourly)
     } else null
   }
@@ -95,7 +98,7 @@ object ProfileService extends AbstractService {
       val hourly = Array[(Int, Long)]()//getHourly(domain, current)
       val time6 = System.currentTimeMillis()
       //printTime(time0,time1,time2,time3,time4,time5, time6)
-      ProfileResponse(whois, current, history, answers, hourly)
+      ProfileResponse(whois, current, history, answers, hourly, "N/A")
     } else null
   }
   

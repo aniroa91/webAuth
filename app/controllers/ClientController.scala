@@ -37,7 +37,6 @@ class ClientController @Inject() (cc: ControllerComponents) extends AbstractCont
     } else {
       Ok(views.html.ace.client(form, null, ClientService.getTop(), ""))
     }
-    
   }
 
   
@@ -45,8 +44,10 @@ class ClientController @Inject() (cc: ControllerComponents) extends AbstractCont
       if (ip == "") {
         Ok("")
       } else {
-        val history = ClientService.historyJsonWithoutHout(ip, offset, CommonService.SIZE_DEFAULT)
-         Ok(views.html.ace.timeline(history))
+        val headers = Array[String]("Day", "Time", "Domain", "Second", "Malware", "RCode", "Answers")
+        
+        val history = ClientService.historyBlack2(ip, offset, CommonService.SIZE_DEFAULT).asInstanceOf[Array[Array[Any]]]
+         Ok(views.html.ace.topRankTable(headers.map(x => ""), history, ""))
       }
 //      println(history.size)
 //      val html = views.html.ace.timeline("", history)

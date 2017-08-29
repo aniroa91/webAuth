@@ -39,6 +39,7 @@ case class ClientResponse (
     topSecond: Array[MainDomainInfo],
     hourly: Array[(Int, Long)],
     daily: Array[ClientInfo],
-    history: HistoryInfo) extends AbstractResponse {
+    history: HistoryInfo,
+    historyBlack: Array[Array[String]]) extends AbstractResponse {
   def toJsonObject: JsonObject = ???
 }

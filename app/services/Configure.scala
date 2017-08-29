@@ -8,6 +8,7 @@ object Configure {
   val LOGO_PATH = ConfigFactory.load().getString("storage") + "/"
   
   val LOGO_API_URL = "https://logo.clearbit.com/"
+  val CATEGORY_API_URL = "http://sitereview.bluecoat.com/sitereview.jsp#/?search="
   
   val PROXY_HOST = ConfigFactory.load().getString("proxy.host")
   val PROXY_PORT = ConfigFactory.load().getString("proxy.port").toInt

@@ -15,7 +15,9 @@ libraryDependencies ++= Seq(
   "com.ftel" % "bigdata-dns_2.11" % "0.1.0-SNAPSHOT",
   "com.google.code.gson" % "gson" % "2.8.1",
   "com.typesafe.play" %% "play-slick" % "3.0.0",
-  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0"
+  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0",
+  "org.scalaj" % "scalaj-http_2.11" % "2.3.0",
+  "org.jsoup" % "jsoup" % "1.8.3"
   )
 libraryDependencies += "com.h2database" % "h2" % "1.4.194"
 

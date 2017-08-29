@@ -67,7 +67,12 @@ object CacheService {
           all.map(x => x.name).map(x => CommonService.getLogo(x, true)),
           "Download Logo"
           )
-
+      /*
+      CommonService.backgroupJob(
+          all.map(x => x.name).map(x => CommonService.indexCategory(x)),
+          "Download Logo"
+          )
+			*/
       val last7Days = CommonService.getPreviousDay(day, 7)
       val last30Days = CommonService.getPreviousDay(day, 30)
       
@@ -106,7 +111,7 @@ object CacheService {
       latest = day
     }
     val res = if (domainCache.contains(domain)) {
-      domainCache.get(domain).get
+      domainCache.get(domain).get.updateCategory()
     } else {
       val response = ProfileService.get(domain)
       domainCache.put(domain, response)

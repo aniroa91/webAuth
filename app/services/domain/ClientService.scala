@@ -14,20 +14,21 @@ import model.HistoryRow
 import model.HistoryHour
 import model.HistoryDay
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
+import com.ftel.bigdata.utils.DateTimeUtil
+import com.ftel.bigdata.utils.Parameters
 
 object ClientService extends AbstractService {
 
   def get(ip: String, day: String): ClientResponse = {
     val time0 = System.currentTimeMillis()
     
-    val response = client.execute(search(s"dns-client-*" / "docs") query {boolQuery().must(termQuery("client", ip))}).await
+    val response = client.execute(search(s"dns-client-*" / "docs") query {boolQuery().must(termQuery("client", ip))} size 30).await
     val responseValid = client.execute(search(s"dns-history-client-${day}" / "docs")
-          query { boolQuery().must(termQuery("client", ip))}
+          query { boolQuery().must(termQuery("client", ip)) }
           aggregations (
             termsAggregation("topDomain").field("domain").subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size 10,
             termsAggregation("topSecond").field("second").subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size 10
-          )
-            sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC)
+          ) sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC)
         ).await
         
 //    val a = client.show(search(s"dns-history-client-${day}" / "docs")
@@ -51,6 +52,7 @@ object ClientService extends AbstractService {
     
    
     val daily = getClientInfo(response, responseValid.totalHits).sortBy(x => x.day)
+    val responseHourly = client.execute(search(s"dns-hourly-client-${day}" / "docs") query {boolQuery().must(termQuery("name", ip))} size 24).await
 //    val response = client.execute(
 //      search(s"dns-statslog-2017-08-20" / "docs") query {
 //        boolQuery().must(termQuery("client", ip))
@@ -88,10 +90,23 @@ object ClientService extends AbstractService {
     val topDomain = ElasticUtil.getBucketTerm(responseValid, "topDomain", "sum").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
     val topSecond = ElasticUtil.getBucketTerm(responseValid, "topSecond", "sum").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
     
+    //daily.map(x => x.day -> x.queries).foreach(println)
+    
     val history = getHistory(response)
     val current = daily.reverse.head
     val prev = if (daily.size >= 2) daily.reverse.tail.head else current
-    ClientResponse(current, prev, topDomain, topSecond, null, daily, historyJsonWithoutHout(ip, 0, CommonService.SIZE_DEFAULT))
+    
+    val hourly = responseHourly.hits.hits.map(x => {
+      val map = x.sourceAsMap
+      val hour = map.getOrElse("hour", "0").toString.toInt
+      val queries = map.getOrElse("queries", "0").toString.toLong
+      hour -> queries
+    }).toMap
+    val hourInDay = (0 until 24).map(x => x -> hourly.getOrElse(x, 0L)).toArray
+    //println(hourly.map(x => x._2).sum)
+    //hourly.foreach(println)
+    //println(hourly.size)
+    ClientResponse(current, prev, topDomain, topSecond, hourInDay, daily, historyBlack(ip, 0, CommonService.SIZE_DEFAULT), historyBlack2(ip, 0, CommonService.SIZE_DEFAULT))
   }
 
   def getTop(): Array[(String, Int)] = {
@@ -104,7 +119,7 @@ object ClientService extends AbstractService {
     res.sortBy(x => x._2).reverse
   }
   
-  def historyJsonWithoutHout(ip: String, offset: Int, size: Int): HistoryInfo = {
+  def historyJsonWithoutHour(ip: String, offset: Int, size: Int): HistoryInfo = {
     val latestDay = CommonService.getLatestDay()
     val time0 = System.currentTimeMillis()
     val response = client.execute(
@@ -115,6 +130,47 @@ object ClientService extends AbstractService {
         fieldSort(DAY_FIELD) order SortOrder.DESC,
         fieldSort("queries") order SortOrder.DESC) from offset limit size).await
     getHistory(response)
+  }
+  
+  def historyBlack(ip: String, offset: Int, size: Int): HistoryInfo = {
+    val latestDay = CommonService.getLatestDay()
+    val time0 = System.currentTimeMillis()
+    val response = client.execute(
+      search(s"dns-black-*" / "docs") query {
+        boolQuery()
+          .must(termQuery("client", ip))
+      } sortBy (
+        fieldSort("timeStamp") order SortOrder.DESC) from offset limit size).await
+    getHistory2(response)
+  }
+  
+  def historyBlack2(ip: String, offset: Int, size: Int): Array[Array[String]] = {
+    val latestDay = CommonService.getLatestDay()
+    val time0 = System.currentTimeMillis()
+    val response = client.execute(
+      search(s"dns-black-*" / "docs") query {
+        boolQuery()
+          .must(termQuery("client", ip))
+      } sortBy (
+        fieldSort("timeStamp") order SortOrder.DESC) from offset limit size).await
+    val res = response.hits.hits.map(x => {
+      val map = x.sourceAsMap
+      //println(map)
+      val timestamp = map.get("timeStamp").getOrElse("0").toString()
+      val date = DateTimeUtil.create(timestamp, Parameters.ES_5_DATETIME_FORMAT)
+      val day = date.toString(DateTimeUtil.YMD)
+      val hour = date.toString("HH")//map.get("hour").getOrElse("").toString()
+      val domain = map.get("domain").getOrElse("").toString()
+      val second = map.get("second").getOrElse("").toString()
+      val label = map.get("label").getOrElse("").toString()
+      val queries = map.get("queries").getOrElse("0").toString().toInt
+      val rCode = map.get("rCodeName").getOrElse("-1").toString()
+      val malware = map.get("malware").getOrElse("null").toString()
+      val answers = map.get("answers").getOrElse("null").toString()
+      
+      Array(day, date.toString("HH:mm:SS"), domain, second, malware, rCode, answers)
+    })
+    res
   }
   
   def historyJson(ip: String, offset: Int, size: Int): HistoryInfo = {
@@ -136,6 +192,26 @@ object ClientService extends AbstractService {
       val map = x.sourceAsMap
       val day = map.get("day").getOrElse("").toString()
       val hour = map.get("hour").getOrElse("").toString()
+      val domain = map.get("domain").getOrElse("").toString()
+      val second = map.get("second").getOrElse("").toString()
+      val label = map.get("label").getOrElse("").toString()
+      val queries = map.get("queries").getOrElse("0").toString().toInt
+      val rCode = map.get("rCode").getOrElse("-1").toString()
+      //println(day)
+      HistoryDay(day, Array(HistoryHour(hour, Array(HistoryRow(domain, second, label, queries, rCode)))))
+    })
+    //println(response.totalHits)
+    HistoryInfo(res).group()
+  }
+  
+  private def getHistory2(response: SearchResponse): HistoryInfo = {
+    val res = response.hits.hits.map(x => {
+      val map = x.sourceAsMap
+      //println(map)
+      val timestamp = map.get("timeStamp").getOrElse("0").toString()
+      val date = DateTimeUtil.create(timestamp, Parameters.ES_5_DATETIME_FORMAT)
+      val day = date.toString(DateTimeUtil.YMD)
+      val hour = date.toString("HH")//map.get("hour").getOrElse("").toString()
       val domain = map.get("domain").getOrElse("").toString()
       val second = map.get("second").getOrElse("").toString()
       val label = map.get("label").getOrElse("").toString()

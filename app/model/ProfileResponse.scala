@@ -4,13 +4,22 @@ import com.ftel.bigdata.whois.Whois
 import com.google.gson.JsonObject
 import com.google.gson.JsonArray
 import com.google.gson.Gson
+import services.domain.CommonService
 
 case class ProfileResponse (
     whois: Whois,
     current: MainDomainInfo,
     history: Array[MainDomainInfo],
     answers: Array[String],
-    hourly: Array[(Int, Long)]) extends AbstractResponse {
+    hourly: Array[(Int, Long)],
+    category: String) extends AbstractResponse {
+
+  def updateCategory(): ProfileResponse = {
+    if (this.category == "N/A")
+      ProfileResponse(this.whois, this.current, this.history, this.answers, this.hourly, CommonService.getCategory(this.current.name))
+    else this
+  }
+  
   def toJsonObject: JsonObject = ???
   /*
   def toJsonObject: JsonObject = if (current != null) {

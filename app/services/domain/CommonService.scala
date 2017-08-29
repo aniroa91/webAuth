@@ -16,6 +16,13 @@ import services.Configure
 import com.ftel.bigdata.utils.FileUtil
 import com.ftel.bigdata.utils.HttpUtil
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
+import org.apache.http.HttpHost
+import scalaj.http.Http
+import play.api.libs.json.Json
+import scala.concurrent.duration.Duration
+import java.util.concurrent.TimeUnit
+import org.jsoup.Jsoup
+import org.jsoup.select.Elements
 
 object CommonService extends AbstractService {
 
@@ -85,6 +92,7 @@ object CommonService extends AbstractService {
       case e: Exception => e.printStackTrace(); new Whois()
     }
   }
+  
   private def indexWhois(esIndex: String, esType: String, whois: Whois) {
     client.execute(
       indexInto(esIndex / esType) fields (
@@ -102,6 +110,59 @@ object CommonService extends AbstractService {
         id whois.domainName).await
   }
 
+  /**
+   * Get Category
+   */
+  def getCategory(domain: String): String = {
+    val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-category/docs").await
+    println(domain -> getResponse.sourceAsMap)
+    val category = getResponse.sourceAsMap.getOrElse("category", "N/A").toString()
+    if (category == "N/A") {
+      CommonService.backgroupJob(indexCategory(domain),"Download Category for " + domain)
+    }
+    category
+  }
+  
+  def indexCategory(domain: String) {
+    val category = getCategorySitereviewBluecoatCom(domain)
+//    println(category)
+    if (category != null) {
+      client.execute( indexInto("dns-category" / "docs") fields ("category" -> category) id domain).await//(Duration.apply(10, TimeUnit.SECONDS))
+    }
+  }
+  
+  def getCategorySitereviewBluecoatCom(domain: String): String = {
+    
+    val req = Http("http://sitereview.bluecoat.com/rest/categorization")
+                .proxy(Configure.PROXY_HOST, Configure.PROXY_PORT)
+                .postForm(Seq("url" -> domain))
+                
+    val res = req.asString.body
+    println(res)
+    val json = Json.parse(res)
+    val option = json.\("categorization")
+    if (option.isEmpty) {
+      null
+    } else {
+      val doc = Jsoup.parse(option.get.toString())
+      val elements = doc.body().select("a")
+      val seq = 0 until elements.size()
+      seq.map(x => elements.get(x))
+         .map(x => x.text())
+         .mkString(" AND ")
+
+//      elements.
+//      for (e <- elements.toArray(Elements)) {
+//        println("1" + e.text())
+//      }
+      
+//      val endIndex = option.get.toString().lastIndexOf("</a>")
+//      val beginIndex = option.get.toString().substring(0, endIndex).lastIndexOf("\\\">") + 3
+//      option.get.toString().substring(beginIndex, endIndex)
+      
+    }
+  }
+  
   /**
    * Get Top
    */
@@ -226,10 +287,13 @@ object CommonService extends AbstractService {
   def backgroupJob(f: => Unit, msg: String) {
     val thread = new Thread {
       override def run {
+        val time0 = System.currentTimeMillis()
         println("Start " +  msg)
         //all.map(x => x.name).map(x => CommonService.getLogo(x, true))
         f
-        println("End " +  msg)
+        val time1 = System.currentTimeMillis()
+        println("End " +  msg + s" [${time1 -time0}]")
+        
       }
     }
     thread.start()

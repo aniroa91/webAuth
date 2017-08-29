@@ -63,13 +63,23 @@
 										} else {
 											<i class="ace-icon fa fa-circle light-grey"></i>
 										}
-										
 									}
 									&nbsp;
 									<span class="white">@domain</span>
 								</a>
 							</div>
 						</div>
+
+						<div class="hr hr16 dotted"></div>
+
+					<div class="clearfix">
+						<div class="grid1">
+							<span class="fa fa-tags" style="font-size:20px;color:Teal">
+								@response.category
+							</span>
+						</div>				
+					</div>
+
 					</div>
 
 					<div class="space-6"></div>
@@ -77,8 +87,16 @@
 
 					<div class="clearfix">
 						<div class="grid3">
-							<span class="bigger-175 blue">@formatNumber(response.current.queries)</span>
-
+							<span class="bigger-175 blue">
+								@{
+									val value = response.current.queries
+									if (value > 99999999) {
+										<font size="4">{formatNumber(value)}</font>
+									} else {
+										{formatNumber(value)}
+									}
+								}
+							</span>
 							<br />
 							Queries
 						</div>
@@ -197,7 +215,7 @@
 								}
 							}
 							
-						</span>
+						
 
 						
 						</div>
