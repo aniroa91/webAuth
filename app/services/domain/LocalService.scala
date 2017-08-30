@@ -75,6 +75,9 @@ object LocalService extends AbstractService {
 //  }
   
   def main(args: Array[String]) {
+    
+    ClientService.historyBlack("210.245.24.101", 0, 10)
+    
 //    println(CommonService.getCategorySitereviewBluecoatCom("facebook.net"))
    // val a = Configure.client.execute(search(s"dns-hourly-client-2017-08-28" / "docs") query {boolQuery().must(termQuery("name", "210.245.24.101"))})
     //val res = a.await

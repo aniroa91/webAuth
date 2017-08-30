@@ -45,4 +45,30 @@
 		<script src="@relativePath/assets/datepicker/css/bootstrap-datetimepicker.min.css"></script>
 		-->
 		<link rel="stylesheet" href="@relativePath/assets/stylesheets/Treant.css" />
+
+		<style>
+			#spreadsheet {
+				border-collapse: collapse;
+
+				counter-reset: row col;
+			}
+
+			#spreadsheet th,
+			#spreadsheet td {
+				width: 10em;
+				min-width: 10em;
+				height: 2em;
+				border: 1px solid #C5C5C5;
+			}
+
+			#spreadsheet tr:first-child th:before {
+				counter-increment: col;
+				content: counter(col, upper-alpha);
+			}
+
+			#spreadsheet tr th:first-child:before {
+				counter-increment: row;
+				content: counter(row);
+			}
+		</style>
 	</head>

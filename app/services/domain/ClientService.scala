@@ -156,19 +156,19 @@ object ClientService extends AbstractService {
     val res = response.hits.hits.map(x => {
       val map = x.sourceAsMap
       //println(map)
-      val timestamp = map.get("timeStamp").getOrElse("0").toString()
+      val timestamp = getValueAsString(map, "timeStamp", "0") //map.get("timeStamp").getOrElse("0").toString()
       val date = DateTimeUtil.create(timestamp, Parameters.ES_5_DATETIME_FORMAT)
       val day = date.toString(DateTimeUtil.YMD)
       val hour = date.toString("HH")//map.get("hour").getOrElse("").toString()
-      val domain = map.get("domain").getOrElse("").toString()
-      val second = map.get("second").getOrElse("").toString()
+      val domain = getValueAsString(map, "domain")//map.get("domain").getOrElse("").toString()
+      val second = getValueAsString(map, "second")//map.get("second").getOrElse("").toString()
       val label = map.get("label").getOrElse("").toString()
-      val queries = map.get("queries").getOrElse("0").toString().toInt
-      val rCode = map.get("rCodeName").getOrElse("-1").toString()
-      val malware = map.get("malware").getOrElse("null").toString()
-      val answers = map.get("answers").getOrElse("null").toString()
+      val queries = getValueAsString(map, "queries")//map.get("queries").getOrElse("0").toString().toInt
+      val rCode = getValueAsString(map, "rCodeName")//map.get("rCodeName").getOrElse("-1").toString()
+      val malware = getValueAsString(map, "malware")//map.get("malware").getOrElse("null").toString()
+      val answers = getValueAsString(map, "answers")//map.get("answers").getOrElse("null").toString()
       
-      Array(day, date.toString("HH:mm:SS"), domain, second, malware, rCode, answers)
+      Array(day, date.toString("HH:mm:SS"), domain, second, malware, rCode, answers.split(",").mkString("\n"))
     })
     res
   }
@@ -212,11 +212,13 @@ object ClientService extends AbstractService {
       val date = DateTimeUtil.create(timestamp, Parameters.ES_5_DATETIME_FORMAT)
       val day = date.toString(DateTimeUtil.YMD)
       val hour = date.toString("HH")//map.get("hour").getOrElse("").toString()
-      val domain = map.get("domain").getOrElse("").toString()
-      val second = map.get("second").getOrElse("").toString()
-      val label = map.get("label").getOrElse("").toString()
-      val queries = map.get("queries").getOrElse("0").toString().toInt
-      val rCode = map.get("rCode").getOrElse("-1").toString()
+      val domain = getValueAsString(map, "domain")//map.get("domain").getOrElse("").toString()
+//      println(map.get("second").get.toString())
+      val second = getValueAsString(map, "second")//map.get("second").getOrElse("").toString()
+      
+      val label = getValueAsString(map, "label")//map.get("label").getOrElse("").toString()
+      val queries = getValueAsInt(map, "queries")//map.get("queries").getOrElse("0").toString().toInt
+      val rCode = getValueAsString(map, "rCode")//map.get("rCode").getOrElse("-1").toString()
       //println(day)
       HistoryDay(day, Array(HistoryHour(hour, Array(HistoryRow(domain, second, label, queries, rCode)))))
     })

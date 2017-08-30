@@ -8,6 +8,7 @@ import model.MalwareInfo
 import model.TotalInfo
 import services.Configure
 import model.ClientInfo
+import com.ftel.bigdata.utils.StringUtil
 
 abstract class AbstractService {
 
@@ -131,12 +132,17 @@ abstract class AbstractService {
     })
   }
   
+  def getValueAsString(map: Map[String, Any], key: String, default: String): String = {
+    val result = map.getOrElse(key, default)
+    if (result != null) result.toString() else default
+  }
+  
   def getValueAsString(map: Map[String, Any], key: String): String = {
-    map.getOrElse(key, "").toString()
+    getValueAsString(map, key, "")
   }
   
   def getValueAsInt(map: Map[String, Any], key: String): Int = {
-    map.getOrElse(key, "0").toString().toInt
+    getValueAsString(map, key, "0").toInt
   }
   
   def sumTotalInfo(totalInfoArrs: Array[TotalInfo]): TotalInfo = {

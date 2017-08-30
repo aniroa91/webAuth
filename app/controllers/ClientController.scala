@@ -47,7 +47,7 @@ class ClientController @Inject() (cc: ControllerComponents) extends AbstractCont
         val headers = Array[String]("Day", "Time", "Domain", "Second", "Malware", "RCode", "Answers")
         
         val history = ClientService.historyBlack2(ip, offset, CommonService.SIZE_DEFAULT).asInstanceOf[Array[Array[Any]]]
-         Ok(views.html.ace.topRankTable(headers.map(x => ""), history, ""))
+         Ok(views.html.ace.tablescroll(null, history))
       }
 //      println(history.size)
 //      val html = views.html.ace.timeline("", history)
