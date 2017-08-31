@@ -18,6 +18,8 @@ import model.MainDomainInfo
 import model.ProfileResponse
 import utils.SearchReponseUtil
 import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.ftel.bigdata.utils.HttpUtil
+import model.DomainLocation
 
 object ProfileService extends AbstractService {
 
@@ -61,13 +63,44 @@ object ProfileService extends AbstractService {
       val time6 = System.currentTimeMillis()
       val category = CommonService.getCategory(domain)
       CommonService.backgroupJob(CommonService.getLogo(domain, true), "Download Logo")
+      //CommonService.backgroupJob(indexLocation(domain), "Download Location")
+      indexLocation(domain)
+      val loc = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await
+      val map = loc.sourceAsMap
+      
       val time7 = System.currentTimeMillis()
       printTime(time0,time1,time2,time3,time4,time5, time6, time7)
-      ProfileResponse(whois, current, history, answers, hourly, category)
+      ProfileResponse(whois, current, history, answers, hourly, category,
+          DomainLocation(domain,
+              getValueAsString(map, "query"),
+              getValueAsString(map, "country"),
+              getValueAsString(map, "regionName"),
+              getValueAsString(map, "city"),
+              getValueAsString(map, "timezone"),
+              getValueAsString(map, "org"),
+              getValueAsString(map, "lat"),
+              getValueAsString(map, "lon")))
       //ProfileResponse(whois, current, history, hourly)
     } else null
   }
 
+  private val IP_API_URL = "http://ip-api.com/json/"
+  private def indexLocation(domain: String) {
+    val time0 = System.currentTimeMillis()
+    val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await
+    if (!getResponse.exists) {
+      val url = IP_API_URL + domain
+      val content = HttpUtil.getContent(url, "172.30.45.220", 80)
+//      val content = HttpUtil.getContent(url)
+      //println(content)
+      client.execute(indexInto("dns-location" / "docs") doc (content) id domain ).await
+      //Thread.sleep(300)
+      
+    }
+    val time1 = System.currentTimeMillis()
+    println("Download location for " + domain + " [" + (time1 - time0) + "]")
+  }
+    
   @deprecated("","")
   def get1(domain: String): ProfileResponse = {
     val time0 = System.currentTimeMillis()
@@ -98,7 +131,7 @@ object ProfileService extends AbstractService {
       val hourly = Array[(Int, Long)]()//getHourly(domain, current)
       val time6 = System.currentTimeMillis()
       //printTime(time0,time1,time2,time3,time4,time5, time6)
-      ProfileResponse(whois, current, history, answers, hourly, "N/A")
+      ProfileResponse(whois, current, history, answers, hourly, "N/A", null)
     } else null
   }
   

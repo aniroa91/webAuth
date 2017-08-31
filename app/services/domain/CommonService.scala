@@ -23,6 +23,8 @@ import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
+import play.api.libs.json.JsObject
+import com.ftel.bigdata.utils.StringUtil
 
 object CommonService extends AbstractService {
 
@@ -124,9 +126,10 @@ object CommonService extends AbstractService {
   }
   
   def indexCategory(domain: String) {
-    val category = getCategorySitereviewBluecoatCom(domain)
+    //val category = getCategorySitereviewBluecoatCom(domain)
+    val category = getCategoryFromApiXforceIbmcloud(domain)
 //    println(category)
-    if (category != null) {
+    if (StringUtil.isNotNullAndEmpty(category)) {
       client.execute( indexInto("dns-category" / "docs") fields ("category" -> category) id domain).await//(Duration.apply(10, TimeUnit.SECONDS))
     }
   }
@@ -138,7 +141,7 @@ object CommonService extends AbstractService {
                 .postForm(Seq("url" -> domain))
                 
     val res = req.asString.body
-    println(res)
+    //println(res)
     val json = Json.parse(res)
     val option = json.\("categorization")
     if (option.isEmpty) {
@@ -162,6 +165,20 @@ object CommonService extends AbstractService {
       
     }
   }
+  
+  def getCategoryFromApiXforceIbmcloud(domain: String): String = {
+    val req = Http("https://api.xforce.ibmcloud.com/url/" + domain)
+                .proxy(Configure.PROXY_HOST, Configure.PROXY_PORT)
+                .header("Accept", "application/json")
+                .header("Authorization", "Basic YTdiYzdiMjctMWRlYy00NTAyLTliM2YtYjVmMGQ3NzNmYjU3OjgyN2RlZWY5LWRkZjUtNDc2MS05ZTkyLTNhYmY5YzVkNDlmYQ==")
+    val res = req.asString.body
+    //println(res)
+    val json = Json.parse(res)
+    val cats = json.\\("cats")
+    cats.map(x => x.asInstanceOf[JsObject].keys.mkString("/")).distinct.mkString(" AND ")
+  }
+  
+  //curl -X GET --header 'Accept: application/json' --header 'Authorization: Basic YTdiYzdiMjctMWRlYy00NTAyLTliM2YtYjVmMGQ3NzNmYjU3OjgyN2RlZWY5LWRkZjUtNDc2MS05ZTkyLTNhYmY5YzVkNDlmYQ==' 'https://api.xforce.ibmcloud.com/url/vnexpress.net'
   
   /**
    * Get Top

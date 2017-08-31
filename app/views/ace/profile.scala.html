@@ -47,7 +47,7 @@
 				<div class="col-xs-12 col-sm-3 center">
 					<div>
 						<span class="profile-picture">
-						<img id="avatar" class="editable img-responsive" alt="@domain's Logo" src="@logo" />
+						<img id="avatar" class="editable img-responsive" onerror="this.src='../assets/images/logo/default.png'" src="@logo" />
 						</span>
 
 						<div class="space-4"></div>
@@ -222,8 +222,77 @@
 						
 					</div>
 
-										
+					<div class="hr hr16 dotted"></div>
 
+					@if(response.loc != null) {
+					<div class="clearfix">
+						<div class="grid1">				
+						
+							<div class="profile-user-info profile-user-info-striped">
+								<div class="profile-info-row">
+									<div class="profile-info-name"> IP </div>
+
+									<div class="profile-info-value">
+										<span class="editable" id="username">@response.loc.ip</span>
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Country </div>
+
+									<div class="profile-info-value">
+										<!--<i class="fa fa-map-marker light-orange bigger-110"></i>-->
+										<span class="editable" id="country">@response.loc.country</span>
+										<!--<span class="editable" id="city">Amsterdam</span>-->
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Region </div>
+
+									<div class="profile-info-value">
+										@response.loc.region
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> City </div>
+
+									<div class="profile-info-value">
+										<span class="editable" id="signup">@response.loc.city</span>
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Timezone </div>
+
+									<div class="profile-info-value">
+										<span class="editable" id="login">@response.loc.timezone</span>
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Organization </div>
+
+									<div class="profile-info-value">
+										<span class="editable" id="about">@response.loc.org</span>
+									</div>
+								</div>
+
+							</div>
+						
+						</div>
+					</div>
+					<div class="hr hr16 dotted"></div>
+					<div class="clearfix">
+						<div class="grid1">	
+							<div id="r" style="opacity: 1; background-image: url(&quot;http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyAjh0Pdk6dasNa6f58zkd86cOrtNxbHQHE&amp;center=@response.loc.lat,@response.loc.lon&amp;zoom=6&amp;format=jpg&amp;size=380x380&amp;language=en&amp;path=color:0x3af1ad30|weight:116|@response.loc.lat,@response.loc.lon&quot;); background-repeat: no-repeat; height:380px; width:380px;">
+							</div>
+						
+						</div>
+					</div>	
+					}	
+					
 
 
 				</div>
@@ -232,59 +301,64 @@
 					
 					<div class="space-12"></div>
 
-					<div class="profile-user-info profile-user-info-striped">
-						<div class="profile-info-row">
-							<div class="profile-info-name"> Registrar </div>
+					<div class="row">
+						<div class="col-xs-12 col-sm-12">
+							<div class="profile-user-info profile-user-info-striped">
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Registrar </div>
 
-							<div class="profile-info-value">
-								<span class="editable" id="username">@response.whois.registrar</span>
+									<div class="profile-info-value">
+										<span class="editable" id="username">@response.whois.registrar</span>
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Whois Server </div>
+
+									<div class="profile-info-value">
+										<!--<i class="fa fa-map-marker light-orange bigger-110"></i>-->
+										<span class="editable" id="country">@response.whois.whoisServer</span>
+										<!--<span class="editable" id="city">Amsterdam</span>-->
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Name Server </div>
+
+									<div class="profile-info-value">
+										@for(nameserver <- response.whois.nameServer) {
+											<span class="editable">@nameserver</span>
+										}
+										
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Create </div>
+
+									<div class="profile-info-value">
+										<span class="editable" id="signup">@response.whois.create</span>
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Update </div>
+
+									<div class="profile-info-value">
+										<span class="editable" id="login">@response.whois.update</span>
+									</div>
+								</div>
+
+								<div class="profile-info-row">
+									<div class="profile-info-name"> Expire </div>
+
+									<div class="profile-info-value">
+										<span class="editable" id="about">@response.whois.expire</span>
+									</div>
+								</div>
 							</div>
 						</div>
-
-						<div class="profile-info-row">
-							<div class="profile-info-name"> Whois Server </div>
-
-							<div class="profile-info-value">
-								<!--<i class="fa fa-map-marker light-orange bigger-110"></i>-->
-								<span class="editable" id="country">@response.whois.whoisServer</span>
-								<!--<span class="editable" id="city">Amsterdam</span>-->
-							</div>
-						</div>
-
-						<div class="profile-info-row">
-							<div class="profile-info-name"> Name Server </div>
-
-							<div class="profile-info-value">
-								@for(nameserver <- response.whois.nameServer) {
-									<span class="editable">@nameserver</span>
-								}
-								
-							</div>
-						</div>
-
-						<div class="profile-info-row">
-							<div class="profile-info-name"> Create </div>
-
-							<div class="profile-info-value">
-								<span class="editable" id="signup">@response.whois.create</span>
-							</div>
-						</div>
-
-						<div class="profile-info-row">
-							<div class="profile-info-name"> Update </div>
-
-							<div class="profile-info-value">
-								<span class="editable" id="login">@response.whois.update</span>
-							</div>
-						</div>
-
-						<div class="profile-info-row">
-							<div class="profile-info-name"> Expire </div>
-
-							<div class="profile-info-value">
-								<span class="editable" id="about">@response.whois.expire</span>
-							</div>
-						</div>
+							
 					</div>
 					<!--
 					<div class="space-20"></div>
@@ -349,6 +423,8 @@
 					<div class="space-6"></div>
 					
 				</div>
+
+				
 			</div>
 		</div>
 		

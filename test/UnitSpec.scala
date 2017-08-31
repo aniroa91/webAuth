@@ -1,5 +1,5 @@
 import akka.actor.ActorSystem
-import controllers.{AsyncController, CountController}
+//import controllers.{AsyncController, CountController}
 import org.scalatestplus.play._
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
@@ -19,6 +19,7 @@ class UnitSpec extends PlaySpec {
     }
   }
   */
+  /*
   "AsyncController" should {
 
     "return a valid result on action.async" in {
@@ -36,5 +37,5 @@ class UnitSpec extends PlaySpec {
     }
 
   }
-
+  */
 }

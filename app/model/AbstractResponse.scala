@@ -46,7 +46,27 @@ case class TotalInfo(
 }
 
 case class MalwareInfo(malware: String, queries: Int, domains: Int, clients: Int)
-    
+
+//private def indexLocation(client: HttpClient, domain: String) {
+//    
+//    val time0 = System.currentTimeMillis()
+//    val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await
+//    if (!getResponse.exists) {
+//      val url = IP_API_URL + domain
+//      //val content = HttpUtil.getContent(url, "172.30.45.220", 80)
+//      val content = HttpUtil.getContent(url)
+//      //println(content)
+//      client.execute(indexInto("dns-location" / "docs") doc (content) id domain ).await
+//      Thread.sleep(300)
+//    }
+//    val time1 = System.currentTimeMillis()
+//    //println(time1 - time0)
+//  }
+
+case class DomainLocation(second: String, ip: String, country: String, region: String, city: String, timezone: String, org: String, lat: String, lon: String) {
+  
+}
+
 abstract class AbstractResponse {
   
 }
