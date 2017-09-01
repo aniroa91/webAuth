@@ -14,6 +14,7 @@ import model.TotalInfo
 import com.ftel.bigdata.utils.DateTimeUtil
 import scala.collection.immutable.HashSet
 import org.joda.time.Days
+import com.ftel.bigdata.dns.parameters.Label
 
 //import org.apache.lucene.index.Terms
 //import org.elasticsearch.search.aggregations.bucket.terms.Terms
@@ -73,7 +74,11 @@ object DashboardService extends AbstractService {
     if (report != null) {
       //val daily = getTotalInfoDaily(response)
       //if (daily.exists(x => x._1 == report.day)) {
-        DashboardResponse(report, days.map(x => if (map.contains(x)) x -> map.getOrElse(x, null) else x -> new TotalInfo()))
+      val black = CommonService.getTopByNumOfQuery(day, Label.Black)
+      val white = CommonService.getTopByNumOfQuery(day, Label.White)
+      val unknow = CommonService.getTopByNumOfQuery(day, Label.Unknow)
+      
+      DashboardResponse(report, days.map(x => if (map.contains(x)) x -> map.getOrElse(x, null) else x -> new TotalInfo()), black, white, unknow)
       //} else {
       //  DashboardResponse(report, daily :+ (report.day -> report.current))
       //}
@@ -91,9 +96,9 @@ object DashboardService extends AbstractService {
     if (report != null) {
       val daily = getTotalInfoDaily(dailyResponse)
       if (daily.exists(x => x._1 == report.day)) {
-        DashboardResponse(report, daily)
+        DashboardResponse(report, daily, null, null, null)
       } else {
-        DashboardResponse(report, daily :+ (report.day -> report.current))
+        DashboardResponse(report, daily :+ (report.day -> report.current), null, null, null)
       }
     } else null
   }

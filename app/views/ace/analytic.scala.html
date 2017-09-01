@@ -1,0 +1,35 @@
+@()
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.getImageTag
+@import services.domain.CommonService.getLinkTag
+
+@top("..", "Top Rank", 2)
+
+<div class="page-header">
+	<h1>
+		Analytic
+		<!--
+		<small>
+			<i class="ace-icon fa fa-angle-double-right"></i>
+			overview &amp; stats
+		</small>
+		-->
+	</h1>
+</div><!-- /.page-header -->
+
+<div class="row">
+	<div class="col-xs-12">
+		<div class="row">
+			<div class="col-xs-12 top-rank" id="top-rank-2">
+				<div class="col-sm-12">
+					<div id="all" class="tab-pane in active">
+						
+					</div>
+				</div><!-- /.col -->
+				<!-- PAGE CONTENT ENDS -->
+			</div><!-- /.col -->
+		</div><!-- /.row -->
+	</div>
+</div>
+
+@bottom("..", "rank")

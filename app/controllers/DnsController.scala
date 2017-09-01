@@ -36,7 +36,8 @@ class DnsController @Inject() (protected val dbConfigProvider: DatabaseConfigPro
 
   def refresh = Action {
     CacheService.refresh()
-    Ok("")
+    Redirect("/")
+    //Ok(views.html.ace.dashboard(CacheService.getDaskboard()._1))
   }
 //  val form = Form(
 //    mapping(
