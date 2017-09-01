@@ -160,6 +160,7 @@
 								</div><!-- /.col -->
 
 								<div class="col-xs-12 col-sm-9">
+									<!--
 									<h4 class="blue">
 										<span class="middle">Alex M. Doe</span>
 
@@ -244,7 +245,7 @@
 											</div>
 										</div>
 									</div>
-
+									-->
 									<div class="hr hr-8 dotted"></div>
 
 									<div class="row">
@@ -337,7 +338,24 @@
 										</div>
 									</div>
 								</div>
-								
+								<div class="col-sm-4">
+									<div class="widget-box transparent">
+										<div class="widget-header widget-header-small">
+											<h4 class="widget-title blue smaller">
+												<i class="ace-icon fa fa-bar-chart orange"></i>
+												Top 10 Malware
+											</h4>
+											<div class="widget-toolbar">
+												<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+											</div>
+										</div>
+										<div class="widget-body" style="display: block;">
+											<div class="widget-main no-padding">
+												<div id="top-10-malware"></div>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div><!-- /.row -->
 							<div class="row">
 								<div class="col-sm-12">
@@ -398,7 +416,7 @@
 									
 								</div>
 							</div>
-							
+							<!--
 							<div class="space-12"></div>
 
 							<div class="center">
@@ -408,6 +426,7 @@
 									<i class="icon-on-right ace-icon fa fa-arrow-right"></i>
 								</button>
 							</div>
+							-->
 						</div><!-- /#feed -->
 
 					</div>
@@ -614,7 +633,42 @@
 	            data: queries
 	        }]
 	    });
+	    /*
+	    categories = @@Html(Json.stringify(Json.toJson(response.topMalware.map(x => getLinkTag(x.malware)))));
+	    queries = @@Html(Json.stringify(Json.toJson(response.topMalware.map(x => x.queries))));
 	    
+
+	    Highcharts.chart('top-10-malware', {
+	        chart: {
+	            type: 'bar',
+	            height: '400px'
+	        },
+	        title: {
+	            text: "Top 10 Malware"
+	        },
+	        plotOptions: {
+	        bar: {
+	            	dataLabels: {
+	                	enabled: true
+	            	}
+	        	}
+	    	},
+	        xAxis: {
+	            categories: categories
+	        },
+
+	        yAxis: {
+	            title: {
+	                text: "Queries"
+	            }
+	        },
+	        series: [
+	        {
+	            name: "Queries",
+	            data: queries
+	        }]
+	    });
+		*/
 	    var hours = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._1))));
 	    var values = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._2))));
 	    Highcharts.chart('hourly-column-chart', {
@@ -735,10 +789,14 @@
 	        chart: {
 	            container: "#binary-tree",
 
-	            animateOnInit: true,
-	            
+	            animateOnInit: false,
+	            /*
+	            connectors: {
+					type: "step"
+				},
+				*/
 	            node: {
-	                collapsable: true
+	                collapsable: false
 	            },
 	            animation: {
 	                nodeAnimation: "easeOutBounce",
@@ -785,16 +843,23 @@
 	        }
 	        */
 	        nodeStructure: {
-	            text: { name: "Domain", value: "@formatNumber(response.current.domains)"},
-	            collapsable: true,
+	        	image: "../assets/images/site.png",
+	            text: { value: "@formatNumber(response.current.domains)"},
+	            /*
+	            collapsable: false,
+	            */
 	            children: [
 	                {
-	                    text: { name: "Valid", value: "@formatNumber(response.current.valid)"  },
+	                	image: "../assets/images/valid.png",
+	                    text: { value: "@formatNumber(response.current.valid)"  },
 	                    childrenDropLevel: 1,
-	                    collapsable: true,
+	                    /*
+	                    collapsable: false,
+	                    */
 	                    children: [
 	                        {
-	                            text: { name: "Main", value: "@formatNumber(response.current.seconds)"  }
+	                        	image: "../assets/images/main-domain.png",
+	                            text: { value: "@formatNumber(response.current.seconds - (response.current.domains - response.current.valid))"  }
 	                            /*
 	                            children: [
 	                            	{text: { name: "Black", value: "1,123,985"  }},
@@ -806,8 +871,11 @@
 	                    ]
 	                },
 	                {
-	                    text: { name: "inValid", value: "@formatNumber(response.current.domains - response.current.valid)"  },
-	                    collapsable: true
+	                	image: "../assets/images/invalid.png",
+	                    text: { value: "@formatNumber(response.current.domains - response.current.valid)"  },
+	                     /*
+	                    collapsable: false,
+	                    */
 	                }
 	            ]
 	        }

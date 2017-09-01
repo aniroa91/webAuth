@@ -30,13 +30,19 @@ case class HistoryInfo(daily: Array[HistoryDay]) {
   }
 }
 
-case class ClientInfo(day: String, client: String, queries: Int, seconds: Int, domains: Int, success: Int, failed: Int, malwares: Int, valid: Int, rank: Int)
+case class ClientInfo(day: String, client: String, queries: Int, seconds: Int, domains: Int, success: Int, failed: Int, malwares: Int, valid: Int, rank: Int) {
+  def updateMalware(num: Int): ClientInfo = {
+    println(malwares + "-" + num)
+    ClientInfo(day, client, queries, seconds, domains, success, failed, num, valid, rank)
+  }
+}
 
 case class ClientResponse (
     current: ClientInfo,
     prev: ClientInfo,
     topDomain: Array[MainDomainInfo],
     topSecond: Array[MainDomainInfo],
+    topMalware: Array[MalwareInfo],
     hourly: Array[(Int, Long)],
     daily: Array[ClientInfo],
     history: HistoryInfo,

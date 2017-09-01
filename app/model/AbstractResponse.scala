@@ -45,7 +45,9 @@ case class TotalInfo(
   def this() = this(0,0,0,0,0,0,0)
 }
 
-case class MalwareInfo(malware: String, queries: Int, domains: Int, clients: Int)
+case class MalwareInfo(malware: String, queries: Int, domains: Int, clients: Int) {
+  def this(malware: String, queries: Int) = this(malware, queries, 0, 0)
+}
 
 //private def indexLocation(client: HttpClient, domain: String) {
 //    

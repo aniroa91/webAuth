@@ -16,6 +16,7 @@ import model.HistoryDay
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import com.ftel.bigdata.utils.DateTimeUtil
 import com.ftel.bigdata.utils.Parameters
+import model.MalwareInfo
 
 object ClientService extends AbstractService {
 
@@ -26,8 +27,9 @@ object ClientService extends AbstractService {
     val responseValid = client.execute(search(s"dns-history-client-${day}" / "docs")
           query { boolQuery().must(termQuery("client", ip)) }
           aggregations (
-            termsAggregation("topDomain").field("domain").subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size 10,
+            //termsAggregation("topDomain").field("domain").subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size 10,
             termsAggregation("topSecond").field("second").subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size 10
+            //termsAggregation("topLabel").field("label").subagg(cardinalityAgg("unique", "second")) size 3
           ) sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC)
         ).await
         
@@ -51,8 +53,30 @@ object ClientService extends AbstractService {
     //val responseValid = client.execute(search(s"dns-history-client-${day}" / "docs") query {boolQuery().must(termQuery("client", ip))}).await
     
    
-    val daily = getClientInfo(response, responseValid.totalHits).sortBy(x => x.day)
+    
     val responseHourly = client.execute(search(s"dns-hourly-client-${day}" / "docs") query {boolQuery().must(termQuery("name", ip))} size 24).await
+    
+    val responseWhite = client.execute(search(s"dns-history-client-${day}" / "docs") query { boolQuery().must(termQuery("label", "white"), termQuery("client", ip)) }).await
+    val responseUnknow = client.execute(search(s"dns-history-client-${day}" / "docs") query { boolQuery().must(termQuery("label", "unknow"), termQuery("client", ip)) }).await
+    
+//    val responseMalwares = client.execute(search(s"dns-black-*" / "docs")
+//          query { boolQuery().must(termQuery("client", ip)) }
+//          aggregations (
+//            //termsAggregation("topDomain").field("domain").subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size 10,
+//            termsAggregation("top").field("malware") size 10
+//            //termsAggregation("topLabel").field("label").subagg(cardinalityAgg("unique", "second")) size 3
+//          ) 
+//        ).await
+        
+    
+    println("========== DEBUG ==============")
+    println(response.took)
+    println(responseValid.took)
+    println(responseHourly.took)
+    println(responseWhite.took)
+    println(responseUnknow.took)
+    println("========== DEBUG ==============")
+    
 //    val response = client.execute(
 //      search(s"dns-statslog-2017-08-20" / "docs") query {
 //        boolQuery().must(termQuery("client", ip))
@@ -86,14 +110,20 @@ object ClientService extends AbstractService {
 //    val daily = ElasticUtil.getBucketTerm(responseDaily, "daily", "sum").map(x => x.key -> x.value.toLong).sorted
     //println(response)
     //println("Time: " + (time1 - time0))
-    
-    val topDomain = ElasticUtil.getBucketTerm(responseValid, "topDomain", "sum").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
+    val daily = getClientInfo(response, responseValid.totalHits).sortBy(x => x.day)
+    val topDomain = responseValid.hits.hits
+      .map(x => {x.sourceAsMap})
+      .map(x => new MainDomainInfo(getValueAsString(x, "domain"), getValueAsInt(x, "queries")))//ElasticUtil.getBucketTerm(responseValid, "topDomain", "sum").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
     val topSecond = ElasticUtil.getBucketTerm(responseValid, "topSecond", "sum").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
-    
+    //val topLabel = ElasticUtil.getBucketTerm(responseValid, "topLabel", "unique").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
     //daily.map(x => x.day -> x.queries).foreach(println)
-    
+    //val topMalware = ElasticUtil.getBucketTerm(responseMalwares, "top").map(x => new MalwareInfo(x.key, x.value)).sortBy(x => x.queries).reverse
+    //val topMalware = Array()
     val history = getHistory(response)
+    
     val current = daily.reverse.head
+    // Remove malware with white or unknow
+    val numMalware = current.malwares - (if (responseWhite.totalHits > 0) 1 else 0) - (if (responseUnknow.totalHits > 0) 1 else 0)
     val prev = if (daily.size >= 2) daily.reverse.tail.head else current
     
     val hourly = responseHourly.hits.hits.map(x => {
@@ -106,7 +136,7 @@ object ClientService extends AbstractService {
     //println(hourly.map(x => x._2).sum)
     //hourly.foreach(println)
     //println(hourly.size)
-    ClientResponse(current, prev, topDomain, topSecond, hourInDay, daily, historyBlack(ip, 0, CommonService.SIZE_DEFAULT), historyBlack2(ip, 0, CommonService.SIZE_DEFAULT))
+    ClientResponse(current.updateMalware(numMalware), prev, topDomain, topSecond, null, hourInDay, daily, historyBlack(ip, 0, CommonService.SIZE_DEFAULT), historyBlack2(ip, 0, CommonService.SIZE_DEFAULT))
   }
 
   def getTop(): Array[(String, Int)] = {
@@ -153,6 +183,7 @@ object ClientService extends AbstractService {
           .must(termQuery("client", ip))
       } sortBy (
         fieldSort("timeStamp") order SortOrder.DESC) from offset limit size).await
+    println(response.took)
     val res = response.hits.hits.map(x => {
       val map = x.sourceAsMap
       //println(map)
