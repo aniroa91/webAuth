@@ -68,9 +68,9 @@ object CommonService extends AbstractService {
         map.getOrElse("status", "").toString(),
         map.getOrElse("create", "").toString(),
         map.getOrElse("update", "").toString(),
-        map.getOrElse("expire", "").toString(),
-        map.getOrElse("label", "").toString(),
-        map.getOrElse("malware", "").toString())
+        map.getOrElse("expire", "").toString())//,
+        //map.getOrElse("label", "").toString(),
+        //map.getOrElse("malware", "").toString())
       whois
     } else {
       CommonService.backgroupJob(
@@ -84,7 +84,7 @@ object CommonService extends AbstractService {
     val esIndex = s"dns-service-domain-whois"
     val esType = "whois"
     try {
-      val whois = WhoisUtil.whoisService(domain, label, malware, Configure.PROXY_HOST, Configure.PROXY_PORT)
+      val whois = WhoisUtil.whoisService(domain, Configure.PROXY_HOST, Configure.PROXY_PORT)
       //println(whois)
       if (whois.isValid()) {
         indexWhois(esIndex, esType, whois)
@@ -107,8 +107,8 @@ object CommonService extends AbstractService {
         "create" -> whois.create.substring(0, 10),
         "update" -> whois.update.substring(0, 10),
         "expire" -> (if (whois.expire.isEmpty()) "2999-12-31" else whois.expire.substring(0, 10)),
-        "label" -> whois.label,
-        "malware" -> whois.malware)
+        "label" -> "",
+        "malware" -> "")
         id whois.domainName).await
   }
 

@@ -31,6 +31,7 @@ case class MainDomainInfo(
     this(that.day, that.name, that.label, that.malware, that.queries, domains, that.clients, that.rankFtel, that.rankAlexa)
   
   def this(name: String, queries: Int) = this("", name, "", "", queries, 0, 0, 0, 0)
+
 }
 
 case class TotalInfo(
@@ -69,6 +70,9 @@ case class DomainLocation(second: String, ip: String, country: String, region: S
   
 }
 
+case class Bubble(x: Int, y: Int, z: Int, name: String)
+
 abstract class AbstractResponse {
   
 }
+

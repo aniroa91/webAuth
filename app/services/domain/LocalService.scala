@@ -19,6 +19,10 @@ import scala.tools.jline_embedded.internal.InputStreamReader
 import java.io.BufferedReader
 import scalaj.http.Http
 import services.Configure
+import play.api.libs.json.Json
+import model.Bubble
+
+case class Post(id: Int, tags: String)
 
 object LocalService extends AbstractService {
 
@@ -76,8 +80,21 @@ object LocalService extends AbstractService {
   
   def main(args: Array[String]) {
     
+    val req = Http("https://dms.inet.vn/api/public/whois/v1/whois/directly")
+                .proxy(Configure.PROXY_HOST, Configure.PROXY_PORT)
+                .postForm(Seq("domainName" -> "tvplay.vn"))
+    
+    val res = req.asString.body
+    //implicit val tjs: play.api.libs.json.Writes[scala.collection.immutable.Map[String,Any]] = Json.writes[scala.collection.immutable.Map[String,Any]]
+    //implicit val bubbleWrites = Json.writes[Bubble]
+//    val res = Json.toJson(Seq(Map("x" -> 1, "y" -> 2, "z" -> "z")))
+    //val res = Json.toJson(Array(Bubble(1, 1, 1, "")))
+    println(res)
+    
+    client.close()
+    
 //    ClientService.historyBlack("210.245.24.101", 0, 10)
-    println(CommonService.getCategoryFromApiXforceIbmcloud("vnexpress.net"))
+    //println(CommonService.getCategoryFromApiXforceIbmcloud("vnexpress.net"))
 //    println(CommonService.getCategorySitereviewBluecoatCom("facebook.net"))
    // val a = Configure.client.execute(search(s"dns-hourly-client-2017-08-28" / "docs") query {boolQuery().must(termQuery("name", "210.245.24.101"))})
     //val res = a.await

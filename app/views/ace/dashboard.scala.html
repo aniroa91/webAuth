@@ -373,9 +373,9 @@
 	        }]
 	    });
 
-	    var data1 = @Html(Json.stringify(Json.toJson(response.black.map(x => Array(x.queries, x.clients, x.queries/x.clients)))));
-	    var data2 = @Html(Json.stringify(Json.toJson(response.white.map(x => Array(x.queries, x.clients, x.queries/x.clients)))));
-	    var data3 = @Html(Json.stringify(Json.toJson(response.unknow.map(x => Array(x.queries, x.clients, x.queries/x.clients)))));
+	    var data1 = @Html(Json.stringify(response.toBubbleBlack));
+	    var data2 = @Html(Json.stringify(response.toBubbleWhite));
+	    var data3 = @Html(Json.stringify(response.toBubbleUnknow));
 	    Highcharts.chart('bubble-chart-3d', {
 
 		    chart: {
@@ -403,10 +403,21 @@
         		}
 		    },
 
+		     tooltip: {
+		        useHTML: true,
+		        headerFormat: '<table>',
+		        pointFormat: 
+		        	'<tr><th colspan="2"><h3>{point.name}</h3></th></tr>' +
+		            '<tr><th>Queries:</th><td>{point.x}</td></tr>' +
+		            '<tr><th>Client:</th><td>{point.y}</td></tr>' +
+		            '<tr><th>QpC:</th><td>{point.z}</td></tr>',
+		        footerFormat: '</table>',
+		        followPointer: true
+		    },
 
 		    series: [{
 		        data: data1,
-		        title: "abc",
+		        name: "Black",
 		        marker: {
 		            fillColor: {
 		                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
@@ -418,6 +429,7 @@
 		        }
 		    }, {
 		        data: data2,
+		        name: "White",
 		        marker: {
 		            fillColor: {
 		                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
@@ -429,6 +441,7 @@
 		        }
 		    }, {
 		        data: data3,
+		        name: "Unknow",
 		        marker: {
 		            fillColor: {
 		                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },

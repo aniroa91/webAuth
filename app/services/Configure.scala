@@ -3,6 +3,8 @@ package services
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.http.HttpClient
 import com.typesafe.config.ConfigFactory
+import model.Bubble
+import play.api.libs.json.Json
 
 object Configure {
   val LOGO_PATH = ConfigFactory.load().getString("storage") + "/"
@@ -19,4 +21,6 @@ object Configure {
   val LOGO_DEFAULT = "../assets/images/logo/domain.png"
   
   val client = HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
+  
+  
 }

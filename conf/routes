@@ -33,5 +33,6 @@ GET     /report                   controllers.ReportController.index(day: String
 GET     /client                   controllers.ClientController.index
 GET     /history                  controllers.ClientController.history(ip: String ?= "", offset: Int ?= 0)
 GET     /refresh                  controllers.DnsController.refresh
+GET     /analytic                 controllers.AnalyticController.index
 #GET     /report/:day              controllers.DnsController.reportBody(day: String)
 #GET     /ace/tables                 controllers.ACEController.tables
