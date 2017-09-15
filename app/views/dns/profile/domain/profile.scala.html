@@ -1,0 +1,369 @@
+@(domain: String, response: model.ProfileResponse, logo: String)
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.percent
+
+<div class="row">
+	<div id="user-profile-1" class="user-profile row">
+		<div class="col-xs-12 col-sm-3 center">
+			<div>
+				<span class="profile-picture">
+					<img id="avatar" class="editable img-responsive" onerror="this.src='../assets/images/logo/default.png'" src="@logo" />
+				</span>
+
+				<div class="space-4"></div>
+
+				<div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
+					<div class="inline position-relative">
+						<a href="#" class="user-title-label dropdown-toggle" data-toggle="dropdown">
+							@{
+								if (response.current.label == "white") {
+									<i class="ace-icon fa fa-circle light-green"></i>
+								} else if (response.current.label == "black") {
+									<i class="ace-icon fa fa-circle light-red"></i>
+								} else {
+									<i class="ace-icon fa fa-circle light-grey"></i>
+								}
+							}
+							&nbsp;
+							<span class="white">@domain</span>
+						</a>
+					</div>
+				</div>
+
+				<div class="hr hr16 dotted"></div>
+
+				<div class="clearfix">
+					<div class="grid1">
+						<span class="fa fa-tags" style="font-size:20px;color:Teal">
+							@response.category
+						</span>
+					</div>				
+				</div>
+			</div>
+
+			<div class="space-6"></div>
+			<div class="hr hr12 dotted"></div>
+
+			<div class="clearfix">
+				<div class="grid3">
+					<span class="bigger-175 blue">
+						@{
+							val value = response.current.queries
+							if (value > 99999999) {
+								<font size="4">{formatNumber(value)}</font>
+							} else {
+								{formatNumber(value)}
+							}
+						}
+					</span>
+					<br /> Queries
+				</div>
+
+				<div class="grid3">
+					<span class="bigger-175 blue">@formatNumber(response.current.domains)</span>
+					<br />
+					Domains
+				</div>
+
+				<div class="grid3">
+					<span class="bigger-175 blue">@formatNumber(response.current.clients)</span>
+					<br /> Clients
+				</div>
+
+			</div>
+
+			<div class="hr hr16 dotted"></div>
+			
+			<div class="clearfix">
+				<div class="grid2">
+					<div class="infobox infobox-orange">
+						<div class="infobox-icon">
+							<i class="ace-icon fa fa-star"></i>
+						</div>
+
+						<div class="infobox-data">
+							<span class="infobox-data-number">
+							@{
+								val value = response.current.rankFtel
+								if (value == 0 || value > 999999) {
+									"1M+"
+								} else if (value > 999999) {
+									<font size="4">{formatNumber(value)}</font>
+								} else {
+									{formatNumber(value)}
+								}
+							}
+							</span>
+							<div class="infobox-content">Ftel</div>
+						</div>
+						@{
+							val prev = if (response.history.size > 1) response.history(1) else response.history(0)
+							val value = response.current.rankFtel
+							val valuePrev = prev.rankFtel
+							val diff = valuePrev - value
+							if (diff >= 0) {
+								<div class="stat stat-success">{diff}</div>
+							} else {
+								<div class="stat stat-important">{diff}</div>
+							}
+						}
+					</div>
+				</div>
+				<div class="grid2">
+					<div class="infobox infobox-green">
+						<div class="infobox-icon">
+							<i class="ace-icon fa fa-star"></i>
+						</div>
+
+						<div class="infobox-data">
+							<span class="infobox-data-number">
+							@{
+								val value = response.current.rankAlexa
+								if (value == 0 || value > 999999) {
+									"1M+"
+								} else if (value > 999999) {
+									<font size="4">{formatNumber(value)}</font>
+								} else {
+									{formatNumber(value)}
+								}
+							}
+							</span>
+							<div class="infobox-content">Alexa</div>
+						</div>
+						@{
+							val prev = if (response.history.size > 1) response.history(1) else response.history(0)
+							val value = response.current.rankAlexa
+							val valuePrev = prev.rankAlexa
+							val diff = valuePrev - value
+							if (diff >= 0) {
+								<div class="stat stat-success">{diff}</div>
+							} else {
+								<div class="stat stat-important">{diff}</div>
+							}
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="hr hr16 dotted"></div>
+
+			<div class="clearfix">
+				<div class="grid1">
+					@{
+						if (response.current.label == "black") {
+							<span class="fa fa-bug" style="font-size:48px;color:red">
+								<br/>
+								{response.current.malware.toUpperCase()}
+							</span>
+						} else if (response.current.label == "white") {
+							<span class="fa fa-check" style="font-size:48px;color:green">
+								<br/>
+								SAFE
+							</span>
+						} else {
+							<span class="fa fa-question-circle" style="font-size:48px;color:grey">
+								<br/>
+								UNKNOW
+							</span>
+						}
+					}
+				</div>
+			</div>
+
+			<div class="hr hr16 dotted"></div>
+
+			@if(response.loc != null) {
+			<div class="clearfix">
+				<div class="grid1">				
+				
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name"> IP </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="username">@response.loc.ip</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Country </div>
+
+							<div class="profile-info-value">
+								<!--<i class="fa fa-map-marker light-orange bigger-110"></i>-->
+								<span class="editable" id="country">@response.loc.country</span>
+								<!--<span class="editable" id="city">Amsterdam</span>-->
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Region </div>
+
+							<div class="profile-info-value">
+								@response.loc.region
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> City </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="signup">@response.loc.city</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Timezone </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="login">@response.loc.timezone</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Organization </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="about">@response.loc.org</span>
+							</div>
+						</div>
+
+					</div>
+				
+				</div>
+			</div>
+			<div class="hr hr16 dotted"></div>
+			<div class="clearfix">
+				<div class="grid1">	
+					<div id="r" style="opacity: 1; background-image: url(&quot;http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyAjh0Pdk6dasNa6f58zkd86cOrtNxbHQHE&amp;center=@response.loc.lat,@response.loc.lon&amp;zoom=6&amp;format=jpg&amp;size=380x380&amp;language=en&amp;path=color:0x3af1ad30|weight:116|@response.loc.lat,@response.loc.lon&quot;); background-repeat: no-repeat; height:380px; width:380px;">
+					</div>
+				
+				</div>
+			</div>	
+			}	
+		</div>
+
+		<div class="col-xs-12 col-sm-9">
+			<div class="space-12"></div>
+			<div class="row">
+				<div class="col-xs-12 col-sm-12">
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Registrar </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="username">@response.whois.registrar</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Whois Server </div>
+
+							<div class="profile-info-value">
+								<!--<i class="fa fa-map-marker light-orange bigger-110"></i>-->
+								<span class="editable" id="country">@response.whois.whoisServer</span>
+								<!--<span class="editable" id="city">Amsterdam</span>-->
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Name Server </div>
+
+							<div class="profile-info-value">
+								@for(nameserver <- response.whois.nameServer) {
+									<span class="editable">@nameserver</span>
+								}
+								
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Create </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="signup">@response.whois.create</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Update </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="login">@response.whois.update</span>
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Expire </div>
+
+							<div class="profile-info-value">
+								<span class="editable" id="about">@response.whois.expire</span>
+							</div>
+						</div>
+					</div>
+				</div>
+					
+			</div>
+			
+			<div class="space-20"></div>
+			<div class="widget-box transparent">
+				<div class="widget-header widget-header-small">
+					<h4 class="widget-title blue smaller">
+						<i class="ace-icon fa fa-bar-chart orange"></i>
+						Hourly Queries
+					</h4>
+					<div class="widget-toolbar">
+						<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+					</div>
+				</div>
+				<div class="widget-body" style="display: block;">
+					<div class="widget-main no-padding">
+						<div id="hourly-column-chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="space-20"></div>
+			<div class="widget-box transparent">
+				<div class="widget-header widget-header-small">
+					<h4 class="widget-title blue smaller">
+						<i class="ace-icon fa fa-line-chart green"></i>
+						Daily Queries
+					</h4>
+					<div class="widget-toolbar">
+						<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+					</div>
+				</div>
+				<div class="widget-body" style="display: block;">
+					<div class="widget-main no-padding">
+						<div id="daily-line-chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="space-20"></div>
+			<div class="widget-box transparent">
+				<div class="widget-header widget-header-small">
+					<h4 class="widget-title blue smaller">
+						<i class="ace-icon fa fa-rss orange"></i>
+						Recent Activities
+					</h4>
+
+					<div class="widget-toolbar action-buttons">
+						<a href="#" data-action="reload">
+							<i class="ace-icon fa fa-refresh blue"></i>
+						</a>&nbsp;
+						<a href="#" class="pink">
+							<i class="ace-icon fa fa-trash-o"></i>
+						</a>
+					</div>
+				</div>
+				@table(response.history)
+			</div>
+
+			<div class="hr hr2 hr-double"></div>
+
+			<div class="space-6"></div>
+			
+		</div>
+	</div>
+</div>

@@ -1,0 +1,94 @@
+@(current: model.TotalInfo, prev: model.TotalInfo)
+
+@{
+	import services.domain.CommonService.formatNumber
+	import services.domain.CommonService.percent
+	val UPPER_NUMBER = 1000000000
+	val ZERO_NUMBER = 0
+
+	<div class="infobox-container" id="total">
+		<div class="infobox infobox-orange2">
+			<div class="infobox-data">
+				<span class="infobox-data-number">
+				{
+					if (current.queries > {UPPER_NUMBER}) {
+						<font size="3">{formatNumber(current.queries)}</font>
+					} else {
+						<font size="4">{formatNumber(current.queries)}</font>
+					}
+				}
+				</span>
+				<div class="infobox-content">
+					<font size="4" color="orange">
+					Num Of Query
+					</font>
+				</div>
+			</div>
+			{
+				val diff = current.queries - prev.queries
+				val percentVal = percent(current.queries, prev.queries)
+				if (diff >= ZERO_NUMBER) {
+					<div class="stat stat-success">{percentVal}%</div>
+				} else {
+					<div class="stat stat-important">{percentVal}%</div>
+				}
+			}
+		</div>
+		<div class="space-6"></div>
+		<div class="infobox infobox-blue">
+			<div class="infobox-data">
+				<span class="infobox-data-number">
+				{
+					if (current.domains > UPPER_NUMBER) {
+						<font size="3">{formatNumber(current.domains)}</font>
+					} else {
+						<font size="4">{formatNumber(current.domains)}</font>
+					}
+				}
+				</span>
+				<div class="infobox-content">
+					<font size="4" color="blue">
+					Num Of Domain
+					</font>
+				</div>
+			</div>
+			{
+				val diff = current.domains - prev.domains
+				val percentVal = percent(current.domains, prev.domains)
+				if (diff >= ZERO_NUMBER) {
+					<div class="stat stat-success">{percentVal}%</div>
+				} else {
+					<div class="stat stat-important">{percentVal}%</div>
+					
+				}
+			}
+		</div>
+		<div class="space-6"></div>
+		<div class="infobox infobox-grey">
+			<div class="infobox-data">
+				{
+					if (current.clients > UPPER_NUMBER) {
+						<font size="3">{formatNumber(current.clients)}</font>
+					} else {
+						<font size="4">{formatNumber(current.clients)}</font>
+					}
+				}
+				<div class="infobox-content">
+					<font size="4" color="grey">
+					Num Of Client
+					</font>
+				</div>
+			</div>
+			{
+				val diff = current.clients - prev.clients
+				val percentVal = percent(current.clients, prev.clients)
+				if (diff >= ZERO_NUMBER) {
+					<div class="stat stat-success">{percentVal}%</div>
+				} else {
+					<div class="stat stat-important">{percentVal}%</div>
+					
+				}
+			}
+		</div>
+	</div>
+}

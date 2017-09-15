@@ -10,14 +10,30 @@ object EsLocal {
   def main(args: Array[String]) {
     //Configure.client.execute( indexInto("dns-category" / "docs") fields ("category" -> category) id domain).await
     
-    Configure.client.execute {
-      createIndex("dns-category").mappings(
-        mapping("docs") as (
-            keywordField("category")
-//            textField("category")//,
-//            longField("")
-        )
-      )
+//    Configure.client.execute {
+//      createIndex("dns-category").mappings(
+//        mapping("docs") as (
+//            keywordField("category")
+////            textField("category")//,
+////            longField("")
+//        )
+//      )
+//    }.await
+
+//    Configure.client.execute {
+//////      createIndex("dns-category").mappings(
+//////        mapping("docs") as (
+//////            keywordField("category")
+////////            textField("category")//,
+////////            longField("")
+//////        )
+//////      )
+//////    }.await
+////      
+    val resp = Configure.client.execute {
+      update(5).in("dns-test/update").doc(
+        "field1" -> "a",
+        "field2" -> "b")
     }.await
     
 //    println(Configure.client.show( indexInto("dns-category" / "docs") fields ("category" -> "a") id "a"))//.await

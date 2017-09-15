@@ -1,0 +1,80 @@
+@(response: model.ProfileResponse)
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.percent
+@import play.api.libs.json.Json
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="widget-box transparent">
+			<div class="widget-header widget-header-small">
+				<h4 class="widget-title blue smaller">
+					<i class="ace-icon fa fa-bar-chart orange"></i>
+					Top 10 sub domain
+				</h4>
+				<div class="widget-toolbar">
+					<a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+				</div>
+			</div>
+			<div class="widget-body" style="display: block;">
+				<div class="widget-main no-padding">
+					<div id="top-10-domain"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--
+	<div class="col-sm-8">
+		<div class="clearfix">
+			<div class="pull-right tableTools-container"></div>
+		</div>
+		
+		<div>
+			<table id="subdomain" class="table table-striped table-bordered table-hover">
+				<thead>
+					<tr>
+      					<td class="center hidden-480">Domain</td>
+      					<td class="center hidden-480">Queries</td>
+					</tr>
+				</thead>
+
+				<tbody>
+					@for(row <- response.subdomain) {
+					<tr>
+      					<td class="center hidden-480">@row._1</td>
+      					<td class="center hidden-480">@formatNumber(row._2)</td>
+					</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	-->
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="clearfix">
+			<div class="pull-right tableTools-container"></div>
+		</div>
+		
+		<div>
+			<table id="subdomain" class="table table-striped table-bordered table-hover">
+				<thead>
+					<tr>
+      					<td class="center hidden-480">Domain</td>
+      					<td class="center hidden-480">Queries</td>
+					</tr>
+				</thead>
+
+				<tbody>
+					@for(row <- response.subdomain) {
+					<tr>
+      					<td class="center hidden-480">@row._1</td>
+      					<td class="center hidden-480">@formatNumber(row._2)</td>
+					</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

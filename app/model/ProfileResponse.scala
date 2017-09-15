@@ -13,11 +13,12 @@ case class ProfileResponse (
     answers: Array[String],
     hourly: Array[(Int, Long)],
     category: String,
-    loc: DomainLocation) extends AbstractResponse {
+    loc: DomainLocation,
+    subdomain: Array[(String, Int)]) extends AbstractResponse {
 
   def updateCategory(): ProfileResponse = {
     if (this.category == "N/A")
-      ProfileResponse(this.whois, this.current, this.history, this.answers, this.hourly, CommonService.getCategory(this.current.name), this.loc)
+      ProfileResponse(this.whois, this.current, this.history, this.answers, this.hourly, CommonService.getCategory(this.current.name), this.loc, subdomain)
     else this
   }
   

@@ -21,10 +21,14 @@ abstract class AbstractService {
   protected val NUM_IP_FIELD = "clients"
   protected val NUM_MALWARE_FIELD = "malwares"
   protected val DAY_FIELD = "day"
+  protected val RANK_FIELD = "rank"
+  protected val RANK_ALEXA_FIELD = "rankAlexa"
 
   protected val MALWARE_FIELD = "malware"
   protected val DOMAIN_FIELD = "domain"
   protected val SECOND_FIELD = "second"
+  protected val CLIENT_FIELD = "client"
+  protected val TIMESTAMP_FIELD = "timeStamp"
 
   val ES_INDEX = "dns-service-domain-"
   val ES_INDEX_ALL = ES_INDEX + "*"
@@ -40,21 +44,22 @@ abstract class AbstractService {
     * 
     * ****************************/
   def getTotalInfo(searchResponse: SearchResponse): Array[(String, TotalInfo)] = {
-    searchResponse.hits.hits.map(x => {
-      val sourceAsMap = x.sourceAsMap
-      val label = sourceAsMap.getOrElse("label", "").toString()
-      val malwares = if (label == BLACK_VALUE) sourceAsMap.getOrElse(NUM_MALWARE_FIELD, "0").toString().toInt else 0
-      label -> TotalInfo(
-         getValueAsInt(sourceAsMap, NUM_QUERY_FIELD),
-         getValueAsInt(sourceAsMap, NUM_DOMAIN_FIELD),
-         getValueAsInt(sourceAsMap, NUM_IP_FIELD),
-         malwares,
-         getValueAsInt(sourceAsMap, "success"),
-         getValueAsInt(sourceAsMap, "failed"),
-         getValueAsInt(sourceAsMap, NUM_SECOND_FIELD))
-     })
+    searchResponse.hits.hits.map(x => getTotalInfo(x.sourceAsMap))
   }
 
+  def getTotalInfo(map: Map[String, AnyRef]): (String, TotalInfo) = {
+    val label = map.getOrElse("label", "").toString()
+    val malwares = if (label == BLACK_VALUE) map.getOrElse(NUM_MALWARE_FIELD, "0").toString().toInt else 0
+    label -> TotalInfo(
+      getValueAsInt(map, NUM_QUERY_FIELD),
+      getValueAsInt(map, NUM_DOMAIN_FIELD),
+      getValueAsInt(map, NUM_IP_FIELD),
+      malwares,
+      getValueAsInt(map, "success"),
+      getValueAsInt(map, "failed"),
+      getValueAsInt(map, NUM_SECOND_FIELD))
+  }
+  
   def getTotalInfoDaily(searchResponse: SearchResponse): Array[(String, TotalInfo)] = {
     searchResponse.hits.hits.reverse.map(x => {
       val sourceAsMap = x.sourceAsMap
@@ -100,17 +105,18 @@ abstract class AbstractService {
         getValueAsInt(sourceAsMap, NUM_QUERY_FIELD),
         //getValueAsInt(sourceAsMap, NUM_DOMAIN_FIELD),
         getValueAsInt(sourceAsMap, NUM_IP_FIELD),
-        getValueAsInt(sourceAsMap, "rank"),
-        getValueAsInt(sourceAsMap, "rank_alexa"))
+        getValueAsInt(sourceAsMap, RANK_FIELD),
+        getValueAsInt(sourceAsMap, RANK_ALEXA_FIELD))
     })
   }
 
   def getMainDomainInfo2(searchResponse: SearchResponse): Array[MainDomainInfo] = {
     val mapLabel = searchResponse.hits.hits.map(x => x.sourceAsMap).map(x => x.getOrElse("second", "") -> x.getOrElse("label", "")).toMap
     val terms = getTerm(searchResponse, "top", "sum")
-    terms.map(x => MainDomainInfo("day", x._1, mapLabel.getOrElse(x._1, "label").toString(), "malware", x._2.toInt, 1, 1, 1, 1))
+    terms.map(x => MainDomainInfo("day", x._1, mapLabel.getOrElse(x._1, "label").toString(), "malware", x._2.toLong, 1, 1, 1, 1))
       .sortWith((x,y) => x.queries > y.queries)
       .zipWithIndex.map { case (x,i) => MainDomainInfo(x.day, x.name, x.label, x.malware, x.queries, 1, 1, (i+1), 0)}
+      
   }
   
   //success:26,633,777  rank:1 seconds:3,374,760 failed:1,575,321 domains:6,676,954 valid:6,747,003 day:2017-08-25 malwares:43 _id:AV4b7KCr2f2KIIB2YFFT _type:docs _index:dns-client-2017-08-25 _score:11.689

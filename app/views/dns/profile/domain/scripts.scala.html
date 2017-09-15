@@ -1,0 +1,213 @@
+@(response: model.ProfileResponse)
+@import play.api.libs.json.Json
+
+@if(response == null) {
+		<script type="text/javascript"></script>
+} else {
+	<script type="text/javascript">
+		$(function () {
+		    var categories = @Html(Json.stringify(Json.toJson(response.history.map(x => x.day).reverse)));
+		    var queries = @Html(Json.stringify(Json.toJson(response.history.map(x => x.queries).reverse)));
+		    var qpc = @Html(Json.stringify(Json.toJson(response.history.map(x => x.getQueryPerClient()).reverse)));
+		    var clients = @Html(Json.stringify(Json.toJson(response.history.map(x => x.clients).reverse)));
+
+		    Highcharts.chart('daily-line-chart', {
+		        chart: {
+		            type: 'line',
+		            zoomType: 'xy'
+		        },
+		        title: {
+		            text: 'Daily Query'
+		        },
+		        subtitle: {
+		            text: 'Source: DNS LOG FTEL'
+		        },
+		        plotOptions: {
+		        line: {
+		            dataLabels: {
+		                enabled: true
+		            },
+		                enableMouseTracking: false
+		            }
+		        },
+		        xAxis: [{
+		            categories: categories,
+		            crosshair: true
+		        }],
+		        yAxis: [{ // Primary yAxis
+		            labels: {
+		                format: '{value}',
+		                style: {
+		                    color: Highcharts.getOptions().colors[2]
+		                }
+		            },
+		            title: {
+		                text: 'Clients',
+		                style: {
+		                    color: Highcharts.getOptions().colors[2]
+		                }
+		            },
+		            opposite: true
+
+		        }, { // Secondary yAxis
+		            gridLineWidth: 0,
+		            title: {
+		                text: 'Queries',
+		                style: {
+		                    color: Highcharts.getOptions().colors[0]
+		                }
+		            },
+		            labels: {
+		                format: '{value}',
+		                style: {
+		                    color: Highcharts.getOptions().colors[0]
+		                }
+		            }
+
+		        }, { // Tertiary yAxis
+		            gridLineWidth: 0,
+		            title: {
+		                text: 'Queries per Client',
+		                style: {
+		                    color: Highcharts.getOptions().colors[1]
+		                }
+		            },
+		            labels: {
+		                format: '{value}',
+		                style: {
+		                    color: Highcharts.getOptions().colors[1]
+		                }
+		            },
+		            opposite: true
+		        }],
+		        tooltip: {
+		            shared: true
+		        },
+		        legend: {
+		            layout: 'vertical',
+		            align: 'left',
+		            x: 80,
+		            verticalAlign: 'top',
+		            y: 55,
+		            floating: true,
+		            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+		        },
+		        series: [{
+		            name: 'Queries',
+		            type: 'spline',
+		            yAxis: 1,
+		            data: queries,
+		            tooltip: {
+		                valueSuffix: ''
+		            }
+
+		        }, {
+		            name: 'Queries per Client',
+		            type: 'spline',
+		            yAxis: 2,
+		            data: qpc,
+		            marker: {
+		                enabled: false
+		            },
+		            dashStyle: 'shortdot',
+		            tooltip: {
+		                valueSuffix: ''
+		            }
+
+		        }, {
+		            name: 'Clients',
+		            type: 'spline',
+		            data: clients,
+		            tooltip: {
+		                valueSuffix: ''
+		            }
+		        }]
+		    });
+
+		    
+		    var hours = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._1))));
+		    var values = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._2))));
+		    Highcharts.chart('hourly-column-chart', {
+			    chart: {
+			        type: 'column'
+			    },
+			    title: {
+			        text: 'Hourly queries'
+			    },
+			    xAxis: {
+			        categories: hours,
+			        crosshair: true
+			    },
+			    yAxis: {
+			        min: 0,
+			        title: {
+			            text: 'Num Of Queries'
+			        }
+			    },
+			    plotOptions: {
+			        column: {
+			            pointPadding: 0.2,
+			            borderWidth: 0
+			        }
+			    },
+			    series: [{
+			        name: 'Queries',
+			        data: values
+			    }]
+			});
+			
+
+			categories = @Html(Json.stringify(Json.toJson(response.subdomain.take(20).map(x => x._1))));
+	    	queries = @Html(Json.stringify(Json.toJson(response.subdomain.take(20).map(x => x._2))));
+
+		    Highcharts.chart('top-10-domain', {
+		        chart: {
+		            type: 'column',
+		            height: '500px'
+		        },
+		        title: {
+		            text: "Top 20 sub domain"
+		        },
+		        plotOptions: {
+		        bar: {
+		            	dataLabels: {
+		                	enabled: true
+		            	}
+		        	}
+		    	},
+		        xAxis: {
+		            categories: categories
+		        },
+
+		        yAxis: {
+		            title: {
+		                text: "Queries"
+		            }
+		        },
+		        series: [
+		        {
+		            name: "Queries",
+		            data: queries
+		        }]
+		    });
+		});
+
+		jQuery(function($) {
+			//initiate dataTables plugin
+			var myTable = 
+			$('#subdomain')
+			//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+			.DataTable( {
+				bAutoWidth: false,
+				"aoColumns": [
+				  { "bSortable": true },
+				  { "bSortable": true }
+				],
+				"aaSorting": [],
+				select: {
+					style: 'multi'
+				}
+		    } );
+		})
+	</script>
+}

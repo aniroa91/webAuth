@@ -79,19 +79,25 @@ object LocalService extends AbstractService {
 //  }
   
   def main(args: Array[String]) {
-    
-    val req = Http("https://dms.inet.vn/api/public/whois/v1/whois/directly")
-                .proxy(Configure.PROXY_HOST, Configure.PROXY_PORT)
-                .postForm(Seq("domainName" -> "tvplay.vn"))
-    
-    val res = req.asString.body
-    //implicit val tjs: play.api.libs.json.Writes[scala.collection.immutable.Map[String,Any]] = Json.writes[scala.collection.immutable.Map[String,Any]]
-    //implicit val bubbleWrites = Json.writes[Bubble]
-//    val res = Json.toJson(Seq(Map("x" -> 1, "y" -> 2, "z" -> "z")))
-    //val res = Json.toJson(Array(Bubble(1, 1, 1, "")))
-    println(res)
+    val day = CommonService.getLatestDay()
+    val last30Days = CommonService.getPreviousDay(day, 30)
+    val topLast30Day = CommonService.getTopByNumOfQueryWithRange(last30Days, day)
+    println(topLast30Day.sortBy(x => x.queries).reverse.head)
     
     client.close()
+    //DashboardService.getDiffSecond()
+//    val req = Http("https://dms.inet.vn/api/public/whois/v1/whois/directly")
+//                .proxy(Configure.PROXY_HOST, Configure.PROXY_PORT)
+//                .postForm(Seq("domainName" -> "tvplay.vn"))
+//    
+//    val res = req.asString.body
+//    //implicit val tjs: play.api.libs.json.Writes[scala.collection.immutable.Map[String,Any]] = Json.writes[scala.collection.immutable.Map[String,Any]]
+//    //implicit val bubbleWrites = Json.writes[Bubble]
+////    val res = Json.toJson(Seq(Map("x" -> 1, "y" -> 2, "z" -> "z")))
+//    //val res = Json.toJson(Array(Bubble(1, 1, 1, "")))
+//    println(res)
+//    
+//    client.close()
     
 //    ClientService.historyBlack("210.245.24.101", 0, 10)
     //println(CommonService.getCategoryFromApiXforceIbmcloud("vnexpress.net"))

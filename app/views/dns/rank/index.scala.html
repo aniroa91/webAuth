@@ -1,0 +1,213 @@
+@(response: model.RankResponse)
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.getImageTag
+@import services.domain.CommonService.getLinkTag
+
+@views.html.ace.top("..", "Top Rank", 2)
+
+<div class="page-header">
+	<h1>
+		Top Rank Domain
+		<!--
+		<small>
+			<i class="ace-icon fa fa-angle-double-right"></i>
+			overview &amp; stats
+		</small>
+		-->
+	</h1>
+</div><!-- /.page-header -->
+
+<div class="row">
+	<div class="col-xs-12">
+		<!-- PAGE CONTENT BEGINS -->
+		<div class="clearfix">
+			<div class="pull-right">
+				<span class="green middle bolder">Choose: &nbsp;</span>
+
+				<div class="btn-toolbar inline middle no-margin">
+					<div data-toggle="buttons" class="btn-group no-margin">
+						<label class="btn btn-sm btn-yellow active">
+							<span class="bigger-110">Latest Day</span>
+
+							<input type="radio" value="1" />
+						</label>
+
+						<label class="btn btn-sm btn-yellow">
+							<span class="bigger-110">Last 7 Days</span>
+
+							<input type="radio" value="2" />
+						</label>
+
+						<label class="btn btn-sm btn-yellow">
+							<span class="bigger-110">Last 30 Days</span>
+
+							<input type="radio" value="3" />
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="hr dotted"></div>
+
+		<div class="row">
+			<div class="col-xs-12 top-rank" id="top-rank-1">
+				<div class="col-sm-12">
+					<div class="tabbable">
+						<ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab4">
+							<li class="active">
+								<a data-toggle="tab" href="#all">All</a>
+							</li>
+
+							<li>
+								<a data-toggle="tab" href="#white">White</a>
+							</li>
+
+							<li>
+								<a data-toggle="tab" href="#black">Black</a>
+							</li>
+
+							<li>
+								<a data-toggle="tab" href="#unknow">Unknow</a>
+							</li>
+						</ul>
+
+						<div class="tab-content">
+							<div id="all" class="tab-pane in active">
+								@views.html.dns.common.topRankTable(
+		            				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Alexa Rank", "Label", "Malware"),
+		              				response.all.map(x => Array[Any](
+		                				formatNumber(x.rankFtel),
+		                				Html.apply(getImageTag(x.name)),
+		                				Html.apply(getLinkTag(x.name)),
+		                				formatNumber(x.queries),
+		                				formatNumber(x.clients),
+		                				formatNumber(x.getQueryPerClient()),
+		                				formatNumber(x.rankAlexa),
+		                				Html.apply(
+		                				if (x.label == "white") {
+											"<span class='center label label-sm label-success arrowed'>WHITE</span>"
+										} else if (x.label == "black") {
+											"<span class='center label label-sm label label-danger arrowed'>BLACK</span>"
+										} else {
+											"<span class='center label label-sm arrowed'>UNKNOW</span>"
+										}),
+		                				x.malware)
+		                			).toArray,
+		                			"table-all"
+		            			)
+							</div>
+
+							<div id="white" class="tab-pane">
+								@views.html.dns.common.topRankTable(
+		            				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Alexa Rank"),
+		              				response.white.map(x => Array[Any](
+		                				formatNumber(x.rankFtel),
+		                				Html.apply(getImageTag(x.name)),
+		                				Html.apply(getLinkTag(x.name)),
+		                				formatNumber(x.queries),
+		                				formatNumber(x.clients),
+		                				formatNumber(x.getQueryPerClient()),
+		                				formatNumber(x.rankAlexa))
+									).toArray,
+									"table-white"
+		            			)
+							</div>
+
+							<div id="black" class="tab-pane">
+								@views.html.dns.common.topRankTable(
+		            				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client", "Malware"),
+		              				response.black.map(x => Array[Any](
+		                				formatNumber(x.rankFtel),
+		                				Html.apply(getImageTag(x.name)),
+		                				Html.apply(getLinkTag(x.name)),
+		                				formatNumber(x.queries),
+		                				formatNumber(x.clients),
+		                				formatNumber(x.getQueryPerClient()),
+										x.malware)
+									).toArray,
+									"table-black"
+		            			)
+							</div>
+							<div id="unknow" class="tab-pane">
+								@views.html.dns.common.topRankTable(
+		            				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Num Of Client", "Query / Client"),
+		              				response.unknow.map(x => Array[Any](
+		                				formatNumber(x.rankFtel),
+		                				Html.apply(getImageTag(x.name)),
+		                				Html.apply(getLinkTag(x.name)),
+		                				formatNumber(x.queries),
+		                				formatNumber(x.clients),
+		                				formatNumber(x.getQueryPerClient()))
+									).toArray,
+									"table-unknow"
+								)
+							</div>
+						</div>
+					</div>
+				</div><!-- /.col -->
+				<!-- PAGE CONTENT ENDS -->
+			</div><!-- /.col -->
+		</div><!-- /.row -->
+
+		<div class="row hide">
+			<div class="col-xs-12 top-rank" id="top-rank-2">
+				<div class="col-sm-12">
+					<div id="all" class="tab-pane in active">
+						@views.html.dns.common.topRankTable(
+            				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Label"),
+              				response.last7Day.map(x => Array[Any](
+                				formatNumber(x.rankFtel),
+                				Html.apply(getImageTag(x.name)),
+                				Html.apply(getLinkTag(x.name)),
+                				formatNumber(x.queries),
+                				Html.apply(
+                				if (x.label == "white") {
+									"<span class='center label label-sm label-success arrowed'>WHITE</span>"
+								} else if (x.label == "black") {
+									"<span class='center label label-sm label label-danger arrowed'>BLACK</span>"
+								} else {
+									"<span class='center label label-sm arrowed'>UNKNOW</span>"
+								}))
+                			).toArray,
+                			"table-last7Day"
+            			)
+					</div>
+				</div><!-- /.col -->
+				<!-- PAGE CONTENT ENDS -->
+			</div><!-- /.col -->
+		</div><!-- /.row -->
+
+		<div class="row hide">
+			<div class="col-xs-12 top-rank" id="top-rank-3">
+				<div class="col-sm-12">
+					<div id="all" class="tab-pane in active">
+						@views.html.dns.common.topRankTable(
+            				Array[String]("Rank", "Logo", "Domain", "Num Of Query", "Label"),
+              				response.last30Day.map(x => Array[Any](
+                				formatNumber(x.rankFtel),
+                				Html.apply(getImageTag(x.name)),
+                				Html.apply(getLinkTag(x.name)),
+                				formatNumber(x.queries),
+                				Html.apply(
+                				if (x.label == "white") {
+									"<span class='center label label-sm label-success arrowed'>WHITE</span>"
+								} else if (x.label == "black") {
+									"<span class='center label label-sm label label-danger arrowed'>BLACK</span>"
+								} else {
+									"<span class='center label label-sm arrowed'>UNKNOW</span>"
+								}))
+                			).toArray,
+                			"table-last30Day"
+            			)
+					</div>
+				</div><!-- /.col -->
+				<!-- PAGE CONTENT ENDS -->
+			</div><!-- /.col -->
+		</div><!-- /.row -->
+
+	</div>
+</div>
+
+@views.html.ace.bottom("..", "rank", scripts())

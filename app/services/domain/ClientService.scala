@@ -28,7 +28,7 @@ object ClientService extends AbstractService {
           query { boolQuery().must(termQuery("client", ip)) }
           aggregations (
             //termsAggregation("topDomain").field("domain").subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size 10,
-            termsAggregation("topSecond").field("second").subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size 10
+            termsAggregation("topSecond").field("second").subagg(sumAgg("sum", NUM_QUERY_FIELD)) order(Terms.Order.aggregation("sum", false)) size 10
             //termsAggregation("topLabel").field("label").subagg(cardinalityAgg("unique", "second")) size 3
           ) sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC)
         ).await
@@ -113,7 +113,7 @@ object ClientService extends AbstractService {
     val daily = getClientInfo(response, responseValid.totalHits).sortBy(x => x.day)
     val topDomain = responseValid.hits.hits
       .map(x => {x.sourceAsMap})
-      .map(x => new MainDomainInfo(getValueAsString(x, "domain"), getValueAsInt(x, "queries")))//ElasticUtil.getBucketTerm(responseValid, "topDomain", "sum").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
+      .map(x => new MainDomainInfo(getValueAsString(x, DOMAIN_FIELD), getValueAsInt(x, NUM_QUERY_FIELD)))//ElasticUtil.getBucketTerm(responseValid, "topDomain", "sum").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
     val topSecond = ElasticUtil.getBucketTerm(responseValid, "topSecond", "sum").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
     //val topLabel = ElasticUtil.getBucketTerm(responseValid, "topLabel", "unique").map(x => new MainDomainInfo(x.key, x.value)).sortBy(x => x.queries).reverse
     //daily.map(x => x.day -> x.queries).foreach(println)
@@ -142,9 +142,9 @@ object ClientService extends AbstractService {
   def getTop(): Array[(String, Int)] = {
     val latest = CommonService.getLatestDay()
 //    val time0 = System.currentTimeMillis()
-    val response = client.execute(search(s"dns-client-${latest}" / "docs") query {must(rangeQuery("rank").gt(0).lte(100))} limit 100).await
+    val response = client.execute(search(s"dns-client-${latest}" / "docs") query {must(rangeQuery(RANK_FIELD).gt(0).lte(100))} limit 100).await
     val res = response.hits.hits.map(x => x.sourceAsMap)
-      .map(x => x.getOrElse("client", "") -> x.getOrElse("queries", ""))
+      .map(x => x.getOrElse(CLIENT_FIELD, "") -> x.getOrElse(NUM_QUERY_FIELD, ""))
       .map(x => x._1.toString -> x._2.toString().toInt)
     res.sortBy(x => x._2).reverse
   }
@@ -155,10 +155,10 @@ object ClientService extends AbstractService {
     val response = client.execute(
       search(s"dns-history-client-*" / "docs") query {
         boolQuery()
-          .must(termQuery("client", ip))
+          .must(termQuery(CLIENT_FIELD, ip))
       } sortBy (
         fieldSort(DAY_FIELD) order SortOrder.DESC,
-        fieldSort("queries") order SortOrder.DESC) from offset limit size).await
+        fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC) from offset limit size).await
     getHistory(response)
   }
   
@@ -168,9 +168,9 @@ object ClientService extends AbstractService {
     val response = client.execute(
       search(s"dns-black-*" / "docs") query {
         boolQuery()
-          .must(termQuery("client", ip))
+          .must(termQuery(CLIENT_FIELD, ip))
       } sortBy (
-        fieldSort("timeStamp") order SortOrder.DESC) from offset limit size).await
+        fieldSort(TIMESTAMP_FIELD) order SortOrder.DESC) from offset limit size).await
     getHistory2(response)
   }
   
@@ -180,23 +180,23 @@ object ClientService extends AbstractService {
     val response = client.execute(
       search(s"dns-black-*" / "docs") query {
         boolQuery()
-          .must(termQuery("client", ip))
+          .must(termQuery(CLIENT_FIELD, ip))
       } sortBy (
-        fieldSort("timeStamp") order SortOrder.DESC) from offset limit size).await
+        fieldSort(TIMESTAMP_FIELD) order SortOrder.DESC) from offset limit size).await
     println(response.took)
     val res = response.hits.hits.map(x => {
       val map = x.sourceAsMap
       //println(map)
-      val timestamp = getValueAsString(map, "timeStamp", "0") //map.get("timeStamp").getOrElse("0").toString()
+      val timestamp = getValueAsString(map, TIMESTAMP_FIELD, "0") //map.get("timeStamp").getOrElse("0").toString()
       val date = DateTimeUtil.create(timestamp, Parameters.ES_5_DATETIME_FORMAT)
       val day = date.toString(DateTimeUtil.YMD)
       val hour = date.toString("HH")//map.get("hour").getOrElse("").toString()
-      val domain = getValueAsString(map, "domain")//map.get("domain").getOrElse("").toString()
-      val second = getValueAsString(map, "second")//map.get("second").getOrElse("").toString()
+      val domain = getValueAsString(map, DOMAIN_FIELD)//map.get("domain").getOrElse("").toString()
+      val second = getValueAsString(map, SECOND_FIELD)//map.get("second").getOrElse("").toString()
       val label = map.get("label").getOrElse("").toString()
-      val queries = getValueAsString(map, "queries")//map.get("queries").getOrElse("0").toString().toInt
+      val queries = getValueAsString(map, NUM_QUERY_FIELD)//map.get("queries").getOrElse("0").toString().toInt
       val rCode = getValueAsString(map, "rCodeName")//map.get("rCodeName").getOrElse("-1").toString()
-      val malware = getValueAsString(map, "malware")//map.get("malware").getOrElse("null").toString()
+      val malware = getValueAsString(map, MALWARE_FIELD)//map.get("malware").getOrElse("null").toString()
       val answers = getValueAsString(map, "answers")//map.get("answers").getOrElse("null").toString()
       
       Array(day, date.toString("HH:mm:SS"), domain, second, malware, rCode, answers.split(",").mkString("\n"))
@@ -210,7 +210,7 @@ object ClientService extends AbstractService {
     val response = client.execute(
       search(s"dns-history-client-*" / "docs") query {
         boolQuery()
-          .must(termQuery("client", ip), termQuery("rCode", "0"))
+          .must(termQuery(CLIENT_FIELD, ip), termQuery("rCode", "0"))
           .not(termQuery("tld", "null"))
       } sortBy (
         fieldSort(DAY_FIELD) order SortOrder.DESC,
@@ -221,12 +221,12 @@ object ClientService extends AbstractService {
   private def getHistory(response: SearchResponse): HistoryInfo = {
     val res = response.hits.hits.map(x => {
       val map = x.sourceAsMap
-      val day = map.get("day").getOrElse("").toString()
+      val day = map.get(DAY_FIELD).getOrElse("").toString()
       val hour = map.get("hour").getOrElse("").toString()
-      val domain = map.get("domain").getOrElse("").toString()
-      val second = map.get("second").getOrElse("").toString()
-      val label = map.get("label").getOrElse("").toString()
-      val queries = map.get("queries").getOrElse("0").toString().toInt
+      val domain = map.get(DOMAIN_FIELD).getOrElse("").toString()
+      val second = map.get(SECOND_FIELD).getOrElse("").toString()
+      val label = map.get(LABEL_FIELD).getOrElse("").toString()
+      val queries = map.get(NUM_QUERY_FIELD).getOrElse("0").toString().toInt
       val rCode = map.get("rCode").getOrElse("-1").toString()
       //println(day)
       HistoryDay(day, Array(HistoryHour(hour, Array(HistoryRow(domain, second, label, queries, rCode)))))

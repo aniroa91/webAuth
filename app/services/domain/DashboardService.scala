@@ -51,16 +51,9 @@ object DashboardService extends AbstractService {
     val daily = response.hits.hits.map(x => {
       val sourceAsMap = x.sourceAsMap
       val day = getValueAsString(sourceAsMap, "day")
-      day -> TotalInfo(
-         getValueAsInt(sourceAsMap, NUM_QUERY_FIELD),
-         getValueAsInt(sourceAsMap, NUM_DOMAIN_FIELD),
-         getValueAsInt(sourceAsMap, NUM_IP_FIELD),
-         0,
-         0,//getValueAsInt(sourceAsMap, "success"),
-         0,//getValueAsInt(sourceAsMap, "failed"),
-         0/*getValueAsInt(sourceAsMap, NUM_SECOND_FIELD)*/)
+      day -> getTotalInfo(sourceAsMap)._2
      }).groupBy(x => x._1)
-       .map(x => x._1 -> x._2.map(y => y._2).reduce((a,b) => TotalInfo(a.queries+b.queries,a.domains+b.domains,a.clients+b.clients,0,0,0,0)))
+       .map(x => x._1 -> x._2.map(y => y._2).reduce((a,b) => a.plus(b)))
        .toArray
        .sortBy(x => x._1)
        
@@ -85,6 +78,35 @@ object DashboardService extends AbstractService {
     } else null
   }
 
+  
+  def getDiffSecond() {
+    val now = DateTimeUtil.now.minusDays(4)//.toString(DateTimeUtil.YMD)
+    val seq = 1 until 2
+    val s = search(s"dns-days-second" / "docs") query {
+         must(
+           termQuery("year", now.toString("yyyy").toInt),
+           termQuery("month", now.toString("MM").toInt),
+           termQuery("value", now.toString("dd").toInt)
+         )}
+    
+    val searchMap = seq.map(x => now.minus(x))
+       .map(x => search(s"dns-days-second" / "docs") query {
+         must(
+           termQuery("year", x.toString("yyyy").toInt),
+           termQuery("month", x.toString("MM").toInt),
+           termQuery("value", x.toString("dd").toInt)
+         )})
+    //val multiSearchResponse = client.execute(multi(searchMap)).await
+    //multiSearchResponse.responses.foreach(x => x.totalHits)
+    println("Finished Search")
+    println(client.show(s))
+    client.close()
+  }
+  
+//  private def getNumDay(num: Int): Array[Int] = {
+//    
+//  }
+  
   @deprecated("This method will be removed in next release, please using get() method", "bigdata-play 0.0.1")
   def get1(day: String): DashboardResponse = {
     val report = ReportService.get(day)

@@ -217,20 +217,23 @@ object CommonService extends AbstractService {
       } aggregations (
           termsAggregation("top")
             .field("second")
-            .subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size MAX_SIZE_RETURN
+            .subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size MAX_SIZE_RETURN * 1000
       ) sortBy {
         fieldSort("queries") order (SortOrder.DESC)
       } limit MAX_SIZE_RETURN).await
     println(s"Time(${fromDay} ${endDay}): " + response.took)
+    //response.aggregations.foreach(println)
     getMainDomainInfo2(response)
+    //println(response)
+    //null
   }
   
   def getTopRank(from: Int, day: String): Array[MainDomainInfo] = {
     val response = client.execute(
       search(s"dns-second-${day}" / "docs") query {
-        boolQuery().must(rangeQuery("rank").gt(from - 1).lt(MAX_SIZE_RETURN), termQuery("day", day))
+        boolQuery().must(rangeQuery(RANK_FIELD).gt(from - 1).lt(MAX_SIZE_RETURN), termQuery(DAY_FIELD, day))
       } sortBy {
-        fieldSort("rank")
+        fieldSort(RANK_FIELD)
       } limit MAX_SIZE_RETURN).await
     getMainDomainInfo(response)
   }
@@ -238,12 +241,17 @@ object CommonService extends AbstractService {
   /**
    * Utils
    */
-  def formatNumber(number: Int): String = {
+//  def formatNumber(number: Int): String = {
+//    val formatter = java.text.NumberFormat.getIntegerInstance
+//    formatter.format(number)
+//  }
+  
+  def formatNumber(number: Long): String = {
     val formatter = java.text.NumberFormat.getIntegerInstance
     formatter.format(number)
   }
   
-  def percent(number: Int, prev: Int): Double = {
+  def percent(number: Long, prev: Long): Double = {
     val value = ((number - prev) / (prev * 1.0)) / 100.0
     BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
   }

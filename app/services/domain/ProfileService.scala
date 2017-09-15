@@ -20,6 +20,7 @@ import utils.SearchReponseUtil
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.ftel.bigdata.utils.HttpUtil
 import model.DomainLocation
+import scala.util.Try
 
 object ProfileService extends AbstractService {
 
@@ -34,9 +35,10 @@ object ProfileService extends AbstractService {
       multi(
         search(s"dns-second-*" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } limit SIZE_DAY,
 //        search("dns-service-domain-*" / "answer") query { must(termQuery(SECOND_FIELD, domain)) } limit 1000,
-        search(s"dns-domain-${latestDay}" / "docs") query { must(termQuery(SECOND_FIELD, domain)) },
+        search(s"dns-domain-${latestDay}" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort("queries") order SortOrder.DESC } limit 100,
           //aggregations (cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
-        search(("dns-service-domain-whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) }
+        search(("dns-service-domain-whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) },
+        search(s"dns-hourly-second-${latestDay}" / "docs") query {boolQuery().must(termQuery("name", domain))} size 24
         )).await
 
     val time1 = System.currentTimeMillis()
@@ -44,10 +46,14 @@ object ProfileService extends AbstractService {
     //val answerResponse = multiSearchResponse.responses(1)
     val domainResponse = multiSearchResponse.responses(1)
     val whoisResponse = multiSearchResponse.responses(2)
+    val hourlyResponse = multiSearchResponse.responses(3)
 
     println(secondResponse.took)
     println(domainResponse.took)
     println(whoisResponse.took)
+    println(hourlyResponse.took)
+    
+    
     
     if (secondResponse.totalHits > 0) {
       val time2 = System.currentTimeMillis()
@@ -59,7 +65,14 @@ object ProfileService extends AbstractService {
       val time4 = System.currentTimeMillis()
       val answers = null//answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
       val time5 = System.currentTimeMillis()
-      val hourly = Array[(Int, Long)]()//getHourly(domain, current)
+      //val hourly = Array[(Int, Long)]() //getHourly(domain, current)
+      val hourly = hourlyResponse.hits.hits.map(x => {
+        val map = x.sourceAsMap
+        val hour = map.getOrElse("hour", "0").toString.toInt
+        val queries = map.getOrElse("queries", "0").toString.toLong
+        hour -> queries
+      }).sorted
+      //hourly.foreach(println)
       val time6 = System.currentTimeMillis()
       val category = CommonService.getCategory(domain)
       CommonService.backgroupJob(CommonService.getLogo(domain, true), "Download Logo")
@@ -67,7 +80,7 @@ object ProfileService extends AbstractService {
       indexLocation(domain)
       val loc = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await
       val map = loc.sourceAsMap
-      
+      val subdomain = domainResponse.hits.hits.map(x => x.sourceAsMap).map(x => x.getOrElse("domain", "").toString -> x.getOrElse("queries", "0").toString.toInt)
       val time7 = System.currentTimeMillis()
       printTime(time0,time1,time2,time3,time4,time5, time6, time7)
       ProfileResponse(whois, current, history, answers, hourly, category,
@@ -79,7 +92,7 @@ object ProfileService extends AbstractService {
               getValueAsString(map, "timezone"),
               getValueAsString(map, "org"),
               getValueAsString(map, "lat"),
-              getValueAsString(map, "lon")))
+              getValueAsString(map, "lon")), subdomain)
       //ProfileResponse(whois, current, history, hourly)
     } else null
   }
@@ -91,9 +104,11 @@ object ProfileService extends AbstractService {
     if (!getResponse.exists) {
       val url = IP_API_URL + domain
       val content = HttpUtil.getContent(url, "172.30.45.220", 80)
+      println(content)
 //      val content = HttpUtil.getContent(url)
       //println(content)
-      client.execute(indexInto("dns-location" / "docs") doc (content) id domain ).await
+      
+      Try(client.execute(indexInto("dns-location" / "docs") doc (content) id domain ).await)
       //Thread.sleep(300)
       
     }
@@ -131,7 +146,7 @@ object ProfileService extends AbstractService {
       val hourly = Array[(Int, Long)]()//getHourly(domain, current)
       val time6 = System.currentTimeMillis()
       //printTime(time0,time1,time2,time3,time4,time5, time6)
-      ProfileResponse(whois, current, history, answers, hourly, "N/A", null)
+      ProfileResponse(whois, current, history, answers, hourly, "N/A", null, null)
     } else null
   }
   

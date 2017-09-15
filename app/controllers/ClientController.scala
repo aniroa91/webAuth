@@ -33,9 +33,9 @@ class ClientController @Inject() (cc: ControllerComponents) extends AbstractCont
     if (!formValidationResult.hasErrors) {
       val ip = formValidationResult.get.q
       val response = CacheService.getClient(ip)
-      Ok(views.html.ace.client(form, response._1, null, ip))
+      Ok(views.html.dns.profile.client.index(form, response._1, null, ip))
     } else {
-      Ok(views.html.ace.client(form, null, ClientService.getTop(), ""))
+      Ok(views.html.dns.profile.client.index(form, null, ClientService.getTop(), ""))
     }
   }
 
@@ -47,7 +47,7 @@ class ClientController @Inject() (cc: ControllerComponents) extends AbstractCont
         val headers = Array[String]("Day", "Time", "Domain", "Second", "Malware", "RCode", "Answers")
         
         val history = ClientService.historyBlack2(ip, offset, CommonService.SIZE_DEFAULT).asInstanceOf[Array[Array[Any]]]
-         Ok(views.html.ace.tablescroll(null, history))
+         Ok(views.html.dns.profile.client.tablescroll(null, history))
       }
 //      println(history.size)
 //      val html = views.html.ace.timeline("", history)

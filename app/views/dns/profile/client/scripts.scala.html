@@ -1,0 +1,365 @@
+@(response: model.ClientResponse, ip: String)
+@import services.domain.CommonService.getLinkTag
+@import services.domain.CommonService.formatNumber
+@import play.api.libs.json.Json
+
+@if(response == null) {
+		<script type="text/javascript"></script>
+	} else {
+<script type="text/javascript">
+	$(function () {
+
+		var categories = @Html(Json.stringify(Json.toJson(response.topDomain.map(x => getLinkTag(x.name)))));
+	    var queries = @Html(Json.stringify(Json.toJson(response.topDomain.map(x => x.queries))));
+	    
+
+	    Highcharts.chart('top-10-domain', {
+	        chart: {
+	            type: 'bar',
+	            height: '400px'
+	        },
+	        title: {
+	            text: "Top 10 Domain"
+	        },
+	        plotOptions: {
+	        bar: {
+	            	dataLabels: {
+	                	enabled: true
+	            	}
+	        	}
+	    	},
+	        xAxis: {
+	            categories: categories
+	        },
+
+	        yAxis: {
+	            title: {
+	                text: "Queries"
+	            }
+	        },
+	        series: [
+	        {
+	            name: "Queries",
+	            data: queries
+	        }]
+	    });
+
+	    categories = @Html(Json.stringify(Json.toJson(response.topSecond.map(x => getLinkTag(x.name)))));
+	    queries = @Html(Json.stringify(Json.toJson(response.topSecond.map(x => x.queries))));
+	    
+
+	    Highcharts.chart('top-10-second', {
+	        chart: {
+	            type: 'bar',
+	            height: '400px'
+	        },
+	        title: {
+	            text: "Top 10 Main Domain"
+	        },
+	        plotOptions: {
+	        bar: {
+	            	dataLabels: {
+	                	enabled: true
+	            	}
+	        	}
+	    	},
+	        xAxis: {
+	            categories: categories
+	        },
+
+	        yAxis: {
+	            title: {
+	                text: "Queries"
+	            }
+	        },
+	        series: [
+	        {
+	            name: "Queries",
+	            data: queries
+	        }]
+	    });
+	    /*
+	    categories = @@Html(Json.stringify(Json.toJson(response.topMalware.map(x => getLinkTag(x.malware)))));
+	    queries = @@Html(Json.stringify(Json.toJson(response.topMalware.map(x => x.queries))));
+	    
+
+	    Highcharts.chart('top-10-malware', {
+	        chart: {
+	            type: 'bar',
+	            height: '400px'
+	        },
+	        title: {
+	            text: "Top 10 Malware"
+	        },
+	        plotOptions: {
+	        bar: {
+	            	dataLabels: {
+	                	enabled: true
+	            	}
+	        	}
+	    	},
+	        xAxis: {
+	            categories: categories
+	        },
+
+	        yAxis: {
+	            title: {
+	                text: "Queries"
+	            }
+	        },
+	        series: [
+	        {
+	            name: "Queries",
+	            data: queries
+	        }]
+	    });
+		*/
+	    var hours = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._1))));
+	    var values = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x._2))));
+	    Highcharts.chart('hourly-column-chart', {
+		    chart: {
+		        type: 'column',
+		        height: '400px'
+		    },
+		    title: {
+		        text: 'Hourly queries'
+		    },
+		    xAxis: {
+		        categories: hours,
+		        crosshair: true
+		    },
+		    yAxis: {
+		        min: 0,
+		        title: {
+		            text: 'Num Of Queries'
+		        }
+		    },
+		    plotOptions: {
+		        column: {
+		            pointPadding: 0.2,
+		            borderWidth: 0
+		        }
+		    },
+		    series: [{
+		        name: 'Queries',
+		        data: values
+
+		    }]
+		});
+		
+		var days = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.day))));
+	    values = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.queries))));
+	    domains = @Html(Json.stringify(Json.toJson(response.daily.map(x => x.domains))));
+	    Highcharts.chart('daily-line-chart', {
+		    chart: {
+		        type: 'line',
+		        height: '400px'
+		    },
+		    title: {
+		        text: 'Daily queries'
+		    },
+		    xAxis: {
+		        categories: days,
+		        crosshair: true
+		    },
+		    yAxis: {
+		        min: 0,
+		        title: {
+		            text: 'Num Of Queries'
+		        }
+		    },
+		    plotOptions: {
+		        column: {
+		            pointPadding: 0.2,
+		            borderWidth: 0
+		        },
+		        line: {
+	            	dataLabels: {
+	                	enabled: true
+	            	},
+	                enableMouseTracking: false
+	            }
+		    },
+		    series: [{
+		        name: 'Queries',
+		        type: 'spline',
+		        data: values
+		    },{
+		        name: 'Domains',
+		        type: 'spline',
+		        data: domains
+		    }]
+		});
+	    
+	    /*
+	    $("#loadMore").on('click', function (e) {
+	    	
+        	e.preventDefault();
+        	/*
+        	$("div:hidden").slice(0, 4).slideDown();
+        	if ($("div:hidden").length == 0) {
+            	$("#load").fadeOut('slow');
+        	}
+        	$('html,body').animate({
+            	scrollTop: $(this).offset().top
+        	}, 1500);
+        	*
+        	//val data = @@routes.ClientController.history
+        	$('#load_more').append('');
+        	
+        	alert("---------------")
+   		});
+	    */
+		
+		
+		var element = $('#load_more2');
+  		var url     = "/history?ip=@ip&offset="
+  		//var limit   = parseInt(element.data('limit'));
+  		//var offset  = limit;
+  		var offset = @services.domain.CommonService.SIZE_DEFAULT
+
+	  	$('#loadMore2').on('click', function(e) {
+	  		
+	    	$.get(url + offset, function(data) {
+	      		element.children().last().after(data);
+	      		offset += @services.domain.CommonService.SIZE_DEFAULT;
+	  		})
+	  		
+	  		//alert("Load More Clicked!")
+	    });
+	    
+		
+	  	
+	  	var chart_config = {
+	        chart: {
+	            container: "#binary-tree",
+
+	            animateOnInit: false,
+	            /*
+	            connectors: {
+					type: "step"
+				},
+				*/
+	            node: {
+	                collapsable: false
+	            },
+	            animation: {
+	                nodeAnimation: "easeOutBounce",
+	                nodeSpeed: 700,
+	                connectorsAnimation: "bounce",
+	                connectorsSpeed: 700
+	            }
+	        },
+	        /*
+	        nodeStructure: {
+	            image: "img/malory.png",
+	            text: { name: "Parent node" },
+	            children: [
+	                {
+	                    image: "img/lana.png",
+	                    collapsed: true,
+	                    children: [
+	                        {
+	                            image: "img/figgs.png"
+	                        }
+	                    ]
+	                },
+	                {
+	                    image: "img/sterling.png",
+	                    childrenDropLevel: 1,
+	                    children: [
+	                        {
+	                            image: "img/woodhouse.png"
+	                        }
+	                    ]
+	                },
+	                {
+	                    pseudo: true,
+	                    children: [
+	                        {
+	                            image: "img/cheryl.png"
+	                        },
+	                        {
+	                            image: "img/pam.png"
+	                        }
+	                    ]
+	                }
+	            ]
+	        }
+	        */
+	        nodeStructure: {
+	        	image: "../assets/images/site.png",
+	            text: { value: "@formatNumber(response.current.domains)"},
+	            /*
+	            collapsable: false,
+	            */
+	            children: [
+	                {
+	                	image: "../assets/images/valid.png",
+	                    text: { value: "@formatNumber(response.current.valid)"  },
+	                    childrenDropLevel: 1,
+	                    /*
+	                    collapsable: false,
+	                    */
+	                    children: [
+	                        {
+	                        	image: "../assets/images/main-domain.png",
+	                            text: { value: "@formatNumber(response.current.seconds - (response.current.domains - response.current.valid))"  }
+	                            /*
+	                            children: [
+	                            	{text: { name: "Black", value: "1,123,985"  }},
+	                            	{text: { name: "White", value: "1,123,985"  }},
+	                            	{text: { name: "Unknow", value: "1,123,985"  }}
+	                            ]
+	                            */
+	                        }
+	                    ]
+	                },
+	                {
+	                	image: "../assets/images/invalid.png",
+	                    text: { value: "@formatNumber(response.current.domains - response.current.valid)"  },
+	                     /*
+	                    collapsable: false,
+	                    */
+	                }
+	            ]
+	        }
+	    };
+	    tree = new Treant( chart_config );
+	    
+
+	    
+
+	});
+
+	// Scroll Pagaging
+	$(document).ready(function() {
+		var win = $(window);
+		var doc = $(document);
+		//alert(doc.height() - win.height() == win.scrollTop())
+		// Each time the user scrolls
+
+		var element = $('#spreadsheet-body');
+  		var url     = "/history?ip=@ip&offset="
+  		var offset = @services.domain.CommonService.SIZE_DEFAULT
+
+		win.scroll(function() {
+			// Vertical end reached?
+			if (doc.height() - win.height() == win.scrollTop()) {
+				//alert($('#black-history').Parent.pr)
+				var active = $('#black-history').attr('class');//.tabs("option", "active");
+				if (active == "tab-pane active") {
+					$.get(url + offset, function(data) {
+						// New row
+		      			element.append(data)
+		      			offset += @services.domain.CommonService.SIZE_DEFAULT;
+		      			//var tr = $('<tr />').append($('<th />')).appendTo($('#spreadsheet'));
+		  			});
+				}
+			}
+		})
+	});
+
+
+</script>
+}

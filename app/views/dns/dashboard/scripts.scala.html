@@ -1,0 +1,472 @@
+@(response: model.DashboardResponse)
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.percent
+@import play.api.libs.json.Json
+@import services.domain.CommonService.getLinkTag
+
+<script type="text/javascript">
+	$(function () {
+	    var categories = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._1))));
+	    var queries = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._2.queries))));
+	    var domains = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._2.domains))));
+	    var clients = @Html(Json.stringify(Json.toJson(response.daily.map(x => x._2.clients))));
+
+	    Highcharts.chart('daily-line-chart', {
+	        chart: {
+	            type: 'line',
+	            zoomType: 'xy'
+	        },
+	        title: {
+	            text: 'Daily Query'
+	        },
+	        subtitle: {
+	            text: 'Source: DNS LOG FTEL'
+	        },
+	        plotOptions: {
+	        line: {
+	            dataLabels: {
+	                enabled: true
+	            },
+	                enableMouseTracking: false
+	            }
+	        },
+	        xAxis: [{
+	            categories: categories,
+	            crosshair: true
+	        }],
+	        yAxis: [{ // Primary yAxis
+	            labels: {
+	                format: '{value}',
+	                style: {
+	                    color: Highcharts.getOptions().colors[2]
+	                }
+	            },
+	            title: {
+	                text: 'Clients',
+	                style: {
+	                    color: Highcharts.getOptions().colors[2]
+	                }
+	            },
+	            opposite: true
+
+	        }, { // Secondary yAxis
+	            gridLineWidth: 0,
+	            title: {
+	                text: 'Queries',
+	                style: {
+	                    color: Highcharts.getOptions().colors[0]
+	                }
+	            },
+	            labels: {
+	                format: '{value}',
+	                style: {
+	                    color: Highcharts.getOptions().colors[0]
+	                }
+	            }
+
+	        }, { // Tertiary yAxis
+	            gridLineWidth: 0,
+	            title: {
+	                text: 'Domains',
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            },
+	            labels: {
+	                format: '{value}',
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            },
+	            opposite: true
+	        }],
+	        tooltip: {
+	            shared: true
+	        },
+	        legend: {
+	            layout: 'vertical',
+	            align: 'left',
+	            x: 80,
+	            verticalAlign: 'top',
+	            y: 55,
+	            floating: true,
+	            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+	        },
+	        series: [{
+	            name: 'Queries',
+	            type: 'spline',
+	            yAxis: 1,
+	            data: queries,
+	            tooltip: {
+	                valueSuffix: ''
+	            }
+
+	        }, {
+	            name: 'Domains',
+	            type: 'spline',
+	            yAxis: 2,
+	            data: domains,
+	            marker: {
+	                enabled: false
+	            },
+	            dashStyle: 'shortdot',
+	            tooltip: {
+	                valueSuffix: ''
+	            }
+
+	        }, {
+	            name: 'Clients',
+	            type: 'spline',
+	            data: clients,
+	            tooltip: {
+	                valueSuffix: ''
+	            }
+	        }]
+	    });
+
+	    categories = @Html(Json.stringify(Json.toJson(response.report.malwares.take(10).map(x => x.malware))));
+	    queries = @Html(Json.stringify(Json.toJson(response.report.malwares.take(10).map(x => x.queries))));
+	    domains = @Html(Json.stringify(Json.toJson(response.report.malwares.take(10).map(x => x.domains))));
+	    var title = "Top 10 Malwares"
+
+
+	    Highcharts.chart('top-10-malwares', {
+	        chart: {
+	            type: 'bar',
+	            height: '600px'
+	        },
+	        title: {
+	            text: "Top 10 Malwares"
+	        },
+	        plotOptions: {
+	        bar: {
+	            	dataLabels: {
+	                	enabled: true
+	            	}
+	        	}
+	    	},
+	        xAxis: {
+	            categories: categories
+	        },
+
+	        yAxis: {
+	            title: {
+	                text: "Queries/Domains"
+	            }
+	        },
+	        series: [
+	        {
+	            name: "Queries",
+	            data: queries
+	        }, {
+	            name: "Domains",
+	            data: domains
+	        }]
+	    });
+
+	    categories = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => getLinkTag(x.name) + " [" + x.malware + "]"))));
+	    queries = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => x.queries))));
+	    clients = @Html(Json.stringify(Json.toJson(response.report.blacks.take(10).map(x => x.clients))));
+	    var title = "Top 10 Malwares"
+
+
+	    Highcharts.chart('top-10-domain-black', {
+	        chart: {
+	            type: 'bar',
+	            height: '600px'
+	        },
+	        title: {
+	            text: "Top 10 Domain Black"
+	        },
+	        plotOptions: {
+	        bar: {
+	            	dataLabels: {
+	                	enabled: true
+	            	}
+	        	}
+	    	},
+	        xAxis: {
+	            categories: categories
+	        },
+
+	        yAxis: {
+	            title: {
+	                text: "Queries/Clients"
+	            }
+	        },
+	        series: [
+	        {
+	            name: "Queries",
+	            data: queries
+	        }, {
+	            name: "Clients",
+	            data: clients
+	        }]
+	    });
+
+	    categories = @Html(Json.stringify(Json.toJson(response.report.seconds.take(10).map(x => x.name))));
+	    queries = @Html(Json.stringify(Json.toJson(response.report.seconds.take(10).map(x => x.queries))));
+	    clients = @Html(Json.stringify(Json.toJson(response.report.seconds.take(10).map(x => x.clients))));
+	    var title = "Top 10 Main Domain"
+
+
+	    Highcharts.chart('top-10-main-domain', {
+	        chart: {
+	            type: 'bar',
+	            height: '600px'
+	        },
+	        title: {
+	            text: "Top 10 Main Domain"
+	        },
+	        plotOptions: {
+	        bar: {
+	            	dataLabels: {
+	                	enabled: true
+	            	}
+	        	}
+	    	},
+	        xAxis: {
+	            categories: categories
+	        },
+
+	        yAxis: {
+	            title: {
+	                text: "Queries/Clients"
+	            }
+	        },
+	        series: [
+	        {
+	            name: "Queries",
+	            data: queries
+	        }, {
+	            name: "Clients",
+	            data: clients
+	        }]
+	    });
+
+	    var data1 = @Html(Json.stringify(response.toBubbleBlack));
+	    var data2 = @Html(Json.stringify(response.toBubbleWhite));
+	    var data3 = @Html(Json.stringify(response.toBubbleUnknow));
+	    Highcharts.chart('bubble-chart-3d', {
+
+		    chart: {
+		        type: 'bubble',
+		        plotBorderWidth: 1,
+		        zoomType: 'xy'
+		    },
+
+		    title: {
+		        text: 'Top 100 second domain black/white/unknow'
+		    },
+
+		    xAxis: {
+		        gridLineWidth: 1,
+		        title: {
+            		text: 'Queries'
+        		}
+		    },
+
+		    yAxis: {
+		        startOnTick: false,
+		        endOnTick: false,
+		        title: {
+            		text: 'Clients'
+        		}
+		    },
+
+		     tooltip: {
+		        useHTML: true,
+		        headerFormat: '<table>',
+		        pointFormat: 
+		        	'<tr><th colspan="2"><h3>{point.name}</h3></th></tr>' +
+		            '<tr><th>Queries:</th><td>{point.x}</td></tr>' +
+		            '<tr><th>Client:</th><td>{point.y}</td></tr>' +
+		            '<tr><th>QpC:</th><td>{point.z}</td></tr>',
+		        footerFormat: '</table>',
+		        followPointer: true
+		    },
+
+		    series: [{
+		        data: data1,
+		        name: "Black",
+		        marker: {
+		            fillColor: {
+		                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
+		                stops: [
+		                    [0, 'rgba(255,255,255,0.5)'],
+		                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0.5).get('rgba')]
+		                ]
+		            }
+		        }
+		    }, {
+		        data: data2,
+		        name: "White",
+		        marker: {
+		            fillColor: {
+		                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
+		                stops: [
+		                    [0, 'rgba(255,255,255,0.5)'],
+		                    [1, Highcharts.Color(Highcharts.getOptions().colors[1]).setOpacity(0.5).get('rgba')]
+		                ]
+		            }
+		        }
+		    }, {
+		        data: data3,
+		        name: "Unknow",
+		        marker: {
+		            fillColor: {
+		                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
+		                stops: [
+		                    [0, 'rgba(255,255,255,0.5)'],
+		                    [1, Highcharts.Color(Highcharts.getOptions().colors[2]).setOpacity(0.5).get('rgba')]
+		                ]
+		            }
+		        }
+		    }
+/*
+		    ,
+		     {
+		        data: [
+		            [42, 38, 20],
+		            [6, 18, 1],
+		            [1, 93, 55],
+		            [57, 2, 90],
+		            [80, 76, 22],
+		            [11, 74, 96],
+		            [88, 56, 10],
+		            [30, 47, 49],
+		            [57, 62, 98],
+		            [4, 16, 16],
+		            [46, 10, 11],
+		            [22, 87, 89],
+		            [57, 91, 82],
+		            [45, 15, 98]
+		        ],
+		        marker: {
+		            fillColor: {
+		                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
+		                stops: [
+		                    [0, 'rgba(255,255,255,0.5)'],
+		                    [1, Highcharts.Color(Highcharts.getOptions().colors[1]).setOpacity(0.5).get('rgba')]
+		                ]
+		            }
+		        }
+		    }*/
+		    ]
+
+		});
+
+		
+	    /*
+		// Prepare demo data
+		// Data is joined to map using value of 'hc-key' property by default.
+		// See API docs for 'joinBy' for more info on linking data and map.
+		var data = [
+		    ['vn-yb', 0],
+		    ['vn-pt', 1],
+		    ['vn-3655', 2],
+		    ['vn-qn', 3],
+		    ['vn-kh', 4],
+		    ['vn-tg', 5],
+		    ['vn-bv', 6],
+		    ['vn-bu', 7],
+		    ['vn-hc', 8],
+		    ['vn-br', 9],
+		    ['vn-st', 10],
+		    ['vn-li', 11],
+		    ['vn-311', 12],
+		    ['vn-ty', 13],
+		    ['vn-318', 14],
+		    ['vn-hd', 15],
+		    ['vn-bn', 16],
+		    ['vn-317', 17],
+		    ['vn-vc', 18],
+		    ['vn-nb', 19],
+		    ['vn-hm', 20],
+		    ['vn-ho', 21],
+		    ['vn-bg', 22],
+		    ['vn-tb', 23],
+		    ['vn-ld', 24],
+		    ['vn-bp', 25],
+		    ['vn-tn', 26],
+		    ['vn-py', 27],
+		    ['vn-bd', 28],
+		    ['vn-3623', 29],
+		    ['vn-724', 30],
+		    ['vn-qg', 31],
+		    ['vn-331', 32],
+		    ['vn-dt', 33],
+		    ['vn-333', 34],
+		    ['vn-la', 35],
+		    ['vn-337', 36],
+		    ['vn-bl', 37],
+		    ['vn-vl', 38],
+		    ['vn-hg', 39],
+		    ['vn-nd', 40],
+		    ['vn-db', 41],
+		    ['vn-ls', 42],
+		    ['vn-th', 43],
+		    ['vn-307', 44],
+		    ['vn-tq', 45],
+		    ['vn-328', 46],
+		    ['vn-na', 47],
+		    ['vn-qb', 48],
+		    ['vn-723', 49],
+		    ['vn-nt', 50],
+		    ['vn-6365', 51],
+		    ['vn-299', 52],
+		    ['vn-300', 53],
+		    ['vn-qt', 54],
+		    ['vn-tt', 55],
+		    ['vn-kg', 56],
+		    ['vn-da', 57],
+		    ['vn-ag', 58],
+		    ['vn-cm', 59],
+		    ['vn-tv', 60],
+		    ['vn-cb', 61],
+		    ['vn-lo', 62],
+		    ['vn-bi', 63]
+		];
+
+		// Create the chart
+		Highcharts.mapChart('vn-map', {
+		    chart: {
+		        map: 'countries/vn/vn-all'
+		    },
+
+		    title: {
+		        text: 'Highmaps basic demo'
+		    },
+
+		    subtitle: {
+		        text: 'Source map: <a href="../assets/javascripts/vn-all.js">Vietnam</a>'
+		    },
+
+		    mapNavigation: {
+		        enabled: true,
+		        buttonOptions: {
+		            verticalAlign: 'bottom'
+		        }
+		    },
+
+		    colorAxis: {
+		        min: 0
+		    },
+
+		    series: [{
+		        data: data,
+		        name: 'Random data',
+		        states: {
+		            hover: {
+		                color: '#BADA55'
+		            }
+		        },
+		        dataLabels: {
+		            enabled: true,
+		            format: '{point.name}'
+		        }
+		    }]
+		});
+		*/
+	});
+</script>

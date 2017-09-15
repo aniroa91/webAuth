@@ -7,11 +7,11 @@ case class MainDomainInfo(
     name: String,
     label: String,
     malware: String,
-    queries: Int,
-    domains: Int,
-    clients: Int,
-    rankFtel: Int,
-    rankAlexa: Int) {
+    queries: Long,
+    domains: Long,
+    clients: Long,
+    rankFtel: Long,
+    rankAlexa: Long) {
 //  def getNumOfQuery(): String = {
 //      DomainService.formatNumber(numOfQuery)
 //    }
@@ -21,7 +21,7 @@ case class MainDomainInfo(
 //  def getQueryPerClient(): String = {
 //      DomainService.formatNumber(numOfQuery / numOfClient)
 //    }
-  def getQueryPerClient(): Int = {
+  def getQueryPerClient(): Long = {
       queries / clients
   }
   def this(day: String, name: String, malware: String, queries: Int, clients: Int, rankFtel: Int, rankAlexa: Int) = 
@@ -44,6 +44,14 @@ case class TotalInfo(
     seconds: Int) {
   def clone(numOfClients: Int) = TotalInfo(queries, domains, numOfClients, malwares, success, failed, seconds)
   def this() = this(0,0,0,0,0,0,0)
+  def plus(that: TotalInfo) = TotalInfo(
+      this.queries + that.queries,
+      this.domains + that.domains,
+      this.clients + that.clients,
+      this.malwares + that.malwares,
+      this.success + that.success,
+      this.failed + that.failed,
+      this.seconds + that.seconds)
 }
 
 case class MalwareInfo(malware: String, queries: Int, domains: Int, clients: Int) {
@@ -70,7 +78,7 @@ case class DomainLocation(second: String, ip: String, country: String, region: S
   
 }
 
-case class Bubble(x: Int, y: Int, z: Int, name: String)
+case class Bubble(x: Long, y: Long, z: Long, name: String)
 
 abstract class AbstractResponse {
   

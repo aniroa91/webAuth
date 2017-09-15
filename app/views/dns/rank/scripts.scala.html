@@ -1,0 +1,130 @@
+<script type="text/javascript">
+	$(function () {
+		////////////////////
+		//change profile
+		$('[data-toggle="buttons"] .btn').on('click', function(e){
+			var target = $(this).find('input[type=radio]');
+			var which = parseInt(target.val());
+			$('.top-rank').parent().addClass('hide');
+			$('#top-rank-'+which).parent().removeClass('hide');
+			//alert(which)
+		});
+
+	});
+
+	jQuery(function($) {
+			//initiate dataTables plugin
+		var myTable = 
+		$('#table-all')
+		//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+		.DataTable( {
+			bAutoWidth: false,
+			"aoColumns": [
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false }
+			],
+			"aaSorting": [],
+			select: {
+				style: 'multi'
+			}
+	    } );
+
+	    $('#table-white')
+		//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+		.DataTable( {
+			bAutoWidth: false,
+			"aoColumns": [
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false }
+			],
+			"aaSorting": [],
+			select: {
+				style: 'multi'
+			}
+	    } );
+
+	    $('#table-black')
+		//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+		.DataTable( {
+			bAutoWidth: false,
+			"aoColumns": [
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false }
+			],
+			"aaSorting": [],
+			select: {
+				style: 'multi'
+			}
+	    } );
+
+	    $('#table-unknow')
+		//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+		.DataTable( {
+			bAutoWidth: false,
+			"aoColumns": [
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false }
+			],
+			"aaSorting": [],
+			select: {
+				style: 'multi'
+			}
+	    } );
+
+	    $('#table-last7Day')
+		//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+		.DataTable( {
+			bAutoWidth: false,
+			"aoColumns": [
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false }
+			],
+			"aaSorting": [],
+			select: {
+				style: 'multi'
+			}
+	    } );
+
+	    $('#table-last30Day')
+		//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+		.DataTable( {
+			bAutoWidth: false,
+			"aoColumns": [
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false },
+			  { "bSortable": false }
+			],
+			"aaSorting": [],
+			select: {
+				style: 'multi'
+			}
+	    } );
+	})
+
+</script>
