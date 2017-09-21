@@ -21,6 +21,6 @@ class ReportController @Inject() (cc: ControllerComponents) extends AbstractCont
       CommonService.getLatestDay()
     }
     val response = CacheService.getReport(key)
-    Ok(views.html.dns.report.index(key, response._1))
+    Ok(views.html.dns_v2.report.index(key, response._1))
   }
 }
