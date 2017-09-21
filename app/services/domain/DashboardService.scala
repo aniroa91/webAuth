@@ -14,7 +14,9 @@ import model.TotalInfo
 import com.ftel.bigdata.utils.DateTimeUtil
 import scala.collection.immutable.HashSet
 import org.joda.time.Days
-import com.ftel.bigdata.dns.parameters.Label
+import model.Label
+
+//import com.ftel.bigdata.dns.parameters.Label
 
 //import org.apache.lucene.index.Terms
 //import org.elasticsearch.search.aggregations.bucket.terms.Terms

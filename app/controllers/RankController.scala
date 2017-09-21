@@ -1,6 +1,6 @@
 package controllers
 
-import com.ftel.bigdata.dns.parameters.Label
+//import com.ftel.bigdata.dns.parameters.Label
 
 import javax.inject.Inject
 import javax.inject.Singleton

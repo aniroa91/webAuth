@@ -2,7 +2,7 @@ package services.domain
 
 import org.elasticsearch.search.sort.SortOrder
 
-import com.ftel.bigdata.dns.parameters.Label
+//import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.DateTimeUtil
 import com.ftel.bigdata.utils.WhoisUtil
 import com.ftel.bigdata.whois.Whois

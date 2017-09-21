@@ -1,6 +1,6 @@
 package services.domain
 
-import com.ftel.bigdata.dns.parameters.Label
+//import com.ftel.bigdata.dns.parameters.Label
 import com.sksamuel.elastic4s.http.search.SearchResponse
 
 import model.MainDomainInfo
@@ -9,6 +9,7 @@ import model.TotalInfo
 import services.Configure
 import model.ClientInfo
 import com.ftel.bigdata.utils.StringUtil
+import model.Label
 
 abstract class AbstractService {
 

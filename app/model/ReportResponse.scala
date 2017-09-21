@@ -15,6 +15,8 @@ package model
 //    domainBlacks: Array[DomainResponse]) {
 //}
 
+case class DayHourly(hour: Int, queries: Int, clients: Int, seconds: Int)
+
 case class ReportResponse (
     day: String,
     current: TotalInfo,
@@ -22,15 +24,8 @@ case class ReportResponse (
     labels: Array[(String, TotalInfo)],
     malwares: Array[MalwareInfo],
     blacks: Array[MainDomainInfo],
-    seconds: Array[MainDomainInfo]) {
+    seconds: Array[MainDomainInfo],
+    org: Array[(String, Int)],
+    country: Array[(String, Int)],
+    hourly: Array[DayHourly]) {
 }
-//case class DashboardResponse (
-//    day: String,
-//    total: LabelResponse,
-//    totalPrev: LabelResponse,
-//    labels: Array[LabelResponse],
-//    malwares: Array[MalwareResponse],
-//    secondBlacks: Array[SecondResponse],
-//    seconds: Array[SecondResponse],
-//    daily: Array[DailyResponse]) {
-//}

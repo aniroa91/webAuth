@@ -33,6 +33,7 @@ case class HistoryInfo(daily: Array[HistoryDay]) {
 case class ClientInfo(day: String, client: String, queries: Int, seconds: Int, domains: Int, success: Int, failed: Int, malwares: Int, valid: Int, rank: Int) {
   def updateMalware(num: Int): ClientInfo = {
     println(malwares + "-" + num)
+    println(client + ": " + queries)
     ClientInfo(day, client, queries, seconds, domains, success, failed, num, valid, rank)
   }
 }

@@ -20,7 +20,7 @@ import com.typesafe.config.ConfigFactory
 import play.api.data._
 import play.api.i18n._
 import play.api.mvc._
-import com.ftel.bigdata.dns.parameters.Label
+//import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.DateTimeUtil
 import scala.util.Try
 import services.Configure

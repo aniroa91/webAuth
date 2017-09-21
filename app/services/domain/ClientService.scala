@@ -23,7 +23,7 @@ object ClientService extends AbstractService {
   def get(ip: String, day: String): ClientResponse = {
     val time0 = System.currentTimeMillis()
     
-    val response = client.execute(search(s"dns-client-*" / "docs") query {boolQuery().must(termQuery("client", ip))} size 30).await
+    val response = client.execute(search(s"dns-client-*" / "docs") query {boolQuery().must(termQuery("client", ip))} sortBy (fieldSort(DAY_FIELD) order SortOrder.DESC) size 30).await
     val responseValid = client.execute(search(s"dns-history-client-${day}" / "docs")
           query { boolQuery().must(termQuery("client", ip)) }
           aggregations (
@@ -122,6 +122,7 @@ object ClientService extends AbstractService {
     val history = getHistory(response)
     
     val current = daily.reverse.head
+    daily.foreach(x => println(x.day -> x.queries))
     // Remove malware with white or unknow
     val numMalware = current.malwares - (if (responseWhite.totalHits > 0) 1 else 0) - (if (responseUnknow.totalHits > 0) 1 else 0)
     val prev = if (daily.size >= 2) daily.reverse.tail.head else current

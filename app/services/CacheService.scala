@@ -1,6 +1,6 @@
 package services
 
-import com.ftel.bigdata.dns.parameters.Label
+//import com.ftel.bigdata.dns.parameters.Label
 
 import model.DashboardResponse
 import model.ProfileResponse
@@ -17,6 +17,7 @@ import scala.concurrent.Future
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import model.Label
 
 
 object CacheService {

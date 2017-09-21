@@ -1,6 +1,6 @@
 package model
 
-import com.ftel.bigdata.dns.parameters.Label
+//import com.ftel.bigdata.dns.parameters.Label
 
 case class MainDomainInfo(
     day: String,
