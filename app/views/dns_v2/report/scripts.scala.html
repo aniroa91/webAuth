@@ -152,6 +152,56 @@
                     }]
                 }]
             });
+            // Build the chart organization
+            Highcharts.chart('pie-chartOrg', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        colors: [
+                            '#3498DB',
+                            '#1ABB9C',
+                            '#9B59B6',
+                            '#9CC2CB',
+                            '#E74C3C'
+                        ],
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: false
+                    }
+                },
+                series: [{
+                    innerSize: '40%',
+                    name: 'Percent',
+                    colorByPoint: true,
+                    data: [ {
+                        name: 'IOS',
+                        y: 30
+                    }, {
+                        name: 'Android',
+                        y: 10
+                    },{
+                        name: 'Blackberry',
+                        y: 20
+                    },{
+                        name: 'Symbian',
+                        y: 15
+                    },{
+                        name: 'Other',
+                        y: 30
+                    }]
+                }]
+            });
             // Build the chart line
 
             Highcharts.chart('chart-line', {
