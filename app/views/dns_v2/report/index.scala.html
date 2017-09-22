@@ -140,58 +140,31 @@
                 <!-- page content -->
             <div class="right_col" role="main">
                     <!-- top tiles -->
-                <div class="row tile_count">
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top">Num Of Query</span>
-                        <div class="count">@formatNumber(response.current.queries)</div>
-                        <span class="count_bottom">@percentNum(response.current.queries, response.previous.queries) From last Day</span>
-                    </div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top"> Num Of Domain</span>
-                        <div class="count">@formatNumber(response.current.domains)</div>
-                        <span class="count_bottom">@percentNum(response.current.domains,response.previous.domains) From last Day</span>
-                    </div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top"> Num Of Client</span>
-                        <div class="count">@formatNumber(response.current.clients)</div>
-                        <span class="count_bottom">@percentNum(response.current.clients,response.previous.clients) From last Day</span>
-                    </div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top"> Number Of Malware</span>
-                        <div class="count">@formatNumber(response.current.malwares)</div>
-                        <span class="count_bottom">@percentNum(response.current.malwares,response.previous.malwares) From last Day</span>
-                    </div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top"> Number Of Success</span>
-                        <div class="count">@formatNumber(response.current.success)</div>
-                        <span class="count_bottom">@percentNum(response.current.success,response.previous.success) From last Day</span>
-                    </div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top"> Number Of Second Domain</span>
-                        <div class="count">@formatNumber(response.current.seconds)</div>
-                        <span class="count_bottom">@percentNum(response.current.seconds,response.previous.seconds) From last Day</span>
-                    </div>
-                </div>
+                @tile(response.current, response.previous)
                     <!-- /top tiles -->
-
+                <div class="row x_title"></div>
+                                
                 <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="dashboard_graph">
-
+                            <!--
                             <div class="row x_title">
                                 <div class="col-md-6">
-                                    <h3>Network Activities <small>Graph title sub-title</small></h3>
+                                    <h3>Hourly Activities <small>Number of query and client by hour</small></h3>
                                 </div>
                             </div>
-
+                            -->
                             <div class="col-md-7 col-sm-7 col-xs-12">
                                 <div id="chart-line" style="min-width: 310px; height: 400px; margin-top: 50px"></div>
                             </div>
+                            
                             <div class="col-md-5 col-sm-5 col-xs-12 bg-white">
+                                <!--
                                 <div class="x_title">
                                     <h2>Classify Labels</h2>
                                     <div class="clearfix"></div>
                                 </div>
+                                -->
                                 <div class="col-md-12">
                                     <div class="panel with-nav-tabs panel-default">
                                         <div class="panel-heading">
@@ -725,6 +698,6 @@
     <script src="../assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
     <script src="../assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
     <script src="../assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-    @scripts(day,response.labels)
+    @scripts(day, response.labels, response)
 </body>
  </html>

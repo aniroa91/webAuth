@@ -1,17 +1,17 @@
 @(number: Long, prev: Long)
+@import services.domain.CommonService.percent
 @{
-    var value = ((number - prev) / (prev * 1.0)) / 100.0
-    value = BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+    var value = percent(number, prev)
 
     if(value >= 0) {
-            <i class="green">
+        <i class="green">
             <i class="fa fa-sort-asc"></i>
             {value} %
-            </i>
+        </i>
     } else {
-            <i class="red">
+        <i class="red">
             <i class="fa fa-sort-desc"></i>
             {value} %
-            </i>
+        </i>
     }
 }

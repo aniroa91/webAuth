@@ -248,12 +248,31 @@ object CommonService extends AbstractService {
   
   def formatNumber(number: Long): String = {
     val formatter = java.text.NumberFormat.getIntegerInstance
+    if (number > 1000000000) {
+      BigDecimal(number / (1000000000 * 1.0)).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble + " B"
+    } else if (number > 1000000) {
+      BigDecimal(number / (1000000 * 1.0)).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble + " M"
+    } else if (number > 1000) {
+      BigDecimal(number / (1000 * 1.0)).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble + " K"
+    } else {
+      number.toString
+    }
+    //formatter.format(number)
+    
+    //BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+  
+  @deprecated
+  def formatNumberOld(number: Long): String = {
+    val formatter = java.text.NumberFormat.getIntegerInstance
     formatter.format(number)
+    
+    //BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
   
   def percent(number: Long, prev: Long): Double = {
-    val value = ((number - prev) / (prev * 1.0)) / 100.0
-    BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+    val value = ((number - prev) / (prev * 1.0)) * 100.0
+    BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
   
   /**

@@ -1,7 +1,8 @@
-@(day: String, labels: Array[(String, model.TotalInfo)])
+@(day: String, labels: Array[(String, model.TotalInfo)], response: model.ReportResponse)
 @import play.api.libs.json.Json
 <script type="text/javascript">
         $(document).ready(function () {
+            
             var black = 0
             var white = 0
             var unknow = 0
@@ -152,6 +153,10 @@
                     }]
                 }]
             });
+
+            //var orgName = @@Html(Json.stringify(Json.toJson(response.org.map(x => x.org))));
+            //var orgValue = @@Html(Json.stringify(Json.toJson(response.org.map(x => x.query))));
+
             // Build the chart organization
             Highcharts.chart('pie-chartOrg', {
                 chart: {
@@ -204,27 +209,30 @@
             });
             // Build the chart line
 
+            var hourly = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x.hour))));
+            var queries = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x.queries))));
+            var clients = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x.clients))));
+
             Highcharts.chart('chart-line', {
                 chart: {
-                    type: 'spline'
+                    type: 'column'
                 },
                 title: {
-                    text: 'Monthly Average Temperature'
+                    text: 'Number Of Client By Hour'
                 },
                 subtitle: {
-                    text: 'Source: WorldClimate.com'
+                    text: 'Source: Dns Log'
                 },
                 xAxis: {
-                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                    categories: hourly
                 },
                 yAxis: {
                     title: {
-                        text: 'Temperature'
+                        text: 'Query & Client'
                     },
                     labels: {
                         formatter: function () {
-                            return this.value + '°';
+                            return (this.value / 1000) + 'k';
                         }
                     }
                 },
@@ -241,29 +249,35 @@
                         }
                     }
                 },
-                series: [{
-                    name: 'Tokyo',
+                series: [
+                /*
+                {
+                    type: 'column',
+                    name: 'Query',
                     marker: {
                         symbol: 'square'
                     },
-                    data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, {
-                        y: 26.5,
-                        marker: {
-                            symbol: 'url(https://www.highcharts.com/samples/graphics/sun.png)'
-                        }
-                    }, 23.3, 18.3, 13.9, 9.6]
+                    data: queries
+                    //data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, {
+                    //    y: 26.5,
+                        //marker: {
+                        //    symbol: 'url(https://www.highcharts.com/samples/graphics/sun.png)'
+                        //}
+                    //}, 23.3, 18.3, 13.9, 9.6]
 
-                }, {
-                    name: 'London',
+                }, */{
+                    type: 'spline',
+                    name: 'Client',
                     marker: {
                         symbol: 'diamond'
                     },
-                    data: [{
-                        y: 3.9,
-                        marker: {
-                            symbol: 'url(https://www.highcharts.com/samples/graphics/snow.png)'
-                        }
-                    }, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+                    data: clients
+                    //data: [{
+                    //    y: 3.9,
+                    //    marker: {
+                    //        symbol: 'url(https://www.highcharts.com/samples/graphics/snow.png)'
+                    //    }
+                    //}, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
                 }]
             });
         });
