@@ -6,12 +6,15 @@
     if(value >= 0) {
         <i class="green">
             <i class="fa fa-sort-asc"></i>
-            {value} %
+            
+            <span class="counter">{value}</span> %
+
         </i>
     } else {
         <i class="red">
             <i class="fa fa-sort-desc"></i>
-            {value} %
+            -<span class="counter">{value}</span> %
+
         </i>
     }
 }

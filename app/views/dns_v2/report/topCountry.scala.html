@@ -1,0 +1,13 @@
+@(countries:Array[(String, Int)])
+@import services.domain.CommonService.formatNumber
+
+<table class="countries_list">
+    <tbody>
+        @for(country <- countries.slice(0,5)){
+        <tr>
+            <td>@country._1</td>
+            <td class="fs15 fw700 text-right">@formatNumber(country._2)</td>
+        </tr>
+        }
+    </tbody>
+</table>

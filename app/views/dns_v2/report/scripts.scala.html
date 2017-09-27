@@ -1,8 +1,117 @@
-@(day: String, labels: Array[(String, model.TotalInfo)], response: model.ReportResponse)
+@(day: String, labels: Array[(String, model.TotalInfo)], response: model.ReportResponse,totalQuery: Int)
 @import play.api.libs.json.Json
+@import services.domain.CommonService.getOthers
+
 <script type="text/javascript">
         $(document).ready(function () {
-            
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip({trigger: 'manual'}).tooltip('show');
+            });
+
+            $(".progress-bar").each(function(){
+                each_bar_width = $(this).attr('aria-valuenow');
+                $(this).width(each_bar_width + '%');
+            });
+
+            // auto count number
+            $('.counter').counterUp({
+                delay: 10,
+                time: 1000
+            });
+
+            // chart bar top 5 domain
+            Highcharts.chart('top5Main', {
+                chart: {
+                    type: 'bar',
+                    height: '290px'
+                },
+                title: {
+                    text: ""
+                },
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                xAxis: {
+                    categories: @Html(Json.stringify(Json.toJson(response.seconds.take(5).map(x => x.name))))
+                },
+
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C'
+                ],
+
+                yAxis: {
+                    title: {
+                        text: ""
+                    }
+                },
+                series: [
+                    {
+                        name: "Queries",
+                        data: @Html(Json.stringify(Json.toJson(response.seconds.take(5).map(x => x.queries))))
+                    }]
+            });
+
+            // chart bar
+            Highcharts.chart('top5Malware', {
+                chart: {
+                    type: 'bar',
+                    height: '290px'
+                },
+                title: {
+                    text: ""
+                },
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C'
+                ],
+                xAxis: {
+                    categories: @Html(Json.stringify(Json.toJson(response.malwares.take(5).map(x => x.malware))))
+                },
+
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true
+                        },
+                        showInLegend: true
+                    }
+                },
+
+                yAxis: {
+                    title: {
+                        text: ""
+                    }
+                },
+                series: [
+                    {
+                        name: "Queries",
+                        data: @Html(Json.stringify(Json.toJson(response.malwares.take(5).map(x => x.queries))))
+                    }]
+            });
+
             var black = 0
             var white = 0
             var unknow = 0
@@ -156,7 +265,7 @@
 
             //var orgName = @@Html(Json.stringify(Json.toJson(response.org.map(x => x.org))));
             //var orgValue = @@Html(Json.stringify(Json.toJson(response.org.map(x => x.query))));
-
+            var org = @Html(Json.stringify(Json.toJson(("others" -> getOthers(response.org.slice(0,5), response.current.queries)) +: response.org.slice(0,5))));
             // Build the chart organization
             Highcharts.chart('pie-chartOrg', {
                 chart: {
@@ -175,7 +284,8 @@
                             '#1ABB9C',
                             '#9B59B6',
                             '#9CC2CB',
-                            '#E74C3C'
+                            '#E74C3C',
+                            '#73879C'
                         ],
                         allowPointSelect: true,
                         cursor: 'pointer',
@@ -189,7 +299,8 @@
                     innerSize: '40%',
                     name: 'Percent',
                     colorByPoint: true,
-                    data: [ {
+                    data: org
+                    /*data: [ {
                         name: 'IOS',
                         y: 30
                     }, {
@@ -204,7 +315,7 @@
                     },{
                         name: 'Other',
                         y: 30
-                    }]
+                    }]*/
                 }]
             });
             // Build the chart line
@@ -223,6 +334,14 @@
                 subtitle: {
                     text: 'Source: Dns Log'
                 },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C'
+                ],
                 xAxis: {
                     categories: hourly
                 },
@@ -278,6 +397,72 @@
                     //        symbol: 'url(https://www.highcharts.com/samples/graphics/snow.png)'
                     //    }
                     //}, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+                }]
+            });
+
+            // Build the chart geo
+
+            var country = @Html(Json.stringify(Json.toJson(response.country.slice(0,5))));
+            function lower(obj) {
+                for (var prop in obj) {
+                    if (typeof obj[prop] === 'string') {
+                        obj[prop] = obj[prop].toLowerCase();
+                    }
+                    if (typeof obj[prop] === 'object') {
+                        lower(obj[prop]);
+                    }
+                }
+                return obj;
+            }
+            Highcharts.mapChart('wdmap', {
+                chart: {
+                    map: 'custom/world'
+                },
+
+                title: {
+                    text: ''
+                },
+
+                mapNavigation: {
+                    enabled: true,
+                    buttonOptions: {
+                        verticalAlign: 'top'
+                    }
+                },
+                legend:false,
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C'
+                ],
+                series: [{
+                    data: lower(country),
+                    name: 'Random data',
+                    states: {
+                        hover: {
+                            color: '#BADA55'
+                        }
+                    },
+                    dataLabels: {
+
+                        enabled: true,
+
+                        color: '#FFFFFF',
+
+                        format: '{point.code}'
+
+                    },
+
+                    name: 'Visitors location',
+
+                    tooltip: {
+
+                        pointFormat:  '{point.name}: {point.value}'
+
+                    }
                 }]
             });
         });

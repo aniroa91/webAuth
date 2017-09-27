@@ -275,6 +275,18 @@ object CommonService extends AbstractService {
     BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
   
+  def percentInfor(number: Long, total: Long): Double = {
+    val value = number/ (total * 1.0) * 100.0
+    BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+
+  def getOthers(orgs: Array[(String, Int)], total: Int): Int ={
+
+    total - orgs.map(x=>x._2).sum
+    //percentInfor(orgQueries,total)
+  }
+
+  
   /**
    * Create html tag
    */
