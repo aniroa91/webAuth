@@ -24,4 +24,5 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
     Ok(views.html.dns_v2.report.index(key, response._1))*/
     Ok(views.html.dns_v2.profile.paytv.index())
   }
+  
 }

@@ -151,7 +151,11 @@ abstract class AbstractService {
   def getValueAsInt(map: Map[String, Any], key: String): Int = {
     getValueAsString(map, key, "0").toInt
   }
-  
+
+  def getValueAsLong(map: Map[String, Any], key: String): Long = {
+    getValueAsString(map, key, "0").toLong
+  }
+
   def sumTotalInfo(totalInfoArrs: Array[TotalInfo]): TotalInfo = {
     totalInfoArrs.reduce((x, y) => {
       TotalInfo(
