@@ -57,4 +57,6 @@ case class Response(
     vectors: Map[String, PayTVVector],
     internetSegment: InternetSegment,
     download: Array[(Int, Double)],
-    upload: Array[(Int, Double)])
+    upload: Array[(Int, Double)],
+    suyhout: Array[(String, String)],
+    error: Array[(String, (Int, String, String))])

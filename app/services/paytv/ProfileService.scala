@@ -194,17 +194,35 @@ object ProfileService extends AbstractService {
       .map(x => x.substring(4).replace("UpLoad", "") -> getValueAsString(downupSource, x))
       .map(x => x._1.toInt -> x._2.toDouble).toArray
     
-    Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload)
+    val pon = client.execute(search(s"pon" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    val suyhoutSource = if (pon.totalHits <= 0) {
+      client.execute(search(s"adsl" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    } else pon
+    
+    //println(suyhout.totalHits)
+    val suyhout = suyhoutSource.hits.hits.map(x => x.sourceAsMap)
+      .map(x => (getValueAsLong(x, "date")/1000) -> getValueAsString(x, "passed"))
+      .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
+      
+    val errorRes = client.execute(search(s"inf" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    val error = errorRes.hits.hits.map(x => x.sourceAsMap)
+      .map(x => (getValueAsLong(x, "date")/1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error") , getValueAsString(x, "n_error")))
+      .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
+    Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload, suyhout, error)
     
   }
 
   def main(args: Array[String]) {
     val time0 = System.currentTimeMillis()
 //    ProfileService.get("LDD018356")
-    val response = ProfileService.get("LDD018356")
+    
+    val response = ProfileService.get("DNFD21708")
+    //val response = ProfileService.get("LDD018356")
     //val response = ProfileService.get("CBFD01425")
-    response.segments.foreach(x => println(x._2.app))
-    response.download.foreach(println)
+    //response.segments.foreach(x => println(x._2.app))
+    //response.download.foreach(println)
+    response.suyhout.foreach(println)
+    response.error.foreach(println)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
