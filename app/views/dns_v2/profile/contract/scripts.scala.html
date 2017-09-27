@@ -1,0 +1,405 @@
+
+<script type="text/javascript">
+        $(document).ready(function () {
+            // auto count number
+            $('.counter').counterUp({
+                delay: 10,
+                time: 1000
+            });
+
+            // Build the chart pie app vector
+            Highcharts.chart('pie-appVector', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        colors: [
+                            '#3498DB',
+                            '#1ABB9C',
+                            '#9B59B6',
+                            '#9CC2CB',
+                            '#E74C3C',
+                            '#73879C'
+                        ],
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true
+                        },
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    name: 'Percent',
+                    innerSize: '40%',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'IPTV',
+                        y: 40,
+                        sliced: true,
+                        selected: true
+                    }, {
+                        name: 'Service',
+                        y: 11
+                    }, {
+                        name: 'Child',
+                        y: 32
+                    }]
+                }]
+            });
+
+            // Build the chart line hourly vector
+
+            Highcharts.chart('line-hourVector', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C'
+                ],
+                xAxis: {
+                    categories: [0,1,2,3,4,5,6,7,8,9,10,11,12]
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        formatter: function () {
+                            return (this.value / 1000) + 'k';
+                        }
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [{
+                        type: 'spline',
+                        name: 'Client',
+                        marker: {
+                            symbol: 'diamond'
+                        },
+                        data: [ 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,8,89]
+                    }]
+            });
+
+            // Build the chart line app-hourly vector
+
+            Highcharts.chart('line-appHourVector', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C','#9B59B6'
+                ],
+                xAxis: {
+                    categories: [0,1,2,3,4,5,6,7,8,9,10,11,12]
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        formatter: function () {
+                            return (this.value / 1000) + 'k';
+                        }
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'spline',
+                        name: 'Query',
+                        marker: {
+                            symbol: 'square'
+                        },
+                        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2,14,31, 23.3, 18.3, 13.9, 9.6]
+
+                    },{
+                    type: 'spline',
+                    name: 'Client',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    data: [ 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,8,89]
+                }]
+            });
+
+            // Build the chart line app-daily vector
+
+            Highcharts.chart('line-appDayVector', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#3498DB','#fbc28d'
+                ],
+                xAxis: {
+                    categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        formatter: function () {
+                            return (this.value / 1000) + 'k';
+                        }
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'spline',
+                        name: 'Query',
+                        marker: {
+                            symbol: 'square'
+                        },
+                        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2]
+
+                    },{
+                        type: 'spline',
+                        name: 'Client',
+                        marker: {
+                            symbol: 'diamond'
+                        },
+                        data: [ 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6]
+                    }]
+            });
+
+            // Build the chart line iptv vector
+
+            Highcharts.chart('pie-iptvVector', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        colors: [
+                            '#3498DB',
+                            '#1ABB9C',
+                            '#9B59B6',
+                            '#9CC2CB',
+                            '#E74C3C',
+                            '#73879C'
+                        ],
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true
+                        },
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    name: 'Percent',
+                    innerSize: '40%',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'VTV1',
+                        y: 40,
+                        sliced: true,
+                        selected: true
+                    }, {
+                        name: 'VTV2',
+                        y: 11
+                    }, {
+                        name: 'VTV3',
+                        y: 12
+                    }, {
+                        name: 'VTV4',
+                        y: 32
+                    }]
+                }]
+            });
+
+            // Build the chart line daily vector
+            Highcharts.chart('col-dayVector', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    categories: [
+                        'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'
+                    ],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Average'
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'left',
+                    x: 120,
+                    verticalAlign: 'top',
+                    y: 100,
+                    floating: true,
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">Day of week: {point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0,
+                    }
+                },
+                colors: [
+                    '#1ABB9C'
+                ],
+                series: [{
+                    name: 'Duration day of week',
+                    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6]
+
+                }]
+            });
+
+            // Build the chart line day of month vector
+            Highcharts.chart('col-dayofMonth', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    categories: [
+                        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+                    ],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Average'
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'left',
+                    x: 120,
+                    verticalAlign: 'top',
+                    y: 100,
+                    floating: true,
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">Day of week: {point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0,
+                    }
+                },
+                colors: [
+                    '#1ABB9C'
+                ],
+                series: [{
+                    name: 'Duration day of month',
+                    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6,
+                        49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6,
+                        419.9, 71.5, 406.4, 229.2, 164.0, 116.0, 35.6,50,21]
+
+                }]
+            });
+
+        });
+ </script>
