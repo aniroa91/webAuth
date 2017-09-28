@@ -1,3 +1,5 @@
+@(form: Form[SearchContract], response: model.paytv.Response)(implicit messages: Messages)
+
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
 
@@ -133,6 +135,18 @@
                 .x-content{
                     padding-bottom: 25px;
                 }
+                .right_col{
+                    min-height: inherit!important;
+                }
+                .noData-title {
+                    margin-bottom: 13px;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                    font-size: 40px;
+                    color: #f60;
+                    font-size: 2.5rem;
+                }
         </style>
     </head>
 
@@ -187,26 +201,22 @@
                     </div>
                 </div>
                     <!-- /top navigation -->
-
                     <!-- page content -->
                 <div class="right_col" role="main">
-                    <div class="">
+                    <div >
                         <div class="page-title">
 
                             <div class="pull-right">
                                 <div class="col-md-3 col-sm-3 col-xs-12 form-group pull-right top_search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="Search ...">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-default" type="button">Go!</button>
-                                        </span>
-                                    </div>
+
+                                    @views.html.dns_v2.profile.contract.frmSearch(form, routes.ProfileContractController.index)
+
                                 </div>
                             </div>
                         </div>
 
                         <div class="clearfix"></div>
-
+                    @if( response != null){
                         <div class="row">
                             <div class="col-md-12 col-sm-12 col-xs-12">
                                 <div class="x_panel">
@@ -237,21 +247,21 @@
                                                     <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
                                                 </div>
                                             </div>
-                                            <h3 class="name_title">Google.com</h3>
-                                            <p style="margin-left: 15px">Status contract</p>
+                                            <h3 class="name_title">@response.internet.contract</h3>
+                                            <p style="margin-left: 15px">@response.internet.status</p>
                                             <ul class="list-unstyled user_data">
-                                                <li><i class="fa fa-map-marker user-profile-icon"></i> Location
+                                                <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.province - @response.internet.region
                                                 </li>
 
                                                 <li>
-                                                    <i class="fa fa-briefcase user-profile-icon"></i> Service package
+                                                    <i class="fa fa-briefcase user-profile-icon"></i> @response.internet.profileType
                                                 </li>
 
-                                                <li><i class="fa fa-calendar user-profile-icon"></i> Date created
+                                                <li><i class="fa fa-calendar user-profile-icon"></i> @response.internet.start
                                                 </li>
 
                                                 <li>
-                                                    <i class="fa fa-clock-o user-profile-icon"></i> Date actived
+                                                    <i class="fa fa-clock-o user-profile-icon"></i> @response.internet.active
                                                 </li>
                                             </ul>
 
@@ -260,24 +270,129 @@
                                             <br />
                                             <ul class="stats-overview">
                                                 <li>
-                                                    <h1 class="price counter">2,300</h1>
+                                                    <h1 class="price">@formatNumber(response.internet.downloadLim)</h1>
                                                     <span class="price-tax">Avg download/day</span>
                                                 </li>
                                                 <li>
-                                                    <h1 class="price counter">72,000</h1>
+                                                    <h1 class="price">@formatNumber(response.internet.updateLim)</h1>
                                                     <span class="price-tax">Avg upload/day</span>
                                                 </li>
                                             </ul>
+                                            <br />
+                                            <div class="x-content" id="payInfor">
+                                                <div class="profile_title">
+                                                    <div class="col-md-6">
+                                                        <h4>Session information</h4>
+                                                    </div>
+                                                </div>
 
+                                                <ul class="list-unstyled timeline">
+                                                    <li>
+                                                        <div class="block">
+                                                            <div class="tags">
+                                                                <a href="" class="tag">
+                                                                    <span>Count</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="block_content">
+                                                                <p class="excerpt"> movie makers. </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="block">
+                                                            <div class="tags">
+                                                                <a href="" class="tag">
+                                                                    <span>Mean</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="block_content">
+                                                                <p class="excerpt"> moments for movie makers. </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="block">
+                                                            <div class="tags">
+                                                                <a href="" class="tag">
+                                                                    <span>Median</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="block_content">
+                                                                <p class="excerpt">Film festivals movie makers. </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="block">
+                                                            <div class="tags">
+                                                                <a href="" class="tag">
+                                                                    <span>Min</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="block_content">
+                                                                <p class="excerpt">Film festivals used to bes. </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="block">
+                                                            <div class="tags">
+                                                                <a href="" class="tag">
+                                                                    <span>Max</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="block_content">
+                                                                <p class="excerpt">Film festivals movie makers. </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <br />
+                                            <div class="x-content" id="payInfor">
+                                                <div class="profile_title">
+                                                    <div class="col-md-6">
+                                                        <h4>Ticket information</h4>
+                                                    </div>
+                                                </div>
+
+                                                <ul class="list-unstyled timeline">
+                                                    <li>
+                                                        <div class="block">
+                                                            <div class="tags">
+                                                                <a href="" class="tag">
+                                                                    <span>Count</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="block_content">
+                                                                <p class="excerpt"> movie makers. </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="block">
+                                                            <div class="tags">
+                                                                <a href="" class="tag">
+                                                                    <span>Type</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="block_content">
+                                                                <p class="excerpt"> moments for movie makers. </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
 
                                         </div>
                                         <div class="col-md-9 col-sm-9 col-xs-12">
                                             <div class="x-content" id="payInfor">
-                                            <div class="profile_title">
-                                                <div class="col-md-6">
-                                                    <h2>PayTV information</h2>
+                                                <div class="profile_title">
+                                                    <div class="col-md-6">
+                                                        <h2>PayTV information</h2>
+                                                    </div>
                                                 </div>
-                                            </div>
 
                                                 <ul class="list-unstyled timeline">
                                                     <li>
@@ -288,7 +403,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. </p>
+                                                                <p class="excerpt"> @response.paytv.contract </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -300,7 +415,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. </p>
+                                                                <p class="excerpt"> @response.paytv.start </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -312,7 +427,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. </p>
+                                                                <p class="excerpt"> @response.paytv.active </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -324,7 +439,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. </p>
+                                                                <p class="excerpt"> @response.paytv.status </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -336,19 +451,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Fee</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt">Film festivals used to be do-or-die moments for movie makers. </p>
+                                                                <p class="excerpt"> @response.paytv.box_count </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -405,66 +508,152 @@
                                                             </tbody>
                                                         </table>
                                                             <!-- end recent activity -->
+                                                        <div class="profile_title row">
+                                                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                <div class="x_panel tile fixed_height_320">
+                                                                    <div class="x_title">
+                                                                        <h2> Down/upload hourly vector</h2>
+                                                                        <ul class="nav navbar-right panel_toolbox">
+                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                            </li>
+                                                                            <li class="dropdown">
+                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li><a href="#">Settings 1</a>
+                                                                                    </li>
+                                                                                    <li><a href="#">Settings 2</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </li>
+                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="x_content">
+                                                                        <div id="int-line-hourVector" style="height:300px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                <div class="x_panel tile fixed_height_320">
+                                                                    <div class="x_title">
+                                                                        <h2> Duration hourly vector</h2>
+                                                                        <ul class="nav navbar-right panel_toolbox">
+                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                            </li>
+                                                                            <li class="dropdown">
+                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li><a href="#">Settings 1</a>
+                                                                                    </li>
+                                                                                    <li><a href="#">Settings 2</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </li>
+                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="x_content">
+                                                                        <div id="int-durHourVector" style="height:300px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="profile_title row">
+                                                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                <div class="x_panel tile fixed_height_320">
+                                                                    <div class="x_title">
+                                                                        <h2> Down/upload daily vector</h2>
+                                                                        <ul class="nav navbar-right panel_toolbox">
+                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                            </li>
+                                                                            <li class="dropdown">
+                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li><a href="#">Settings 1</a>
+                                                                                    </li>
+                                                                                    <li><a href="#">Settings 2</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </li>
+                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="x_content">
+                                                                        <div id="int-col-dayVector" style="height:250px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                <div class="x_panel tile fixed_height_320">
+                                                                    <div class="x_title">
+                                                                        <h2> Duration daily vector</h2>
+                                                                        <ul class="nav navbar-right panel_toolbox">
+                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                            </li>
+                                                                            <li class="dropdown">
+                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li><a href="#">Settings 1</a>
+                                                                                    </li>
+                                                                                    <li><a href="#">Settings 2</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </li>
+                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="x_content">
+                                                                        <div id="int-pie-durDayVector" style="height:300px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="profile_title row">
+                                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="x_panel tile fixed_height_320">
+                                                                    <div class="x_title">
+                                                                        <h2> UpDown & Duration Day Vector</h2>
+                                                                        <ul class="nav navbar-right panel_toolbox">
+                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                            </li>
+                                                                            <li class="dropdown">
+                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li><a href="#">Settings 1</a>
+                                                                                    </li>
+                                                                                    <li><a href="#">Settings 2</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </li>
+                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="x_content">
+                                                                        <div id="int-col-dayofMonth" style="height:250px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
                                                     </div>
                                                     <div role="tabpanel" class="tab-pane fade" id="tab_paytv" aria-labelledby="paytv-tab">
 
-                                                            <!-- start user projects -->
-                                                        <table class="data table table-striped no-margin">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Box id</th>
-                                                                    <th>Year</th>
-                                                                    <th>Duration segment</th>
-                                                                    <th>Daily segment</th>
-                                                                    <th>Hourly segment</th>
-                                                                    <th>App segment</th>
-                                                                    <th>Iptv segment</th>
-                                                                    <th>Vod segment</th>
-                                                                    <th>Vod child segment</th>
-                                                                    <th>Vod relax segment</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>1</td>
-                                                                    <td>2017</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>1</td>
-                                                                    <td>2017</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>1</td>
-                                                                    <td>2017</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                            <!-- end user projects -->
+                                                        @segmentPayTv(response.segments)
+
                                                         <div class="profile_title row">
                                                             <div class="col-md-6 col-sm-6 col-xs-12">
                                                                 <div class="x_panel tile fixed_height_320">
@@ -544,7 +733,7 @@
                                                                         <div class="clearfix"></div>
                                                                     </div>
                                                                     <div class="x_content">
-                                                                        <div id="col-dayVector" style="height:300px;"></div>
+                                                                        <div id="col-dayVector" style="height:250px;"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -667,9 +856,13 @@
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
+                      } else{
+                        <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
+                        }
                     </div>
                 </div>
                     <!-- /page content -->
