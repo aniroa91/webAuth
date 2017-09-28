@@ -69,4 +69,5 @@ case class Response(
     suyhout: Array[(String, String)],
     error: Array[(String, (Int, String, String))],
     bill: Bill,
-    session: Session)
+    session: Session,
+    sessiontType: (String, Int))

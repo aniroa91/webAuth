@@ -271,9 +271,17 @@ object ProfileService extends AbstractService {
           getValueAsDouble(map, "ssOnline_Std"))
     } else null
     
+    val checkListRes = ESUtil.get(client, "check-list", "docs", contract)
+    val checkList = if (checkListRes.exists) {
+      val map = checkListRes.source
+      getValueAsString(map, "Nhom_CheckList") -> getValueAsInt(map, "So_checklist")
+    } else null
+//    val payTVBillRes = ESUtil.get(client, "bill-paytv", "docs", contract)
+    
     Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload, suyhout, error,
         Bill(internetBill, payTVBill),
-        session)
+        session,
+        checkList)
     
   }
 
