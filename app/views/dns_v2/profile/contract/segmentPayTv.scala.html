@@ -1,6 +1,6 @@
-@(segments: Map[String, model.paytv.PayTVSegment])
+@(response: model.paytv.Response,segments: Map[String, model.paytv.PayTVSegment])
 
-<table class="data table table-striped no-margin">
+<table class="data table table-striped no-margin" id="tbSegPaytv">
     <thead>
         <tr>
             <th>Box id</th>
@@ -17,7 +17,7 @@
     <tbody>
         @for(payTv <- segments) {
             <tr>
-                <td><a href="#" style="color: #1ABB9C;">@payTv._1</a></td>
+                <td><a id="@payTv._1" style="color: #1ABB9C;cursor: pointer;">@payTv._1</a></td>
                 <td>@payTv._2.sum</td>
                 <td>@payTv._2.daily</td>
                 <td>@payTv._2.hourly</td>

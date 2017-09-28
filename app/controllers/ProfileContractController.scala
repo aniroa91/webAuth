@@ -38,9 +38,9 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
     if (!formValidationResult.hasErrors) {
       val domain = formValidationResult.get.q
       val response = ProfileService.get(domain)
-      Ok(views.html.dns_v2.profile.contract.index(form, response))
+      Ok(views.html.dns_v2.profile.contract.index(form, response,domain))
     } else {
-      Ok(views.html.dns_v2.profile.contract.index(form, null))
+      Ok(views.html.dns_v2.profile.contract.index(form, null,null))
     }
   }
 }

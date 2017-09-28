@@ -2,6 +2,8 @@ package services.domain
 
 import org.elasticsearch.search.sort.SortOrder
 
+import scala.collection.mutable
+
 //import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.DateTimeUtil
 import com.ftel.bigdata.utils.WhoisUtil
@@ -13,6 +15,7 @@ import com.sksamuel.elastic4s.http.search.SearchResponse
 import model.MainDomainInfo
 import scala.util.Try
 import services.Configure
+import services.Bucket2
 import com.ftel.bigdata.utils.FileUtil
 import com.ftel.bigdata.utils.HttpUtil
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
@@ -285,7 +288,6 @@ object CommonService extends AbstractService {
     total - orgs.map(x=>x._2).sum
     //percentInfor(orgQueries,total)
   }
-
   
   /**
    * Create html tag

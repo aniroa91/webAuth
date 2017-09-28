@@ -1,4 +1,4 @@
-@(form: Form[SearchContract], response: model.paytv.Response)(implicit messages: Messages)
+@(form: Form[SearchContract], response: model.paytv.Response,contract: String)(implicit messages: Messages)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -147,6 +147,7 @@
                     color: #f60;
                     font-size: 2.5rem;
                 }
+                .hight-light{    color: #26B99A;font-weight: 600;}
         </style>
     </head>
 
@@ -462,52 +463,16 @@
                                                 <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
                                                     <li role="presentation" class="active"><a href="#tab_internet" id="internet-tab" role="tab" data-toggle="tab" aria-expanded="true">Internet profile</a>
                                                     </li>
+                                                    <li role="presentation" class=""><a href="#tab_inf" id="inf-tab" role="tab" data-toggle="tab" aria-expanded="true">INF</a>
+                                                    </li>
                                                     <li role="presentation" class=""><a href="#tab_paytv" role="tab" id="paytv-tab" data-toggle="tab" aria-expanded="false">PayTV profile</a>
                                                     </li>
                                                 </ul>
                                                 <div id="myTabContent" class="tab-content">
                                                     <div role="tabpanel" class="tab-pane fade active in" id="tab_internet" aria-labelledby="internet-tab">
 
-                                                            <!-- start recent activity -->
-                                                        <table class="data table table-striped no-margin">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Year segment</th>
-                                                                    <th>Use demand segment</th>
-                                                                    <th>Connection segment</th>
-                                                                    <th>Bill segment</th>
-                                                                    <th>Ticket segment</th>
-                                                                    <th>RM segment</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>2017</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>2017</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>2017</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                    <td>18</td>
-                                                                    <td>Deveint Inc</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                            <!-- end recent activity -->
+                                                        @segmentInternet(response,response.internetSegment)
+
                                                         <div class="profile_title row">
                                                             <div class="col-md-6 col-sm-6 col-xs-12">
                                                                 <div class="x_panel tile fixed_height_320">
@@ -614,7 +579,7 @@
                                                                         <div class="clearfix"></div>
                                                                     </div>
                                                                     <div class="x_content">
-                                                                        <div id="int-pie-durDayVector" style="height:300px;"></div>
+                                                                        <div id="int-pie-durDayVector" style="height:250px;"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -650,9 +615,67 @@
                                                         </div>
 
                                                     </div>
+                                                    <div role="tabpanel" class="tab-pane fade" id="tab_inf" aria-labelledby="inf-tab">
+                                                        <div class="profile_title row">
+                                                            <div class=" col-xs-12">
+                                                                <div class="x_panel tile fixed_height_320">
+                                                                    <div class="x_title">
+                                                                        <h2> Suy hout vector</h2>
+                                                                        <ul class="nav navbar-right panel_toolbox">
+                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                            </li>
+                                                                            <li class="dropdown">
+                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li><a href="#">Settings 1</a>
+                                                                                    </li>
+                                                                                    <li><a href="#">Settings 2</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </li>
+                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="x_content">
+                                                                        <div id="line-suyVector" style="height:250px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="profile_title row">
+                                                            <div class=" col-xs-12">
+                                                                <div class="x_panel tile fixed_height_320">
+                                                                    <div class="x_title">
+                                                                        <h2> Suy hout vector</h2>
+                                                                        <ul class="nav navbar-right panel_toolbox">
+                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                            </li>
+                                                                            <li class="dropdown">
+                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li><a href="#">Settings 1</a>
+                                                                                    </li>
+                                                                                    <li><a href="#">Settings 2</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </li>
+                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <div class="clearfix"></div>
+                                                                    </div>
+                                                                    <div class="x_content">
+                                                                        <div id="line-errVector" style="height:250px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div role="tabpanel" class="tab-pane fade" id="tab_paytv" aria-labelledby="paytv-tab">
 
-                                                        @segmentPayTv(response.segments)
+                                                        @segmentPayTv(response,response.segments)
 
                                                         <div class="profile_title row">
                                                             <div class="col-md-6 col-sm-6 col-xs-12">
@@ -933,6 +956,8 @@
             <!-- Counter number -->
         <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
-        @scripts()
+        @if( response != null){
+           @scripts(response,contract,response.segments.head._1)
+        }
     </body>
 </html>
