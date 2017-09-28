@@ -1,0 +1,10 @@
+@(form: Form[SearchContract], route: Call)(implicit messages: Messages)
+
+@helper.form(action = route) {
+    <div class="input-group">
+        <input type="text" class="form-control" id="ct" name="ct" placeholder="Search ...">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="submit">Go!</button>
+        </span>
+    </div>
+}
