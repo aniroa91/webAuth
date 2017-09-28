@@ -68,6 +68,8 @@ case class Response(
     upload: Array[(Int, Double)],
     suyhout: Array[(String, String)],
     error: Array[(String, (Int, String, String))],
+    errorModule: Array[(String, Int)],
+    errorDisconnect: Array[(String, Int)],
     bill: Bill,
     session: Session,
     sessiontType: (String, Int))

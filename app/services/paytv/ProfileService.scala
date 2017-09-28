@@ -253,7 +253,9 @@ object ProfileService extends AbstractService {
     val error = errorRes.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date")/1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error") , getValueAsString(x, "n_error")))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
-      
+    val module = error.filter(x => x._2._2 == "module/cpe error").map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum).toArray
+    val disconnet = error.filter(x => x._2._2 == "disconnect/lost IP").map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum).toArray
+    
     val internetBillRes = ESUtil.get(client, "bill-internet", "docs", contract)
     val payTVBillRes = ESUtil.get(client, "bill-paytv", "docs", contract)
     val sessionRes = ESUtil.get(client, "session", "docs", contract)
@@ -278,7 +280,7 @@ object ProfileService extends AbstractService {
     } else null
 //    val payTVBillRes = ESUtil.get(client, "bill-paytv", "docs", contract)
     
-    Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload, suyhout, error,
+    Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload, suyhout, error, module, disconnet,
         Bill(internetBill, payTVBill),
         session,
         checkList)
@@ -291,7 +293,7 @@ object ProfileService extends AbstractService {
     
 //    val response = ProfileService.get("DNFD21708")
     
-    val response = ProfileService.get("SGD235686")
+    val response = ProfileService.get("HNFD94642")
     //val response = ProfileService.get("NAFD01366")
     
     //val response = ProfileService.get("LDD018356")
@@ -305,10 +307,12 @@ object ProfileService extends AbstractService {
     //response.suyhout.foreach(println)
     //response.error.foreach(println)
 //    response.vectors.head
-    println(response.paytv.box_count)//
-    println(response.bill.internet -> response.bill.paytv)
-    println(response.session)
-    response.upload.foreach(println)//
+    //println(response.paytv.box_count)//
+    //println(response.bill.internet -> response.bill.paytv)
+    //println(response.session)
+    //response.upload.foreach(println)//
+    response.errorModule.foreach(println)
+//    response.errorDisconnect.foreach(println)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
