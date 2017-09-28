@@ -940,13 +940,13 @@
                     name: 'Upload',
                     type: 'spline',
                     color: "#9B59B6",
-                    data: [ 4.2, 67, 8.5, 11.9, 4,31,4,22,12,32,12,44, 17.0,7.6, 14.2, 10.3, 6.6, 4.8,8,33,2,9,11.9, 15.2, 17.0, 16.6, 14.2, 10.3]
+                    data: @Html(Json.stringify(Json.toJson(response.upload.map(x => x._2))))
 
                 }, {
                     name: 'Download',
                     type: 'spline',
                     color: "#1ABB9C",
-                    data: [ 14.2, 5.7, 8.5, 11.9, 11,31,4,22,12,32,12,44, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,8,33,2,9,11.9, 15.2, 17.0, 16.6, 14.2, 8.3]
+                    data: @Html(Json.stringify(Json.toJson(response.download.map(x => x._2))))
                 }]
             });
 
@@ -959,50 +959,36 @@
                 title: {
                     text: ''
                 },
-                subtitle: {
-                    text: ''
+                xAxis: {
+                    categories: @Html(Json.stringify(Json.toJson(response.suyhout.map(x => x._1))))
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Value'
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">Clients: {point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
                 },
                 plotOptions: {
                     column: {
-                        colorByPoint: true
+                        pointPadding: 0.2,
+                        borderWidth: 0,
                     }
                 },
                 colors: [
                     '#1ABB9C'
                 ],
-                xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(response.suyhout.map(x => x._1))))
-                },
-                yAxis: {
-                    title: {
-                        text: ''
-                    },
-                    labels: {
-                        formatter: function () {
-                            return (this.value / 1000) + 'k';
-                        }
-                    }
-                },
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
                 series: [{
-                    type: 'spline',
-                    name: 'Client',
-                    marker: {
-                        symbol: 'diamond'
-                    },
-                    data: @Html(Json.stringify(Json.toJson(response.suyhout.map(x => x._2))))
+                    name: 'Values',
+                    data: @Html(Json.stringify(Json.toJson(response.suyhout.map(x => if (x._2.toBoolean) 1 else 0))))
+
                 }]
             });
 
