@@ -2,6 +2,8 @@ package model.paytv
 
 import services.BucketDouble
 import services.Bucket2
+import services.Bucket
+import utils.Session
 
 /**
  * cluster_sum:USE_125 cluster_iptv:PRO_VTV1 cluster_vod:DRAMA_ROMANCE cluster_vod_giaitri:TALK_SHOW cluster_vod_thieunhi:MOVIE_ONLY _id:943110 
@@ -24,6 +26,9 @@ case class PayTVVector(
      iptv: Array[BucketDouble],
      appHourly: Array[Bucket2],
      appDayOfWeek: Array[Bucket2],
+     vod: Array[Bucket],
+     vodthieunhi: Array[Bucket],
+     vodgiaitri: Array[Bucket],
      daily: Array[BucketDouble])
 
 case class InternetSegment(
@@ -50,6 +55,9 @@ case class InternetSegment(
     So_Lan_Loi_Ha_Tang: String, 
     So_Ngay_Loi_Ha_Tang: String)
 
+case class Bill(internet: Int, paytv: Int)
+
+
 case class Response(
     internet: InternetContract,
     paytv: PayTVContract,
@@ -59,4 +67,6 @@ case class Response(
     download: Array[(Int, Double)],
     upload: Array[(Int, Double)],
     suyhout: Array[(String, String)],
-    error: Array[(String, (Int, String, String))])
+    error: Array[(String, (Int, String, String))],
+    bill: Bill,
+    session: Session)

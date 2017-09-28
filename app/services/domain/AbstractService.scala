@@ -156,6 +156,10 @@ abstract class AbstractService {
     getValueAsString(map, key, "0").toLong
   }
 
+  def getValueAsDouble(map: Map[String, Any], key: String): Double = {
+    getValueAsString(map, key, "0").toDouble
+  }
+  
   def sumTotalInfo(totalInfoArrs: Array[TotalInfo]): TotalInfo = {
     totalInfoArrs.reduce((x, y) => {
       TotalInfo(

@@ -13,6 +13,9 @@ import model.paytv.Response
 import model.paytv.PayTVSegment
 import model.paytv.PayTVVector
 import model.paytv.InternetSegment
+import services.Bucket
+import utils.Session
+import model.paytv.Bill
 
 object ProfileService extends AbstractService {
   //val client = Configure.client
@@ -48,7 +51,6 @@ object ProfileService extends AbstractService {
       .field("cate")
       .subaggs(
         sumAgg("sum", "value")) size SIZE_DEFAULT)
-
   }
 
   private def getAppHourly(to: String, boxId: String): SearchDefinition = {
@@ -58,7 +60,7 @@ object ProfileService extends AbstractService {
             .subaggs(sumAgg("sum", "value"))) size SIZE_DEFAULT)
   }
 
-  private def getAppDaily(to: String, boxId: String): SearchDefinition = {
+  private def getAppDayOfWeek(to: String, boxId: String): SearchDefinition = {
     search(s"paytv-weekly-daily-${to}" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("app")
@@ -68,6 +70,30 @@ object ProfileService extends AbstractService {
 
   }
 
+//  private def getVOD(to: String, boxId: String): SearchDefinition = {
+//    search(s"vod_cate" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+//      termsAggregation("top")
+//      .field("cate")
+//      .subaggs(
+//        sumAgg("sum", "value")) size SIZE_DEFAULT)
+//  }
+//  
+//  private def getVODthieunhi(to: String, boxId: String): SearchDefinition = {
+//    search(s"vod_thieu" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+//      termsAggregation("top")
+//      .field("cate")
+//      .subaggs(
+//        sumAgg("sum", "value")) size SIZE_DEFAULT)
+//  }
+//  
+//  private def getVODgiaitri(to: String, boxId: String): SearchDefinition = {
+//    search(s"vod_giaitri" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+//      termsAggregation("top")
+//      .field("cate")
+//      .subaggs(
+//        sumAgg("sum", "value")) size SIZE_DEFAULT)
+//  }
+  
   private def getDaily(month: Int, boxId: String): SearchDefinition = {
     search(s"paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId), termQuery("month", month)) } aggregations (
       termsAggregation("top")
@@ -99,7 +125,7 @@ object ProfileService extends AbstractService {
             getValueAsString(x._2, "cluster_vod_giaitri"),
             getValueAsString(x._2, "cluster_vod_thieunhi")
             )).toMap
-            
+//      println(segments.size)
       val to = "2017-09-25"
       val vectors = boxids.map(x => {
         
@@ -108,7 +134,7 @@ object ProfileService extends AbstractService {
         val dayOfWeek = getDayOfWeek(to, x)
         val iptv = getIPTV(to, x)
         val appHourly = getAppHourly(to, x)
-        val appDaily = getAppDaily(to, x)
+        val appDaily = getAppDayOfWeek(to, x)
         val daily = getDaily(8, x)
         val multiSearchResponse = client.execute(multi(hourly, app, dayOfWeek, iptv, appHourly, appDaily, daily)).await
         
@@ -120,11 +146,30 @@ object ProfileService extends AbstractService {
         val appDailyBucket = ElasticUtil.getBucketTerm2(multiSearchResponse.responses(5), "top", "sum")
         val dailyBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(6), "top", "sum")
         
-        x -> PayTVVector(hourlyBucket, appBucket, dayOfWeekBucket, iptvBucket, appHourlyBucket, appDailyBucket, dailyBucket)
+        val vodRes = ESUtil.get(client, "vod_cate", "docs", x)
+        val vodthieuRes = ESUtil.get(client, "vod_thieu", "docs", x)
+        val vodgiaitriRes = ESUtil.get(client, "vod_giaitri", "docs", x)
+        
+        val vod = if (vodRes.exists) {
+          val source = vodRes.source
+          source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
+          } else null
+        
+        val vodthieu = if (vodthieuRes.exists) {
+          val source = vodthieuRes.source
+          source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
+          } else null
+        
+        val vodgiaitri = if (vodgiaitriRes.exists) {
+          val source = vodgiaitriRes.source
+          source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
+          } else null
+        
+        x -> PayTVVector(hourlyBucket, appBucket, dayOfWeekBucket, iptvBucket, appHourlyBucket, appDailyBucket, vod, vodthieu, vodgiaitri, dailyBucket)
 
       }).toMap
       //boxids.foreach(println)
-      val paytvSource = internetRes.source
+      val paytvSource = payTVRes.source
       val payTVContract = PayTVContract(
           getValueAsString(paytvSource, "contract"),
           getValueAsInt(paytvSource, "box_count"),
@@ -190,8 +235,8 @@ object ProfileService extends AbstractService {
     val download = downupSource.keySet.filter(x => x.contains("Download"))
       .map(x => x.substring(4).replace("Download", "") -> getValueAsString(downupSource, x))
       .map(x => x._1.toInt -> x._2.toDouble).toArray
-    val upload = downupSource.keySet.filter(x => x.contains("UpLoad"))
-      .map(x => x.substring(4).replace("UpLoad", "") -> getValueAsString(downupSource, x))
+    val upload = downupSource.keySet.filter(x => x.contains("Upload"))
+      .map(x => x.substring(4).replace("Upload", "") -> getValueAsString(downupSource, x))
       .map(x => x._1.toInt -> x._2.toDouble).toArray
     
     val pon = client.execute(search(s"pon" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
@@ -208,7 +253,27 @@ object ProfileService extends AbstractService {
     val error = errorRes.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date")/1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error") , getValueAsString(x, "n_error")))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
-    Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload, suyhout, error)
+      
+    val internetBillRes = ESUtil.get(client, "bill-internet", "docs", contract)
+    val payTVBillRes = ESUtil.get(client, "bill-paytv", "docs", contract)
+    val sessionRes = ESUtil.get(client, "session", "docs", contract)
+    
+    val internetBill = if (internetBillRes.exists) getValueAsInt(internetBillRes.source, "SoTienDaThanhToan") else 0
+    val payTVBill = if (payTVBillRes.exists) getValueAsInt(payTVBillRes.source, "BillFee") else 0
+    
+    val session: Session = if (sessionRes.exists) {
+      val map = sessionRes.source
+      Session(contract,
+          getValueAsInt(map, "Session_Count"),
+          getValueAsInt(map, "ssOnline_Min"),
+          getValueAsInt(map, "ssOnline_Max"),
+          getValueAsDouble(map, "ssOnline_Mean"),
+          getValueAsDouble(map, "ssOnline_Std"))
+    } else null
+    
+    Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload, suyhout, error,
+        Bill(internetBill, payTVBill),
+        session)
     
   }
 
@@ -216,13 +281,26 @@ object ProfileService extends AbstractService {
     val time0 = System.currentTimeMillis()
 //    ProfileService.get("LDD018356")
     
-    val response = ProfileService.get("DNFD21708")
+//    val response = ProfileService.get("DNFD21708")
+    
+    val response = ProfileService.get("SGD235686")
+    //val response = ProfileService.get("NAFD01366")
+    
     //val response = ProfileService.get("LDD018356")
     //val response = ProfileService.get("CBFD01425")
-    //response.segments.foreach(x => println(x._2.app))
+    //response.segments.foreach(x => println(x._1 -> x._2.app))
+    //println("IPTV")
+//    response.vectors.foreach(x => x._1 -> x._2.iptv.foreach(println))
+    //println("Vod")
+    //response.vectors.foreach(x => x._1 -> x._2.vod.foreach(println))
     //response.download.foreach(println)
-    response.suyhout.foreach(println)
-    response.error.foreach(println)
+    //response.suyhout.foreach(println)
+    //response.error.foreach(println)
+//    response.vectors.head
+    println(response.paytv.box_count)//
+    println(response.bill.internet -> response.bill.paytv)
+    println(response.session)
+    response.upload.foreach(println)//
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
