@@ -211,681 +211,681 @@
                             <div class="pull-right">
                                 <div class="col-md-3 col-sm-3 col-xs-12 form-group pull-right top_search">
 
-                                    @views.html.dns_v2.profile.contract.frmSearch(form, routes.ProfileContractController.index)
+                                @views.html.dns_v2.profile.contract.frmSearch(form, routes.ProfileContractController.index)
 
                                 </div>
                             </div>
                         </div>
 
                         <div class="clearfix"></div>
-                    @if( response != null){
-                        <div class="row">
-                            <div class="col-md-12 col-sm-12 col-xs-12">
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Contract Information</h2>
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                            </li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Settings 1</a>
-                                                    </li>
-                                                    <li><a href="#">Settings 2</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                            </li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
-                                            <div class="profile_img">
-                                                <div id="crop-avatar">
-                                                        <!-- Current avatar -->
-                                                    <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
-                                                </div>
-                                            </div>
-                                            <h3 class="name_title">@response.internet.contract</h3>
-                                            <p style="margin-left: 15px">@response.internet.status</p>
-                                            <ul class="list-unstyled user_data">
-                                                <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.province - @response.internet.region
+                        @if( response != null){
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2>Contract Information</h2>
+                                            <ul class="nav navbar-right panel_toolbox">
+                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                                 </li>
-
-                                                <li>
-                                                    <i class="fa fa-briefcase user-profile-icon"></i> @response.internet.profileType
+                                                <li class="dropdown">
+                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                    <ul class="dropdown-menu" role="menu">
+                                                        <li><a href="#">Settings 1</a>
+                                                        </li>
+                                                        <li><a href="#">Settings 2</a>
+                                                        </li>
+                                                    </ul>
                                                 </li>
-
-                                                <li><i class="fa fa-calendar user-profile-icon"></i> @formatDateYYMMDD(response.internet.start)
-                                                </li>
-
-                                                <li>
-                                                    <i class="fa fa-clock-o user-profile-icon"></i>@formatDateYYMMDD(response.internet.active)
+                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
                                                 </li>
                                             </ul>
-
-                                            <br />
-                                            <div></div>
-                                            <br />
-                                            <ul class="stats-overview">
-                                                <li>
-                                                    <h1 class="price">@formatNumber(response.internet.downloadLim)</h1>
-                                                    <span class="price-tax">Avg download/day</span>
-                                                </li>
-                                                <li>
-                                                    <h1 class="price">@formatNumber(response.internet.updateLim)</h1>
-                                                    <span class="price-tax">Avg upload/day</span>
-                                                </li>
-                                            </ul>
-                                            <br />
-                                            <div class="x-content" id="payInfor">
-                                                <div class="profile_title">
-                                                    <div class="col-md-6">
-                                                        <h4>Session information</h4>
-                                                    </div>
-                                                </div>
-
-                                                <ul class="list-unstyled timeline">
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Count</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @response.session.count </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Mean</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @response.session.mean </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Median</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @response.session.std </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Min</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @response.session.min </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Max</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @response.session.max </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <br />
-                                            <div class="x-content" id="payInfor">
-                                                <div class="profile_title">
-                                                    <div class="col-md-6">
-                                                        <h4>Ticket information</h4>
-                                                    </div>
-                                                </div>
-
-                                                <ul class="list-unstyled timeline">
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Count</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> 0 </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Type</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> 0 </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
+                                            <div class="clearfix"></div>
                                         </div>
-                                        <div class="col-md-9 col-sm-9 col-xs-12">
-                                            <div class="x-content" id="payInfor">
-                                                <div class="profile_title">
-                                                    <div class="col-md-6">
-                                                        <h2>PayTV information</h2>
+                                        <div class="x_content">
+                                            <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
+                                                <div class="profile_img">
+                                                    <div id="crop-avatar">
+                                                            <!-- Current avatar -->
+                                                        <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
                                                     </div>
                                                 </div>
+                                                <h3 class="name_title">@response.internet.contract</h3>
+                                                <p style="margin-left: 15px">@response.internet.status</p>
+                                                <ul class="list-unstyled user_data">
+                                                    <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.province - @response.internet.region
+                                                    </li>
 
-                                                <ul class="list-unstyled timeline">
                                                     <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Service package</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @response.paytv.contract </p>
-                                                            </div>
-                                                        </div>
+                                                        <i class="fa fa-briefcase user-profile-icon"></i> @response.internet.profileType
                                                     </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Date created</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @formatDateYYMMDD(response.paytv.start) </p>
-                                                            </div>
-                                                        </div>
+
+                                                    <li><i class="fa fa-calendar user-profile-icon"></i> @formatDateYYMMDD(response.internet.start)
                                                     </li>
+
                                                     <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Date actived</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt">  @formatDateYYMMDD(response.paytv.active) </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Status</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @response.paytv.status </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a href="" class="tag">
-                                                                    <span>Box number</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt"> @response.paytv.box_count </p>
-                                                            </div>
-                                                        </div>
+                                                        <i class="fa fa-clock-o user-profile-icon"></i>@formatDateYYMMDD(response.internet.active)
                                                     </li>
                                                 </ul>
+
+                                                <br />
+                                                <div></div>
+                                                <br />
+                                                <ul class="stats-overview">
+                                                    <li>
+                                                        <h1 class="price">@formatNumber(response.internet.downloadLim)</h1>
+                                                        <span class="price-tax">Avg download/day</span>
+                                                    </li>
+                                                    <li>
+                                                        <h1 class="price">@formatNumber(response.internet.updateLim)</h1>
+                                                        <span class="price-tax">Avg upload/day</span>
+                                                    </li>
+                                                </ul>
+                                                <br />
+                                                <div class="x-content" id="payInfor">
+                                                    <div class="profile_title">
+                                                        <div class="col-md-6">
+                                                            <h4>Session information</h4>
+                                                        </div>
+                                                    </div>
+
+                                                    <ul class="list-unstyled timeline">
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Count</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.session.count </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Mean</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.session.mean </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Median</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.session.std </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Min</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.session.min </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Max</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.session.max </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <br />
+                                                <div class="x-content" id="payInfor">
+                                                    <div class="profile_title">
+                                                        <div class="col-md-6">
+                                                            <h4>Ticket information</h4>
+                                                        </div>
+                                                    </div>
+
+                                                    <ul class="list-unstyled timeline">
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Count</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.sessiontType._1 </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Type</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.sessiontType._2 </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
                                             </div>
-
-                                            <div class="" role="tabpanel" data-example-id="togglable-tabs">
-                                                <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
-                                                    <li role="presentation" class="active"><a href="#tab_internet" id="internet-tab" role="tab" data-toggle="tab" aria-expanded="true">Internet profile</a>
-                                                    </li>
-                                                    <li role="presentation" class=""><a href="#tab_inf" id="inf-tab" role="tab" data-toggle="tab" aria-expanded="true">INF</a>
-                                                    </li>
-                                                    <li role="presentation" class=""><a href="#tab_paytv" role="tab" id="paytv-tab" data-toggle="tab" aria-expanded="false">PayTV profile</a>
-                                                    </li>
-                                                </ul>
-                                                <div id="myTabContent" class="tab-content">
-                                                    <div role="tabpanel" class="tab-pane fade active in" id="tab_internet" aria-labelledby="internet-tab">
-
-                                                        @segmentInternet(response,response.internetSegment)
-
-                                                        <div class="profile_title row">
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Down/upload hourly vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="int-line-hourVector" style="height:300px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Duration hourly vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="int-durHourVector" style="height:300px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="profile_title row">
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Down/upload daily vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="int-col-dayVector" style="height:250px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Duration daily vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="int-pie-durDayVector" style="height:250px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="profile_title row">
-                                                            <div class="col-md-12 col-sm-12 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> UpDown & Duration Day Vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="int-col-dayofMonth" style="height:250px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                    <div role="tabpanel" class="tab-pane fade" id="tab_inf" aria-labelledby="inf-tab">
-                                                        <div class="profile_title row">
-                                                            <div class=" col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Suy hout vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="line-suyVector" style="height:250px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="profile_title row">
-                                                            <div class=" col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Error vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="line-errVector" style="height:250px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                                <div class="x-content" id="payInfor">
+                                                    <div class="profile_title">
+                                                        <div class="col-md-6">
+                                                            <h2>PayTV information</h2>
                                                         </div>
                                                     </div>
-                                                    <div role="tabpanel" class="tab-pane fade" id="tab_paytv" aria-labelledby="paytv-tab">
 
-                                                        @segmentPayTv(response,response.segments)
+                                                    <ul class="list-unstyled timeline">
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Service package</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.paytv.contract </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Date created</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @formatDateYYMMDD(response.paytv.start) </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Date actived</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt">  @formatDateYYMMDD(response.paytv.active) </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Status</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.paytv.status </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Box number</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.paytv.box_count </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
 
-                                                        <div class="profile_title row">
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Hourly Vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
+                                                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                                    <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                                                        <li role="presentation" class="active"><a href="#tab_internet" id="internet-tab" role="tab" data-toggle="tab" aria-expanded="true">Internet profile</a>
+                                                        </li>
+                                                        <li role="presentation" class=""><a href="#tab_inf" id="inf-tab" role="tab" data-toggle="tab" aria-expanded="true">INF</a>
+                                                        </li>
+                                                        <li role="presentation" class=""><a href="#tab_paytv" role="tab" id="paytv-tab" data-toggle="tab" aria-expanded="false">PayTV profile</a>
+                                                        </li>
+                                                    </ul>
+                                                    <div id="myTabContent" class="tab-content">
+                                                        <div role="tabpanel" class="tab-pane fade active in" id="tab_internet" aria-labelledby="internet-tab">
+
+                                                            @segmentInternet(response,response.internetSegment)
+
+                                                            <div class="profile_title row">
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Down/upload hourly vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="int-line-hourVector" style="height:300px;"></div>
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="x_content">
-                                                                        <div id="line-hourVector" style="height:300px;"></div>
+                                                                </div>
+
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Duration hourly vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="int-durHourVector" style="height:300px;"></div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> App vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
+                                                            <div class="profile_title row">
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Down/upload daily vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="int-col-dayVector" style="height:250px;"></div>
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="x_content">
-                                                                        <div id="pie-appVector" style="height:300px;"></div>
+                                                                </div>
+
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Duration daily vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="int-pie-durDayVector" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="profile_title row">
+                                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> UpDown & Duration Day Vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="int-col-dayofMonth" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane fade" id="tab_inf" aria-labelledby="inf-tab">
+                                                            <div class="profile_title row">
+                                                                <div class=" col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Suy hout vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="line-suyVector" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="profile_title row">
+                                                                <div class=" col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Error vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="line-errVector" style="height:250px;"></div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <div role="tabpanel" class="tab-pane fade" id="tab_paytv" aria-labelledby="paytv-tab">
 
-                                                        <div class="profile_title row">
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Daily Vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
+                                                            @segmentPayTv(response,response.segments)
+
+                                                            <div class="profile_title row">
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Hourly Vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="line-hourVector" style="height:250px;"></div>
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="x_content">
-                                                                        <div id="col-dayVector" style="height:250px;"></div>
+                                                                </div>
+
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> App vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="pie-appVector" style="height:250px;"></div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> IpTV vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
+                                                            <div class="profile_title row">
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Daily Vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="col-dayVector" style="height:250px;"></div>
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="x_content">
-                                                                        <div id="pie-iptvVector" style="height:300px;"></div>
+                                                                </div>
+
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> IpTV vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="pie-iptvVector" style="height:250px;"></div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
+
+                                                            <div class="profile_title row">
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> App hourly Vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="line-appHourVector" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> App daily vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="line-appDayVector" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="profile_title row">
+                                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Daily Vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="col-dayofMonth" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
                                                         </div>
-
-                                                        <div class="profile_title row">
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> App hourly Vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="line-appHourVector" style="height:300px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> App daily vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="line-appDayVector" style="height:300px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="profile_title row">
-                                                            <div class="col-md-12 col-sm-12 col-xs-12">
-                                                                <div class="x_panel tile fixed_height_320">
-                                                                    <div class="x_title">
-                                                                        <h2> Daily Vector</h2>
-                                                                        <ul class="nav navbar-right panel_toolbox">
-                                                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                            </li>
-                                                                            <li class="dropdown">
-                                                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                <ul class="dropdown-menu" role="menu">
-                                                                                    <li><a href="#">Settings 1</a>
-                                                                                    </li>
-                                                                                    <li><a href="#">Settings 2</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
-                                                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                            </li>
-                                                                        </ul>
-                                                                        <div class="clearfix"></div>
-                                                                    </div>
-                                                                    <div class="x_content">
-                                                                        <div id="col-dayofMonth" style="height:250px;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
-
                                 </div>
                             </div>
-                        </div>
-                      } else{
-                        <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
+                        } else{
+                            <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
                         }
                     </div>
                 </div>
@@ -958,7 +958,7 @@
         <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
         @if( response != null){
-           @scripts(response,contract,response.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1)
+            @scripts(response,contract,response.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1)
         }
     </body>
 </html>
