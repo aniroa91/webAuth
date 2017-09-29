@@ -1,6 +1,9 @@
 package services.domain
 
 import org.elasticsearch.search.sort.SortOrder
+import org.joda.time.DateTime
+
+import scala.collection.mutable
 
 //import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.DateTimeUtil
@@ -13,6 +16,7 @@ import com.sksamuel.elastic4s.http.search.SearchResponse
 import model.MainDomainInfo
 import scala.util.Try
 import services.Configure
+import services.Bucket2
 import com.ftel.bigdata.utils.FileUtil
 import com.ftel.bigdata.utils.HttpUtil
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
@@ -25,6 +29,9 @@ import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import play.api.libs.json.JsObject
 import com.ftel.bigdata.utils.StringUtil
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.DateTime
+
 
 object CommonService extends AbstractService {
 
@@ -286,6 +293,9 @@ object CommonService extends AbstractService {
     //percentInfor(orgQueries,total)
   }
 
+  def formatDateYYMMDD( date : DateTime) : String = {
+    date.toString(DateTimeFormat.forPattern("yyyy/MM/dd"))
+  }
   
   /**
    * Create html tag

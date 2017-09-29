@@ -1,0 +1,24 @@
+@(response: model.paytv.Response,internet: model.paytv.InternetSegment)
+
+<table class="data table table-striped no-margin">
+    <thead>
+        <tr>
+            <th>Contract</th>
+            <th>Checklist</th>
+            <th>Tuoi</th>
+            <th>Cuoc</th>
+            <th>Ket noi</th>
+            <th>Nhu cau</th>
+        </tr>
+    </thead>
+    <tbody>
+            <tr>
+                <td><a style="color: #1ABB9C">@internet.contract</a></td>
+                <td>@internet.nhom_CheckList</td>
+                <td>@internet.nhom_Tuoi</td>
+                <td>@internet.nhom_Cuoc</td>
+                <td>@internet.nhom_Ket_Noi</td>
+                <td>@internet.Nhom_Nhu_Cau</td>
+            </tr>
+    </tbody>
+</table>

@@ -1,3 +1,5 @@
+@(response: model.paytv.DashboardResponse)
+
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
 
@@ -96,6 +98,9 @@
                 .tooltip.top .tooltip-arrow{
                     border-top-color:#9CC2CB
                 }
+                .right_col{
+                    min-height: inherit!important;
+                }
         </style>
     </head>
 
@@ -127,9 +132,10 @@
                             <div class="menu_section">
                                     <!-- <h3>General</h3>-->
                                 <ul class="nav side-menu">
-                                    <li><a href="/paytv"><i class="fa fa-television"></i> PayTV </a>
+                                    <li><a href="/paytv"><i class="fa fa-television"></i> Dashboard </a>
                                     </li>
-
+                                    <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
+                                    </li>
                                 </ul>
                             </div>
 
@@ -189,7 +195,7 @@
                                             </div>
                                             <div class="padder-v text-center clearfix">
                                                 <div class="col-xs-12">
-                                                    <div class="h3 font-bold counter">724,202</div>
+                                                    <div class="h3 font-bold ">@formatNumber(response.uniqueCustomer)</div>
                                                     <span class="text-muted">Unique count of customer</span>
                                                 </div>
                                             </div>
@@ -202,7 +208,7 @@
                                             </div>
                                             <div class="padder-v text-center clearfix">
                                                 <div class="col-xs-12">
-                                                    <div class="h3 font-bold counter">619,134</div>
+                                                    <div class="h3 font-bold ">@formatNumber(response.uniqueContract)</div>
                                                     <span class="text-muted">Unique count of contract</span>
                                                 </div>
                                             </div>
@@ -217,7 +223,7 @@
                     </div>
 
                     <br/>
-                    <div class="row">
+                    <div class="row" style="display: none">
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="x_panel">
                                 <div class="x_title">
@@ -346,7 +352,7 @@
         <script src="../assets/javascripts/exporting.js"></script>
             <!-- HightChartMap -->
         <script src="../assets/javascripts/map.js"></script>
-        <script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+        <script src="../assets/javascripts/world.js"></script>
             <!-- Datatable -->
         <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
         <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -360,6 +366,6 @@
             <!-- Counter number -->
         <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
-        @scripts()
+        @scripts(response)
     </body>
 </html>

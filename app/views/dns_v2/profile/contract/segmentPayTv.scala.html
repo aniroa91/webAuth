@@ -1,0 +1,32 @@
+@(response: model.paytv.Response,segments: Map[String, model.paytv.PayTVSegment])
+
+<table class="data table table-striped no-margin" id="tbSegPaytv">
+    <thead>
+        <tr>
+            <th>Box id</th>
+            <th>Sum segment</th>
+            <th>Daily segment</th>
+            <th>Hourly segment</th>
+            <th>App segment</th>
+            <th>Iptv segment</th>
+            <th>Vod segment</th>
+            <th>Vod child segment</th>
+            <th>Vod relax segment</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(payTv <- segments.toList.sortWith( (x,y) => x._1 > y._1 )) {
+            <tr>
+                <td><a id="@payTv._1" style="color: #1ABB9C;cursor: pointer;">@payTv._1</a></td>
+                <td>@payTv._2.sum</td>
+                <td>@payTv._2.daily</td>
+                <td>@payTv._2.hourly</td>
+                <td>@payTv._2.app</td>
+                <td>@payTv._2.iptv</td>
+                <td>@payTv._2.vod</td>
+                <td>@payTv._2.vod_thieunhi</td>
+                <td>@payTv._2.vod_giaitri</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,3 +1,4 @@
+@(response: model.paytv.DashboardResponse)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.getOthers
 
@@ -109,6 +110,8 @@
             });
 
             // draw chart column hourly, day of week
+            var daily = @Html(Json.stringify(Json.toJson(response.dayOfWeek.map(x => x.key))));
+            var values = @Html(Json.stringify(Json.toJson(response.dayOfWeek.map(x => x.value))));
             Highcharts.chart('col-day', {
                 chart: {
                     type: 'column'
@@ -117,9 +120,7 @@
                     text: ''
                 },
                 xAxis: {
-                    categories: [
-                        '6', '5', '4', '3', '2', '1', '0'
-                    ],
+                    categories: daily,
                     crosshair: true
                 },
                 yAxis: {
@@ -127,15 +128,6 @@
                     title: {
                         text: 'Average'
                     }
-                },
-                legend: {
-                    layout: 'vertical',
-                    align: 'left',
-                    x: 120,
-                    verticalAlign: 'top',
-                    y: 100,
-                    floating: true,
-                    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
                 },
                 tooltip: {
                     headerFormat: '<span style="font-size:10px">Day of week: {point.key}</span><table>',
@@ -156,11 +148,12 @@
                 ],
                 series: [{
                     name: 'Duration day of week',
-                    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6]
+                    data: values
 
                 }]
             });
-
+            var hourly = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x.key))));
+                values = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x.value))));
             Highcharts.chart('col-hourly', {
                 chart: {
                     type: 'column'
@@ -169,11 +162,7 @@
                     text: ''
                 },
                 xAxis: {
-                    categories: [
-                        '0', '1', '2', '3', '4', '5', '6',
-                        '7', '8', '9', '10', '11', '12', '13',
-                        '14', '15', '16', '17', '18', '19', '20','21','22','23'
-                    ],
+                    categories: hourly,
                     crosshair: true
                 },
                 colors: [
@@ -184,15 +173,6 @@
                     title: {
                         text: 'Average'
                     }
-                },
-                legend: {
-                    layout: 'vertical',
-                    align: 'left',
-                    x: 120,
-                    verticalAlign: 'top',
-                    y: 100,
-                    floating: true,
-                    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
                 },
                 tooltip: {
                     headerFormat: '<span style="font-size:10px">Day of week: {point.key}</span><table>',
@@ -210,7 +190,7 @@
                 },
                 series: [{
                     name: 'Duration hourly',
-                    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6,49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6,49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6,66,88,32]
+                    data: values
 
                 }]
             });

@@ -37,4 +37,4 @@ GET     /analytic                 controllers.AnalyticController.index
 #GET     /report/:day              controllers.DnsController.reportBody(day: String)
 #GET     /ace/tables                 controllers.ACEController.tables
 GET     /paytv                   controllers.PaytvClientController.index
-
+GET     /profile                   controllers.ProfileContractController.index
