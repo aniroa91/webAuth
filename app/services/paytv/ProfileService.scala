@@ -343,14 +343,14 @@ object ProfileService extends AbstractService {
     
   }
   
-  def getContract(): Array[String] = {
-    //search(s"paytv-contract" / "docs") query (termQuery("status", "Binh thuong")) size 10000
-    search(s"paytv-contract" / "docs") query { must(termQuery("status", "Binh thuong")) } aggregations (
-      termsAggregation("top")
-      .field("dayOfWeek")
-      .subaggs(
-        sumAgg("sum", "value")) size SIZE_DEFAULT)
-  }
+//  def getContract(): Array[String] = {
+//    //search(s"paytv-contract" / "docs") query (termQuery("status", "Binh thuong")) size 10000
+//    search(s"paytv-contract" / "docs") query { must(termQuery("status", "Binh thuong")) } aggregations (
+//      termsAggregation("top")
+//      .field("dayOfWeek")
+//      .subaggs(
+//        sumAgg("sum", "value")) size SIZE_DEFAULT)
+//  }
 
   def main(args: Array[String]) {
     val time0 = System.currentTimeMillis()

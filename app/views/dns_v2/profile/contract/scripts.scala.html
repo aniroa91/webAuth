@@ -978,13 +978,14 @@
                     shared: true
                 },
 
-                series: [{
+                series: [
+                /*{
                     name: 'Duration',
                     type: 'column',
                     color: "#80b3ff",
                     yAxis: 1,
                     data: @Html(Json.stringify(Json.toJson(response.duration.map(x => x._2))))
-                }, {
+                }*/ {
                     name: 'Upload',
                     type: 'spline',
                     color: "#9B59B6",
