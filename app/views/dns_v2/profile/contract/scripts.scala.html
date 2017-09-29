@@ -187,83 +187,142 @@
                           data: iptvVectors
                       }]
                   });
-                  // Build the chart line app-hourly vector
-                  hourly = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.appHourly.map(x => x.term))));
-                  values = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.appHourly.map(x => x.value))));
-                  console.log(values)
-                  Highcharts.chart('line-appHourVector', {
-                      chart: {
-                          type: 'column'
-                      },
-                      title: {
-                          text: ''
-                      },
-                      subtitle: {
-                          text: ''
-                      },
-                      plotOptions: {
-                          column: {
-                              colorByPoint: true
-                          }
-                      },
-                      colors: [
-                          '#1ABB9C','#9B59B6'
-                      ],
-                      xAxis: {
-                          categories: hourly
-                      },
-                      yAxis: {
-                          title: {
-                              text: ''
-                          },
-                          labels: {
-                              formatter: function () {
-                                  return (this.value / 1000) + 'k';
-                              }
-                          }
-                      },
-                      tooltip: {
-                          crosshairs: true,
-                          shared: true
-                      },
-                      plotOptions: {
-                          spline: {
-                              marker: {
-                                  radius: 4,
-                                  lineColor: '#666666',
-                                  lineWidth: 1
-                              }
-                          }
-                      },
-                      series: values
-                      /*[
-                      {
-                          type: 'column',
-                          name: 'Query',
-                          marker: {
-                              symbol: 'square'
-                          },
-                          data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, {
-                              y: 26.5,
-                              marker: {
-                                  symbol: 'url(https://www.highcharts.com/samples/graphics/sun.png)'
-                              }
-                          }, 23.3, 18.3, 13.9, 9.6]
 
-                      }, {
-                          type: 'spline',
-                          name: 'Client',
-                          marker: {
-                              symbol: 'diamond'
-                          },
-                          data: [{
-                              y: 3.9,
-                              marker: {
-                                  symbol: 'url(https://www.highcharts.com/samples/graphics/snow.png)'
-                              }
-                          }, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
-                      }]*/
-                  });
+                  // Build the chart line app-daily vector
+            var keyHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptvHourly.map(x => x._1))));
+            var iptvHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptvHourly.map(x => x._2))));
+            var vodHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.vodHourly.map(x => x._2))));
+            Highcharts.chart('line-appHourVector', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#3498DB','#fbc28d'
+                ],
+                xAxis: {
+                    categories: keyHourly
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        formatter: function () {
+                            return (this.value / 1000) + 'k';
+                        }
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'spline',
+                        name: 'IPTV',
+                        marker: {
+                            symbol: 'square'
+                        },
+                        data: iptvHourly
+
+                    },{
+                        type: 'spline',
+                        name: 'VOD',
+                        marker: {
+                            symbol: 'diamond'
+                        },
+                        data: vodHourly
+                    }]
+            });
+
+            // Build the chart line app-daily vector
+            var keyDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptvDayOfWeek.map(x => x._1))));
+            var iptvDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptvDayOfWeek.map(x => x._2))));
+            var vodDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.vodDayOfWeek.map(x => x._2))));
+            Highcharts.chart('line-appDayVector', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#3498DB','#fbc28d'
+                ],
+                xAxis: {
+                    categories: keyDayOfWeek
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        formatter: function () {
+                            return (this.value / 1000) + 'k';
+                        }
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'spline',
+                        name: 'IPTV',
+                        marker: {
+                            symbol: 'square'
+                        },
+                        data: iptvDayOfWeek
+
+                    },{
+                        type: 'spline',
+                        name: 'VOD',
+                        marker: {
+                            symbol: 'diamond'
+                        },
+                        data: vodDayOfWeek
+                    }]
+            });
+
+
                   // Build the chart line day of month vector
                   daily = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.daily.map(x => x.key))));
                   values = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.daily.map(x => x.value))));
