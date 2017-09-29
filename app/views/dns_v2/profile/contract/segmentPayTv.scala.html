@@ -15,7 +15,7 @@
         </tr>
     </thead>
     <tbody>
-        @for(payTv <- segments) {
+        @for(payTv <- segments.toList.sortWith( (x,y) => x._1 > y._1 )) {
             <tr>
                 <td><a id="@payTv._1" style="color: #1ABB9C;cursor: pointer;">@payTv._1</a></td>
                 <td>@payTv._2.sum</td>

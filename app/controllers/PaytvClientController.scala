@@ -4,7 +4,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
-import services.CacheService
+import services.paytv.DashboardService
 import services.domain.CommonService
 
 /**
@@ -15,14 +15,8 @@ import services.domain.CommonService
 class PaytvClientController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
 
   def index() = Action {
-    /*val key = if (CommonService.isDayValid(day)) {
-      day
-    } else {
-      CommonService.getLatestDay()
-    }
-    val response = CacheService.getReport(key)
-    Ok(views.html.dns_v2.report.index(key, response._1))*/
-    Ok(views.html.dns_v2.profile.paytv.index())
+    val response = DashboardService.get()
+    Ok(views.html.dns_v2.profile.paytv.index(response))
   }
   
 }

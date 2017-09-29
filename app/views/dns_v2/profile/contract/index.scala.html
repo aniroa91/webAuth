@@ -2,6 +2,7 @@
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
+@import services.domain.CommonService.formatDateYYMMDD
 
 <!DOCTYPE html>
 
@@ -258,11 +259,11 @@
                                                     <i class="fa fa-briefcase user-profile-icon"></i> @response.internet.profileType
                                                 </li>
 
-                                                <li><i class="fa fa-calendar user-profile-icon"></i> @response.internet.start
+                                                <li><i class="fa fa-calendar user-profile-icon"></i> @formatDateYYMMDD(response.internet.start)
                                                 </li>
 
                                                 <li>
-                                                    <i class="fa fa-clock-o user-profile-icon"></i> @response.internet.active
+                                                    <i class="fa fa-clock-o user-profile-icon"></i>@formatDateYYMMDD(response.internet.active)
                                                 </li>
                                             </ul>
 
@@ -296,7 +297,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt"> movie makers. </p>
+                                                                <p class="excerpt"> @response.session.count </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -308,7 +309,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt"> moments for movie makers. </p>
+                                                                <p class="excerpt"> @response.session.mean </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -320,7 +321,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt">Film festivals movie makers. </p>
+                                                                <p class="excerpt"> @response.session.std </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -332,7 +333,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt">Film festivals used to bes. </p>
+                                                                <p class="excerpt"> @response.session.min </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -344,7 +345,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt">Film festivals movie makers. </p>
+                                                                <p class="excerpt"> @response.session.max </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -367,7 +368,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt"> movie makers. </p>
+                                                                <p class="excerpt"> 0 </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -379,7 +380,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt"> moments for movie makers. </p>
+                                                                <p class="excerpt"> 0 </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -416,7 +417,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt"> @response.paytv.start </p>
+                                                                <p class="excerpt"> @formatDateYYMMDD(response.paytv.start) </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -428,7 +429,7 @@
                                                                 </a>
                                                             </div>
                                                             <div class="block_content">
-                                                                <p class="excerpt"> @response.paytv.active </p>
+                                                                <p class="excerpt">  @formatDateYYMMDD(response.paytv.active) </p>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -957,7 +958,7 @@
         <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
         @if( response != null){
-           @scripts(response,contract,response.segments.head._1)
+           @scripts(response,contract,response.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1)
         }
     </body>
 </html>

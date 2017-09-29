@@ -1,6 +1,7 @@
 package services.domain
 
 import org.elasticsearch.search.sort.SortOrder
+import org.joda.time.DateTime
 
 import scala.collection.mutable
 
@@ -28,6 +29,9 @@ import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import play.api.libs.json.JsObject
 import com.ftel.bigdata.utils.StringUtil
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.DateTime
+
 
 object CommonService extends AbstractService {
 
@@ -287,6 +291,10 @@ object CommonService extends AbstractService {
 
     total - orgs.map(x=>x._2).sum
     //percentInfor(orgQueries,total)
+  }
+
+  def formatDateYYMMDD( date : DateTime) : String = {
+    date.toString(DateTimeFormat.forPattern("yyyy/MM/dd"))
   }
   
   /**
