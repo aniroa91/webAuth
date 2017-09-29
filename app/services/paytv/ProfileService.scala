@@ -289,7 +289,7 @@ object ProfileService extends AbstractService {
       .sortBy(x => x._1)
     val duration = durationRes.source.keySet.filter(x => x.contains("Session"))
       .map(x => x.replace("Session", "") -> getValueAsString(durationRes.source, x))
-      .map(x => (x._1.toInt + 1) -> (x._2.toDouble / 3600))
+      .map(x => (x._1.toInt + 1) -> (x._2.toDouble / 60))
       .toArray
       .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -341,6 +341,15 @@ object ProfileService extends AbstractService {
         session,
         checkList)
     
+  }
+  
+  def getContract(): Array[String] = {
+    //search(s"paytv-contract" / "docs") query (termQuery("status", "Binh thuong")) size 10000
+    search(s"paytv-contract" / "docs") query { must(termQuery("status", "Binh thuong")) } aggregations (
+      termsAggregation("top")
+      .field("dayOfWeek")
+      .subaggs(
+        sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
   def main(args: Array[String]) {
