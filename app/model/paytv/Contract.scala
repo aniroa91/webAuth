@@ -29,6 +29,7 @@ case class InternetContract(
     host: String,
     port: Int,
     slot: Int,
+    onu: Int,
     cable: String,
     life_time: Int)
 

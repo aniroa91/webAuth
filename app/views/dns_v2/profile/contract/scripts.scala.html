@@ -302,6 +302,7 @@
                           '#1ABB9C'
                       ],
                       series: [{
+                          type: 'spline',
                           name: 'Duration day of month',
                           data: values
                       }]
@@ -313,6 +314,7 @@
 
             /* START CHART FOR PAYTV*/
 
+            @if(idPayTv != null) {
             // Build the chart pie app vector
             var appVectors = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.app.map(x => x.key -> x.value))));
             Highcharts.chart('pie-appVector', {
@@ -350,6 +352,7 @@
                     data: appVectors
                 }]
             });
+
 
             // Build the chart line hourly vector
             var hourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.hourly.map(x => x.key))));
@@ -409,6 +412,7 @@
                 }]
             });
 
+            /*
             // Build the chart line app-hourly vector
             hourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.appHourly.map(x => x.key))));
             values = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.appHourly.map(x => x.value))));
@@ -458,11 +462,13 @@
                     }
                 },
                 series: values
-            });
+            });*/
 
             // Build the chart line app-daily vector
-
-            Highcharts.chart('line-appDayVector', {
+            var keyHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptvHourly.map(x => x._1))));
+            var iptvHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptvHourly.map(x => x._2))));
+            var vodHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.vodHourly.map(x => x._2))));
+            Highcharts.chart('line-appHourVector', {
                 chart: {
                     type: 'column'
                 },
@@ -481,7 +487,7 @@
                     '#3498DB','#fbc28d'
                 ],
                 xAxis: {
-                    categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+                    categories: keyHourly
                 },
                 yAxis: {
                     title: {
@@ -509,19 +515,86 @@
                 series: [
                     {
                         type: 'spline',
-                        name: 'Query',
+                        name: 'IPTV',
                         marker: {
                             symbol: 'square'
                         },
-                        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2]
+                        data: iptvHourly
 
                     },{
                         type: 'spline',
-                        name: 'Client',
+                        name: 'VOD',
                         marker: {
                             symbol: 'diamond'
                         },
-                        data: [ 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6]
+                        data: vodHourly
+                    }]
+            });
+
+            // Build the chart line app-daily vector
+            var keyDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptvDayOfWeek.map(x => x._1))));
+            var iptvDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptvDayOfWeek.map(x => x._2))));
+            var vodDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.vodDayOfWeek.map(x => x._2))));
+            Highcharts.chart('line-appDayVector', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#3498DB','#fbc28d'
+                ],
+                xAxis: {
+                    categories: keyDayOfWeek
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        formatter: function () {
+                            return (this.value / 1000) + 'k';
+                        }
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'spline',
+                        name: 'IPTV',
+                        marker: {
+                            symbol: 'square'
+                        },
+                        data: iptvDayOfWeek
+
+                    },{
+                        type: 'spline',
+                        name: 'VOD',
+                        marker: {
+                            symbol: 'diamond'
+                        },
+                        data: vodDayOfWeek
                     }]
             });
 
@@ -613,7 +686,7 @@
             values = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.daily.map(x => x.value))));
             Highcharts.chart('col-dayofMonth', {
                 chart: {
-                    type: 'column'
+                    type: 'spline'
                 },
                 title: {
                     text: ''
@@ -625,17 +698,8 @@
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Average'
+                        text: 'Average Duration (seconds)'
                     }
-                },
-                legend: {
-                    layout: 'vertical',
-                    align: 'left',
-                    x: 120,
-                    verticalAlign: 'top',
-                    y: 100,
-                    floating: true,
-                    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
                 },
                 tooltip: {
                     headerFormat: '<span style="font-size:10px">Day of week: {point.key}</span><table>',
@@ -659,6 +723,7 @@
                     data: values
                 }]
             });
+            }
             /* END CHART FOR PAYTV*/
 
             /* START CHART FOR INTERNET*/
@@ -906,22 +971,22 @@
                 }],
                 yAxis: [{ // Primary yAxis
                     labels: {
-                        format: '{value}',
+                        format: '{value} MB',
                         style: {
                             color: "#1ABB9C"
                         }
                     },
                     title: {
-                        text: 'Upload',
+                        text: 'Size (MB)',
                         style: {
                             color: "#1ABB9C"
                         }
                     }
                 }, { // Secondary yAxis
                     title: {
-                        text: 'Download',
+                        text: 'Duration (seconds)',
                         style: {
-                            color: "#9B59B6"
+                            color: "#9B59B6  MB"
                         }
                     },
                     labels: {
@@ -937,6 +1002,12 @@
                 },
 
                 series: [{
+                    name: 'Duration',
+                    type: 'column',
+                    color: "#80b3ff",
+                    yAxis: 1,
+                    data: @Html(Json.stringify(Json.toJson(response.duration.map(x => x._2))))
+                }, {
                     name: 'Upload',
                     type: 'spline',
                     color: "#9B59B6",

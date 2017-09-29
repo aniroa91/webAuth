@@ -16,6 +16,8 @@ import model.paytv.InternetSegment
 import services.Bucket
 import utils.Session
 import model.paytv.Bill
+import services.BucketDouble
+import services.Bucket2
 
 object ProfileService extends AbstractService {
   //val client = Configure.client
@@ -56,8 +58,8 @@ object ProfileService extends AbstractService {
   private def getAppHourly(to: String, boxId: String): SearchDefinition = {
     search(s"paytv-weekly-hourly-${to}" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top").field("app")
-        .subaggs(termsAggregation("sub").field("hour")
-            .subaggs(sumAgg("sum", "value"))) size SIZE_DEFAULT)
+        .subaggs(termsAggregation("sub").field("hour") 
+            .subaggs(sumAgg("sum", "value")) size SIZE_DEFAULT) size SIZE_DEFAULT ) limit SIZE_DEFAULT
   }
 
   private def getAppDayOfWeek(to: String, boxId: String): SearchDefinition = {
@@ -66,7 +68,7 @@ object ProfileService extends AbstractService {
       .field("app")
       .subaggs(
         termsAggregation("sub").field("dayOfWeek").subaggs(
-          sumAgg("sum", "value"))) size SIZE_DEFAULT)
+          sumAgg("sum", "value")) size SIZE_DEFAULT) size SIZE_DEFAULT)  limit (SIZE_DEFAULT * 10)
 
   }
 
@@ -111,8 +113,8 @@ object ProfileService extends AbstractService {
       //println(client.show(search(s"paytv-box" / "docs") limit 10))
       //println(boxRes.size)
       //boxRes.hits.hits.map(x => x.sourceAsMap).foreach(println)
-      val boxids = boxRes.hits.hits.map(x => x.id)
-      val segments = boxids.map(x => ESUtil.get(client, "segment-paytv", "docs", x))
+      val boxids = boxRes.hits.hits.map(x => x.id -> getValueAsString(x.sourceAsMap, "status")).toMap
+      val segments = boxids.map(x => ESUtil.get(client, "segment-paytv", "docs", x._1))
         .map(x => x.id -> x.source)
         .map(x => x._1 -> PayTVSegment(
             getValueAsString(x._2, "cluster_app"),
@@ -123,28 +125,46 @@ object ProfileService extends AbstractService {
             getValueAsString(x._2, "cluster_iptv"),
             getValueAsString(x._2, "cluster_vod"),
             getValueAsString(x._2, "cluster_vod_giaitri"),
-            getValueAsString(x._2, "cluster_vod_thieunhi")
+            getValueAsString(x._2, "cluster_vod_thieunhi"),
+            boxids.getOrElse(x._1, "N/A")
             )).toMap
 //      println(segments.size)
       val to = "2017-09-25"
-      val vectors = boxids.map(x => {
+      val vectors = boxids.map(x => x._1).map(x => {
         
         val hourly = getHourly(to, x)
         val app = getApp(to, x)
         val dayOfWeek = getDayOfWeek(to, x)
         val iptv = getIPTV(to, x)
         val appHourly = getAppHourly(to, x)
+        //println(client.show(appHourly))
         val appDaily = getAppDayOfWeek(to, x)
         val daily = getDaily(8, x)
         val multiSearchResponse = client.execute(multi(hourly, app, dayOfWeek, iptv, appHourly, appDaily, daily)).await
         
+        //multiSearchResponse.responses(4).aggregations.foreach(println)
+        
         val hourlyBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(0), "top", "sum")
         val appBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(1), "top", "sum")
+        def dayOfWeekNumberToLabel = (i: Int) => {
+          i match {
+            case 0 => "Mon"
+            case 1 => "Tue"
+            case 2 => "Wed"
+            case 3 => "Thu"
+            case 4 => "Fri"
+            case 5 => "Sat"
+            case 6 => "Sun"
+            case _ => "???"
+          }
+        }
         val dayOfWeekBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(2), "top", "sum")
+          .sortBy(x => x.key.toInt)
+          .map(x => BucketDouble(dayOfWeekNumberToLabel(x.key.toInt), x.count, x.value))
         val iptvBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(3), "top", "sum")
         val appHourlyBucket = ElasticUtil.getBucketTerm2(multiSearchResponse.responses(4), "top", "sum")
         val appDailyBucket = ElasticUtil.getBucketTerm2(multiSearchResponse.responses(5), "top", "sum")
-        val dailyBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(6), "top", "sum")
+        val dailyBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(6), "top", "sum").sortBy(x => x.key.toInt)
         
         val vodRes = ESUtil.get(client, "vod_cate", "docs", x)
         val vodthieuRes = ESUtil.get(client, "vod_thieu", "docs", x)
@@ -164,8 +184,20 @@ object ProfileService extends AbstractService {
           val source = vodgiaitriRes.source
           source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
           } else null
-        
-        x -> PayTVVector(hourlyBucket, appBucket, dayOfWeekBucket, iptvBucket, appHourlyBucket, appDailyBucket, vod, vodthieu, vodgiaitri, dailyBucket)
+          
+        def group(array: Array[Bucket2], key: String): Array[(String, Double)] = {
+            array.filter(a => a.key == key).map(a => a.term -> a.value)
+                 .groupBy(a => a._1).map(a => a._1 -> a._2.map(b => b._2).sum)
+                 .toArray
+                 .sortBy(a => a._1.toInt)
+          }
+        //val b = a.groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum).toArray
+        x -> PayTVVector(hourlyBucket, appBucket, dayOfWeekBucket, iptvBucket, appHourlyBucket, appDailyBucket,
+            group(appHourlyBucket, "IPTV"),
+            group(appHourlyBucket, "VOD"),
+            group(appDailyBucket, "IPTV"),
+            group(appDailyBucket, "VOD"),
+            vod, vodthieu, vodgiaitri, dailyBucket)
 
       }).toMap
       //boxids.foreach(println)
@@ -179,7 +211,7 @@ object ProfileService extends AbstractService {
           DateTimeUtil.create(getValueAsLong(paytvSource, "change_date")/1000))
           
       (segments, vectors, payTVContract)
-    } else (null,null,null)
+    } else (Map[String, PayTVSegment](),Map[String, PayTVVector](), null)
 
     val internetSource = internetRes.source
     val internetInfo = InternetContract(
@@ -201,6 +233,7 @@ object ProfileService extends AbstractService {
         getValueAsString(internetSource, "host"),
         getValueAsInt(internetSource, "port"),
         getValueAsInt(internetSource, "slot"),
+        getValueAsInt(internetSource, "onu"),
         getValueAsString(internetSource, "cable_type"),
         getValueAsInt(internetSource, "life_time"))
     val internetSegmentRes = ESUtil.get(client, "segment-internet", "docs", contract)
@@ -230,15 +263,27 @@ object ProfileService extends AbstractService {
         getValueAsString(internetSegmentSource, "So_Lan_Loi_Ha_Tang"),
         getValueAsString(internetSegmentSource, "So_Ngay_Loi_Ha_Tang"))
     val downupRes = ESUtil.get(client, "downup", "docs", contract)
+    val durationRes = ESUtil.get(client, "duration", "docs", contract)
     val downupSource = downupRes.source
 //    downupSource.keySet.filter(x => x.contains("Download")).foreach(println)
     val download = downupSource.keySet.filter(x => x.contains("Download"))
       .map(x => x.substring(4).replace("Download", "") -> getValueAsString(downupSource, x))
-      .map(x => x._1.toInt -> x._2.toDouble).toArray
+      .map(x => (x._1.toInt + 1) -> (x._2.toDouble * 1024))
+      .toArray
+      .sortBy(x => x._1)
+      
     val upload = downupSource.keySet.filter(x => x.contains("Upload"))
       .map(x => x.substring(4).replace("Upload", "") -> getValueAsString(downupSource, x))
-      .map(x => x._1.toInt -> x._2.toDouble).toArray
-    
+      .map(x => (x._1.toInt + 1) -> (x._2.toDouble * 1024))
+      .toArray
+      .sortBy(x => x._1)
+    val duration = durationRes.source.keySet.filter(x => x.contains("Session"))
+      .map(x => x.replace("Session", "") -> getValueAsString(durationRes.source, x))
+      .map(x => (x._1.toInt + 1) -> (x._2.toDouble))
+      .toArray
+      .sortBy(x => x._1)
+      .take(28)
+      
     val pon = client.execute(search(s"pon" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val suyhoutSource = if (pon.totalHits <= 0) {
       client.execute(search(s"adsl" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
@@ -280,7 +325,7 @@ object ProfileService extends AbstractService {
     } else null
 //    val payTVBillRes = ESUtil.get(client, "bill-paytv", "docs", contract)
     
-    Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload, suyhout, error, module, disconnet,
+    Response(internetInfo, segmentsVectorInfo._3, segmentsVectorInfo._1, segmentsVectorInfo._2, internetSegment, download, upload, duration, suyhout, error, module, disconnet,
         Bill(internetBill, payTVBill),
         session,
         checkList)
@@ -293,7 +338,7 @@ object ProfileService extends AbstractService {
     
 //    val response = ProfileService.get("DNFD21708")
     
-    val response = ProfileService.get("HNFD94642")
+    val response = ProfileService.get("SGD235686")
     //val response = ProfileService.get("NAFD01366")
     
     //val response = ProfileService.get("LDD018356")
@@ -311,8 +356,10 @@ object ProfileService extends AbstractService {
     //println(response.bill.internet -> response.bill.paytv)
     //println(response.session)
     //response.upload.foreach(println)//
-    response.errorModule.foreach(println)
+//    response.duration.foreach(println)
 //    response.errorDisconnect.foreach(println)
+    //println(response.vectors.get("88479").get.appHourly.size)
+    response.vectors.get("88479").get.appHourly.foreach(println)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()

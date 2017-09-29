@@ -17,7 +17,8 @@ case class PayTVSegment(
     iptv: String,
     vod: String,
     vod_giaitri: String,
-    vod_thieunhi: String)
+    vod_thieunhi: String,
+    status: String)
 
 case class PayTVVector(
      hourly: Array[BucketDouble],
@@ -26,6 +27,10 @@ case class PayTVVector(
      iptv: Array[BucketDouble],
      appHourly: Array[Bucket2],
      appDayOfWeek: Array[Bucket2],
+     iptvHourly: Array[(String, Double)],
+     vodHourly: Array[(String, Double)],
+     iptvDayOfWeek: Array[(String, Double)],
+     vodDayOfWeek: Array[(String, Double)],
      vod: Array[Bucket],
      vodthieunhi: Array[Bucket],
      vodgiaitri: Array[Bucket],
@@ -66,6 +71,7 @@ case class Response(
     internetSegment: InternetSegment,
     download: Array[(Int, Double)],
     upload: Array[(Int, Double)],
+    duration: Array[(Int, Double)],
     suyhout: Array[(String, String)],
     error: Array[(String, (Int, String, String))],
     errorModule: Array[(String, Int)],

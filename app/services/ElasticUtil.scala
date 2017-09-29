@@ -50,11 +50,16 @@ object ElasticUtil {
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
       .map(x => x.asInstanceOf[Map[String, AnyRef]])
       .flatMap(x => {
+        //println(x)
         val key = x.getOrElse("key", "key").toString()
+        //println(x.getOrElse("sub", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]])
         val sub = x.getOrElse("sub", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
                    .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
                    .map(y => y.asInstanceOf[Map[String, AnyRef]])
-                   .map(y => {
+        //println(x.getOrElse("sub", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+                   //.getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+                   //.size)
+                   sub.map(y => {
                       Bucket2(
                           key,
                           y.getOrElse("key", "key").toString(),
@@ -63,7 +68,7 @@ object ElasticUtil {
                    })
         //val count = x.getOrElse("doc_count", "0").toString().toDouble
         //val value = x.getOrElse(nameSubTerm, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].getOrElse("value", "0").toString().toDouble
-       sub
+       //sub
       }).toArray
     } else {
       Array[Bucket2]()

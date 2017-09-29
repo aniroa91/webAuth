@@ -3,6 +3,7 @@
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
 @import services.domain.CommonService.formatDateYYMMDD
+@import services.domain.CommonService.formatSecond
 
 <!DOCTYPE html>
 
@@ -250,7 +251,7 @@
                                                     </div>
                                                 </div>
                                                 <h3 class="name_title">@response.internet.contract</h3>
-                                                <p style="margin-left: 15px">@response.internet.status</p>
+                                                
                                                 <ul class="list-unstyled user_data">
                                                     <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.province - @response.internet.region
                                                     </li>
@@ -258,12 +259,18 @@
                                                     <li>
                                                         <i class="fa fa-briefcase user-profile-icon"></i> @response.internet.profileType
                                                     </li>
-
-                                                    <li><i class="fa fa-calendar user-profile-icon"></i> @formatDateYYMMDD(response.internet.start)
+                                                    <li>
+                                                    <i class="fa fa-briefcase user-profile-icon"></i>
+                                                    @if(response.internet.cable == "pon") {
+                                                        @response.internet.host / @response.internet.port / @response.internet.onu
+                                                    } else {
+                                                        @response.internet.host / @response.internet.port / @response.internet.slot
+                                                    }
                                                     </li>
 
                                                     <li>
-                                                        <i class="fa fa-clock-o user-profile-icon"></i>@formatDateYYMMDD(response.internet.active)
+                                                    <i class="fa fa-briefcase user-profile-icon"></i>
+                                                        Cable: @response.internet.cable
                                                     </li>
                                                 </ul>
 
@@ -272,15 +279,16 @@
                                                 <br />
                                                 <ul class="stats-overview">
                                                     <li>
-                                                        <h1 class="price">@formatNumber(response.internet.downloadLim)</h1>
-                                                        <span class="price-tax">Avg download/day</span>
+                                                        <h1 class="price"><font size=6>@formatNumber(response.internet.downloadLim)</font></h1>
+                                                        <span class="price-tax">download/day</span>
                                                     </li>
                                                     <li>
-                                                        <h1 class="price">@formatNumber(response.internet.updateLim)</h1>
-                                                        <span class="price-tax">Avg upload/day</span>
+                                                        <h1 class="price"><font size=6>@formatNumber(response.internet.updateLim)</font></h1>
+                                                        <span class="price-tax">upload/day</span>
                                                     </li>
                                                 </ul>
                                                 <br />
+                                                @if(response.session != null) {
                                                 <div class="x-content" id="payInfor">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
@@ -309,7 +317,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.session.mean </p>
+                                                                    <p class="excerpt"> @formatSecond(response.session.mean) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -321,7 +329,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.session.std </p>
+                                                                    <p class="excerpt"> @formatSecond(response.session.std) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -333,7 +341,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.session.min </p>
+                                                                    <p class="excerpt"> @formatSecond(response.session.min.toDouble) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -345,13 +353,15 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.session.max </p>
+                                                                    <p class="excerpt"> @formatSecond(response.session.max.toDouble) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
                                                     </ul>
                                                 </div>
+                                                }
                                                 <br />
+                                                @if(response.sessiontType != null) {
                                                 <div class="x-content" id="payInfor">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
@@ -386,13 +396,16 @@
                                                         </li>
                                                     </ul>
                                                 </div>
+                                                }
 
                                             </div>
                                             <div class="col-md-9 col-sm-9 col-xs-12">
+                                                <div class="row">
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
                                                 <div class="x-content" id="payInfor">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
-                                                            <h2>PayTV information</h2>
+                                                            <h2>Internet Info</h2>
                                                         </div>
                                                     </div>
 
@@ -401,11 +414,11 @@
                                                             <div class="block">
                                                                 <div class="tags">
                                                                     <a href="" class="tag">
-                                                                        <span>Service package</span>
+                                                                        <span>Gói dịch vụ</span>
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.paytv.contract </p>
+                                                                    <p class="excerpt"> @if(response.internet.profile == "") {N/A} else {@response.internet.profile} </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -413,7 +426,81 @@
                                                             <div class="block">
                                                                 <div class="tags">
                                                                     <a href="" class="tag">
-                                                                        <span>Date created</span>
+                                                                        <span>Ngày tạo</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @formatDateYYMMDD(response.internet.start) </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Ngày active</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt">  @formatDateYYMMDD(response.internet.active) </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Tình trạng</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt"> @response.internet.status </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Cước phí</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt">@formatNumber(response.bill.internet) (VND)</p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        
+                                                    </ul>
+                                                </div>
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                @if(response.paytv != null) {
+                                                <div class="x-content" id="payInfor">
+                                                    <div class="profile_title">
+                                                        <div class="col-md-6">
+                                                            <h2>PayTV Info</h2>
+                                                        </div>
+                                                    </div>
+
+                                                    <ul class="list-unstyled timeline">
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Số box</span>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="block_content">
+                                                                    <p class="excerpt">@response.segments.size (<font color="green">@response.paytv.box_count: Bình thường</font>, <font color="red">@(response.segments.size - response.paytv.box_count): Đã chấm dứt hợp đồng</font>) </p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="block">
+                                                                <div class="tags">
+                                                                    <a href="" class="tag">
+                                                                        <span>Ngày tạo</span>
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
@@ -425,7 +512,7 @@
                                                             <div class="block">
                                                                 <div class="tags">
                                                                     <a href="" class="tag">
-                                                                        <span>Date actived</span>
+                                                                        <span>Ngày active</span>
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
@@ -437,7 +524,7 @@
                                                             <div class="block">
                                                                 <div class="tags">
                                                                     <a href="" class="tag">
-                                                                        <span>Status</span>
+                                                                        <span>Tình trạng</span>
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
@@ -449,15 +536,20 @@
                                                             <div class="block">
                                                                 <div class="tags">
                                                                     <a href="" class="tag">
-                                                                        <span>Box number</span>
+                                                                        <span>Cước phí</span>
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.paytv.box_count </p>
+                                                                    <p class="excerpt">@formatNumber(response.bill.paytv) (VND)</p>
                                                                 </div>
                                                             </div>
                                                         </li>
+                                                        
                                                     </ul>
+                                                </div>
+                                                }
+                                                </div>
+                                                
                                                 </div>
 
                                                 <div class="" role="tabpanel" data-example-id="togglable-tabs">
@@ -590,7 +682,7 @@
                                                                 <div class="col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
-                                                                            <h2> UpDown & Duration Day Vector</h2>
+                                                                            <h2> UpDown & Duration</h2>
                                                                             <ul class="nav navbar-right panel_toolbox">
                                                                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                                                                 </li>
@@ -674,6 +766,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        @if(response.paytv != null) {
                                                         <div role="tabpanel" class="tab-pane fade" id="tab_paytv" aria-labelledby="paytv-tab">
 
                                                             @segmentPayTv(response,response.segments)
@@ -738,7 +831,7 @@
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
-                                                                            <h2> Daily Vector</h2>
+                                                                            <h2>Day Of Week</h2>
                                                                             <ul class="nav navbar-right panel_toolbox">
                                                                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                                                                 </li>
@@ -850,7 +943,7 @@
                                                                 <div class="col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
-                                                                            <h2> Daily Vector</h2>
+                                                                            <h2>Duration day of month</h2>
                                                                             <ul class="nav navbar-right panel_toolbox">
                                                                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                                                                 </li>
@@ -876,6 +969,7 @@
                                                             </div>
 
                                                         </div>
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>
@@ -896,7 +990,7 @@
                         Dashboard Admin 21/09/2017
                     </div>
                     <div class="clearfix"></div>
-                </footer>
+                </footer>UpDow
                     <!-- /footer content -->
             </div>
         </div>
@@ -958,7 +1052,7 @@
         <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
         @if( response != null){
-            @scripts(response,contract,response.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1)
+            @scripts(response,contract, if(!response.segments.isEmpty) {response.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1} else null)
         }
     </body>
 </html>

@@ -297,6 +297,13 @@ object CommonService extends AbstractService {
     date.toString(DateTimeFormat.forPattern("yyyy/MM/dd"))
   }
   
+  def formatSecond(seconds: Double) : String = {
+    val minutes = (seconds.toInt / 60)
+    val hours = (minutes / 60)
+    val days = (hours / 24)
+    s"${days}d ${hours%24}h ${minutes%60}m ${seconds.toInt%60}s"
+  }
+  
   /**
    * Create html tag
    */
