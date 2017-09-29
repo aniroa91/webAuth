@@ -150,6 +150,35 @@
                     font-size: 2.5rem;
                 }
                 .hight-light{    color: #26B99A;font-weight: 600;}
+                .ui-autocomplete {
+                    position: absolute;
+                    z-index: 1000;
+                    cursor: pointer;
+                    max-height: 200px;
+                    overflow: auto;
+                    left:1440px;
+                    padding: 0;
+                    margin-top: 2px;
+                    list-style: none;
+                    background-color: #ffffff;
+                    border: 1px solid #ccc
+                    -webkit-border-radius: 5px;
+                    -moz-border-radius: 5px;
+                    border-radius: 5px;
+                    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                }
+                .ui-autocomplete > li {
+                    padding: 3px 20px;
+                }
+                .ui-autocomplete > li.ui-state-focus {
+                    background-color: #26B99A;
+                    color: white;
+                }
+                .ui-helper-hidden-accessible {
+                    display: none;
+                }
         </style>
     </head>
 
@@ -574,7 +603,7 @@
 
                                                             @segmentInternet(response,response.internetSegment)
 
-                                                            <div class="profile_title row">
+                                                            <div class="profile_title row" style="display: none">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -630,7 +659,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="profile_title row">
+                                                            <div class="profile_title row" style="display: none">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -1047,6 +1076,8 @@
             <!-- HightChartMap -->
         <script src="../assets/javascripts/map.js"></script>
         <script src="../assets/javascripts/world.js"></script>
+            <!-- Autocomplete -->
+        <script src="../assets/javascripts/jquery-ui.js"></script>
             <!-- Datatable -->
         <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
         <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -1060,6 +1091,24 @@
             <!-- Counter number -->
         <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+
+        <script type="text/javascript">
+                $(document).ready(function () {
+                    // autocomplete
+                    var listContracts = [
+                        "AGD000001", "AGD000006", "AGD000018", "AGD000030", "AGD000031", "AGD000035", "AGD000057", "AGD000085", "AGD000088", "AGD000110", "AGD000117", "AGD000147", "AGD000159", "AGD000176", "AGD000180", "AGD000192", "AGD000196", "AGD000237", "AGD000262", "AGD000273", "AGD000283", "AGD000289", "AGD000290", "AGD000293", "AGD000305", "AGD000386", "AGD000387", "AGD000388", "AGD000405", "AGD000411", "AGD000413", "AGD000414", "AGD000434", "AGD000466", "AGD000469", "AGD000483", "AGD000491", "AGD000494", "AGD000502", "AGD000506", "AGD000511", "AGD000533", "AGD000542", "AGD000546", "AGD000580", "AGD000585", "AGD000596", "AGD000599", "AGD000604", "AGD000617", "AGD000620", "AGD000622", "AGD000639", "AGD000667", "AGD000680", "AGD000681", "AGD000706", "AGD000707", "AGD000737", "AGD000743", "AGD000764", "AGD000836", "AGD000857", "AGD000862", "AGD000867", "AGD000889", "AGD000898", "AGD000927", "AGD000934", "AGD000944", "AGD000971", "AGD000987", "AGD000998", "AGD001002", "AGD001004", "AGD001014", "AGD001018", "AGD001034", "AGD001038", "AGD001046", "AGD001088", "AGD001095", "AGD001097", "AGD001103", "AGD001115", "AGD001121", "AGD001140", "AGD001146", "AGD001158", "AGD001171", "AGD001188", "AGD001211", "AGD001275", "AGD001439", "AGD001459", "AGD001486", "AGD001530", "AGD001580", "AGD001582", "AGD001583", "AGD001587", "AGD001591", "AGD001595", "AGD001608", "AGD001683", "AGD001685", "AGD001698", "AGD001718", "SGB000000", "SGB000001", "SGB000003", "SGB000011", "SGB000026", "SGB000030", "SGB000031", "SGB000033", "SGB000038", "SGB000040", "SGB000055", "SGB000056", "SGB000071", "SGB000073", "SGB000076", "SGB000077", "SGB000079", "SGB000080", "SGB000086", "SGB000092", "SGB000093", "SGB000094", "SGB000096", "SGB000100", "SGB000126", "SGB000151", "SGB000184", "SGB000194", "SGB000199", "SGB000237", "SGB000251", "SGB000257", "SGB000259", "SGB000262", "SGB000282", "SGB000285", "SGB000291", "SGB000323", "SGB000326", "SGB000358", "SGB000359", "SGB000369", "SGB000390", "SGB000404", "SGB000411", "SGB000433", "SGB000442", "SGB000457", "SGB000470", "SGB000489", "SGB000490", "SGB000492", "SGB000497", "SGB000502", "SGB000507", "SGB000508", "SGB000509", "SGB000519", "SGB000524", "SGB000525", "SGB000526", "SGB000530", "SGB000534", "SGB000536", "SGB000551", "SGB000554", "SGB000562", "SGB000579", "SGB000588", "SGB000608", "SGB000609", "SGB000628", "SGB000633", "SGB000682", "SGB000694", "SGB000699", "SGB000706", "SGB000717", "SGB000791", "SGB000793", "SGB000805", "SGB000806", "SGB000809", "SGB000811", "SGB000813", "SGB000814", "SGB000816", "SGB000819", "SGB000820", "SGB000830", "SGB000904", "SGB000909", "SGB000910", "SGB000911", "SGB000916", "SGB000917", "SGB000920", "SGB000922", "SGB000925", "SGB000934", "SGB000935", "SGB000939", "SGB000945", "SGB000948", "SGB000950", "SGB000951", "SGB000957", "SGB000958", "SGB000959", "SGB000962", "SGB000965", "SGB000968", "SGB000977", "SGB000983", "SGB000984", "SGB000987", "SGB001004", "SGB001008", "SGB001012", "SGB001017", "SGB001026", "SGB001114", "SGB001121", "SGB001130", "SGB001155", "SGB001158", "SGB001160", "SGB001163", "SGB001172", "SGB001176", "SGB001177", "SGB001201", "SGB001202", "SGB001206", "SGB001217", "SGB001223", "SGB001225", "SGB001228", "SGB001233", "SGB001234", "SGB001235", "SGB001236", "SGB001240", "SGB001254", "SGB001255", "SGB001297", "SGB001298", "SGB001301", "SGB001303", "SGB001305", "SGB001306", "SGB001307", "SGB001309", "SGB001316", "SGB001330", "SGB001331", "SGB001335", "SGB001345", "SGB001348", "SGB001350", "SGB001351", "SGB001352", "SGB001354", "SGB001355", "SGB001362", "SGB001366", "SGB001367", "SGB001370", "SGB001371", "SGB001375", "SGB001383", "SGB001386", "SGB001391", "SGB001398", "SGB001419", "SGB001426", "SGB001438", "SGB001441", "SGB001445", "SGB001446", "SGB001448", "SGB001449", "SGB001452", "SGB001457", "SGB001459", "SGB001460", "SGB001465", "SGB001467", "SGB001482", "SGB001483", "SGB001487", "SGB001491", "SGB001497", "SGB001704", "SGB001716", "SGB001718", "SGB001720", "SGB001721", "SGB001724", "SGB001730", "SGB001744", "SGB001746", "SGB001748", "SGB001750", "SGB001753", "SGB001754", "SGB001755", "SGB001760", "SGB001764", "SGB001769", "SGB001773", "SGB001784", "SGB001785", "SGB001805", "SGB001807", "SGB012000", "SGB013404", "SGB025966", "SGB031940", "SGB038834", "SGB062584", "SGB067972", "SGB075518", "SGB200000", "SGB200008", "SGB200013", "SGB200023", "SGB200033", "SGB200035", "SGB200037", "SGB200039", "SGB200047", "SGB200051", "SGB200061", "SGB200072", "SGB200075", "SGB200077", "SGB200086", "SGB200091", "SGB200094", "SGB200098", "SGB200100", "SGB200105", "SGB200113", "SGB200117", "SGB200124", "SGB200132", "SGB200133", "SGB200134", "SGB200137", "SGB200138", "SGB200156", "SGB200161", "SGB200170", "SGB200174", "SGB200176", "SGB200184", "SGB200185", "SGB200195", "SGB200199", "SGB200203", "SGB200210", "SGB200215", "SGB200218", "SGB200223", "SGB200224", "SGB200225", "SGB200231", "SGB200234", "SGB200236", "SGB200237", "SGB200245", "SGB200246", "SGB200252", "SGB200253", "SGB200254", "SGB200262", "SGB200265", "SGB200270", "SGB200271", "SGB200272", "SGB200277", "SGB200279", "SGB200285", "SGB200286", "SGB200310", "SGB200317", "SGB200321", "SGB200323", "SGB200327", "SGB200332", "SGB200343", "SGB200356", "SGB200358", "SGB200360", "SGB200361", "SGB200362", "SGB200364", "SGB200372", "SGB200378", "SGB200379", "SGB200382", "SGB200388", "SGB200391", "SGB200397", "SGB200400", "SGB200403", "SGB200408", "SGB200414", "SGB200418", "SGB200419", "SGB200421", "SGB200423", "SGB200425", "SGB200433", "SGB200435", "SGB200441", "SGB200443", "SGB200445", "SGB200447", "SGB200450", "SGB200454", "SGB200464", "SGB200465", "SGB200466", "SGB200471", "SGB200472", "SGB200475", "SGB200477", "SGB200481", "SGB200483", "SGB200489", "SGB200490", "SGB200505", "SGB200507", "SGB200509", "SGB200510", "SGB200511", "SGB200513", "SGB200514", "SGB200515", "SGB200518", "SGB200526", "SGB200530", "SGB200532", "SGB200533", "SGB200536", "SGB200537", "SGB200540", "SGB200543", "SGB200545", "SGB200556", "SGB200558", "SGB200560", "SGB200566", "SGB200567", "SGB200570", "SGB200571", "SGB200576", "SGB200578", "SGB200582", "SGB200601", "SGB200603", "SGB200613", "SGB200617", "SGB200623", "SGB200632", "SGB200635", "SGB200638", "SGB200640", "SGB200642", "SGB200647", "SGB200658", "SGB200659", "SGB200661", "SGB200664", "SGB200671", "SGB200672", "SGB200675", "SGB200676", "SGB200701", "SGD000059", "SGD000127", "SGD000192", "SGD000219", "SGD000475", "SGD000736", "SGD000982", "SGD001077", "SGD001380", "SGD001409", "SGD001512", "SGD001989", "SGD002089", "SGD002208", "SGD002497", "SGD002678", "SGD002790", "SGD002801", "SGD002838", "SGD003051", "SGD003188", "SGD003247", "SGD003452", "SGD003768", "SGD003912", "SGD004013", "SGD004015", "SGD004168", "SGD004252", "SGD004262", "SGD004275", "SGD004279", "SGD004478", "SGD004549", "SGD004566", "SGD004584", "SGD004634", "SGD004638", "SGD004892", "SGD004963", "SGD005101", "SGD005145", "SGD005248", "SGD005250", "SGD005313", "SGD005318", "SGD005352", "SGD005476", "SGD005549", "SGD005679", "SGD005927", "SGD005932", "SGD006135", "SGD006191", "SGD006297", "SGD006452", "SGD006525", "SGD006592", "SGD006593", "SGD006721", "SGD006862", "SGD006884", "SGD006962", "SGD007096", "SGD007165", "SGD007205", "SGD007286", "SGD007310", "SGD007352", "SGD007371", "SGD007546", "SGD007621", "SGD007638", "SGD007674", "SGD007780", "SGD007890", "SGD007926", "SGD008049", "SGD008105", "SGD008140", "SGD008156", "SGD008176", "SGD008205", "SGD008236", "SGD008252", "SGD008279", "SGD008301", "SGD008340", "SGD008479", "SGD008524", "SGD008551", "SGD008675", "SGD008731"
+                    ];
+
+                    $(".autocomplete").autocomplete({
+                        source: listContracts,
+                        select: function (event, ui) {
+                            $("#ct").val(ui.item.value);
+                            $("#ctSearch").submit();
+                        }
+                    });
+                });
+                    </script>
+
         @if( response != null){
             @scripts(response,contract, if(!response.segments.isEmpty) {response.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1} else null)
         }

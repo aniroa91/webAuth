@@ -1,8 +1,8 @@
 @(form: Form[SearchContract], route: Call)(implicit messages: Messages)
 
-@helper.form(action = route) {
+@helper.form(action = route,'id -> "ctSearch") {
     <div class="input-group">
-        <input type="text" class="form-control" required id="ct" name="ct" placeholder="Search ...">
+        <input type="text" class="form-control autocomplete" required id="ct" name="ct" placeholder="Search ...">
         <span class="input-group-btn">
             <button class="btn btn-default" type="submit">Go!</button>
         </span>
