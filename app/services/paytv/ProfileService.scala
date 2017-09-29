@@ -293,7 +293,7 @@ object ProfileService extends AbstractService {
     val suyhout = suyhoutSource.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date")/1000) -> getValueAsString(x, "passed"))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
-      
+
     val errorRes = client.execute(search(s"inf" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val error = errorRes.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date")/1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error") , getValueAsString(x, "n_error")))

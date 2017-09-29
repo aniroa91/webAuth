@@ -1022,9 +1022,23 @@
             });
 
             // chart line suy vector
+            values = @Html(Json.stringify(Json.toJson(response.suyhout.map(x => if (x._2.toBoolean) 1 else -1))))
             Highcharts.chart('line-suyVector', {
                 chart: {
-                    type: 'column'
+                    type: 'column',
+                    events: {
+                        load: function () {
+                             $.each(this.series[0].data, function(i, point) {
+                                if(point.y>0)
+                                   point.graphic.attr({ fill: '#1ABB9C' });
+                                else
+                                    point.graphic.attr({ fill: '#FF0000' });
+                            });
+                        }
+                    }
+                },
+                legend: {
+                    enabled: false
                 },
                 title: {
                     text: ''
@@ -1033,32 +1047,56 @@
                     categories: @Html(Json.stringify(Json.toJson(response.suyhout.map(x => x._1))))
                 },
                 yAxis: {
-                    min: 0,
+                    min: -1,
                     title: {
                         text: 'Value'
                     }
                 },
                 tooltip: {
                     headerFormat: '<span style="font-size:10px">Date: {point.key}</span><table>',
-                        text: 'Average'
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
                 },
-                plotOptions: {
-                    column: {
+                plotOptions:{
+                    column:{
                         pointPadding: 0.2,
                         borderWidth: 0,
-                    }
+                        point: {
+                            events:  {
+                                mouseOut: function(){
+                                    console.log('mouseout');
+                                    var chart = $('#line-suyVector').highcharts();
+                                    $.each(chart.series[0].data, function(i, point) {
+                                        if(point.y>0)
+                                            point.graphic.attr({ fill: '#1ABB9C' });
+                                        else
+                                            point.graphic.attr({ fill: '#FF0000' });
+                                    });
+                                },
+                                mouseOver: function(){
+                                    console.log('mouseover');
+                                    var chart = $('#line-suyVector').highcharts();
+                                    $.each(chart.series[0].data, function(i, point) {
+                                        if(point.y>0)
+                                            point.graphic.attr({ fill: '#1ABB9C' });
+                                        else
+                                            point.graphic.attr({ fill: '#FF0000' });
+                                    });
+                                },
+                            },
+                        },
+                        states:{hover:{enabled:false}},
+                    },
                 },
-                colors: [
-                    '#1ABB9C'
-                ],
                 series: [{
-                    name: 'Values',
-                    data: @Html(Json.stringify(Json.toJson(response.suyhout.map(x => if (x._2.toBoolean) 1 else 0))))
+                    name: 'Value',
+                    data: values
                 }]
             });
-
-            // chart line error vector
-            console.log(@Html(Json.stringify(Json.toJson(response.errorModule.map(x => x._1)))))
+                // chart line error vector
 
             Highcharts.chart('line-errVector', {
                 chart: {
