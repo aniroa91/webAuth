@@ -16,7 +16,7 @@ case class InternetContract(
     name: String,
     profile: String,
     profileType: String,
-    updateLim: Long,
+    uploadLim: Long,
     downloadLim: Long,
     status: String,
     macAddress: String,

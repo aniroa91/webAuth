@@ -190,13 +190,21 @@ object ProfileService extends AbstractService {
                  .groupBy(a => a._1).map(a => a._1 -> a._2.map(b => b._2).sum)
                  .toArray
                  .sortBy(a => a._1.toInt)
+                 .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
+          }
+         def group2(array: Array[Bucket2], key: String): Array[(String, Double)] = {
+            array.filter(a => a.key == key).map(a => a.term -> a.value)
+                 .groupBy(a => a._1).map(a => a._1 -> a._2.map(b => b._2).sum)
+                 .toArray
+                 .sortBy(a => a._1.toInt)
+                 .map(x => dayOfWeekNumberToLabel(x._1.toInt) -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
           }
         //val b = a.groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum).toArray
         x -> PayTVVector(hourlyBucket, appBucket, dayOfWeekBucket, iptvBucket, appHourlyBucket, appDailyBucket,
             group(appHourlyBucket, "IPTV"),
             group(appHourlyBucket, "VOD"),
-            group(appDailyBucket, "IPTV"),
-            group(appDailyBucket, "VOD"),
+            group2(appDailyBucket, "IPTV"),
+            group2(appDailyBucket, "VOD"),
             vod, vodthieu, vodgiaitri, dailyBucket)
 
       }).toMap
@@ -268,19 +276,22 @@ object ProfileService extends AbstractService {
 //    downupSource.keySet.filter(x => x.contains("Download")).foreach(println)
     val download = downupSource.keySet.filter(x => x.contains("Download"))
       .map(x => x.substring(4).replace("Download", "") -> getValueAsString(downupSource, x))
-      .map(x => (x._1.toInt + 1) -> (x._2.toDouble * 1024))
+      .map(x => (x._1.toInt + 1) -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
       .toArray
+      .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
       
     val upload = downupSource.keySet.filter(x => x.contains("Upload"))
       .map(x => x.substring(4).replace("Upload", "") -> getValueAsString(downupSource, x))
-      .map(x => (x._1.toInt + 1) -> (x._2.toDouble * 1024))
+      .map(x => (x._1.toInt + 1) -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
       .toArray
+      .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
     val duration = durationRes.source.keySet.filter(x => x.contains("Session"))
       .map(x => x.replace("Session", "") -> getValueAsString(durationRes.source, x))
-      .map(x => (x._1.toInt + 1) -> (x._2.toDouble))
+      .map(x => (x._1.toInt + 1) -> (x._2.toDouble / 3600))
       .toArray
+      .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
       .take(28)
       

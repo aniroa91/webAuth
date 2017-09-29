@@ -272,6 +272,14 @@
                                                     <i class="fa fa-briefcase user-profile-icon"></i>
                                                         Cable: @response.internet.cable
                                                     </li>
+
+                                                    <li>
+                                                    <i class="fa fa-briefcase user-profile-icon"></i>
+                                                        Down/Up Lim (GB): @formatNumber(response.internet.downloadLim) / @formatNumber(response.internet.uploadLim)
+                                                    </li>
+
+                                                    <li>
+                                                   
                                                 </ul>
 
                                                 <br />
@@ -279,12 +287,12 @@
                                                 <br />
                                                 <ul class="stats-overview">
                                                     <li>
-                                                        <h1 class="price"><font size=6>@formatNumber(response.internet.downloadLim)</font></h1>
-                                                        <span class="price-tax">download/day</span>
+                                                        <h1 class="price"><font size=6>@formatNumber((response.download.map(x => x._2).sum / 28).toLong)</font></h1>
+                                                        <span class="price-tax">Download/day (MB)</span>
                                                     </li>
                                                     <li>
-                                                        <h1 class="price"><font size=6>@formatNumber(response.internet.updateLim)</font></h1>
-                                                        <span class="price-tax">upload/day</span>
+                                                        <h1 class="price"><font size=6>@formatNumber((response.upload.map(x => x._2).sum / 28).toLong)</font></h1>
+                                                        <span class="price-tax">Upload/day (MB)</span>
                                                     </li>
                                                 </ul>
                                                 <br />
@@ -378,7 +386,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.sessiontType._1 </p>
+                                                                    <p class="excerpt"> @response.sessiontType._2 </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -390,7 +398,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.sessiontType._2 </p>
+                                                                    <p class="excerpt"> @response.sessiontType._1 </p>
                                                                 </div>
                                                             </div>
                                                         </li>
