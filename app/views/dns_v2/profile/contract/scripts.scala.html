@@ -1,4 +1,4 @@
-@(response: model.paytv.Response, contract: String,idPayTv: String)
+@(response: model.user.ProfileResponse, contract: String, idPayTv: String)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatNumber
 
@@ -23,13 +23,13 @@
             });
             /* START CHART FOR PAYTV*/
             /* START CLICK PAYTV ID */
-            @for(p <- response.segments) {
+            @for(p <- response.paytv.segments) {
               $("#@p._1").click(function(e) {
                   $("#tbSegPaytv").find('.hight-light').removeClass('hight-light');
                  $(this).parent().parent().addClass('hight-light');
                 // chart hourly vector
-                var hourly = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.hourly.map(x => x.key))));
-                var values = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.hourly.map(x => x.value))));
+                var hourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => x.key))));
+                var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => x.value))));
                 Highcharts.chart('line-hourVector', {
                     chart: {
                         type: 'column'
@@ -74,7 +74,7 @@
                     }]
                 });
                   // Build the chart pie app vector
-                  var appVectors = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.app.map(x => x.key -> x.value))));
+                  var appVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.app.map(x => x.key -> x.value))));
                   Highcharts.chart('pie-appVector', {
                       chart: {
                           type: 'pie'
@@ -111,8 +111,8 @@
                       }]
                   });
                   // Build the chart line daily vector
-                  var daily = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.dayOfWeek.map(x => x.key))));
-                  values = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.dayOfWeek.map(x => x.value))));
+                  var daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.dayOfWeek.map(x => x.key))));
+                  values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.dayOfWeek.map(x => x.value))));
                   Highcharts.chart('col-dayVector', {
                       chart: {
                           type: 'column'
@@ -153,7 +153,7 @@
                       }]
                   });
                   // Build the chart line iptv vector
-                  var iptvVectors = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptv.filter(x => x.value > 0).map(x => x.key -> x.value))));
+                  var iptvVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptv.filter(x => x.value > 0).map(x => x.key -> x.value))));
                   Highcharts.chart('pie-iptvVector', {
                       chart: {
                           type: 'pie'
@@ -191,9 +191,9 @@
                   });
 
                   // Build the chart line app-daily vector
-            var keyHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptvHourly.map(x => x._1))));
-            var iptvHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptvHourly.map(x => x._2))));
-            var vodHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.vodHourly.map(x => x._2))));
+            var keyHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptvHourly.map(x => x._1))));
+            var iptvHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptvHourly.map(x => x._2))));
+            var vodHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.vodHourly.map(x => x._2))));
             Highcharts.chart('line-appHourVector', {
                 chart: {
                     type: 'column'
@@ -251,9 +251,9 @@
             });
 
             // Build the chart line app-daily vector
-            var keyDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptvDayOfWeek.map(x => x._1))));
-            var iptvDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.iptvDayOfWeek.map(x => x._2))));
-            var vodDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.vodDayOfWeek.map(x => x._2))));
+            var keyDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptvDayOfWeek.map(x => x._1))));
+            var iptvDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptvDayOfWeek.map(x => x._2))));
+            var vodDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.vodDayOfWeek.map(x => x._2))));
             Highcharts.chart('line-appDayVector', {
                 chart: {
                     type: 'column'
@@ -309,8 +309,8 @@
 
 
                   // Build the chart line day of month vector
-                  daily = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.daily.map(x => x.key))));
-                  values = @Html(Json.stringify(Json.toJson(response.vectors.get(p._1).get.daily.map(x => x.value))));
+                  daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x.key))));
+                  values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x.value))));
                   Highcharts.chart('col-dayofMonth', {
                       chart: {
                           type: 'column'
@@ -360,7 +360,7 @@
 
             @if(idPayTv != null) {
             // Build the chart pie app vector
-            var appVectors = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.app.map(x => x.key -> x.value))));
+            var appVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.app.map(x => x.key -> x.value))));
             Highcharts.chart('pie-appVector', {
                 chart: {
                     type: 'pie'
@@ -399,8 +399,8 @@
 
 
             // Build the chart line hourly vector
-            var hourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.hourly.map(x => x.key))));
-            var values = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.hourly.map(x => x.value))));
+            var hourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.hourly.map(x => x.key))));
+            var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.hourly.map(x => x.value))));
 
             Highcharts.chart('line-hourVector', {
                 chart: {
@@ -448,8 +448,8 @@
 
             /*
             // Build the chart line app-hourly vector
-            hourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.appHourly.map(x => x.key))));
-            values = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.appHourly.map(x => x.value))));
+            hourly = @@Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.appHourly.map(x => x.key))));
+            values = @@Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.appHourly.map(x => x.value))));
 
             Highcharts.chart('line-appHourVector', {
                 chart: {
@@ -499,9 +499,9 @@
             });*/
 
             // Build the chart line app-daily vector
-            var keyHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptvHourly.map(x => x._1))));
-            var iptvHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptvHourly.map(x => x._2))));
-            var vodHourly = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.vodHourly.map(x => x._2))));
+            var keyHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptvHourly.map(x => x._1))));
+            var iptvHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptvHourly.map(x => x._2))));
+            var vodHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.vodHourly.map(x => x._2))));
             Highcharts.chart('line-appHourVector', {
                 chart: {
                     type: 'column'
@@ -556,9 +556,9 @@
             });
 
             // Build the chart line app-daily vector
-            var keyDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptvDayOfWeek.map(x => x._1))));
-            var iptvDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptvDayOfWeek.map(x => x._2))));
-            var vodDayOfWeek = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.vodDayOfWeek.map(x => x._2))));
+            var keyDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptvDayOfWeek.map(x => x._1))));
+            var iptvDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptvDayOfWeek.map(x => x._2))));
+            var vodDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.vodDayOfWeek.map(x => x._2))));
             Highcharts.chart('line-appDayVector', {
                 chart: {
                     type: 'column'
@@ -613,7 +613,7 @@
             });
 
             // Build the chart line iptv vector
-            var iptvVectors = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.iptv.filter(x => x.value > 0).map(x => x.key -> x.value))));
+            var iptvVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptv.filter(x => x.value > 0).map(x => x.key -> x.value))));
 
             Highcharts.chart('pie-iptvVector', {
                 chart: {
@@ -652,8 +652,8 @@
             });
 
             // Build the chart line daily vector
-            var daily = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.dayOfWeek.map(x => x.key))));
-                values = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.dayOfWeek.map(x => x.value))));
+            var daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.dayOfWeek.map(x => x.key))));
+                values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.dayOfWeek.map(x => x.value))));
             Highcharts.chart('col-dayVector', {
                 chart: {
                     type: 'column'
@@ -696,8 +696,8 @@
             });
 
             // Build the chart line day of month vector
-            daily = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.daily.map(x => x.key))));
-            values = @Html(Json.stringify(Json.toJson(response.vectors.get(idPayTv).get.daily.map(x => x.value))));
+            daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x.key))));
+            values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x.value))));
             Highcharts.chart('col-dayofMonth', {
                 chart: {
                     type: 'spline'
@@ -940,7 +940,7 @@
                     text: ''
                 },
                 xAxis: [{
-                    categories: @Html(Json.stringify(Json.toJson(response.download.map(x => x._1)))),
+                    categories: @Html(Json.stringify(Json.toJson(response.internet.download.map(x => x._1)))),
                     crosshair: true,
                     title: {
                         text: 'Daily',
@@ -984,23 +984,23 @@
                     type: 'column',
                     color: "#80b3ff",
                     yAxis: 1,
-                    data: @Html(Json.stringify(Json.toJson(response.duration.map(x => x._2))))
+                    data: @@Html(Json.stringify(Json.toJson(response.internet.duration.map(x => x._2))))
                 }*/ {
                     name: 'Upload',
                     type: 'spline',
                     color: "#9B59B6",
-                    data: @Html(Json.stringify(Json.toJson(response.upload.map(x => x._2))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.upload.map(x => x._2))))
 
                 }, {
                     name: 'Download',
                     type: 'spline',
                     color: "#1ABB9C",
-                    data: @Html(Json.stringify(Json.toJson(response.download.map(x => x._2))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.download.map(x => x._2))))
                 }]
             });
 
             // chart line suy vector
-            values = @Html(Json.stringify(Json.toJson(response.suyhout.map(x => if (x._2.toBoolean) 1 else -1))))
+            values = @Html(Json.stringify(Json.toJson(response.internet.suyhout.map(x => if (x._2.toBoolean) 1 else -1))))
             Highcharts.chart('line-suyVector', {
                 chart: {
                     type: 'column',
@@ -1022,7 +1022,7 @@
                     text: ''
                 },
                 xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(response.suyhout.map(x => x._1))))
+                    categories: @Html(Json.stringify(Json.toJson(response.internet.suyhout.map(x => x._1))))
                 },
                 yAxis: {
                     min: -1,
@@ -1095,7 +1095,7 @@
                     '#3498DB','#fbc28d'
                 ],
                 xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(response.errorDisconnect.map(x => x._1))))
+                    categories: @Html(Json.stringify(Json.toJson(response.internet.errorDisconnect.map(x => x._1))))
                 },
                 tooltip: {
                     crosshairs: true,
@@ -1117,7 +1117,7 @@
                         marker: {
                             symbol: 'square'
                         },
-                        data: @Html(Json.stringify(Json.toJson(response.errorDisconnect.map(x => x._2))))
+                        data: @Html(Json.stringify(Json.toJson(response.internet.errorDisconnect.map(x => x._2))))
 
                     },{
                         type: 'spline',
@@ -1125,7 +1125,7 @@
                         marker: {
                             symbol: 'diamond'
                         },
-                        data: @Html(Json.stringify(Json.toJson(response.errorModule.map(x => x._2))))
+                        data: @Html(Json.stringify(Json.toJson(response.internet.errorModule.map(x => x._2))))
                     }]
             });
             /* END CHART FOR INTERNET*/

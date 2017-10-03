@@ -4,8 +4,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
-import services.paytv.DashboardService
 import services.domain.CommonService
+import services.user.DashboardService
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the

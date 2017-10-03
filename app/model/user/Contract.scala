@@ -1,4 +1,4 @@
-package model.paytv
+package model.user
 
 import org.joda.time.DateTime
 
@@ -47,11 +47,11 @@ case class PayTVContract(
      * customer_id:374,703 contract:SGD516753 status:Binh thuong change_date:1,441,157,953,000 mac_address:FBOX001c550101bb
      */
 case class PayTVBox(
-    customer_id: Int,
+    id: String,
     contract: String, 
     status: String,
     change: DateTime,
-     macAddress: String)
+    macAddress: String)
 
 
 case class ContractResponse()

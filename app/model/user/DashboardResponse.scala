@@ -1,4 +1,4 @@
-package model.paytv
+package model.user
 
 import services.Bucket
 import services.BucketDouble

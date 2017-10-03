@@ -14,8 +14,8 @@ import play.api.mvc.AbstractController
 import play.api.mvc.AnyContent
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Request
-import services.paytv.ProfileService
 import slick.jdbc.JdbcProfile
+import services.user.ProfileService
 
 case class SearchContract(q: String)
 
@@ -38,7 +38,7 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
     if (!formValidationResult.hasErrors) {
       val domain = formValidationResult.get.q
       val response = ProfileService.get(domain)
-      Ok(views.html.dns_v2.profile.contract.index(form, response,domain))
+      Ok(views.html.dns_v2.profile.contract.index(form, response, domain))
     } else {
       Ok(views.html.dns_v2.profile.contract.index(form, null,null))
     }

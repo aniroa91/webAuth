@@ -3,9 +3,7 @@ package utils
 import com.ftel.bigdata.utils.FileUtil
 import play.Environment
 
-case class Session(contract: String, count: Int, min: Int, max: Int, mean: Double, std: Double) {
-  override def toString = List(contract, count, min, max, mean, std).mkString("\t")
-}
+
 
 object BillUtil {
   

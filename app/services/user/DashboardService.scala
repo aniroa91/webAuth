@@ -1,4 +1,4 @@
-package services.paytv
+package services.user
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import services.Configure
@@ -6,7 +6,7 @@ import com.ftel.bigdata.utils.ESUtil
 import com.sksamuel.elastic4s.searches.SearchDefinition
 import services.domain.AbstractService
 import services.ElasticUtil
-import model.paytv.DashboardResponse
+import model.user.DashboardResponse
 
 object DashboardService extends AbstractService {
 

@@ -1,4 +1,4 @@
-@(form: Form[SearchContract], response: model.paytv.Response,contract: String)(implicit messages: Messages)
+@(form: Form[SearchContract], response: model.user.ProfileResponse, contract: String)(implicit messages: Messages)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -279,32 +279,32 @@
                                                         <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
                                                     </div>
                                                 </div>
-                                                <h3 class="name_title">@response.internet.contract</h3>
+                                                <h3 class="name_title">@response.internet.contract.contract</h3>
                                                 
                                                 <ul class="list-unstyled user_data">
-                                                    <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.province - @response.internet.region
+                                                    <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.contract.province - @response.internet.contract.region
                                                     </li>
 
                                                     <li>
-                                                        <i class="fa fa-briefcase user-profile-icon"></i> @response.internet.profileType
+                                                        <i class="fa fa-briefcase user-profile-icon"></i> @response.internet.contract.profileType
                                                     </li>
                                                     <li>
                                                     <i class="fa fa-briefcase user-profile-icon"></i>
-                                                    @if(response.internet.cable == "pon") {
-                                                        @response.internet.host / @response.internet.port / @response.internet.onu
+                                                    @if(response.internet.contract.cable == "pon") {
+                                                        @response.internet.contract.host / @response.internet.contract.port / @response.internet.contract.onu
                                                     } else {
-                                                        @response.internet.host / @response.internet.port / @response.internet.slot
+                                                        @response.internet.contract.host / @response.internet.contract.port / @response.internet.contract.slot
                                                     }
                                                     </li>
 
                                                     <li>
                                                     <i class="fa fa-briefcase user-profile-icon"></i>
-                                                        Cable: @response.internet.cable
+                                                        Cable: @response.internet.contract.cable
                                                     </li>
 
                                                     <li>
                                                     <i class="fa fa-briefcase user-profile-icon"></i>
-                                                        Down/Up Lim (GB): @formatNumber(response.internet.downloadLim) / @formatNumber(response.internet.uploadLim)
+                                                        Down/Up Lim (GB): @formatNumber(response.internet.contract.downloadLim) / @formatNumber(response.internet.contract.uploadLim)
                                                     </li>
 
                                                     <li>
@@ -316,16 +316,16 @@
                                                 <br />
                                                 <ul class="stats-overview">
                                                     <li>
-                                                        <h1 class="price"><font size=6>@formatNumber((response.download.map(x => x._2).sum / 28).toLong)</font></h1>
+                                                        <h1 class="price"><font size=6>@formatNumber((response.internet.download.map(x => x._2).sum / 28).toLong)</font></h1>
                                                         <span class="price-tax">Download/day (MB)</span>
                                                     </li>
                                                     <li>
-                                                        <h1 class="price"><font size=6>@formatNumber((response.upload.map(x => x._2).sum / 28).toLong)</font></h1>
+                                                        <h1 class="price"><font size=6>@formatNumber((response.internet.upload.map(x => x._2).sum / 28).toLong)</font></h1>
                                                         <span class="price-tax">Upload/day (MB)</span>
                                                     </li>
                                                 </ul>
                                                 <br />
-                                                @if(response.session != null) {
+                                                @if(response.internet.session != null) {
                                                 <div class="x-content" id="payInfor">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
@@ -342,7 +342,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.session.count </p>
+                                                                    <p class="excerpt"> @response.internet.session.count </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -354,7 +354,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @formatSecond(response.session.mean) </p>
+                                                                    <p class="excerpt"> @formatSecond(response.internet.session.mean) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -366,7 +366,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @formatSecond(response.session.std) </p>
+                                                                    <p class="excerpt"> @formatSecond(response.internet.session.std) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -378,7 +378,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @formatSecond(response.session.min.toDouble) </p>
+                                                                    <p class="excerpt"> @formatSecond(response.internet.session.min.toDouble) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -390,7 +390,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @formatSecond(response.session.max.toDouble) </p>
+                                                                    <p class="excerpt"> @formatSecond(response.internet.session.max.toDouble) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -398,7 +398,7 @@
                                                 </div>
                                                 }
                                                 <br />
-                                                @if(response.sessiontType != null) {
+                                                @if(response.internet.sessiontType != null) {
                                                 <div class="x-content" id="payInfor">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
@@ -415,7 +415,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.sessiontType._2 </p>
+                                                                    <p class="excerpt"> @response.internet.sessiontType._2 </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -427,7 +427,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.sessiontType._1 </p>
+                                                                    <p class="excerpt"> @response.internet.sessiontType._1 </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -455,7 +455,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @if(response.internet.profile == "") {N/A} else {@response.internet.profile} </p>
+                                                                    <p class="excerpt"> @if(response.internet.contract.profile == "") {N/A} else {@response.internet.contract.profile} </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -467,7 +467,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @formatDateYYMMDD(response.internet.start) </p>
+                                                                    <p class="excerpt"> @formatDateYYMMDD(response.internet.contract.start) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -479,7 +479,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt">  @formatDateYYMMDD(response.internet.active) </p>
+                                                                    <p class="excerpt">  @formatDateYYMMDD(response.internet.contract.active) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -491,7 +491,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.internet.status </p>
+                                                                    <p class="excerpt"> @response.internet.contract.status </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -503,7 +503,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt">@formatNumber(response.bill.internet) (VND)</p>
+                                                                    <p class="excerpt">@formatNumber(response.internet.bill.toLong) (VND)</p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -529,7 +529,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt">@response.segments.size (<font color="green">@response.paytv.box_count: Bình thường</font>, <font color="red">@(response.segments.size - response.paytv.box_count): Đã chấm dứt hợp đồng</font>) </p>
+                                                                    <p class="excerpt">@response.paytv.segments.size (<font color="green">@response.paytv.contract.box_count: Bình thường</font>, <font color="red">@(response.paytv.segments.size - response.paytv.contract.box_count): Đã chấm dứt hợp đồng</font>) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -541,7 +541,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @formatDateYYMMDD(response.paytv.start) </p>
+                                                                    <p class="excerpt"> @formatDateYYMMDD(response.paytv.contract.start) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -553,7 +553,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt">  @formatDateYYMMDD(response.paytv.active) </p>
+                                                                    <p class="excerpt">  @formatDateYYMMDD(response.paytv.contract.active) </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -565,7 +565,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt"> @response.paytv.status </p>
+                                                                    <p class="excerpt"> @response.paytv.contract.status </p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -577,7 +577,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="block_content">
-                                                                    <p class="excerpt">@formatNumber(response.bill.paytv) (VND)</p>
+                                                                    <p class="excerpt">@formatNumber(response.paytv.bill.toLong) (VND)</p>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -601,7 +601,7 @@
                                                     <div id="myTabContent" class="tab-content">
                                                         <div role="tabpanel" class="tab-pane fade active in" id="tab_internet" aria-labelledby="internet-tab">
 
-                                                            @segmentInternet(response,response.internetSegment)
+                                                            @segmentInternet(response, response.internet.segment)
 
                                                             <div class="profile_title row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
@@ -807,7 +807,7 @@
                                                         @if(response.paytv != null) {
                                                         <div role="tabpanel" class="tab-pane fade" id="tab_paytv" aria-labelledby="paytv-tab">
 
-                                                            @segmentPayTv(response,response.segments)
+                                                            @segmentPayTv(response, response.paytv.segments)
 
                                                             <div class="profile_title row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
@@ -1109,8 +1109,8 @@
                 });
                     </script>
 
-        @if( response != null){
-            @scripts(response,contract, if(!response.segments.isEmpty) {response.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1} else null)
+        @if( response.paytv != null){
+            @scripts(response, contract, if(!response.paytv.segments.isEmpty) {response.paytv.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1} else null)
         }
     </body>
 </html>
