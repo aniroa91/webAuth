@@ -210,10 +210,15 @@
                     }
                 },
                 colors: [
-                    '#3498DB','#fbc28d'
+                    '#9B59B6',
+                    '#1ABB9C',
+                    '#3498DB',
+                    '#9CC2CB',
+                    '#E74C3C',
+                    '#73879C'
                 ],
                 xAxis: {
-                    categories: keyHourly,
+                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23"],
                     title: {
                         text: ''
                     },
@@ -231,7 +236,7 @@
                         }
                     }
                 },
-                series: [
+                series: /*[
                     {
                         type: 'spline',
                         name: 'IPTV',
@@ -247,34 +252,38 @@
                             symbol: 'diamond'
                         },
                         data: vodHourly
-                    }]
+                    }]*/
+                getJsonAppVector(appHour2)
             });
 
             // Build the chart line app-daily vector
-            var keyDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptvDayOfWeek.map(x => x._1))));
-            var iptvDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptvDayOfWeek.map(x => x._2))));
-            var vodDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.vodDayOfWeek.map(x => x._2))));
-            Highcharts.chart('line-appDayVector', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                colors: [
-                    '#3498DB','#fbc28d'
-                ],
-                xAxis: {
-                    categories: keyDayOfWeek
-                },
+                  var appDaily2 = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.appDayOfWeek2)));
+                  Highcharts.chart('line-appDayVector', {
+                      chart: {
+                          type: 'column'
+                      },
+                      title: {
+                          text: ''
+                      },
+                      subtitle: {
+                          text: ''
+                      },
+                      plotOptions: {
+                          column: {
+                              colorByPoint: true
+                          }
+                      },
+                      colors: [
+                          '#9B59B6',
+                          '#1ABB9C',
+                          '#3498DB',
+                          '#9CC2CB',
+                          '#E74C3C',
+                          '#73879C'
+                      ],
+                      xAxis: {
+                          categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+                      },
                 tooltip: {
                     crosshairs: true,
                     shared: true
@@ -288,7 +297,7 @@
                         }
                     }
                 },
-                series: [
+                series:/* [
                     {
                         type: 'spline',
                         name: 'IPTV',
@@ -304,7 +313,8 @@
                             symbol: 'diamond'
                         },
                         data: vodDayOfWeek
-                    }]
+                    }]*/
+                      getJsonAppVector(appDaily2)
             });
 
 
@@ -499,9 +509,8 @@
             });*/
 
             // Build the chart line app-daily vector
-            var keyHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptvHourly.map(x => x._1))));
-            var iptvHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptvHourly.map(x => x._2))));
-            var vodHourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.vodHourly.map(x => x._2))));
+
+            var appHour2 = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.appHourly2)));
             Highcharts.chart('line-appHourVector', {
                 chart: {
                     type: 'column'
@@ -518,10 +527,15 @@
                     }
                 },
                 colors: [
-                    '#3498DB','#fbc28d'
+                    '#9B59B6',
+                    '#1ABB9C',
+                    '#3498DB',
+                    '#9CC2CB',
+                    '#E74C3C',
+                    '#73879C'
                 ],
                 xAxis: {
-                    categories: keyHourly
+                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23"]
                 },
                 tooltip: {
                     crosshairs: true,
@@ -536,29 +550,11 @@
                         }
                     }
                 },
-                series: [
-                    {
-                        type: 'spline',
-                        name: 'IPTV',
-                        marker: {
-                            symbol: 'square'
-                        },
-                        data: iptvHourly
-
-                    },{
-                        type: 'spline',
-                        name: 'VOD',
-                        marker: {
-                            symbol: 'diamond'
-                        },
-                        data: vodHourly
-                    }]
+                series: getJsonAppVector(appHour2)
             });
 
             // Build the chart line app-daily vector
-            var keyDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptvDayOfWeek.map(x => x._1))));
-            var iptvDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptvDayOfWeek.map(x => x._2))));
-            var vodDayOfWeek = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.vodDayOfWeek.map(x => x._2))));
+            var appDaily2 = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.appDayOfWeek2)));
             Highcharts.chart('line-appDayVector', {
                 chart: {
                     type: 'column'
@@ -575,10 +571,15 @@
                     }
                 },
                 colors: [
-                    '#3498DB','#fbc28d'
+                    '#9B59B6',
+                    '#1ABB9C',
+                    '#3498DB',
+                    '#9CC2CB',
+                    '#E74C3C',
+                    '#73879C'
                 ],
                 xAxis: {
-                    categories: keyDayOfWeek
+                    categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
                 },
                 tooltip: {
                     crosshairs: true,
@@ -593,7 +594,7 @@
                         }
                     }
                 },
-                series: [
+                series: /*[
                     {
                         type: 'spline',
                         name: 'IPTV',
@@ -609,7 +610,8 @@
                             symbol: 'diamond'
                         },
                         data: vodDayOfWeek
-                    }]
+                    }]*/
+                getJsonAppVector(appDaily2)
             });
 
             // Build the chart line iptv vector
@@ -1130,4 +1132,16 @@
             });
             /* END CHART FOR INTERNET*/
         });
+
+        function getJsonAppVector(appHour){
+            var jsonArr = [];
+            for (var i = 0; i < appHour.length; i++) {
+                jsonArr.push({
+                    type: "spline",
+                    name: appHour[i][0],
+                    data: appHour[i][1]
+                });
+            }
+            return jsonArr
+        }
  </script>
