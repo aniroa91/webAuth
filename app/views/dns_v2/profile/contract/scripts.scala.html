@@ -23,6 +23,7 @@
             });
             /* START CHART FOR PAYTV*/
             /* START CLICK PAYTV ID */
+            @if(idPayTv != null) {
             @for(p <- response.paytv.segments) {
               $("#@p._1").click(function(e) {
                   $("#tbSegPaytv").find('.hight-light').removeClass('hight-light');
@@ -388,8 +389,6 @@
            /* END CLICK PAYTV ID */
 
             /* START CHART FOR PAYTV*/
-
-            @if(idPayTv != null) {
             // Build the chart pie app vector
             var appVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.app.map(x => x.key -> x.value))));
             Highcharts.chart('pie-appVector', {
@@ -1077,6 +1076,7 @@
             });
                 // chart line error vector
 
+            console.log( @Html(Json.stringify(Json.toJson(response.internet.errorDisconnect.map(x => x._2)))))
             Highcharts.chart('line-errVector', {
                 chart: {
                     type: 'column'
