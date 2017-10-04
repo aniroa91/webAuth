@@ -323,7 +323,7 @@ object ProfileService extends AbstractService {
     } else null
     val internetBillRes = ESUtil.get(client, "bill-internet", "docs", contract)
     val internetBill = if (internetBillRes.exists) getValueAsInt(internetBillRes.source, "SoTienDaThanhToan") else 0
-    InternetResponse(internetInfo, segment, downup, duration, suyhout, error, module, disconnet, session, checkList, internetBill)
+    InternetResponse(internetInfo, segment, downup, duration, suyhout, error, formatArray2(module), formatArray2(disconnet), session, checkList, internetBill)
   }
 
   private def getPayTVResponse(contract: String): PayTVResponse = {
@@ -467,6 +467,12 @@ object ProfileService extends AbstractService {
     val map = array.toMap
     seq.toArray.map(x => x.toString -> map.getOrElse(x.toString, 0.0))
   }
+  
+  private def formatArray2(array: Array[(String, Int)]): Array[(String, Int)] = {
+    val seq = 1 until (DateTimeUtil.create("2017-09-01", DateTimeUtil.YMD).dayOfMonth().getMaximumValue + 1)
+    val map = array.toMap
+    seq.map(x => "2017-09-" + f"$x%02d").toArray.map(x => x.toString -> map.getOrElse(x.toString, 0))
+  }
 
   def main(args: Array[String]) {
     val time0 = System.currentTimeMillis()
@@ -475,7 +481,9 @@ object ProfileService extends AbstractService {
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
 //    response.internet.errorModule.foreach(println)
-    response.internet.errorDisconnect.foreach(println)
+//    response.internet.errorDisconnect.foreach(println)
+//    response.internet.errorModule.map(x => x._1).foreach(println)
+    println(response.internet.errorDisconnect.size -> response.internet.errorModule.size) 
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
