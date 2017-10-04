@@ -277,9 +277,9 @@ object ProfileService extends AbstractService {
     
     val durationDow = getDurationDoW(contract)
     val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
-    val pon = client.execute(search(s"pon" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    val pon = client.execute(search(s"user-inf-pon-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val suyhoutSource = if (pon.totalHits <= 0) {
-      client.execute(search(s"adsl" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+      client.execute(search(s"user-inf-adsl-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     } else pon
 
     //println(suyhout.totalHits)
@@ -289,7 +289,7 @@ object ProfileService extends AbstractService {
       .sortBy(x => x._1)
       //.toMap.toArray
 
-    val errorRes = client.execute(search(s"inf" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    val errorRes = client.execute(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val error = errorRes.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date") / 1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error"), getValueAsString(x, "n_error")))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)

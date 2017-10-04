@@ -759,6 +759,11 @@
                 xAxis: {
                     categories: hourly
 
+                }, yAxis: {
+                  title: {
+                    text: "Time (seconds)"
+                  }
+                  
                 },
                 tooltip: {
                     crosshairs: true,
@@ -808,6 +813,12 @@
                     categories: hourly
 
                 },
+                yAxis: {
+                  title: {
+                    text: "Size (GB)"
+                  }
+                  
+                },
                 tooltip: {
                     crosshairs: true,
                     shared: true
@@ -856,6 +867,12 @@
                 xAxis: {
                     categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
                 },
+                yAxis: {
+                  title: {
+                    text: "Size (GB)"
+                  }
+                  
+                },
                 tooltip: {
                     crosshairs: true,
                     shared: true
@@ -896,6 +913,12 @@
                     column: {
                         colorByPoint: true
                     }
+                },
+                 yAxis: {
+                  title: {
+                    text: "Time (seconds)"
+                  }
+                  
                 },
                 colors: [
                     '#9B59B6',
@@ -941,13 +964,14 @@
                 subtitle: {
                     text: ''
                 },
+                /*
                 xAxis: [{
                     categories: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => x._1)))),
                     crosshair: true,
                     title: {
                         text: 'Daily',
                     }
-                }],
+                }],*/
                 yAxis: [{ // Primary yAxis
                     labels: {
                         format: '{value} MB',
@@ -985,18 +1009,18 @@
                     type: 'column',
                     name: 'Duration',
                     yAxis: 1,
-                    data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => x._2))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => BigDecimal(x._2 / 60).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
                 }, {
                     name: 'Upload',
                     type: 'spline',
                     color: "#9B59B6",
-                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upDaily.map(x => x._2))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upDaily.map(x => BigDecimal(x._2 * 1024).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
 
                 }, {
                     name: 'Download',
                     type: 'spline',
                     color: "#1ABB9C",
-                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => x._2))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => BigDecimal(x._2 * 1024).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
                 }]
             });
 
