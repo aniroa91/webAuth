@@ -276,9 +276,7 @@ object ProfileService extends AbstractService {
       //.take(28)
     
     val durationDow = getDurationDoW(contract)
-    
     val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
-    
     val pon = client.execute(search(s"pon" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val suyhoutSource = if (pon.totalHits <= 0) {
       client.execute(search(s"adsl" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
@@ -288,6 +286,7 @@ object ProfileService extends AbstractService {
     val suyhout = suyhoutSource.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date") / 1000) -> getValueAsString(x, "passed"))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
+      .sortBy(x => x._1)
       //.toMap.toArray
 
     val errorRes = client.execute(search(s"inf" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
@@ -308,7 +307,7 @@ object ProfileService extends AbstractService {
         getValueAsDouble(map, "ssOnline_Mean"),
         getValueAsDouble(map, "ssOnline_Std"))
     } else null
-    val checkListRes = ESUtil.get(client, "check-list", "docs", contract)
+    val checkListRes = ESUtil.get(client, "user-ticket-2017-09", "docs", contract)
     val checkList = if (checkListRes.exists) {
       val map = checkListRes.source
       getValueAsString(map, "Nhom_CheckList") -> getValueAsInt(map, "So_checklist")
@@ -342,12 +341,15 @@ object ProfileService extends AbstractService {
 
       // Get Segment
       val segments = boxs.map(x => x -> ESUtil.get(client, "user-segment-paytv-2017-10-02", "docs", x.id))
-        .map(x => x._1 -> x._2.source)
+        .map(x => {
+            //println(x._2.source)
+            x._1 -> x._2.source
+          })
         .map(x => x._1.id -> PayTVSegment(
           getValueAsString(x._2, "cluster_app"),
           getValueAsString(x._2, "cluster_hourly"),
           getValueAsString(x._2, "cluster_daily"),
-          getValueAsString(x._2, "cluster_lifeoemd"),
+          getValueAsString(x._2, "cluster_lifetoend"),
           getValueAsString(x._2, "cluster_sum"),
           getValueAsString(x._2, "cluster_iptv"),
           getValueAsString(x._2, "cluster_vod"),
@@ -438,15 +440,7 @@ object ProfileService extends AbstractService {
     } else null
   }
 
-  def main(args: Array[String]) {
-    val time0 = System.currentTimeMillis()
-    val response = ProfileService.get("SGB000000")
-    val a = response.paytv.vectors.get("395238").get
-    a.appHourly2.foreach(println)
-    val time1 = System.currentTimeMillis()
-    println(time1 - time0)
-    client.close()
-  }
+  
 
   def dayOfWeekNumberToLabel = (i: Int) => {
     i match {
@@ -465,6 +459,17 @@ object ProfileService extends AbstractService {
     val seq = 1 until (DateTimeUtil.create("2017-09-01", DateTimeUtil.YMD).dayOfMonth().getMaximumValue + 1)
     val map = array.toMap
     seq.toArray.map(x => x -> map.getOrElse(x, 0.0))
+  }
+  
+  
+  def main(args: Array[String]) {
+    val time0 = System.currentTimeMillis()
+    val response = ProfileService.get("SGB000026")
+    val a = response.paytv.vectors.get("316292").get
+    a.app.foreach(println)
+    val time1 = System.currentTimeMillis()
+    println(time1 - time0)
+    client.close()
   }
   
 }

@@ -4,6 +4,7 @@
     <thead>
         <tr>
             <th>Box id</th>
+            <th>Year</th>
             <th>Sum</th>
             <th>Daily</th>
             <th>Hourly</th>
@@ -19,6 +20,7 @@
         @for(payTv <- segments.toList.sortWith( (x,y) => x._1 > y._1 )) {
             <tr>
                 <td><a id="@payTv._1" style="color: #1ABB9C;cursor: pointer;">@payTv._1</a></td>
+                <td>@payTv._2.lifetoend</td>
                 <td>@payTv._2.sum</td>
                 <td>@payTv._2.daily</td>
                 <td>@payTv._2.hourly</td>
