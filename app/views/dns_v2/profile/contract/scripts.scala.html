@@ -942,7 +942,7 @@
                     text: ''
                 },
                 xAxis: [{
-                    categories: @Html(Json.stringify(Json.toJson(response.internet.download.map(x => x._1)))),
+                    categories: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => x._1)))),
                     crosshair: true,
                     title: {
                         text: 'Daily',
@@ -981,23 +981,23 @@
                 },
 
                 series: [
-                /*{
+                {
                     name: 'Duration',
                     type: 'column',
                     color: "#80b3ff",
                     yAxis: 1,
-                    data: @@Html(Json.stringify(Json.toJson(response.internet.duration.map(x => x._2))))
-                }*/ {
+                    data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => x._2))))
+                }, {
                     name: 'Upload',
                     type: 'spline',
                     color: "#9B59B6",
-                    data: @Html(Json.stringify(Json.toJson(response.internet.upload.map(x => x._2))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upDaily.map(x => x._2))))
 
                 }, {
                     name: 'Download',
                     type: 'spline',
                     color: "#1ABB9C",
-                    data: @Html(Json.stringify(Json.toJson(response.internet.download.map(x => x._2))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => x._2))))
                 }]
             });
 

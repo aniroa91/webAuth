@@ -25,6 +25,9 @@ import model.user.PayTVBox
 import model.user.InternetResponse
 import model.user.InternetContract
 import model.user.Session
+import model.user.DownUp
+import model.user.Duration
+import org.joda.time.DateTime
 
 object ProfileService extends AbstractService {
   //val client = Configure.client
@@ -119,6 +122,43 @@ object ProfileService extends AbstractService {
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
+  private def getDurationDoW(contract: String): Array[(Int, Array[Double])] = {
+     val response = client.execute(search(s"user-duration-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await
+     val result= response.hits.hits.map(x => x.sourceAsMap)
+       .map(x => getValueAsInt(x, "wod") -> Array(
+           getValueAsDouble(x, "Mon"),
+           getValueAsDouble(x, "Tue"),
+           getValueAsDouble(x, "Wed"),
+           getValueAsDouble(x, "Thu"),
+           getValueAsDouble(x, "Fri"),
+           getValueAsDouble(x, "Sat"),
+           getValueAsDouble(x, "Sun")))
+     result
+  }
+  
+  private def getDownloadDoW(contract: String): (Array[(Int, Array[Double])], Array[(Int, Array[Double])]) = {
+     val response = client.execute(search(s"user-downup-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await
+     val download= response.hits.hits.map(x => x.sourceAsMap)
+       .map(x => getValueAsInt(x, "wod") -> Array(
+           getValueAsDouble(x, "Mon_Download"),
+           getValueAsDouble(x, "Tue_Download"),
+           getValueAsDouble(x, "Wed_Download"),
+           getValueAsDouble(x, "Thu_Download"),
+           getValueAsDouble(x, "Fri_Download"),
+           getValueAsDouble(x, "Sat_Download"),
+           getValueAsDouble(x, "Sun_Download")))
+     val upload= response.hits.hits.map(x => x.sourceAsMap)
+       .map(x => getValueAsInt(x, "wod") -> Array(
+           getValueAsDouble(x, "Mon_Upload"),
+           getValueAsDouble(x, "Tue_Upload"),
+           getValueAsDouble(x, "Wed_Upload"),
+           getValueAsDouble(x, "Thu_Upload"),
+           getValueAsDouble(x, "Fri_Upload"),
+           getValueAsDouble(x, "Sat_Upload"),
+           getValueAsDouble(x, "Sun_Upload")))
+     (download, upload)
+  }
+  
   def get(contract: String): ProfileResponse = {
     ProfileResponse(getInternetResponse(contract), getPayTVResponse(contract))
   }
@@ -174,31 +214,71 @@ object ProfileService extends AbstractService {
       getValueAsString(internetSegmentSource, "So_Lan_Loi_Ha_Tang"),
       getValueAsString(internetSegmentSource, "So_Ngay_Loi_Ha_Tang"))
 
-    val downupRes = ESUtil.get(client, "downup", "docs", contract)
-    val durationRes = ESUtil.get(client, "duration", "docs", contract)
-    val downupSource = downupRes.source
+    
+    val downupQuadRes = ESUtil.get(client, "user-downup-quad-2017-09", "docs", contract)
+    val downupQuadSource = downupQuadRes.source
     //    downupSource.keySet.filter(x => x.contains("Download")).foreach(println)
-    val download = downupSource.keySet.filter(x => x.contains("Download"))
-      .map(x => x.substring(4).replace("Download", "") -> getValueAsString(downupSource, x))
-      .map(x => (x._1.toInt + 1) -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+    val downloadQuad = downupQuadSource.keySet
+      .filter(x => x.contains("Quad_"))
+      .filter(x => x.contains("Download"))
+      .map(x => x.substring(5).replace("_Download", "") -> getValueAsString(downupQuadSource, x))
+      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
       .toArray
-      .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
+      //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
+    val uploadQuad = downupQuadSource.keySet
+      .filter(x => x.contains("Quad_"))
+      .filter(x => x.contains("Upload"))
+      .map(x => x.substring(5).replace("_Upload", "") -> getValueAsString(downupQuadSource, x))
+      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+      .toArray
+      //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
+      .sortBy(x => x._1)
+    val downloadDaily = downupQuadSource.keySet
+      .filter(x => x.contains("Size"))
+      .filter(x => x.contains("Download"))
+      .map(x => x.substring(4).replace("Download", "") -> getValueAsString(downupQuadSource, x))
+      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+      .toArray
+      //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
+      .sortBy(x => x._1)
+    val uploadDaily = downupQuadSource.keySet
+      .filter(x => x.contains("Size"))
+      .filter(x => x.contains("Upload"))
+      .map(x => x.substring(4).replace("Upload", "") -> getValueAsString(downupQuadSource, x))
+      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+      .toArray
+      //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
+      .sortBy(x => x._1)
+    val downupDow = getDownloadDoW(contract)
+    val downup = DownUp(downloadQuad, uploadQuad, downupDow._1, downupDow._2, formatArray(downloadDaily), formatArray(uploadDaily))
+    
+    val durationDailyRes = ESUtil.get(client, "user-duration-daily-2017-09", "docs", contract)
+    val durationDailySource = durationDailyRes.source
+    val durationDaily = durationDailySource.keySet
+      .filter(x => x.contains("sum(Size"))
+      .map(x => x.substring(8).replace("Duration)", "") -> getValueAsString(durationDailySource, x))
+      .map(x => x._1.toInt -> x._2.toDouble)
+      .toArray
+      //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
+      .sortBy(x => x._1)
+      //.take(28)
 
-    val upload = downupSource.keySet.filter(x => x.contains("Upload"))
-      .map(x => x.substring(4).replace("Upload", "") -> getValueAsString(downupSource, x))
-      .map(x => (x._1.toInt + 1) -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+    val durationHourlyRes = ESUtil.get(client, "user-duration-hourly-2017-09", "docs", contract)
+    val durationHourlySource = durationHourlyRes.source
+    val durationHourly = durationHourlySource.keySet
+      .filter(x => !x.contains("Contract") && !x.contains("Name") && !x.contains("Date"))
+      .map(x => x -> getValueAsDouble(durationDailySource, x))
+      .map(x => x._1.toInt -> x._2.toDouble)
       .toArray
-      .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
+      //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
-    val duration = durationRes.source.keySet.filter(x => x.contains("Session"))
-      .map(x => x.replace("Session", "") -> getValueAsString(durationRes.source, x))
-      .map(x => (x._1.toInt + 1) -> (x._2.toDouble / 60))
-      .toArray
-      .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
-      .sortBy(x => x._1)
-      .take(28)
-      
+      //.take(28)
+    
+    val durationDow = getDurationDoW(contract)
+    
+    val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
+    
     val pon = client.execute(search(s"pon" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val suyhoutSource = if (pon.totalHits <= 0) {
       client.execute(search(s"adsl" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
@@ -208,11 +288,13 @@ object ProfileService extends AbstractService {
     val suyhout = suyhoutSource.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date") / 1000) -> getValueAsString(x, "passed"))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
+      //.toMap.toArray
 
     val errorRes = client.execute(search(s"inf" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val error = errorRes.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date") / 1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error"), getValueAsString(x, "n_error")))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
+      //.toMap.toArray
     val module = error.filter(x => x._2._2 == "module/cpe error").map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum).toArray
     val disconnet = error.filter(x => x._2._2 == "disconnect/lost IP").map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum).toArray
 
@@ -233,7 +315,7 @@ object ProfileService extends AbstractService {
     } else null
     val internetBillRes = ESUtil.get(client, "bill-internet", "docs", contract)
     val internetBill = if (internetBillRes.exists) getValueAsInt(internetBillRes.source, "SoTienDaThanhToan") else 0
-    InternetResponse(internetInfo, segment, download, upload, duration, suyhout, error, module, disconnet, session, checkList, internetBill)
+    InternetResponse(internetInfo, segment, downup, duration, suyhout, error, module, disconnet, session, checkList, internetBill)
   }
 
   private def getPayTVResponse(contract: String): PayTVResponse = {
@@ -378,4 +460,11 @@ object ProfileService extends AbstractService {
       case _ => "???"
     }
   }
+  
+  private def formatArray(array: Array[(Int, Double)]): Array[(Int, Double)] = {
+    val seq = 1 until (DateTimeUtil.create("2017-09-01", DateTimeUtil.YMD).dayOfMonth().getMaximumValue + 1)
+    val map = array.toMap
+    seq.toArray.map(x => x -> map.getOrElse(x, 0.0))
+  }
+  
 }
