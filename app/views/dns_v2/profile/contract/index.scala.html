@@ -1109,7 +1109,7 @@
                 });
                     </script>
 
-        @if( response.paytv != null){
+        @if( response != null){
             @scripts(response, contract, if(!response.paytv.segments.isEmpty) {response.paytv.segments.toList.sortWith( (x,y) => x._1 > y._1 ).head._1} else null)
         }
     </body>
