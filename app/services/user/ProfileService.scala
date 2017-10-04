@@ -222,7 +222,7 @@ object ProfileService extends AbstractService {
       .filter(x => x.contains("Quad_"))
       .filter(x => x.contains("Download"))
       .map(x => x.substring(5).replace("_Download", "") -> getValueAsString(downupQuadSource, x))
-      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -230,7 +230,7 @@ object ProfileService extends AbstractService {
       .filter(x => x.contains("Quad_"))
       .filter(x => x.contains("Upload"))
       .map(x => x.substring(5).replace("_Upload", "") -> getValueAsString(downupQuadSource, x))
-      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -238,7 +238,7 @@ object ProfileService extends AbstractService {
       .filter(x => x.contains("Size"))
       .filter(x => x.contains("Download"))
       .map(x => x.substring(4).replace("Download", "") -> getValueAsString(downupQuadSource, x))
-      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -246,7 +246,7 @@ object ProfileService extends AbstractService {
       .filter(x => x.contains("Size"))
       .filter(x => x.contains("Upload"))
       .map(x => x.substring(4).replace("Upload", "") -> getValueAsString(downupQuadSource, x))
-      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble * 1024))
+      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -260,7 +260,7 @@ object ProfileService extends AbstractService {
       .map(x => x.substring(8).replace("Duration)", "") -> getValueAsString(durationDailySource, x))
       .map(x => x._1.toInt -> x._2.toDouble)
       .toArray
-      //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
+      .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
       //.take(28)
 
@@ -440,8 +440,6 @@ object ProfileService extends AbstractService {
     } else null
   }
 
-  
-
   def dayOfWeekNumberToLabel = (i: Int) => {
     i match {
       case 0 => "Mon"
@@ -454,14 +452,13 @@ object ProfileService extends AbstractService {
       case _ => "???"
     }
   }
-  
+
   private def formatArray(array: Array[(Int, Double)]): Array[(Int, Double)] = {
     val seq = 1 until (DateTimeUtil.create("2017-09-01", DateTimeUtil.YMD).dayOfMonth().getMaximumValue + 1)
     val map = array.toMap
     seq.toArray.map(x => x -> map.getOrElse(x, 0.0))
   }
-  
-  
+
   def main(args: Array[String]) {
     val time0 = System.currentTimeMillis()
     val response = ProfileService.get("SGB000026")

@@ -316,11 +316,11 @@
                                                 <br />
                                                 <ul class="stats-overview">
                                                     <li>
-                                                        <h1 class="price"><font size=6>@formatNumber((response.internet.downUp.downDaily.map(x => x._2).sum / 28).toLong)</font></h1>
+                                                        <h1 class="price"><font size=6>@formatNumber((response.internet.downUp.downDaily.map(x => x._2).sum * 1024 / 28).toLong)</font></h1>
                                                         <span class="price-tax">Download/day (MB)</span>
                                                     </li>
                                                     <li>
-                                                        <h1 class="price"><font size=6>@formatNumber((response.internet.downUp.upDaily.map(x => x._2).sum / 28).toLong)</font></h1>
+                                                        <h1 class="price"><font size=6>@formatNumber((response.internet.downUp.upDaily.map(x => x._2).sum  * 1024 / 28).toLong)</font></h1>
                                                         <span class="price-tax">Upload/day (MB)</span>
                                                     </li>
                                                 </ul>

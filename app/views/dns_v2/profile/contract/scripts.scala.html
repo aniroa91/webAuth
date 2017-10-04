@@ -821,7 +821,8 @@
                         }
                     }
                 },
-                series: [{
+                series: [
+                {
                     type: 'spline',
                     name: 'Download',
                     data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => x._2))))
@@ -960,7 +961,7 @@
                             color: "#1ABB9C"
                         }
                     }
-                }/*, { // Secondary yAxis
+                }, { // Secondary yAxis
                     title: {
                         text: 'Duration (minutes)',
                         style: {
@@ -974,12 +975,18 @@
                         }
                     },
                     opposite: true
-                }*/],
+                }],
                 tooltip: {
                     shared: true
                 },
 
-                series: [{
+                series: [
+                {
+                    type: 'column',
+                    name: 'Duration',
+                    yAxis: 1,
+                    data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => x._2))))
+                }, {
                     name: 'Upload',
                     type: 'spline',
                     color: "#9B59B6",
