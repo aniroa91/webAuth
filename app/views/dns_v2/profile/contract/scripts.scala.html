@@ -736,7 +736,8 @@
             /* START CHART FOR INTERNET*/
 
             // Build the chart line hourly vector
-
+            hourly = @Html(Json.stringify(Json.toJson(response.internet.duration.hourly.map(x => x._1))));
+            values = @Html(Json.stringify(Json.toJson(response.internet.duration.hourly.map(x => x._2))));
             Highcharts.chart('int-durHourVector', {
                 chart: {
                     type: 'column'
@@ -756,7 +757,7 @@
                     '#1ABB9C'
                 ],
                 xAxis: {
-                    categories: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+                    categories: hourly
 
                 },
                 tooltip: {
@@ -778,13 +779,13 @@
                     marker: {
                         symbol: 'diamond'
                     },
-                    data: [ 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,8,8,9,11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,8,8]
+                    data: values
 
                 }]
             });
 
             // Build the chart line hourly vector
-
+            hourly = @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => "Q" + x._1.toString))));
             Highcharts.chart('int-line-hourVector', {
                 chart: {
                     type: 'column'
@@ -801,10 +802,10 @@
                     }
                 },
                 colors: [
-                    '#1ABB9C'
+                    '#1ABB9C','#9B59B6'
                 ],
                 xAxis: {
-                    categories: ['Q1','Q2','Q3','Q4']
+                    categories: hourly
 
                 },
                 tooltip: {
@@ -822,16 +823,17 @@
                 },
                 series: [{
                     type: 'spline',
-                    name: 'Quarter of day',
-                    marker: {
-                        symbol: 'diamond'
-                    },
-                    data: [12,32.5,21,4]
-
+                    name: 'Download',
+                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => x._2))))
+                },{
+                type: 'spline',
+                        name: 'Upload',
+                        data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upQuad.map(x => x._2))))
                 }]
             });
             // Build the chart line hourly vector
-
+            var valueDown = @Html(Json.stringify(Json.toJson(response.internet.downUp.downDayOfWeek.map(x => x._2).toList.transpose.map(_.sum))));
+            var valueUp = @Html(Json.stringify(Json.toJson(response.internet.downUp.upDayOfWeek.map(x => x._2).toList.transpose.map(_.sum))));
             Highcharts.chart('int-col-dayVector', {
                 chart: {
                     type: 'column'
@@ -848,7 +850,7 @@
                     }
                 },
                 colors: [
-                    '#1ABB9C'
+                    '#1ABB9C','#9B59B6'
                 ],
                 xAxis: {
                     categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
@@ -868,15 +870,17 @@
                 },
                 series: [{
                     type: 'spline',
-                    name: 'Day of week',
-                    marker: {
-                        symbol: 'diamond'
-                    },
-                    data: [ 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 21]
-                }]
+                    name: 'Download',
+                    data: valueDown
+                   },
+                    {
+                        type: 'spline',
+                        name: 'Upload',
+                        data: valueUp
+                    }]
             });
            // Build the chart line hourly vector
-
+            values = @Html(Json.stringify(Json.toJson(response.internet.duration.dayOfWeek)));
             Highcharts.chart('int-pie-durDayVector', {
                 chart: {
                     type: 'column'
@@ -893,7 +897,10 @@
                     }
                 },
                 colors: [
-                    '#1ABB9C'
+                    '#9B59B6',
+                    '#1ABB9C',
+                    '#3498DB',
+                    '#9CC2CB',
                 ],
                 xAxis: {
                     categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
@@ -912,14 +919,15 @@
                         }
                     }
                 },
-                series: [{
+                series: /*[{
                     type: 'spline',
                     name: 'Day of week',
                     marker: {
                         symbol: 'diamond'
                     },
                     data: [ 14.2, 10.3, 6.6, 4.8,8,33, 10.3]
-                }]
+                }]*/
+                getJsonAppVector(values)
             });
             // Build the chart line day of month vector
             Highcharts.chart('int-col-dayofMonth', {
@@ -971,14 +979,7 @@
                     shared: true
                 },
 
-                series: [
-                {
-                    name: 'Duration',
-                    type: 'column',
-                    color: "#80b3ff",
-                    yAxis: 1,
-                    data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => x._2))))
-                }, {
+                series: [{
                     name: 'Upload',
                     type: 'spline',
                     color: "#9B59B6",
