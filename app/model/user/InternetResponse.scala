@@ -29,17 +29,17 @@ case class InternetSegment(
     So_Ngay_Loi_Ha_Tang: String)
 
 case class DownUp(
-    downQuad: Array[(Int, Double)],
-    upQuad: Array[(Int, Double)],
-    downDayOfWeek: Array[(Int, Array[Double])],
-    upDayOfWeek: Array[(Int, Array[Double])],
-    downDaily: Array[(Int, Double)],
-    upDaily: Array[(Int, Double)])
+    downQuad: Array[(String, Double)],
+    upQuad: Array[(String, Double)],
+    downDayOfWeek: Array[(String, Array[Double])],
+    upDayOfWeek: Array[(String, Array[Double])],
+    downDaily: Array[(String, Double)],
+    upDaily: Array[(String, Double)])
 
 case class Duration(
-    hourly: Array[(Int, Double)],
-    dayOfWeek: Array[(Int, Array[Double])],
-    daily: Array[(Int, Double)])
+    hourly: Array[(String, Double)],
+    dayOfWeek: Array[(String, Array[Double])],
+    daily: Array[(String, Double)])
 
 case class InternetResponse(
     contract: InternetContract,

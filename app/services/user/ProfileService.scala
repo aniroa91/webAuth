@@ -122,10 +122,10 @@ object ProfileService extends AbstractService {
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
-  private def getDurationDoW(contract: String): Array[(Int, Array[Double])] = {
+  private def getDurationDoW(contract: String): Array[(String, Array[Double])] = {
      val response = client.execute(search(s"user-duration-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await
      val result= response.hits.hits.map(x => x.sourceAsMap)
-       .map(x => getValueAsInt(x, "wod") -> Array(
+       .map(x => getValueAsString(x, "wod") -> Array(
            getValueAsDouble(x, "Mon"),
            getValueAsDouble(x, "Tue"),
            getValueAsDouble(x, "Wed"),
@@ -136,10 +136,10 @@ object ProfileService extends AbstractService {
      result
   }
   
-  private def getDownloadDoW(contract: String): (Array[(Int, Array[Double])], Array[(Int, Array[Double])]) = {
+  private def getDownloadDoW(contract: String): (Array[(String, Array[Double])], Array[(String, Array[Double])]) = {
      val response = client.execute(search(s"user-downup-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await
      val download= response.hits.hits.map(x => x.sourceAsMap)
-       .map(x => getValueAsInt(x, "wod") -> Array(
+       .map(x => getValueAsString(x, "wod") -> Array(
            getValueAsDouble(x, "Mon_Download"),
            getValueAsDouble(x, "Tue_Download"),
            getValueAsDouble(x, "Wed_Download"),
@@ -148,7 +148,7 @@ object ProfileService extends AbstractService {
            getValueAsDouble(x, "Sat_Download"),
            getValueAsDouble(x, "Sun_Download")))
      val upload= response.hits.hits.map(x => x.sourceAsMap)
-       .map(x => getValueAsInt(x, "wod") -> Array(
+       .map(x => getValueAsString(x, "wod") -> Array(
            getValueAsDouble(x, "Mon_Upload"),
            getValueAsDouble(x, "Tue_Upload"),
            getValueAsDouble(x, "Wed_Upload"),
@@ -222,7 +222,7 @@ object ProfileService extends AbstractService {
       .filter(x => x.contains("Quad_"))
       .filter(x => x.contains("Download"))
       .map(x => x.substring(5).replace("_Download", "") -> getValueAsString(downupQuadSource, x))
-      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
+      .map(x => x._1.toInt.toString -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -230,7 +230,7 @@ object ProfileService extends AbstractService {
       .filter(x => x.contains("Quad_"))
       .filter(x => x.contains("Upload"))
       .map(x => x.substring(5).replace("_Upload", "") -> getValueAsString(downupQuadSource, x))
-      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
+      .map(x => x._1.toInt.toString -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -238,7 +238,7 @@ object ProfileService extends AbstractService {
       .filter(x => x.contains("Size"))
       .filter(x => x.contains("Download"))
       .map(x => x.substring(4).replace("Download", "") -> getValueAsString(downupQuadSource, x))
-      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
+      .map(x => x._1.toInt.toString -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -246,7 +246,7 @@ object ProfileService extends AbstractService {
       .filter(x => x.contains("Size"))
       .filter(x => x.contains("Upload"))
       .map(x => x.substring(4).replace("Upload", "") -> getValueAsString(downupQuadSource, x))
-      .map(x => x._1.toInt -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
+      .map(x => x._1.toInt.toString -> (if (x._2.toDouble < 0) 0 else x._2.toDouble))
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -258,7 +258,7 @@ object ProfileService extends AbstractService {
     val durationDaily = durationDailySource.keySet
       .filter(x => x.contains("sum(Size"))
       .map(x => x.substring(8).replace("Duration)", "") -> getValueAsString(durationDailySource, x))
-      .map(x => x._1.toInt -> x._2.toDouble)
+      .map(x => x._1.toInt.toString -> x._2.toDouble)
       .toArray
       .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -269,7 +269,7 @@ object ProfileService extends AbstractService {
     val durationHourly = durationHourlySource.keySet
       .filter(x => !x.contains("Contract") && !x.contains("Name") && !x.contains("Date"))
       .map(x => x -> getValueAsDouble(durationDailySource, x))
-      .map(x => x._1.toInt -> x._2.toDouble)
+      .map(x => x._1.toInt.toString -> x._2.toDouble)
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
@@ -288,14 +288,23 @@ object ProfileService extends AbstractService {
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
       .sortBy(x => x._1)
       //.toMap.toArray
-
+      println(client.show(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000))
     val errorRes = client.execute(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
-    val error = errorRes.hits.hits.map(x => x.sourceAsMap)
+    val error = errorRes.hits.hits.map(x => {
+        //println(x.sourceAsMap)
+        x.sourceAsMap
+      })
       .map(x => (getValueAsLong(x, "date") / 1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error"), getValueAsString(x, "n_error")))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
       //.toMap.toArray
-    val module = error.filter(x => x._2._2 == "module/cpe error").map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum).toArray
-    val disconnet = error.filter(x => x._2._2 == "disconnect/lost IP").map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum).toArray
+    val module = error.filter(x => x._2._2 == "module/cpe error")
+      .map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum)
+      .toArray
+      .sortBy(x => x._1)
+    val disconnet = error.filter(x => x._2._2 == "disconnect/lost IP")
+      .map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum)
+      .toArray
+      .sortBy(x => x._1)
 
     val sessionRes = ESUtil.get(client, "session", "docs", contract)
     val session: Session = if (sessionRes.exists) {
@@ -453,17 +462,20 @@ object ProfileService extends AbstractService {
     }
   }
 
-  private def formatArray(array: Array[(Int, Double)]): Array[(Int, Double)] = {
+  private def formatArray(array: Array[(String, Double)]): Array[(String, Double)] = {
     val seq = 1 until (DateTimeUtil.create("2017-09-01", DateTimeUtil.YMD).dayOfMonth().getMaximumValue + 1)
     val map = array.toMap
-    seq.toArray.map(x => x -> map.getOrElse(x, 0.0))
+    seq.toArray.map(x => x.toString -> map.getOrElse(x.toString, 0.0))
   }
 
   def main(args: Array[String]) {
     val time0 = System.currentTimeMillis()
-    val response = ProfileService.get("SGB000026")
-    val a = response.paytv.vectors.get("316292").get
-    a.app.foreach(println)
+    val response = ProfileService.get("SGD150673")
+    //val a = response.paytv.vectors.get("316292").get
+//    a.app.foreach(println)
+//    response.internet.errorDisconnect.foreach(println)
+//    response.internet.errorModule.foreach(println)
+    response.internet.errorDisconnect.foreach(println)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
