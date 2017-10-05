@@ -114,12 +114,12 @@ object ProfileService extends AbstractService {
   //        sumAgg("sum", "value")) size SIZE_DEFAULT)
   //  }
 
-  private def getDaily(month: Int, boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId), termQuery("month", month)) } aggregations (
+  private def getDaily(boxId: String): SearchDefinition = {
+    search(s"paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("day")
       .subaggs(
-        sumAgg("sum", "value")) size SIZE_DEFAULT)
+        sumAgg("sum", "value")) size SIZE_DEFAULT) size SIZE_DEFAULT
   }
 
   private def getDurationDoW(contract: String): Array[(String, Array[Double])] = {
@@ -379,7 +379,7 @@ object ProfileService extends AbstractService {
         val appHourly = getAppHourly(x)
         //println(client.show(appHourly))
         val appDaily = getAppDayOfWeek(x)
-        val daily = getDaily(8, x)
+        val daily = getDaily(x)
         val multiSearchResponse = client.execute(multi(hourly, app, dayOfWeek, iptv, appHourly, appDaily, daily, hourlyInMonth)).await
 
         //multiSearchResponse.responses(4).aggregations.foreach(println)
@@ -393,6 +393,7 @@ object ProfileService extends AbstractService {
         val iptvBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(3), "top", "sum")
         val appHourlyBucket = ElasticUtil.getBucketTerm2(multiSearchResponse.responses(4), "top", "sum")
         val appDailyBucket = ElasticUtil.getBucketTerm2(multiSearchResponse.responses(5), "top", "sum")
+        //multiSearchResponse.responses(6).aggregations.foreach(println)
         val dailyBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(6), "top", "sum").sortBy(x => x.key.toInt)
         val hourlyInMonthBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(7), "top", "sum")
 
@@ -443,7 +444,7 @@ object ProfileService extends AbstractService {
           group(appHourlyBucket, "VOD"),
           group2(appDailyBucket, "IPTV"),
           group2(appDailyBucket, "VOD"),
-          vod, vodthieu, vodgiaitri, dailyBucket)
+          vod, vodthieu, vodgiaitri, formatArray(dailyBucket.map(x => x.key -> x.value)))
       }).toMap
 
       val payTVBillRes = ESUtil.get(client, "user-bill-paytv-2017-09", "docs", contract)

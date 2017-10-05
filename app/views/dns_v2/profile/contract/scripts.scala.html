@@ -55,12 +55,12 @@
                     },
                     yAxis: [{ // Primary yAxis
                         title: {
-                            text: 'Values',
+                            text: 'Duration (seconds)',
                             style: {
                                 color: "#1ABB9C"
                             }
                         }
-                      }, { // Secondary yAxis
+                      }/*, { // Secondary yAxis
                         title: {
                             text: 'Values',
                             style: {
@@ -68,7 +68,7 @@
                             }
                         },
                         opposite: true
-                     }],
+                     }*/],
                     tooltip: {
                         crosshairs: true,
                         shared: true
@@ -86,12 +86,12 @@
                         type: 'spline',
                         name: 'Hourly',
                         data: values
-                    },{
+                    }/*,{
                         type: 'spline',
                         name: 'Hourly in month',
                         data: hourInMonth,
                         yAxis:1
-                    }]
+                    }*/]
                 });
                   // Build the chart pie app vector
                   var appVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.app.map(x => x.key -> x.value))));
@@ -341,8 +341,8 @@
 
 
                   // Build the chart line day of month vector
-                  daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x.key))));
-                  values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x.value))));
+                  daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x._1))));
+                  values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x._2))));
                   Highcharts.chart('col-dayofMonth', {
                       chart: {
                           type: 'column'
@@ -455,12 +455,12 @@
                 },
                 yAxis: [{ // Primary yAxis
                     title: {
-                        text: 'Values',
+                        text: 'Duration (seconds)',
                         style: {
                             color: "#1ABB9C"
                         }
                     }
-                }, { // Secondary yAxis
+                }/*, { // Secondary yAxis
                     title: {
                         text: 'Values',
                         style: {
@@ -468,7 +468,7 @@
                         }
                     },
                     opposite: true
-                }],
+                }*/],
                 tooltip: {
                     crosshairs: true,
                     shared: true
@@ -486,12 +486,12 @@
                     type: 'spline',
                     name: 'Hourly',
                     data: values
-                },{
+                }/*,{
                     type: 'spline',
                     name: 'Hourly in month',
                     data: hourInmonth,
                     yAxis: 1
-                }]
+                }*/]
             });
 
             // Build the chart line app-daily vector
@@ -688,8 +688,8 @@
             });
 
             // Build the chart line day of month vector
-            daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x.key))));
-            values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x.value))));
+            daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x._1))));
+            values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x._2))));
             Highcharts.chart('col-dayofMonth', {
                 chart: {
                     type: 'spline'

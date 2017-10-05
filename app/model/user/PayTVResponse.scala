@@ -33,7 +33,7 @@ case class PayTVVector(
      vod: Array[Bucket],
      vodthieunhi: Array[Bucket],
      vodgiaitri: Array[Bucket],
-     daily: Array[BucketDouble])
+     daily: Array[(String, Double)])
 
 
 case class PayTVResponse (
