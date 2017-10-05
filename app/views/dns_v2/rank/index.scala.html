@@ -115,7 +115,6 @@
                 }
                 .topRankingInner {
                     padding: 0 20px;
-                    max-width: 1550px;
                     margin: 0 auto;
                 }
                 .select2-container{
@@ -182,9 +181,9 @@
                                 <ul class="nav side-menu">
                                     <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard </a>
                                     </li>
-                                    <li><a href="/search"><i class="fa fa-search"></i> Search </a>
+                                    <li><a><i class="fa fa-search"></i> Search </a>
                                         <ul class="nav child_menu">
-                                            <li><a href="#">Profile</a></li>
+                                            <li><a href="/search">Profile</a></li>
                                             <li><a href="#">Sub domain</a></li>
                                             <li><a href="#">Compare</a></li>
                                         </ul>
@@ -238,19 +237,19 @@
                                     </h2>
                                 </div>
                             </div>
-                            <div class="topRankingInner">
+                            <div class="topRankingInner" style="margin-top: 10px">
                                 <select class="topRank" class="form-control">
                                     <option value="al">All</option>
                                     <option value="bla">Black</option>
                                     <option value="wht">White</option>
                                     <option value="unk">Unknown</option>
                                 </select>
-                                <select class="topRank" class="form-control">
+                                <select class="topRank" class="form-control" disabled>
                                     <option value="AL">Worldwide</option>
                                     <option value="AL">Viet Nam</option>
                                     <option value="AL">USA</option>
                                 </select>
-                                <button type="button" class="btn btn-warning btn-go">Go</button>
+                                <button type="button" class="btn btn-warning btn-go" disabled>Go</button>
                             </div>
                         </div>
 
@@ -259,15 +258,7 @@
                     <div class="row">
                         <div class="x_panel">
                             <table id="datatable" class="table table-striped table-bordered">
-                                <thead>
-                                    <tr><th>Rank</th><th>Logo</th><th>Domain</th><th>Num of queries</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>1</td><td>Facebook</td><td>facebook.com</td><td>122</td></tr>
-                                    <tr><td>1</td><td>Facebook</td><td>facebook.com</td><td>122</td></tr>
-                                    <tr><td>1</td><td>Facebook</td><td>facebook.com</td><td>122</td></tr>
-                                    <tr><td>1</td><td>Facebook</td><td>facebook.com</td><td>122</td></tr>
-                                </tbody>
+                                @topRanktable(response)
                             </table>
                         </div>
                     </div>
@@ -343,7 +334,9 @@
 
         <script type="text/javascript">
                 $(document).ready(function () {
-                    $('.topRank').select2();
+                    $('.topRank').select2({
+                        minimumResultsForSearch: Infinity
+                    });
                     $('.ui.selection.dropdown').dropdown();
                 });
         </script>
