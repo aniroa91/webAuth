@@ -18,8 +18,6 @@ import services.CacheService
 import services.domain.CommonService
 import slick.jdbc.JdbcProfile
 
-case class SearchData(q: String)
-
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -30,8 +28,8 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
 
   val form = Form(
     mapping(
-      "q" -> text
-    )(SearchData.apply)(SearchData.unapply)
+      "ct" -> text
+    )(SearchContract.apply)(SearchContract.unapply)
   )
 
   def index = Action { implicit request: Request[AnyContent] =>
@@ -41,10 +39,9 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
       val second = DomainUtil.extract(domain).second
       val logo = CommonService.getLogo(second, false)
       val response = CacheService.getDomain(second)
-      Ok(views.html.dns.profile.domain.index(form, second, response._1, logo))
+      Ok(views.html.dns_v2.search.index(form, second, response._1, logo))
     } else {
-      Ok(views.html.dns.profile.domain.index(form, null, null, null))
-    }
+      Ok(views.html.dns_v2.search.index(form, null, null, null))    }
   }
 }
 
