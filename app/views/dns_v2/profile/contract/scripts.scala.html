@@ -897,7 +897,7 @@
                     }]
             });
            // Build the chart line hourly vector
-            values = @Html(Json.stringify(Json.toJson(response.internet.duration.dayOfWeek)));
+            values = @Html(Json.stringify(Json.toJson(response.internet.duration.dayOfWeek.map(x => x._2).toList.transpose.map(_.sum))));
             Highcharts.chart('int-pie-durDayVector', {
                 chart: {
                     type: 'column'
@@ -942,15 +942,15 @@
                         }
                     }
                 },
-                series: /*[{
+                series: [{
                     type: 'spline',
-                    name: 'Day of week',
+                    name: 'Duration',
                     marker: {
                         symbol: 'diamond'
                     },
-                    data: [ 14.2, 10.3, 6.6, 4.8,8,33, 10.3]
-                }]*/
-                getJsonAppVector(values)
+                    data: values
+                }]
+                //getJsonAppVector(values)
             });
             // Build the chart line day of month vector
             Highcharts.chart('int-col-dayofMonth', {
