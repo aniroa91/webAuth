@@ -84,8 +84,8 @@ object LocalService extends AbstractService {
     //val topLast30Day = CommonService.getTopByNumOfQueryWithRange(last30Days, day)
     //println(topLast30Day.sortBy(x => x.queries).reverse.head)
     //val profile = ProfileService.get("google.com")
-    val map = redis.hgetall1("google.com")
-    println(map)
+    //val map = redis.hgetall1("google.com")
+    //println(map)
     client.close()
     
   }

@@ -61,19 +61,20 @@ object CommonService extends AbstractService {
   }
 
   def getWhoisInfo(domain: String): Whois = {
-    val map = redis.hgetall1(domain).getOrElse(Map[String, String]())
-    if (!map.isEmpty) {
-      Whois(
-          domain,
-          getValueAsString(map, "registrar"),
-          getValueAsString(map, "whoisServer"),
-          getValueAsString(map, "referral"),
-          getValueAsString(map, "nameServer").split(","),
-          getValueAsString(map, "status"),
-          getValueAsString(map, "create"),
-          getValueAsString(map, "update"),
-          getValueAsString(map, "expire"))
-    } else new Whois()
+    new Whois()
+//    val map = redis.hgetall1(domain).getOrElse(Map[String, String]())
+//    if (!map.isEmpty) {
+//      Whois(
+//          domain,
+//          getValueAsString(map, "registrar"),
+//          getValueAsString(map, "whoisServer"),
+//          getValueAsString(map, "referral"),
+//          getValueAsString(map, "nameServer").split(","),
+//          getValueAsString(map, "status"),
+//          getValueAsString(map, "create"),
+//          getValueAsString(map, "update"),
+//          getValueAsString(map, "expire"))
+//    } else new Whois()
 //    
 //    if (whoisResponse != null) {
 //      println("Whois: " + whoisResponse + "-" + whoisResponse.totalHits)

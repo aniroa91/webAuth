@@ -22,6 +22,6 @@ object Configure {
   val LOGO_DEFAULT = "../assets/images/logo/domain.png"
   
   val client = HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
-  val redis = new RedisClient("172.27.11.141", 6375)
+  //val redis = new RedisClient("172.27.11.141", 6375)
   
 }
