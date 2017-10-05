@@ -266,13 +266,17 @@ object ProfileService extends AbstractService {
 
     val durationHourlyRes = ESUtil.get(client, "user-duration-hourly-2017-09", "docs", contract)
     val durationHourlySource = durationHourlyRes.source
+    //println(durationHourlySource)
     val durationHourly = durationHourlySource.keySet
       .filter(x => !x.contains("Contract") && !x.contains("Name") && !x.contains("Date"))
-      .map(x => x -> getValueAsDouble(durationDailySource, x))
+      .map(x => {
+        //println(x -> getValueAsString(durationHourlySource, x))
+        x -> getValueAsDouble(durationHourlySource, x)
+        })
       .map(x => x._1.toInt.toString -> x._2.toDouble)
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
-      .sortBy(x => x._1)
+      .sortBy(x => x._1.toInt)
       //.take(28)
     
     val durationDow = getDurationDoW(contract)
@@ -288,7 +292,7 @@ object ProfileService extends AbstractService {
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
       .sortBy(x => x._1)
       //.toMap.toArray
-      println(client.show(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000))
+    //println(client.show(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000))
     val errorRes = client.execute(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val error = errorRes.hits.hits.map(x => {
         //println(x.sourceAsMap)
@@ -476,14 +480,15 @@ object ProfileService extends AbstractService {
 
   def main(args: Array[String]) {
     val time0 = System.currentTimeMillis()
-    val response = ProfileService.get("SGD150673")
+    val response = ProfileService.get("HNH391822")
     //val a = response.paytv.vectors.get("316292").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
 //    response.internet.errorModule.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
 //    response.internet.errorModule.map(x => x._1).foreach(println)
-    println(response.internet.errorDisconnect.size -> response.internet.errorModule.size) 
+    //println(response.internet.errorDisconnect.size -> response.internet.errorModule.size)
+    response.internet.duration.hourly.foreach(println)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()

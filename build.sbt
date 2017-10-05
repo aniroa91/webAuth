@@ -17,7 +17,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "3.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0",
   "org.scalaj" % "scalaj-http_2.11" % "2.3.0",
-  "org.jsoup" % "jsoup" % "1.8.3"
+  "org.jsoup" % "jsoup" % "1.8.3",
+  "net.debasishg" %% "redisclient" % "3.4" exclude("io.netty", "netty")
   )
 libraryDependencies += "com.h2database" % "h2" % "1.4.194"
 

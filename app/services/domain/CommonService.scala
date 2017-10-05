@@ -60,10 +60,54 @@ object CommonService extends AbstractService {
     Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
   }
 
+  def getWhoisInfo(domain: String): Whois = {
+    val map = redis.hgetall1(domain).getOrElse(Map[String, String]())
+    if (!map.isEmpty) {
+      Whois(
+          domain,
+          getValueAsString(map, "registrar"),
+          getValueAsString(map, "whoisServer"),
+          getValueAsString(map, "referral"),
+          getValueAsString(map, "nameServer").split(","),
+          getValueAsString(map, "status"),
+          getValueAsString(map, "create"),
+          getValueAsString(map, "update"),
+          getValueAsString(map, "expire"))
+    } else new Whois()
+//    
+//    if (whoisResponse != null) {
+//      println("Whois: " + whoisResponse + "-" + whoisResponse.totalHits)
+//    if (whoisResponse.totalHits > 0) {
+//      val map = whoisResponse.hits.hits.head.sourceAsMap
+//      val whois = Whois(
+//        map.getOrElse("domain", "").toString(),
+//        map.getOrElse("registrar", "").toString(),
+//        map.getOrElse("whoisServer", "").toString(),
+//        map.getOrElse("referral", "").toString(),
+//        map.getOrElse("servername", "").toString().split(" "),
+//        map.getOrElse("status", "").toString(),
+//        map.getOrElse("create", "").toString(),
+//        map.getOrElse("update", "").toString(),
+//        map.getOrElse("expire", "").toString())//,
+//        //map.getOrElse("label", "").toString(),
+//        //map.getOrElse("malware", "").toString())
+//      whois
+//    } else {
+//      CommonService.backgroupJob(
+//          getWhoisFromWeb(domain, label, malware),
+//          "Download Whois for " + domain)
+//      //getWhoisFromWeb(domain, label, malware)
+//      new Whois()
+//    } } else  new Whois()
+  }
+  
   /**
    * Get Whois From Web
    */
+  @deprecated
   def getWhoisInfo(whoisResponse: SearchResponse, domain: String, label: String, malware: String): Whois = {
+    if (whoisResponse != null) {
+      println("Whois: " + whoisResponse + "-" + whoisResponse.totalHits)
     if (whoisResponse.totalHits > 0) {
       val map = whoisResponse.hits.hits.head.sourceAsMap
       val whois = Whois(
@@ -85,8 +129,9 @@ object CommonService extends AbstractService {
           "Download Whois for " + domain)
       //getWhoisFromWeb(domain, label, malware)
       new Whois()
-    }
+    } } else  new Whois()
   }
+  
   private def getWhoisFromWeb(domain: String, label: String, malware: String): Whois = {
     val esIndex = s"dns-service-domain-whois"
     val esType = "whois"

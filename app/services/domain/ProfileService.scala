@@ -34,10 +34,10 @@ object ProfileService extends AbstractService {
     val multiSearchResponse = client.execute(
       multi(
         search(s"dns-second-*" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } limit SIZE_DAY,
-//        search("dns-service-domain-*" / "answer") query { must(termQuery(SECOND_FIELD, domain)) } limit 1000,
+        //search("dns-service-domain-*" / "answer") query { must(termQuery(SECOND_FIELD, domain)) } limit 1000,
         search(s"dns-domain-${latestDay}" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort("queries") order SortOrder.DESC } limit 100,
-          //aggregations (cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
-        search(("dns-service-domain-whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) },
+        //aggregations (cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
+        //search(("dns-service-domain-whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) },
         search(s"dns-hourly-second-${latestDay}" / "docs") query {boolQuery().must(termQuery("name", domain))} size 24
         )).await
 
@@ -45,12 +45,12 @@ object ProfileService extends AbstractService {
     val secondResponse = multiSearchResponse.responses(0)
     //val answerResponse = multiSearchResponse.responses(1)
     val domainResponse = multiSearchResponse.responses(1)
-    val whoisResponse = multiSearchResponse.responses(2)
-    val hourlyResponse = multiSearchResponse.responses(3)
+    //val whoisResponse = multiSearchResponse.responses(2)
+    val hourlyResponse = multiSearchResponse.responses(2)
 
     println(secondResponse.took)
     println(domainResponse.took)
-    println(whoisResponse.took)
+//    println(whoisResponse.took)
     println(hourlyResponse.took)
     
     
@@ -61,7 +61,8 @@ object ProfileService extends AbstractService {
       val history = getMainDomainInfo(secondResponse)
       val current = new MainDomainInfo(history.head, numOfDomain)
       val time3 = System.currentTimeMillis()
-      val whois = CommonService.getWhoisInfo(whoisResponse, domain, current.label, current.malware)
+//      val whois = CommonService.getWhoisInfo(whoisResponse, domain, current.label, current.malware)
+      val whois = CommonService.getWhoisInfo(domain)
       val time4 = System.currentTimeMillis()
       val answers = null//answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
       val time5 = System.currentTimeMillis()

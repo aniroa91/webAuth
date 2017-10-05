@@ -80,103 +80,14 @@ object LocalService extends AbstractService {
   
   def main(args: Array[String]) {
     val day = CommonService.getLatestDay()
-    val last30Days = CommonService.getPreviousDay(day, 30)
-    val topLast30Day = CommonService.getTopByNumOfQueryWithRange(last30Days, day)
-    println(topLast30Day.sortBy(x => x.queries).reverse.head)
-    
+    //val last30Days = CommonService.getPreviousDay(day, 30)
+    //val topLast30Day = CommonService.getTopByNumOfQueryWithRange(last30Days, day)
+    //println(topLast30Day.sortBy(x => x.queries).reverse.head)
+    //val profile = ProfileService.get("google.com")
+    val map = redis.hgetall1("google.com")
+    println(map)
     client.close()
-    //DashboardService.getDiffSecond()
-//    val req = Http("https://dms.inet.vn/api/public/whois/v1/whois/directly")
-//                .proxy(Configure.PROXY_HOST, Configure.PROXY_PORT)
-//                .postForm(Seq("domainName" -> "tvplay.vn"))
-//    
-//    val res = req.asString.body
-//    //implicit val tjs: play.api.libs.json.Writes[scala.collection.immutable.Map[String,Any]] = Json.writes[scala.collection.immutable.Map[String,Any]]
-//    //implicit val bubbleWrites = Json.writes[Bubble]
-////    val res = Json.toJson(Seq(Map("x" -> 1, "y" -> 2, "z" -> "z")))
-//    //val res = Json.toJson(Array(Bubble(1, 1, 1, "")))
-//    println(res)
-//    
-//    client.close()
     
-//    ClientService.historyBlack("210.245.24.101", 0, 10)
-    //println(CommonService.getCategoryFromApiXforceIbmcloud("vnexpress.net"))
-//    println(CommonService.getCategorySitereviewBluecoatCom("facebook.net"))
-   // val a = Configure.client.execute(search(s"dns-hourly-client-2017-08-28" / "docs") query {boolQuery().must(termQuery("name", "210.245.24.101"))})
-    //val res = a.await
-    
-    //println(res.totalHits)
-   //val info = ClientService.get("210.245.24.101", CommonService.getLatestDay())
-   
-   
-    
-//    val proxy = new HttpHost("172.30.45.220",80);
-//    val req = Http("http://sitereview.bluecoat.com/rest/categorization")
-//                .proxy("172.30.45.220", 80)
-//                .postForm(Seq("url" -> "google.com"))
-//    println(req.url)
-//    val res = req.asString.body
-//    println(res)
-    
-    //println(CommonService.getCategorySitereviewBluecoatCom("google.com"))
-//    postTest()
-//    println("Finish")
-    //val res = DashboardService.get("2017-08-17")
-    
-    //res.daily.foreach(x => println(x._1 -> (x._2.queries + "|" + x._2.domains + "|" + x._2.clients)))
-    //println(res)
-//    val res = ClientService.get("210.245.24.101", "2017-08-27")
-    //res._1.unknow.foreach(println)
-//    val category = CommonService.getCategorySitereview_Bluecoat_Com("google.com")
-    //println(category)
-    //client.close()
-//    
-//    val res = CommonService.getTopByNumOfQueryWithRange("2017-08-10", "2017-08-16")
-//    
-//    //res.map(x => x.name -> x.queries).foreach(println)
-//    //println(res)
-//    //    searchProfile()
-//    //    val clientIP = "103.27.237.102"
-//    //    val response = ClientService.get(clientIP)
-//    //    //response.history.foreach(x => {
-//    //        println(response.history._1)
-//    //        response.history._2.foreach(y => {
-//    //          println(y.hour)
-//    //          y.rows.foreach(x => println(x.domain -> x.queries -> x.rCode))
-//    //        })
-//    //     // })
-//    //    client.close()
-//    //    val json = client.show {
-//    //      search(s"dns-statslog-*" / "docs") query {
-//    //        boolQuery()
-//    //          .must(termQuery("client", ""), termQuery("rCode", "0"))
-//    //          .not(termQuery("tld", "null"))
-//    //      } aggregations {
-//    //        cardinalityAgg(NUM_DOMAIN_FIELD, "domain")
-//    //      } sortBy (
-//    //        fieldSort(DAY_FIELD) order SortOrder.DESC,
-//    //        fieldSort("hour") order SortOrder.DESC) limit 1000
-//    //    }
-//
-////    val json = client.show {
-////      search(s"dns-statslog-*" / "docs") query {
-////        boolQuery().must(termQuery("client", ""))
-////      } aggregations {
-////        cardinalityAgg(NUM_DOMAIN_FIELD, "domain")
-////      } postFilter {
-////          boolQuery().must(termQuery("rCode", "0")).not(termQuery("tld", "null"))
-////      } sortBy (
-////            fieldSort(DAY_FIELD) order SortOrder.DESC,
-////            fieldSort("hour") order SortOrder.DESC
-////      ) limit 1000
-////    }
-////
-////    println(json)
-//    //clientProfile()
-//    
-//    //val clientIP = "118.70.132.21"
-//    //val response = ClientService.get(clientIP, "2017-08-16")
-//    client.close()
   }
 
   private def clientProfile() {
