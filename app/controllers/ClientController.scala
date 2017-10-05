@@ -18,6 +18,8 @@ import services.domain.CommonService
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
  */
+case class SearchData(q: String)
+
 @Singleton
 class ClientController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with I18nSupport {
 
