@@ -14,6 +14,7 @@
         <tr>
             <td>@formatNumber(row.rankFtel)</td>
             <td>@Html.apply(getImageTag(row.name)) @Html.apply(getLinkTag(row.name))</td>
+
             <td>@formatNumber(row.queries)</td>
             <td>@formatNumber(row.clients)</td>
             <td>@formatNumber(row.getQueryPerClient())</td>
@@ -28,6 +29,7 @@
                 }
 
             </td>
+
             <td>@row.malware</td>
         </tr>
     }
