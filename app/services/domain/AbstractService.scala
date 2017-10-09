@@ -10,6 +10,7 @@ import services.Configure
 import model.ClientInfo
 import com.ftel.bigdata.utils.StringUtil
 import model.Label
+import com.redis.RedisClient
 
 abstract class AbstractService {
 
@@ -37,8 +38,11 @@ abstract class AbstractService {
   val SIZE_DAY = 30
   val MAX_SIZE_RETURN = 100
 
+  
   val client = Configure.client // HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
-  //val redis = Configure.redis // HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
+  
+  val redis: RedisClient = Configure.redis // HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
+  
    /*******************************
     * 
     * REFACTOR

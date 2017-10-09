@@ -61,45 +61,23 @@ object CommonService extends AbstractService {
   }
 
   def getWhoisInfo(domain: String): Whois = {
-    new Whois()
-//    val map = redis.hgetall1(domain).getOrElse(Map[String, String]())
-//    if (!map.isEmpty) {
-//      Whois(
-//          domain,
-//          getValueAsString(map, "registrar"),
-//          getValueAsString(map, "whoisServer"),
-//          getValueAsString(map, "referral"),
-//          getValueAsString(map, "nameServer").split(","),
-//          getValueAsString(map, "status"),
-//          getValueAsString(map, "create"),
-//          getValueAsString(map, "update"),
-//          getValueAsString(map, "expire"))
-//    } else new Whois()
-//    
-//    if (whoisResponse != null) {
-//      println("Whois: " + whoisResponse + "-" + whoisResponse.totalHits)
-//    if (whoisResponse.totalHits > 0) {
-//      val map = whoisResponse.hits.hits.head.sourceAsMap
-//      val whois = Whois(
-//        map.getOrElse("domain", "").toString(),
-//        map.getOrElse("registrar", "").toString(),
-//        map.getOrElse("whoisServer", "").toString(),
-//        map.getOrElse("referral", "").toString(),
-//        map.getOrElse("servername", "").toString().split(" "),
-//        map.getOrElse("status", "").toString(),
-//        map.getOrElse("create", "").toString(),
-//        map.getOrElse("update", "").toString(),
-//        map.getOrElse("expire", "").toString())//,
-//        //map.getOrElse("label", "").toString(),
-//        //map.getOrElse("malware", "").toString())
-//      whois
-//    } else {
-//      CommonService.backgroupJob(
-//          getWhoisFromWeb(domain, label, malware),
-//          "Download Whois for " + domain)
-//      //getWhoisFromWeb(domain, label, malware)
-//      new Whois()
-//    } } else  new Whois()
+    //new Whois()
+    if (redis == null) new Whois()
+    else {
+      val map = redis.hgetall1(domain).getOrElse(Map[String, String]())
+      if (!map.isEmpty) {
+        Whois(
+          domain,
+          getValueAsString(map, "registrar"),
+          getValueAsString(map, "whoisServer"),
+          getValueAsString(map, "referral"),
+          getValueAsString(map, "nameServer").split(","),
+          getValueAsString(map, "status"),
+          getValueAsString(map, "create"),
+          getValueAsString(map, "update"),
+          getValueAsString(map, "expire"))
+      } else new Whois()
+    }
   }
   
   /**
@@ -330,6 +308,11 @@ object CommonService extends AbstractService {
   
   def percentInfor(number: Long, total: Long): Double = {
     val value = number/ (total * 1.0) * 100.0
+    BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+
+  def formatNumHour(number: Double):Double = {
+    val value = number/ 3600 * 1.00
     BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 

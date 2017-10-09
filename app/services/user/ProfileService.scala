@@ -28,6 +28,7 @@ import model.user.Session
 import model.user.DownUp
 import model.user.Duration
 import org.joda.time.DateTime
+import model.user.Device
 
 object ProfileService extends AbstractService {
   //val client = Configure.client
@@ -89,30 +90,46 @@ object ProfileService extends AbstractService {
           sumAgg("sum", "value")) size SIZE_DEFAULT) size SIZE_DEFAULT) limit (SIZE_DEFAULT * 10)
 
   }
-
-  //  private def getVOD(to: String, boxId: String): SearchDefinition = {
-  //    search(s"vod_cate" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
-  //      termsAggregation("top")
-  //      .field("cate")
-  //      .subaggs(
-  //        sumAgg("sum", "value")) size SIZE_DEFAULT)
-  //  }
-  //  
-  //  private def getVODthieunhi(to: String, boxId: String): SearchDefinition = {
-  //    search(s"vod_thieu" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
-  //      termsAggregation("top")
-  //      .field("cate")
-  //      .subaggs(
-  //        sumAgg("sum", "value")) size SIZE_DEFAULT)
-  //  }
-  //  
-  //  private def getVODgiaitri(to: String, boxId: String): SearchDefinition = {
-  //    search(s"vod_giaitri" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
-  //      termsAggregation("top")
-  //      .field("cate")
-  //      .subaggs(
-  //        sumAgg("sum", "value")) size SIZE_DEFAULT)
-  //  }
+  
+  private def getVod(boxId: String): SearchDefinition = {
+    search(s"user-paytv-vod-2017-09-*" / "docs") query { must(termQuery("customer_id", boxId)) }
+  }
+  
+  private def getVodGiaitri(boxId: String): SearchDefinition = {
+    search(s"user-paytv-vod-giaitri-2017-09-*" / "docs") query { must(termQuery("customer_id", boxId)) }
+  }
+  
+  private def getVodThieuNhi(boxId: String): SearchDefinition = {
+    search(s"user-paytv-vod-thieunhi-2017-09-*" / "docs") query { must(termQuery("customer_id", boxId)) }
+  }
+  
+  private def getDevice(mac: String): SearchDefinition = {
+    search(s"user-device-*" / "docs") query { must(termQuery("mac", mac)) }
+  }
+//
+//    private def getVOD(to: String, boxId: String): SearchDefinition = {
+//      search(s"vod_cate" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+//        termsAggregation("top")
+//        .field("cate")
+//        .subaggs(
+//          sumAgg("sum", "value")) size SIZE_DEFAULT)
+//    }
+//    
+//    private def getVODthieunhi(to: String, boxId: String): SearchDefinition = {
+//      search(s"vod_thieu" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+//        termsAggregation("top")
+//        .field("cate")
+//        .subaggs(
+//          sumAgg("sum", "value")) size SIZE_DEFAULT)
+//    }
+//    
+//    private def getVODgiaitri(to: String, boxId: String): SearchDefinition = {
+//      search(s"vod_giaitri" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+//        termsAggregation("top")
+//        .field("cate")
+//        .subaggs(
+//          sumAgg("sum", "value")) size SIZE_DEFAULT)
+//    }
 
   private def getDaily(boxId: String): SearchDefinition = {
     search(s"paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
@@ -325,9 +342,23 @@ object ProfileService extends AbstractService {
       val map = checkListRes.source
       getValueAsString(map, "Nhom_CheckList") -> getValueAsInt(map, "So_checklist")
     } else null
-    val internetBillRes = ESUtil.get(client, "bill-internet", "docs", contract)
-    val internetBill = if (internetBillRes.exists) getValueAsInt(internetBillRes.source, "SoTienDaThanhToan") else 0
-    InternetResponse(internetInfo, segment, downup, duration, suyhout, error, formatArray2(module), formatArray2(disconnet), session, checkList, internetBill)
+    
+    val billRes = ESUtil.get(client, "user-bill-internet-2017-09", "docs", contract)
+    val bill = if (billRes.exists) getValueAsDouble(billRes.source, "SoTienDaThanhToan") else 0
+    
+    val mac = internetInfo.macAddress.replace(":", "")
+    val deviceRes = client.execute(getDevice(mac)).await
+    
+    val numberOfDevice = deviceRes.totalHits
+    val venders = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "vendor")).groupBy(x => x).mapValues(x => x.length).toArray
+    val deviceTypes = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "name")).groupBy(x => x).mapValues(x => x.length).toArray
+    
+    val numberOfVender = venders.size
+    val numberOfDeviceType = deviceTypes.size
+    val numberOfMobile = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "member")).filter(x => x == "true").distinct.length
+    val numberOfPermanent = numberOfDevice - numberOfMobile
+    val device = Device(numberOfDevice, numberOfVender, numberOfDeviceType, numberOfMobile, numberOfPermanent, venders, deviceTypes)
+    InternetResponse(internetInfo, segment, downup, duration, suyhout, error, formatArray2(module), formatArray2(disconnet), session, checkList, bill, device)
   }
 
   private def getPayTVResponse(contract: String): PayTVResponse = {
@@ -380,7 +411,12 @@ object ProfileService extends AbstractService {
         //println(client.show(appHourly))
         val appDaily = getAppDayOfWeek(x)
         val daily = getDaily(x)
-        val multiSearchResponse = client.execute(multi(hourly, app, dayOfWeek, iptv, appHourly, appDaily, daily, hourlyInMonth)).await
+        
+        val vodRequest = getVod(x)
+        //println(client.show(vodRequest))
+        val vodgiaitriRequest = getVodGiaitri(x)
+        val vodthieunhiRequest = getVodThieuNhi(x)
+        val multiSearchResponse = client.execute(multi(hourly, app, dayOfWeek, iptv, appHourly, appDaily, daily, hourlyInMonth, vodRequest, vodgiaitriRequest, vodthieunhiRequest)).await
 
         //multiSearchResponse.responses(4).aggregations.foreach(println)
 
@@ -397,24 +433,57 @@ object ProfileService extends AbstractService {
         val dailyBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(6), "top", "sum").sortBy(x => x.key.toInt)
         val hourlyInMonthBucket = ElasticUtil.getBucketDoubleTerm(multiSearchResponse.responses(7), "top", "sum")
 
-        val vodRes = ESUtil.get(client, "vod_cate", "docs", x)
-        val vodthieuRes = ESUtil.get(client, "vod_thieu", "docs", x)
-        val vodgiaitriRes = ESUtil.get(client, "vod_giaitri", "docs", x)
+        val vodRes = multiSearchResponse.responses(8)
+        val vodgiaitriRes = multiSearchResponse.responses(9)//ESUtil.get(client, "vod_giaitri", "docs", x)
+        val vodthieunhiRes = multiSearchResponse.responses(10)//ESUtil.get(client, "vod_thieu", "docs", x)
+        //println(vodRes.totalHits)
+        //vodRes.hits.hits.foreach(println)
+        val vodCate = Array("action", "animation", "comedy", "documentary", "horror", "romance", "drama", "family", "crime", "adventure", "costume")
 
-        val vod = if (vodRes.exists) {
-          val source = vodRes.source
-          source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
+        val vod = if (!vodRes.hits.hits.isEmpty) {
+          val array = vodRes.hits.hits.map(x => {
+            val source = x.sourceAsMap
+            source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type")
+                               .map(x => x -> getValueAsInt(source, x))
+                               .toMap
+          })
+          mergeArrayMap(array).toArray.map(x => Bucket(x._1, 0, x._2)).filter(x => vodCate.contains(x.key.toLowerCase()))
+          
+          //map.sum(x => map1 ++ map2.map{ case (k,v) => k -> (v + map1.getOrElse(k,0)) })
+          //null
         } else null
-
-        val vodthieu = if (vodthieuRes.exists) {
-          val source = vodthieuRes.source
-          source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
+        val vodgiaitri = if (!vodgiaitriRes.hits.hits.isEmpty) {
+          val array = vodgiaitriRes.hits.hits.map(x => {
+            val source = x.sourceAsMap
+            source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type")
+                               .map(x => x -> getValueAsInt(source, x))
+                               .toMap
+          })
+          mergeArrayMap(array).toArray.map(x => Bucket(x._1, 0, x._2))
+          //map.sum(x => map1 ++ map2.map{ case (k,v) => k -> (v + map1.getOrElse(k,0)) })
+          //null
         } else null
-
-        val vodgiaitri = if (vodgiaitriRes.exists) {
-          val source = vodgiaitriRes.source
-          source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
+        val vodthieunhi = if (!vodthieunhiRes.hits.hits.isEmpty) {
+          val array = vodthieunhiRes.hits.hits.map(x => {
+            val source = x.sourceAsMap
+            source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type")
+                               .map(x => x -> getValueAsInt(source, x))
+                               .toMap
+          })
+          mergeArrayMap(array).toArray.map(x => Bucket(x._1, 0, x._2))
+          //map.sum(x => map1 ++ map2.map{ case (k,v) => k -> (v + map1.getOrElse(k,0)) })
+          //null
         } else null
+        //val vodgiaitri = null
+//        val vodthieu = if (vodthieuRes.exists) {
+//          val source = vodthieuRes.source
+//          source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
+//        } else null
+//
+//        val vodgiaitri = if (vodgiaitriRes.exists) {
+//          val source = vodgiaitriRes.source
+//          source.keySet.filter(x => x != "ds" && x != "contract" && x != "customer_id" && x != "vec_type").map(x => Bucket(x, 0, getValueAsInt(source, x))).toArray
+//        } else null
 
         def group(array: Array[Bucket2], key: String): Array[(String, Double)] = {
           array.filter(a => a.key == key).map(a => a.term -> a.value)
@@ -432,7 +501,7 @@ object ProfileService extends AbstractService {
         }
         def groupHourAndDayOfWeek(array: Array[Bucket2]): Array[(String, Array[Double])] = {
           array.groupBy(x => x.key)
-            .map(x => x._1 -> x._2.map(y => y.term -> y.value).sortBy(y => y._1).map(y => y._2))
+            .map(x => x._1 -> x._2.map(y => y.term -> y.value).sortBy(y => y._1.toInt).map(y => y._2))
             .toArray
         }
 
@@ -444,11 +513,11 @@ object ProfileService extends AbstractService {
           group(appHourlyBucket, "VOD"),
           group2(appDailyBucket, "IPTV"),
           group2(appDailyBucket, "VOD"),
-          vod, vodthieu, vodgiaitri, formatArray(dailyBucket.map(x => x.key -> x.value)))
+          vod, vodthieunhi, vodgiaitri, formatArray(dailyBucket.map(x => x.key -> x.value)))
       }).toMap
 
-      val payTVBillRes = ESUtil.get(client, "user-bill-paytv-2017-09", "docs", contract)
-      val bill = if (payTVBillRes.exists) getValueAsInt(payTVBillRes.source, "BillFee") else 0
+      val billRes = ESUtil.get(client, "user-bill-paytv-2017-09", "docs", contract)
+      val bill = if (billRes.exists) getValueAsDouble(billRes.source, "BillFee") else 0
 
       PayTVResponse(payTVContract, boxs, segments, vectors, bill)
     } else null
@@ -479,10 +548,21 @@ object ProfileService extends AbstractService {
     seq.map(x => "2017-09-" + f"$x%02d").toArray.map(x => x.toString -> map.getOrElse(x.toString, 0))
   }
 
+  private def mergeArrayMap(array: Array[Map[String, Int]]): Map[String, Int] = {
+    array.reduce((map1, map2) => map1 ++ map2.map{ case (k,v) => k -> (v + map1.getOrElse(k,0)) })
+  }
+  
   def main(args: Array[String]) {
     val time0 = System.currentTimeMillis()
-    val response = ProfileService.get("AGD000585")
-    //val a = response.paytv.vectors.get("316292").get
+    
+    //val map1 = Map("a" -> 1, "b" -> 2)
+    //val map2 = Map("a" -> 2, "b" -> 4)
+    //val array = Array(map1, map2)
+    
+    //val map3 = mergeArrayMap(array)
+    //map3.foreach(println)
+    val response = ProfileService.get("AGFD04299")
+    //val a = response.paytv.vectors.get("445814").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
 //    response.internet.errorModule.foreach(println)
@@ -490,8 +570,12 @@ object ProfileService extends AbstractService {
 //    response.internet.errorModule.map(x => x._1).foreach(println)
     //println(response.internet.errorDisconnect.size -> response.internet.errorModule.size)
     //response.internet.duration.hourly.foreach(println)
-    response.paytv.vectors.get("90012").get.daily.foreach(println)
+    //response.paytv.vectors.get("90012").get.daily.foreach(println)
     //response.paytv.vectors.get("356724").get.hourlyInMonths.foreach(println)
+    //a.vodgiaitri.foreach(println)
+    response.internet.device.venders.foreach(println)
+    response.internet.device.deviceTypes.foreach(println)
+    println(response.internet.device.numberOfDevice)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()

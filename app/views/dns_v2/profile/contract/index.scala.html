@@ -35,6 +35,7 @@
 
             <!-- Custom Theme Style -->
         <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
+        <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
 
         <link href="../assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
@@ -177,6 +178,12 @@
                     color: white;
                 }
                 .ui-helper-hidden-accessible {
+                    display: none;
+                }
+                .fade.in{
+                    display: block;
+                }
+                .fade{
                     display: none;
                 }
         </style>
@@ -835,6 +842,65 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2>Day Of Week Vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="col-dayVector" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="profile_title row">
+                                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2>Duration day of month</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="col-dayofMonth" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="profile_title row">
 
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
@@ -862,36 +928,27 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <div class="profile_title row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
-                                                                        <div class="x_title">
-                                                                            <h2>Day Of Week</h2>
-                                                                            <ul class="nav navbar-right panel_toolbox">
-                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                        <div>
+                                                                            <ul id="tabApp" class="nav nav-tabs bar_tabs" role="tablist">
+                                                                                <li role="presentation" class="active"><a href="#line-appHourVector" id="hourly-tab" role="tab" data-toggle="tab" aria-expanded="true">App hourly vector</a>
                                                                                 </li>
-                                                                                <li class="dropdown">
-                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                    <ul class="dropdown-menu" role="menu">
-                                                                                        <li><a href="#">Settings 1</a>
-                                                                                        </li>
-                                                                                        <li><a href="#">Settings 2</a>
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                </li>
-                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                <li role="presentation" class=""><a href="#line-appDayVector" id="daily-tab" role="tab" data-toggle="tab" aria-expanded="true">App daily vector</a>
                                                                                 </li>
                                                                             </ul>
-                                                                            <div class="clearfix"></div>
                                                                         </div>
                                                                         <div class="x_content">
-                                                                            <div id="col-dayVector" style="height:250px;"></div>
+                                                                            <div id="line-appHourVector" class="tab-pane fade active in animated rotateInDownLeft" aria-labelledby="hourly-tab" style="height:250px;"></div>
+                                                                            <div id="line-appDayVector" class="tab-pane fade animated rotateInDownLeft" aria-labelledby="daily-tab" style="height:250px;"></div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
 
+                                                            </div>
+
+                                                            <div class="profile_title row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -918,13 +975,10 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-
-                                                            <div class="profile_title row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
-                                                                            <h2> App hourly Vector</h2>
+                                                                            <h2> Vod vector</h2>
                                                                             <ul class="nav navbar-right panel_toolbox">
                                                                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                                                                 </li>
@@ -943,44 +997,17 @@
                                                                             <div class="clearfix"></div>
                                                                         </div>
                                                                         <div class="x_content">
-                                                                            <div id="line-appHourVector" style="height:250px;"></div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                    <div class="x_panel tile fixed_height_320">
-                                                                        <div class="x_title">
-                                                                            <h2> App daily vector</h2>
-                                                                            <ul class="nav navbar-right panel_toolbox">
-                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                                                </li>
-                                                                                <li class="dropdown">
-                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                                                    <ul class="dropdown-menu" role="menu">
-                                                                                        <li><a href="#">Settings 1</a>
-                                                                                        </li>
-                                                                                        <li><a href="#">Settings 2</a>
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                </li>
-                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                                                </li>
-                                                                            </ul>
-                                                                            <div class="clearfix"></div>
-                                                                        </div>
-                                                                        <div class="x_content">
-                                                                            <div id="line-appDayVector" style="height:250px;"></div>
+                                                                            <div id="pie-vodVector" style="height:250px;"></div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
                                                             <div class="profile_title row">
-                                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
-                                                                            <h2>Duration day of month</h2>
+                                                                            <h2> Vod child vector</h2>
                                                                             <ul class="nav navbar-right panel_toolbox">
                                                                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                                                                 </li>
@@ -999,7 +1026,33 @@
                                                                             <div class="clearfix"></div>
                                                                         </div>
                                                                         <div class="x_content">
-                                                                            <div id="col-dayofMonth" style="height:250px;"></div>
+                                                                            <div id="pie-vodChildVector" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2> Vod relax vector</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="pie-vodRelaxVector" style="height:250px;"></div>
                                                                         </div>
                                                                     </div>
                                                                 </div>

@@ -19,9 +19,11 @@ object Configure {
   val ES_HOST = ConfigFactory.load().getString("es.host")
   val ES_PORT = ConfigFactory.load().getString("es.port").toInt
   
+  val REDIS_HOST = ConfigFactory.load().getString("redis.whois.host")
+  val REDIS_PORT = ConfigFactory.load().getString("redis.whois.port").toInt
+  
   val LOGO_DEFAULT = "../assets/images/logo/domain.png"
   
+  val redis = new RedisClient(REDIS_HOST, REDIS_PORT)
   val client = HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
-  //val redis = new RedisClient("172.27.11.141", 6375)
-  
 }

@@ -21,6 +21,8 @@ import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.ftel.bigdata.utils.HttpUtil
 import model.DomainLocation
 import scala.util.Try
+import model.Label
+import com.ftel.bigdata.utils.ESUtil
 
 object ProfileService extends AbstractService {
 
@@ -82,8 +84,13 @@ object ProfileService extends AbstractService {
       val loc = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await
       val map = loc.sourceAsMap
       val subdomain = domainResponse.hits.hits.map(x => x.sourceAsMap).map(x => x.getOrElse("domain", "").toString -> x.getOrElse("queries", "0").toString.toInt)
+      val score = if(current.label == Label.Black) {
+        val getRes = ESUtil.get(client, "dns-score", "docs", domain)
+        getValueAsDouble(getRes.source, "score")
+      } else 0.0
       val time7 = System.currentTimeMillis()
       printTime(time0,time1,time2,time3,time4,time5, time6, time7)
+      
       ProfileResponse(whois, current, history, answers, hourly, category,
           DomainLocation(domain,
               getValueAsString(map, "query"),
@@ -93,7 +100,7 @@ object ProfileService extends AbstractService {
               getValueAsString(map, "timezone"),
               getValueAsString(map, "org"),
               getValueAsString(map, "lat"),
-              getValueAsString(map, "lon")), subdomain)
+              getValueAsString(map, "lon")), subdomain, score)
       //ProfileResponse(whois, current, history, hourly)
     } else null
   }
@@ -147,7 +154,7 @@ object ProfileService extends AbstractService {
       val hourly = Array[(Int, Long)]()//getHourly(domain, current)
       val time6 = System.currentTimeMillis()
       //printTime(time0,time1,time2,time3,time4,time5, time6)
-      ProfileResponse(whois, current, history, answers, hourly, "N/A", null, null)
+      ProfileResponse(whois, current, history, answers, hourly, "N/A", null, null, 0.0)
     } else null
   }
   

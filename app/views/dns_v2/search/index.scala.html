@@ -252,13 +252,23 @@
                                 <ul class="nav side-menu">
                                     <li><a href="/"><i class="fa fa-home"></i> Dashboard </a>
                                     </li>
-                                    <li><a><i class="fa fa-search"></i> Search </a>
-                                        <ul class="nav child_menu">
-                                            <li><a href="/search">Profile</a></li>
-                                            <li><a href="#">Sub domain</a></li>
-                                            <li><a href="#">Compare</a></li>
-                                        </ul>
-                                    </li>
+                                    @if(domain != null) {
+                                        <li class="active"><a><i class="fa fa-search"></i> Search </a>
+                                            <ul class="nav child_menu" style="display: block">
+                                                <li class="current-page"><a href="/search?ct=@domain">Profile</a></li>
+                                                <li><a href="#">Sub domain</a></li>
+                                                <li><a href="#">Compare</a></li>
+                                            </ul>
+                                        </li>
+                                    }else{
+                                        <li><a><i class="fa fa-search"></i> Search </a>
+                                            <ul class="nav child_menu">
+                                                <li><a href="/search">Profile</a></li>
+                                                <li><a href="#">Sub domain</a></li>
+                                                <li><a href="#">Compare</a></li>
+                                            </ul>
+                                        </li>
+                                    }
                                     <li><a href="/rank"><i class="fa fa-star-o"></i> Rank </a>
                                     </li>
                                     <li><a href="/report"><i class="fa fa-edit"></i> Report </a>
@@ -301,84 +311,7 @@
 
                                     <div class="x_panel" style="background: none!important;border: transparent">
 
-                                        <div class="x_content">
-                                            <div class="row">
-                                                <div class="col-md-3 col-sm-3 col-xs-12 profile_left" style="background: white;margin-bottom: 20px;padding: 20px;">
-                                                    <div class="row">
-                                                        <div class="col-lg-6 col-sm-6 col-xs-12 col-md-12">
-                                                            <div class="profile_img">
-                                                              <div id="crop-avatar">
-                                                                <!-- Current avatar -->
-                                                               <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
-                                                              </div>
-                                                            </div>
-                                                            <span class="fa fa-check nameTitle">Zing.vn</span>
-                                                        </div>
-                                                        <div class="col-lg-6 col-sm-6 col-xs-12 col-md-12">
-                                                            <ul class="list-unstyled user_data">
 
-                                                            <li>
-                                                                <i class="fa fa-briefcase user-profile-icon"></i> 118.102.1.119
-                                                            </li>
-
-                                                            <li>
-                                                                <i class="fa fa-briefcase user-profile-icon"></i> Soc Trang- Viet Nam
-                                                            </li>
-
-                                                            <li>
-                                                                <i class="fa fa-briefcase user-profile-icon"></i> Trung tam VNNIC
-                                                            </li>
-
-                                                            <li>
-                                                                <i class="fa fa-briefcase user-profile-icon"></i> Asia/Ho_Chi_Minh
-                                                            </li>
-
-                                                            <li>
-                                                                <i class="fa fa-tags"></i> Search Engines and Portals
-                                                            </li></ul></div>
-                                                    </div>
-
-                                                    <br>
-                                                    <div>
-                                                        <div class="inline position-relative">
-                                                            <span class="white">Category website</span>
-                                                        </div>
-                                                    </div>
-                                                    <br>
-                                                    <ul class="list-group clear-list" style="/* width: 80% */">
-                                                        <li class="list-group-item fist-item">
-                                                            <span class="pull-right"> 09:00 pm </span>
-                                                            <span class="subTitle">Registrar</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 10:16 am </span>
-                                                            <span class="subTitle">Whois Server</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 08:22 pm </span>
-                                                            <span class="subTitle">Name Server</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 11:06 pm </span>
-                                                            <span class="subTitle">Create</span>
-
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 12:00 am </span>
-                                                            <span class="subTitle">Update</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 12:00 am </span>
-                                                            <span class="subTitle">Expire</span>
-                                                        </li>
-                                                    </ul>
-<<<<<<< HEAD
-                                                </li>
-                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                </li>
-                                            </ul>
-                                            <div class="clearfix"></div>
-                                        </div>
                                         <div class="x_content">
                                             <div class="row">
                                                 <div class="col-lg-4 col-sm-12 col-xs-12 profile_left" style="background: white;margin-bottom: 20px;padding: 20px;">
@@ -483,8 +416,11 @@
                                                                     }
                                                                 }
                                                             </div>
+
+
                                                         </div>
                                                     </div>
+
 
                                                     <ul class="list-group clear-list" id="ulWhois">
                                                         @if(response.whois.registrar != null && response.whois.registrar != "") {

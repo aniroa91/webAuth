@@ -41,6 +41,16 @@ case class Duration(
     dayOfWeek: Array[(String, Array[Double])],
     daily: Array[(String, Double)])
 
+//case class DeviceRecord(mac: String, macAddr: String, vender: String, name: String, )
+case class Device(
+    numberOfDevice: Int,
+    numberOfVender: Int,
+    numberOfDeviceType: Int,
+    numberOfMobile: Int,
+    numberOfPermanent: Int,
+    venders: Array[(String, Int)],
+    deviceTypes: Array[(String, Int)])
+
 case class InternetResponse(
     contract: InternetContract,
     segment: InternetSegment,
@@ -52,4 +62,5 @@ case class InternetResponse(
     errorDisconnect: Array[(String, Int)],
     session: Session,
     sessiontType: (String, Int),
-    bill: Double)
+    bill: Double,
+    device: Device)
