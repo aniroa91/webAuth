@@ -356,11 +356,11 @@ object CommonService extends AbstractService {
     val logo = getLogo(domain, false)
     //"<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
     //<img id="currentPhoto" src="SomeImage.jpg" onerror="this.src='Default.jpg'" width="100" height="120">
-    "<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='../assets/images/logo/default.png'\" width=\"30\" height=\"30\"></a>"
+    "<a href=\"/search?ct=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='../assets/images/logo/default.png'\" width=\"30\" height=\"30\"></a>"
   }
   
   def getLinkTag(domain: String): String = {
-    "<a href=\"/search?q=" + domain + "\">" + domain + "</a>"
+    "<a href=\"/search?ct=" + domain + "\" style = \" color:#1ABB9C;cursor: pointer;\">" + domain + "</a>"
   }
 
   /**

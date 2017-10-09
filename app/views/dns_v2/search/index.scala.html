@@ -32,6 +32,7 @@
 
             <!-- Custom Theme Style -->
         <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
+        <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
 
         <link href="../assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
@@ -138,6 +139,46 @@
                 .ui-helper-hidden-accessible {
                     display: none;
                 }
+                .nameTitle{
+                    font-size:35px;color:green;margin-right: 5px;margin-bottom: 10px;
+                }
+                .list-group.clear-list .list-group-item {
+                    border-top: 1px solid #e7eaec;
+                    border-bottom: 0;
+                    border-right: 0;
+                    border-left: 0;
+                    padding: 10px 0;
+                }
+                .list-group-item:first-child {
+                    border-top-left-radius: 4px;
+                    border-top-right-radius: 4px;
+                }
+                .fist-item {
+                    border-top: none !important;
+                }
+                .tile-stats{
+                    padding:10px;
+                }
+                .icon{color:#1ABB9C!important;}
+                .tile-stats:hover .icon i{
+                    color:#1ABB9C!important;
+                }
+                .subTitle{
+                    font-weight: 600;
+                    color: green;
+                }
+                .tile-stats:hover{
+                    color: white!important;
+                    background: #fbb450;
+                }
+                .spanTit{
+                    position: relative;
+                    margin: 0 0 0 10px;
+                    z-index: 5;
+                    padding: 0;
+                    opacity: 0.8;
+                    font-size: 24px;
+                }
         </style>
     </head>
 
@@ -198,49 +239,181 @@
                                 <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                             </div>
                         </nav>
+                        <div style="margin-top: 10px">
+                            <div class="col-md-3 col-sm-3 col-xs-12 form-group pull-right top_search">
+
+                            @views.html.dns_v2.profile.contract.frmSearch(form, routes.ProfileController.index)
+
+                            </div>
+                        </div>
                     </div>
                 </div>
                     <!-- /top navigation -->
 
                     <!-- page content -->
                 <div class="right_col" role="main">
-                    <div >
-                        <div class="page-title">
-
-                            <div class="pull-right">
-                                <div class="col-md-3 col-sm-3 col-xs-12 form-group pull-right top_search">
-
-                                @views.html.dns_v2.profile.contract.frmSearch(form, routes.ProfileController.index)
-
-                                </div>
-                            </div>
-                        </div>
+                    <div>
 
                         <div class="clearfix"></div>
                         @if( response != null){
                             <div class="row">
                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <div class="x_panel">
-                                        <div class="x_title">
-                                            <h2>Profile Information</h2>
-                                            <ul class="nav navbar-right panel_toolbox">
-                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                                </li>
-                                                <li class="dropdown">
-                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                    <ul class="dropdown-menu" role="menu">
-                                                        <li><a href="#">Settings 1</a>
+                                    <div class="x_panel" style="background: none!important;border: transparent">
+
+                                        <div class="x_content">
+                                            <div class="row">
+                                                <div class="col-md-3 col-sm-3 col-xs-12 profile_left" style="background: white;margin-bottom: 20px;padding: 20px;">
+                                                    <div class="row">
+                                                        <div class="col-lg-6 col-sm-6 col-xs-12 col-md-12">
+                                                            <div class="profile_img">
+                                                              <div id="crop-avatar">
+                                                                <!-- Current avatar -->
+                                                               <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
+                                                              </div>
+                                                            </div>
+                                                            <span class="fa fa-check nameTitle">Zing.vn</span>
+                                                        </div>
+                                                        <div class="col-lg-6 col-sm-6 col-xs-12 col-md-12">
+                                                            <ul class="list-unstyled user_data">
+
+                                                            <li>
+                                                                <i class="fa fa-briefcase user-profile-icon"></i> 118.102.1.119
+                                                            </li>
+
+                                                            <li>
+                                                                <i class="fa fa-briefcase user-profile-icon"></i> Soc Trang- Viet Nam
+                                                            </li>
+
+                                                            <li>
+                                                                <i class="fa fa-briefcase user-profile-icon"></i> Trung tam VNNIC
+                                                            </li>
+
+                                                            <li>
+                                                                <i class="fa fa-briefcase user-profile-icon"></i> Asia/Ho_Chi_Minh
+                                                            </li>
+
+                                                            <li>
+                                                                <i class="fa fa-tags"></i> Search Engines and Portals
+                                                            </li></ul></div>
+                                                    </div>
+
+                                                    <br>
+                                                    <div>
+                                                        <div class="inline position-relative">
+                                                            <span class="white">Category website</span>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <ul class="list-group clear-list" style="/* width: 80% */">
+                                                        <li class="list-group-item fist-item">
+                                                            <span class="pull-right"> 09:00 pm </span>
+                                                            <span class="subTitle">Registrar</span>
                                                         </li>
-                                                        <li><a href="#">Settings 2</a>
+                                                        <li class="list-group-item">
+                                                            <span class="pull-right"> 10:16 am </span>
+                                                            <span class="subTitle">Whois Server</span>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <span class="pull-right"> 08:22 pm </span>
+                                                            <span class="subTitle">Name Server</span>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <span class="pull-right"> 11:06 pm </span>
+                                                            <span class="subTitle">Create</span>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <span class="pull-right"> 12:00 am </span>
+                                                            <span class="subTitle">Update</span>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <span class="pull-right"> 12:00 am </span>
+                                                            <span class="subTitle">Expire</span>
                                                         </li>
                                                     </ul>
-                                                </li>
-                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                                </li>
-                                            </ul>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
+                                                </div>
+                                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                                    <div class="row top_tiles">
+                                                        <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                                            <div class="tile-stats">
+                                                                <div class="icon"><i class="fa fa-users green"></i></div>
+                                                                <div class="count ">179</div>
+                                                                <span class="spanTit">Queries</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                                            <div class="tile-stats">
+                                                                <div class="icon"><i class="fa fa-user green"></i></div>
+                                                                <div class="count">179</div>
+                                                                <span class="spanTit">Clients</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                                            <div class="tile-stats">
+                                                                <div class="icon"><i class="fa fa-server green"></i></div>
+                                                                <div class="count">179</div>
+                                                                <span class="spanTit">Domains</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="profile_title row">
+                                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="x_panel tile fixed_height_320">
+                                                                <div class="x_title">
+                                                                    <h2> Hourly Queries</h2>
+                                                                    <ul class="nav navbar-right panel_toolbox">
+                                                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                        </li>
+                                                                        <li class="dropdown">
+                                                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                            <ul class="dropdown-menu" role="menu">
+                                                                                <li><a href="#">Settings 1</a>
+                                                                                </li>
+                                                                                <li><a href="#">Settings 2</a>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </li>
+                                                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                        </li>
+                                                                    </ul>
+                                                                    <div class="clearfix"></div>
+                                                                </div>
+                                                                <div class="x_content">
+                                                                    <div id="int-col-dayofMonth" style="height:250px;"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="profile_title row">
+                                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="x_panel tile fixed_height_320">
+                                                                <div class="x_title">
+                                                                    <h2> Daily Queries</h2>
+                                                                    <ul class="nav navbar-right panel_toolbox">
+                                                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                        </li>
+                                                                        <li class="dropdown">
+                                                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                            <ul class="dropdown-menu" role="menu">
+                                                                                <li><a href="#">Settings 1</a>
+                                                                                </li>
+                                                                                <li><a href="#">Settings 2</a>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </li>
+                                                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                        </li>
+                                                                    </ul>
+                                                                    <div class="clearfix"></div>
+                                                                </div>
+                                                                <div class="x_content">
+                                                                    <div id="int-col-dayofMonth" style="height:250px;"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
                                         </div>
 
                                     </div>

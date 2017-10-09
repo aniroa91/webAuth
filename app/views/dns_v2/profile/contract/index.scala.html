@@ -690,7 +690,7 @@
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
-                                                                            <h2> Duration daily vector</h2>
+                                                                            <h2> Duration day of week vector</h2>
                                                                             <ul class="nav navbar-right panel_toolbox">
                                                                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                                                                 </li>
@@ -1116,7 +1116,7 @@
         @if( response != null) {
             @if(response.paytv != null) {
                 @scripts(response, contract, if(!response.paytv.segments.isEmpty) {
-                    response.paytv.segments.toList.sortWith((x, y) => x._1 > y._1).head._1
+                    response.paytv.segments.toList.sortWith((x, y) => x._1.toInt > y._1.toInt).head._1
                 } else null)
             } else {
                 @scripts(response, contract, null)

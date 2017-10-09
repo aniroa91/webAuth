@@ -14,10 +14,20 @@
         <tr>
             <td>@formatNumber(row.rankFtel)</td>
             <td>@Html.apply(getImageTag(row.name)) @Html.apply(getLinkTag(row.name))</td>
+            <td>@formatNumber(row.queries)</td>
             <td>@formatNumber(row.clients)</td>
             <td>@formatNumber(row.getQueryPerClient())</td>
             <td>@formatNumber(row.rankAlexa)</td>
-            <td></td>
+            <td  class="text-center">
+                @if(row.label == "white"){
+                    <span class="label label-success">WHITE</span>
+                } else if(row.label == "black"){
+                    <span class="label label-warning">BLACK</span>
+                } else{
+                    <span class="label label-default">UNKNOWN</span>
+                }
+
+            </td>
             <td>@row.malware</td>
         </tr>
     }
