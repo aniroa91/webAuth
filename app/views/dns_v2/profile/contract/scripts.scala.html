@@ -1218,7 +1218,7 @@
                     }
                 }, { // Secondary yAxis
                     title: {
-                        text: 'Duration (minutes)',
+                        text: 'Duration (hours)',
                         style: {
                             color: "#9B59B6  MB"
                         }
@@ -1240,7 +1240,7 @@
                     type: 'column',
                     name: 'Duration',
                     yAxis: 1,
-                    data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => BigDecimal(x._2 / 60).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => BigDecimal(x._2 / 3600).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
                 }, {
                     name: 'Upload',
                     type: 'spline',
@@ -1391,9 +1391,6 @@
         function getJsonAppVector(appHour){
             var jsonArr = [];
             for (var i = 0; i < appHour.length; i++) {
-               /* console.log(appHour[i][1])
-                console.log("aaaaa")
-                console.log(convertHourly(appHour[i][1]))*/
                 jsonArr.push({
                     type: "spline",
                     name: appHour[i][0],
@@ -1404,7 +1401,7 @@
         }
         function convertHourly(arr){
             for(var i=0; i< arr.length;i++){
-                arr[i] = arr[i]/3600 * 1.00
+                arr[i] = parseFloat((arr[i]/3600).toFixed(2));
             }
             return arr
         }
