@@ -35,17 +35,17 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
 
   def index = Action { implicit request: Request[AnyContent] =>
     val formValidationResult = form.bindFromRequest
-    try{
+    //try{
       if (!formValidationResult.hasErrors) {
-        val domain = formValidationResult.get.q
+        val domain = formValidationResult.get.q.trim()
         val response = ProfileService.get(domain)
         Ok(views.html.dns_v2.profile.contract.index(form, response, domain))
       } else {
         Ok(views.html.dns_v2.profile.contract.index(form, null,null))
       }
-    }
+    /*}
     catch{
-      case e: Exception => Ok(views.html.dns_v2.search.index(form, null, null, null))  }
+      case e: Exception => Ok(views.html.dns_v2.profile.contract.index(form, null, null))  }*/
   }
 }
 

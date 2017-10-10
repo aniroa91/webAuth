@@ -252,13 +252,23 @@
                                 <ul class="nav side-menu">
                                     <li><a href="/"><i class="fa fa-home"></i> Dashboard </a>
                                     </li>
-                                    <li><a><i class="fa fa-search"></i> Search </a>
-                                        <ul class="nav child_menu">
-                                            <li><a href="/search">Profile</a></li>
-                                            <li><a href="#">Sub domain</a></li>
-                                            <li><a href="#">Compare</a></li>
-                                        </ul>
-                                    </li>
+                                    @if(domain != null) {
+                                        <li class="active"><a><i class="fa fa-search"></i> Search </a>
+                                            <ul class="nav child_menu" style="display: block">
+                                                <li class="current-page"><a href="/search?ct=@domain">Profile</a></li>
+                                                <li><a href="#">Sub domain</a></li>
+                                                <li><a href="#">Compare</a></li>
+                                            </ul>
+                                        </li>
+                                    }else{
+                                        <li><a><i class="fa fa-search"></i> Search </a>
+                                            <ul class="nav child_menu">
+                                                <li><a href="/search">Profile</a></li>
+                                                <li><a href="#">Sub domain</a></li>
+                                                <li><a href="#">Compare</a></li>
+                                            </ul>
+                                        </li>
+                                    }
                                     <li><a href="/rank"><i class="fa fa-star-o"></i> Rank </a>
                                     </li>
                                     <li><a href="/report"><i class="fa fa-edit"></i> Report </a>
@@ -301,7 +311,7 @@
 
                                     <div class="x_panel" style="background: none!important;border: transparent">
 
-                                        
+
                                         <div class="x_content">
                                             <div class="row">
                                                 <div class="col-lg-4 col-sm-12 col-xs-12 profile_left" style="background: white;margin-bottom: 20px;padding: 20px;">
