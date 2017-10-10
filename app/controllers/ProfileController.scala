@@ -34,14 +34,19 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
 
   def index = Action { implicit request: Request[AnyContent] =>
     val formValidationResult = form.bindFromRequest
-    if (!formValidationResult.hasErrors) {
-      val domain = formValidationResult.get.q
-      val second = DomainUtil.extract(domain).second
-      val logo = CommonService.getLogo(second, false)
-      val response = CacheService.getDomain(second)
-      Ok(views.html.dns_v2.search.index(form, second, response._1, logo))
-    } else {
-      Ok(views.html.dns_v2.search.index(form, null, null, null))    }
+    try {
+      if (!formValidationResult.hasErrors) {
+        val domain = formValidationResult.get.q
+        val second = DomainUtil.extract(domain).second
+        val logo = CommonService.getLogo(second, false)
+        val response = CacheService.getDomain(second)
+        Ok(views.html.dns_v2.search.index(form, second, response._1, logo))
+      } else {
+        Ok(views.html.dns_v2.search.index(form, null, null, null))
+      }
+    }
+    catch{
+      case e: Exception => Ok(views.html.dns_v2.search.index(form, null, null, null))  }
   }
 }
 

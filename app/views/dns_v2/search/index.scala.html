@@ -179,6 +179,46 @@
                     opacity: 0.8;
                     font-size: 24px;
                 }
+                .boxGroup{
+                    background: #eee;
+                    border-right: 10px white solid;
+                    border-bottom: 1px white solid;
+                }
+                .percent:after {
+                    content: '';
+                    margin-left: .1em;
+                    font-size: .8em;
+                }
+                .iconGreen{font-size: 40px;color: #1ABB9C;height: 50px;}
+                .iconPurple{font-size: 40px;color: #9B59B6;height: 50px;}
+                .txtPurple{
+                    text-align: center;
+                    color: #9B59B6;
+                }
+                .txtGreen{
+                    text-align: center;
+                    color: #1ABB9C;
+                }
+                .spanIconDown{
+                    float: right;
+                    position: absolute;
+                    top: -20px;
+                    color: red;
+                }
+                .iconUp{
+                    float: right;
+                    position: absolute;
+                    right: 0;
+                    top: -20px;
+                    color: #1ABB9C;
+                }
+                .iconUpPurple{
+                    float: right;
+                    position: absolute;
+                    right: 0;
+                    top: -20px;
+                    color: #9B59B6;
+                }
         </style>
     </head>
 
@@ -210,7 +250,7 @@
                             <div class="menu_section">
                                     <!-- <h3>General</h3>-->
                                 <ul class="nav side-menu">
-                                    <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard </a>
+                                    <li><a href="/"><i class="fa fa-home"></i> Dashboard </a>
                                     </li>
                                     <li><a><i class="fa fa-search"></i> Search </a>
                                         <ul class="nav child_menu">
@@ -258,99 +298,180 @@
                         @if( response != null){
                             <div class="row">
                                 <div class="col-md-12 col-sm-12 col-xs-12">
+
                                     <div class="x_panel" style="background: none!important;border: transparent">
 
+                                        
                                         <div class="x_content">
                                             <div class="row">
-                                                <div class="col-md-3 col-sm-3 col-xs-12 profile_left" style="background: white;margin-bottom: 20px;padding: 20px;">
+                                                <div class="col-lg-4 col-sm-12 col-xs-12 profile_left" style="background: white;margin-bottom: 20px;padding: 20px;">
                                                     <div class="row">
                                                         <div class="col-lg-6 col-sm-6 col-xs-12 col-md-12">
                                                             <div class="profile_img">
                                                               <div id="crop-avatar">
                                                                 <!-- Current avatar -->
-                                                               <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
+                                                               <img class="img-responsive avatar-view" onerror="this.src='../assets/images/logo/fpt.jpg'" src="@logo">
                                                               </div>
                                                             </div>
-                                                            <span class="fa fa-check nameTitle">Zing.vn</span>
+                                                            <span class="fa fa-check nameTitle">@domain</span>
                                                         </div>
                                                         <div class="col-lg-6 col-sm-6 col-xs-12 col-md-12">
                                                             <ul class="list-unstyled user_data">
 
                                                             <li>
-                                                                <i class="fa fa-briefcase user-profile-icon"></i> 118.102.1.119
+                                                                <i class="fa fa-internet-explorer"></i> @response.loc.ip
                                                             </li>
 
                                                             <li>
-                                                                <i class="fa fa-briefcase user-profile-icon"></i> Soc Trang- Viet Nam
+                                                                <i class="fa fa-map-marker"></i> @response.loc.country - @response.loc.region
                                                             </li>
 
                                                             <li>
-                                                                <i class="fa fa-briefcase user-profile-icon"></i> Trung tam VNNIC
+                                                               <i class="fa fa-location-arrow"></i> @response.loc.timezone
                                                             </li>
 
                                                             <li>
-                                                                <i class="fa fa-briefcase user-profile-icon"></i> Asia/Ho_Chi_Minh
+                                                                <i class="fa fa-users"></i> @response.loc.org
                                                             </li>
 
                                                             <li>
-                                                                <i class="fa fa-tags"></i> Search Engines and Portals
+                                                                <i class="fa fa-tags"></i> @response.category
                                                             </li></ul></div>
                                                     </div>
 
                                                     <br>
-                                                    <div>
-                                                        <div class="inline position-relative">
-                                                            <span class="white">Category website</span>
+                                                    <div class="row">
+                                                        <div class="col-md-6 col-xs-12 boxGroup">
+                                                            <div class="col-md-2 col-xs-2">
+                                                                <div class="iconPurple">
+                                                                  <i class="fa fa-star"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6 col-xs-6 txtPurple">
+                                                                <h3 class="ng-binding" >
+                                                                @{
+                                                                    val value = response.current.rankFtel
+                                                                    if (value == 0 || value > 999999) {
+                                                                        "1M+"
+                                                                    } else {
+                                                                        {formatNumber(value)}
+                                                                    }
+                                                                }
+                                                                </h3>
+                                                                <p class="ng-binding">Ftel</p>
+                                                            </div>
+                                                            <div class="col-md-4 col-xs-4">
+                                                                @{
+                                                                    val prev = if (response.history.size > 1) response.history(1) else response.history(0)
+                                                                    val value = response.current.rankFtel
+                                                                    val valuePrev = prev.rankFtel
+                                                                    val diff = valuePrev - value
+                                                                    if (diff >= 0) {
+                                                                            <span class="percent down iconUpPurple animated bounceInDown"> <i class="fa fa-caret-up"></i> {diff}</span>
+                                                                    } else {
+                                                                            <span class="percent down spanIconDown animated bounceInDown"> <i class="fa fa-caret-down"></i> {diff}</span>
+                                                                    }
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6 col-xs-12 " style="background: #eee;">
+                                                            <div class="col-md-2 col-xs-2">
+                                                                <div class="iconGreen">
+                                                                  <i class="fa fa-star"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6 col-xs-6 txtGreen">
+                                                                <h3 class="ng-binding">
+                                                                @{
+                                                                    val value = response.current.rankAlexa
+                                                                    if (value == 0 || value > 999999) {
+                                                                        "1M+"
+                                                                    }else {
+                                                                        {formatNumber(value)}
+                                                                    }
+                                                                }
+                                                                </h3>
+                                                                <p class="ng-binding">Alexa</p> </div>
+                                                            <div class="col-md-4 col-xs-4">
+                                                                @{
+                                                                    val prev = if (response.history.size > 1) response.history(1) else response.history(0)
+                                                                    val value = response.current.rankAlexa
+                                                                    val valuePrev = prev.rankAlexa
+                                                                    val diff = valuePrev - value
+                                                                    if (diff >= 0) {
+                                                                            <span class="percent down iconUp animated bounceInDown"> <i class="fa fa-caret-up "></i> {diff}</span>
+                                                                    } else {
+                                                                            <span class="percent down spanIconDown animated bounceInDown"> <i class="fa fa-caret-down"></i> {diff}</span>
+                                                                    }
+                                                                }
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <br>
-                                                    <ul class="list-group clear-list" style="/* width: 80% */">
-                                                        <li class="list-group-item fist-item">
-                                                            <span class="pull-right"> 09:00 pm </span>
-                                                            <span class="subTitle">Registrar</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 10:16 am </span>
-                                                            <span class="subTitle">Whois Server</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 08:22 pm </span>
-                                                            <span class="subTitle">Name Server</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 11:06 pm </span>
-                                                            <span class="subTitle">Create</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 12:00 am </span>
-                                                            <span class="subTitle">Update</span>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <span class="pull-right"> 12:00 am </span>
-                                                            <span class="subTitle">Expire</span>
-                                                        </li>
+
+                                                    <ul class="list-group clear-list" id="ulWhois">
+                                                        @if(response.whois.registrar != null && response.whois.registrar != "") {
+                                                            <li class="list-group-item fist-item">
+                                                                <span class="pull-right"> @response.whois.registrar </span>
+                                                                <span class="subTitle">Registrar</span>
+                                                            </li>
+                                                        }
+                                                        @if(response.whois.whoisServer != null && response.whois.whoisServer != "") {
+                                                            <li class="list-group-item">
+                                                                <span class="pull-right"> @response.whois.whoisServer </span>
+                                                                <span class="subTitle">Whois Server</span>
+                                                            </li>
+                                                        }
+                                                        @if(response.whois.nameServer != null && response.whois.nameServer.length>0) {
+                                                            <li class="list-group-item">
+                                                                <span class="pull-right">
+                                                                @for(nameserver <- response.whois.nameServer) {
+                                                                    <span class="editable">@nameserver</span>
+                                                                }
+                                                                </span>
+                                                                <span class="subTitle">Name Server</span>
+                                                            </li>
+                                                        }
+                                                        @if(response.whois.create != null && response.whois.create != "") {
+                                                            <li class="list-group-item">
+                                                                <span class="pull-right"> @response.whois.create </span>
+                                                                <span class="subTitle">Create</span>
+                                                            </li>
+                                                        }
+                                                        @if(response.whois.update != null && response.whois.update != "") {
+                                                            <li class="list-group-item">
+                                                                <span class="pull-right"> @response.whois.update </span>
+                                                                <span class="subTitle">Update</span>
+                                                            </li>
+                                                        }
+                                                        @if(response.whois.expire != null && response.whois.expire != "") {
+                                                            <li class="list-group-item">
+                                                                <span class="pull-right"> @response.whois.expire </span>
+                                                                <span class="subTitle">Expire</span>
+                                                            </li>
+                                                        }
                                                     </ul>
                                                 </div>
-                                                <div class="col-md-9 col-sm-9 col-xs-12">
+                                                <div class="col-lg-8 col-sm-12 col-xs-12">
                                                     <div class="row top_tiles">
                                                         <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                                             <div class="tile-stats">
                                                                 <div class="icon"><i class="fa fa-users green"></i></div>
-                                                                <div class="count ">179</div>
+                                                                <div class="count ">@formatNumber(response.current.queries)</div>
                                                                 <span class="spanTit">Queries</span>
                                                             </div>
                                                         </div>
                                                         <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                                             <div class="tile-stats">
                                                                 <div class="icon"><i class="fa fa-user green"></i></div>
-                                                                <div class="count">179</div>
+                                                                <div class="count">@formatNumber(response.current.clients)</div>
                                                                 <span class="spanTit">Clients</span>
                                                             </div>
                                                         </div>
                                                         <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                                             <div class="tile-stats">
                                                                 <div class="icon"><i class="fa fa-server green"></i></div>
-                                                                <div class="count">179</div>
+                                                                <div class="count">@formatNumber(response.current.domains)</div>
                                                                 <span class="spanTit">Domains</span>
                                                             </div>
                                                         </div>
@@ -378,14 +499,14 @@
                                                                     <div class="clearfix"></div>
                                                                 </div>
                                                                 <div class="x_content">
-                                                                    <div id="int-col-dayofMonth" style="height:250px;"></div>
+                                                                    <div id="col-hourly" style="height:250px;"></div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="profile_title row">
                                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                                            <div class="x_panel tile fixed_height_320">
+                                                            <div class="x_panel tile fixed_height_350">
                                                                 <div class="x_title">
                                                                     <h2> Daily Queries</h2>
                                                                     <ul class="nav navbar-right panel_toolbox">
@@ -405,8 +526,8 @@
                                                                     </ul>
                                                                     <div class="clearfix"></div>
                                                                 </div>
-                                                                <div class="x_content">
-                                                                    <div id="int-col-dayofMonth" style="height:250px;"></div>
+                                                                <div class="x_content" >
+                                                                    <div id="line-daily" style="height:250px;"></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -493,6 +614,8 @@
         <script src="../assets/javascripts/jquery-ui.js"></script>
         <script type="text/javascript">
                 $(document).ready(function () {
+                    if($('#ulWhois li').length==0)
+                        $('#ulWhois').css('display','none');
                     // autocomplete
                     var listDomain = [
                         "24h.com.vn","google.com","facebook.com","zing.vn","vnexpress.net"
@@ -506,5 +629,8 @@
                     });
                 });
         </script>
+        @if(response != null) {
+            @scripts(response)
+        }
     </body>
 </html>
