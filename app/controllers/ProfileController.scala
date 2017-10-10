@@ -36,7 +36,7 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
     val formValidationResult = form.bindFromRequest
     try {
       if (!formValidationResult.hasErrors) {
-        val domain = formValidationResult.get.q
+        val domain = formValidationResult.get.q.trim()
         val second = DomainUtil.extract(domain).second
         val logo = CommonService.getLogo(second, false)
         val response = CacheService.getDomain(second)

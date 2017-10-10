@@ -1,6 +1,7 @@
 @(response: model.user.ProfileResponse, contract: String, idPayTv: String)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.formatNumHour
 
 <script type="text/javascript">
         $(document).ready(function () {
@@ -30,7 +31,7 @@
                  $(this).parent().parent().addClass('hight-light');
                 // chart hourly vector
                 var hourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => x.key))));
-                var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => x.value))));
+                var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => formatNumHour(x.value)))));
                 var hourInMonth = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourlyInMonths.map(x => x.value))));
                   Highcharts.chart('line-hourVector', {
                     chart: {
@@ -55,7 +56,7 @@
                     },
                     yAxis: [{ // Primary yAxis
                         title: {
-                            text: 'Duration (seconds)',
+                            text: 'Duration (hours)',
                             style: {
                                 color: "#1ABB9C"
                             }
@@ -132,7 +133,7 @@
                   });
                   // Build the chart line daily vector
                   var daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.dayOfWeek.map(x => x.key))));
-                  values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.dayOfWeek.map(x => x.value))));
+                  values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.dayOfWeek.map(x => formatNumHour(x.value)))));
                   Highcharts.chart('col-dayVector', {
                       chart: {
                           type: 'column'
@@ -146,7 +147,7 @@
                       yAxis: {
                           min: 0,
                           title: {
-                              text: 'Average'
+                              text: 'Average(hours)'
                           }
                       },
                       tooltip: {
@@ -172,7 +173,7 @@
 
                       }]
                   });
-                  // Build the chart line iptv vector
+                  // Build the chart pie iptv vector
                   var iptvVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptv.filter(x => x.value > 0).map(x => x.key -> x.value))));
                   Highcharts.chart('pie-iptvVector', {
                       chart: {
@@ -186,14 +187,14 @@
                       },
                       plotOptions: {
                           pie: {
-                              colors: [
+                             /* colors: [
                                   '#9B59B6',
                                   '#1ABB9C',
                                   '#3498DB',
                                   '#9CC2CB',
                                   '#E74C3C',
                                   '#73879C'
-                              ],
+                              ],*/
                               allowPointSelect: true,
                               cursor: 'pointer',
                               dataLabels: {
@@ -209,7 +210,123 @@
                           data: iptvVectors
                       }]
                   });
-
+                  // Build the chart pie vod vector
+                  @if(response.paytv.vectors.get(p._1).get.vod != null){
+                      var vodVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.vod.filter(x => x.value > 0).map(x => x.key -> x.value))));
+                      Highcharts.chart('pie-vodVector', {
+                          chart: {
+                              type: 'pie'
+                          },
+                          title: {
+                              text: ''
+                          },
+                          tooltip: {
+                              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                          },
+                          plotOptions: {
+                              pie: {
+                                  /*colors: [
+                                      '#9B59B6',
+                                      '#1ABB9C',
+                                      '#3498DB',
+                                      '#9CC2CB',
+                                      '#E74C3C',
+                                      '#73879C'
+                                  ],*/
+                                  allowPointSelect: true,
+                                  cursor: 'pointer',
+                                  dataLabels: {
+                                      enabled: true
+                                  },
+                                  showInLegend: true
+                              }
+                          },
+                          series: [{
+                              name: 'Percent',
+                              innerSize: '40%',
+                              colorByPoint: true,
+                              data: vodVectors
+                          }]
+                      });
+                  }
+                  // Build the chart pie vod child vector
+                  @if(response.paytv.vectors.get(p._1).get.vodthieunhi != null){
+                      var vodChildVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.vodthieunhi.filter(x => x.value > 0).map(x => x.key -> x.value))));
+                      Highcharts.chart('pie-vodChildVector', {
+                          chart: {
+                              type: 'pie'
+                          },
+                          title: {
+                              text: ''
+                          },
+                          tooltip: {
+                              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                          },
+                          plotOptions: {
+                              pie: {
+                                  /*colors: [
+                                      '#9B59B6',
+                                      '#1ABB9C',
+                                      '#3498DB',
+                                      '#9CC2CB',
+                                      '#E74C3C',
+                                      '#73879C'
+                                  ],*/
+                                  allowPointSelect: true,
+                                  cursor: 'pointer',
+                                  dataLabels: {
+                                      enabled: true
+                                  },
+                                  showInLegend: true
+                              }
+                          },
+                          series: [{
+                              name: 'Percent',
+                              innerSize: '40%',
+                              colorByPoint: true,
+                              data: vodChildVectors
+                          }]
+                      });
+                  }
+                  // Build the chart pie vod child vector
+                  @if(response.paytv.vectors.get(p._1).get.vodgiaitri != null){
+                      var vodRelaxVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.vodgiaitri.filter(x => x.value > 0).map(x => x.key -> x.value))));
+                      Highcharts.chart('pie-vodRelaxVector', {
+                          chart: {
+                              type: 'pie'
+                          },
+                          title: {
+                              text: ''
+                          },
+                          tooltip: {
+                              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                          },
+                          plotOptions: {
+                              pie: {
+                                  /*colors: [
+                                      '#9B59B6',
+                                      '#1ABB9C',
+                                      '#3498DB',
+                                      '#9CC2CB',
+                                      '#E74C3C',
+                                      '#73879C'
+                                  ],*/
+                                  allowPointSelect: true,
+                                  cursor: 'pointer',
+                                  dataLabels: {
+                                      enabled: true
+                                  },
+                                  showInLegend: true
+                              }
+                          },
+                          series: [{
+                              name: 'Percent',
+                              innerSize: '40%',
+                              colorByPoint: true,
+                              data: vodRelaxVectors
+                          }]
+                      });
+                  }
                   // Build the chart line app-daily vector
                   var appHour2 = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.appHourly2)));
             Highcharts.chart('line-appHourVector', {
@@ -342,7 +459,7 @@
 
                   // Build the chart line day of month vector
                   daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x._1))));
-                  values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x._2))));
+                  values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => formatNumHour(x._2)))));
                   Highcharts.chart('col-dayofMonth', {
                       chart: {
                           type: 'column'
@@ -357,7 +474,7 @@
                       yAxis: {
                           min: 0,
                           title: {
-                              text: 'Average'
+                              text: 'Average duration(hours)'
                           }
                       },
                       tooltip: {
@@ -430,7 +547,7 @@
 
             // Build the chart line hourly vector
             var hourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.hourly.map(x => x.key))));
-            var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.hourly.map(x => x.value))));
+            var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.hourly.map(x => formatNumHour(x.value)))));
             var hourInmonth = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.hourlyInMonths.map(x => x.value))));
             Highcharts.chart('line-hourVector', {
                 chart: {
@@ -455,7 +572,7 @@
                 },
                 yAxis: [{ // Primary yAxis
                     title: {
-                        text: 'Duration (seconds)',
+                        text: 'Duration (hours)',
                         style: {
                             color: "#1ABB9C"
                         }
@@ -606,7 +723,6 @@
 
             // Build the chart line iptv vector
             var iptvVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptv.filter(x => x.value > 0).map(x => x.key -> x.value))));
-
             Highcharts.chart('pie-iptvVector', {
                 chart: {
                     type: 'pie'
@@ -619,14 +735,14 @@
                 },
                 plotOptions: {
                     pie: {
-                        colors: [
+                        /*colors: [
                             '#9B59B6',
                             '#1ABB9C',
                             '#3498DB',
                             '#9CC2CB',
                             '#E74C3C',
                             '#73879C'
-                        ],
+                        ],*/
                         allowPointSelect: true,
                         cursor: 'pointer',
                         dataLabels: {
@@ -642,10 +758,127 @@
                     data: iptvVectors
                 }]
             });
+            // Build the chart pie vod vector
+            @if(response.paytv.vectors.get(idPayTv).get.vod != null){
+                var vodVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.vod.filter(x => x.value > 0).map(x => x.key -> x.value))));
+                Highcharts.chart('pie-vodVector', {
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            /*colors: [
+                                '#9B59B6',
+                                '#1ABB9C',
+                                '#3498DB',
+                                '#9CC2CB',
+                                '#E74C3C',
+                                '#73879C'
+                            ],*/
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    series: [{
+                        name: 'Percent',
+                        innerSize: '40%',
+                        colorByPoint: true,
+                        data: vodVectors
+                    }]
+                });
+            }
+            // Build the chart pie vod child vector
+            @if(response.paytv.vectors.get(idPayTv).get.vodthieunhi != null){
+                var vodChildVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.vodthieunhi.filter(x => x.value > 0).map(x => x.key -> x.value))));
+                Highcharts.chart('pie-vodChildVector', {
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            /*colors: [
+                                '#9B59B6',
+                                '#1ABB9C',
+                                '#3498DB',
+                                '#9CC2CB',
+                                '#E74C3C',
+                                '#73879C'
+                            ],*/
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    series: [{
+                        name: 'Percent',
+                        innerSize: '40%',
+                        colorByPoint: true,
+                        data: vodChildVectors
+                    }]
+                });
+            }
+            // Build the chart pie vod child vector
+            @if(response.paytv.vectors.get(idPayTv).get.vodgiaitri != null){
+                var vodRelaxVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.vodgiaitri.filter(x => x.value > 0).map(x => x.key -> x.value))));
+                Highcharts.chart('pie-vodRelaxVector', {
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            /*colors: [
+                                '#9B59B6',
+                                '#1ABB9C',
+                                '#3498DB',
+                                '#9CC2CB',
+                                '#E74C3C',
+                                '#73879C'
+                            ],*/
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    series: [{
+                        name: 'Percent',
+                        innerSize: '40%',
+                        colorByPoint: true,
+                        data: vodRelaxVectors
+                    }]
+                });
+            }
 
             // Build the chart line daily vector
             var daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.dayOfWeek.map(x => x.key))));
-                values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.dayOfWeek.map(x => x.value))));
+                values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.dayOfWeek.map(x => formatNumHour(x.value)))));
             Highcharts.chart('col-dayVector', {
                 chart: {
                     type: 'column'
@@ -660,7 +893,7 @@
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Average'
+                        text: 'Average(hours)'
                     }
                 },
                 tooltip: {
@@ -689,7 +922,7 @@
 
             // Build the chart line day of month vector
             daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x._1))));
-            values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x._2))));
+            values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => formatNumHour(x._2)))));
             Highcharts.chart('col-dayofMonth', {
                 chart: {
                     type: 'spline'
@@ -704,7 +937,7 @@
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Average Duration (seconds)'
+                        text: 'Average Duration(hours)'
                     }
                 },
                 tooltip: {
@@ -736,7 +969,7 @@
 
             // Build the chart line hourly vector
             hourly = @Html(Json.stringify(Json.toJson(response.internet.duration.hourly.map(x => x._1))));
-            values = @Html(Json.stringify(Json.toJson(response.internet.duration.hourly.map(x => x._2))));
+            values = @Html(Json.stringify(Json.toJson(response.internet.duration.hourly.map(x => formatNumHour(x._2)))));
             Highcharts.chart('int-durHourVector', {
                 chart: {
                     type: 'column'
@@ -760,7 +993,7 @@
 
                 }, yAxis: {
                   title: {
-                    text: "Time (seconds)"
+                    text: "Time (hours)"
                   }
                   
                 },
@@ -897,7 +1130,7 @@
                     }]
             });
            // Build the chart line hourly vector
-            values = @Html(Json.stringify(Json.toJson(response.internet.duration.dayOfWeek.map(x => x._2).toList.transpose.map(_.sum))));
+            values = @Html(Json.stringify(Json.toJson(response.internet.duration.dayOfWeek.map(x => x._2).toList.transpose.map(_.sum).map(x => formatNumHour(x)))));
             Highcharts.chart('int-pie-durDayVector', {
                 chart: {
                     type: 'column'
@@ -915,7 +1148,7 @@
                 },
                  yAxis: {
                   title: {
-                    text: "Time (seconds)"
+                    text: "Time (hours)"
                   }
                   
                 },
@@ -1158,12 +1391,21 @@
         function getJsonAppVector(appHour){
             var jsonArr = [];
             for (var i = 0; i < appHour.length; i++) {
+               /* console.log(appHour[i][1])
+                console.log("aaaaa")
+                console.log(convertHourly(appHour[i][1]))*/
                 jsonArr.push({
                     type: "spline",
                     name: appHour[i][0],
-                    data: appHour[i][1]
+                    data: convertHourly(appHour[i][1])
                 });
             }
             return jsonArr
+        }
+        function convertHourly(arr){
+            for(var i=0; i< arr.length;i++){
+                arr[i] = arr[i]/3600 * 1.00
+            }
+            return arr
         }
  </script>

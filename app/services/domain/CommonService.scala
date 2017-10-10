@@ -333,6 +333,11 @@ object CommonService extends AbstractService {
     BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 
+  def formatNumHour(number: Double):Double = {
+    val value = number/ 3600 * 1.00
+    BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+
   def getOthers(orgs: Array[(String, Int)], total: Int): Int ={
 
     total - orgs.map(x=>x._2).sum
