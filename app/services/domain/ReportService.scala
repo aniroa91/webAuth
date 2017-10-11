@@ -58,7 +58,7 @@ object ReportService extends AbstractService {
     val currentClientUnique = multiSearchResponse.responses(3)
     val previousClientUnique = multiSearchResponse.responses(4)
     
-    val orgResponse = multiSearchResponse.responses(5)
+    val orgResponse: SearchResponse = multiSearchResponse.responses(5)
     val countryResponse = multiSearchResponse.responses(6)
     val hourlyResponse = multiSearchResponse.responses(7)
 
@@ -73,11 +73,17 @@ object ReportService extends AbstractService {
       val malwares = getMalwareInfo2(malwaresResponse) // Array(1,2,3,4,5,6,7,8,9,10).reverse.map(x => MalwareInfo("test", x, 1, 1))//
       val blacks = CommonService.getTopByNumOfQuery(day, Label.Black)
       val seconds = CommonService.getTopRank(1, day)
+      val org = if (orgResponse.hits != null) {
+          orgResponse.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "org") -> getValueAsInt(x, NUM_QUERY_FIELD))
+        } else Array[(String, Int)]()
+      val country = if (countryResponse.hits != null) {
+          countryResponse.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "country") -> getValueAsInt(x, NUM_QUERY_FIELD)) 
+        } else Array[(String, Int)]()
       
-      val org = orgResponse.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "org") -> getValueAsInt(x, NUM_QUERY_FIELD))
-      val country = countryResponse.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "country") -> getValueAsInt(x, NUM_QUERY_FIELD))
-      val hourly = hourlyResponse.hits.hits.map(x => x.sourceAsMap)
-        .map(x => DayHourly(getValueAsInt(x, "hour"), getValueAsInt(x, NUM_QUERY_FIELD), getValueAsInt(x, NUM_IP_FIELD), getValueAsInt(x, NUM_SECOND_FIELD)))
+      val hourly = if (hourlyResponse.hits != null) {
+          hourlyResponse.hits.hits.map(x => x.sourceAsMap)
+            .map(x => DayHourly(getValueAsInt(x, "hour"), getValueAsInt(x, NUM_QUERY_FIELD), getValueAsInt(x, NUM_IP_FIELD), getValueAsInt(x, NUM_SECOND_FIELD)))
+        } else Array[DayHourly]()
 
       //def sort(arr: Array[(String, Int)]): Array[(String, Int)] = Sort[(String, Int)](arr, (x: (String, Int)) => x._2, false)
       def sort(arr: Array[DayHourly]): Array[DayHourly] = Sort[DayHourly](arr, (x: DayHourly) => x.hour, true)
