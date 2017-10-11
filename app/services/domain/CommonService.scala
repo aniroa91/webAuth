@@ -42,8 +42,8 @@ object CommonService extends AbstractService {
    */
   def getLatestDay(): String = {
     val response = client.execute(
-      search("dns-daily-*" / "docs") sortBy { fieldSort("day") order SortOrder.DESC } limit 1).await
-    response.hits.hits.head.sourceAsMap.getOrElse("day", "").toString()
+      search("dns-marker" / "docs") sortBy { fieldSort("day") order SortOrder.DESC } limit 1).await
+    response.hits.hits.head.id//.sourceAsMap.getOrElse("day", "").toString()
   }
 
   def getPreviousDay(day: String): String = {

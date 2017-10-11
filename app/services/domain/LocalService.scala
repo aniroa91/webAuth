@@ -80,6 +80,7 @@ object LocalService extends AbstractService {
   
   def main(args: Array[String]) {
     val day = CommonService.getLatestDay()
+    println(day)
     //val last30Days = CommonService.getPreviousDay(day, 30)
     //val topLast30Day = CommonService.getTopByNumOfQueryWithRange(last30Days, day)
     //println(topLast30Day.sortBy(x => x.queries).reverse.head)
@@ -185,6 +186,9 @@ object LocalService extends AbstractService {
     //buckets.map(x => )
     //val map = terms.getAggregations.asMap()
     println(res)
+    println(CommonService.getLatestDay())
     client.close()
+    
+    
   }
 }
