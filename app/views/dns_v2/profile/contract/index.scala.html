@@ -36,6 +36,7 @@
             <!-- Custom Theme Style -->
         <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
         <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
+        <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
 
         <link href="../assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
@@ -206,11 +207,15 @@
                 }
                 .tile-stats{
                     text-align: center;
-                    color: green;
+                    color: #73879C;
                 }
                 .tile-stats .price-tax{
                     color: #73879C;
                     font-weight: bold;
+                }
+                .numText{
+                    font-size: 18px;
+                    font-weight: 600;
                 }
         </style>
     </head>
@@ -308,10 +313,10 @@
                                                 <div class="profile_img">
                                                     <div id="crop-avatar">
                                                             <!-- Current avatar -->
-                                                        <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
+                                                        <img class="img-responsive avatar-view" src="../assets/images/logo/fpt.jpg" alt="Avatar" title="Change the avatar">
                                                     </div>
                                                 </div>
-                                                <h3 class="name_title" style="color: green">@response.internet.contract.contract</h3>
+                                                <h3 class="name_title hvr-pulse" style="color: green">@response.internet.contract.contract</h3>
                                                 
                                                 <ul class="list-unstyled user_data">
                                                     <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.contract.province - @response.internet.contract.region
@@ -347,18 +352,18 @@
                                                 <div></div>
                                                 <br />
                                                 <ul class="stats-overview">
-                                                    <li>
+                                                    <li class="hvr-underline-from-left" style="vertical-align: initial;">
                                                         <h1 class="price"><font size=6>@formatNumber((response.internet.downUp.downDaily.map(x => x._2).sum * 1024 / 28).toLong)</font></h1>
                                                         <span class="price-tax">Download/day (MB)</span>
                                                     </li>
-                                                    <li>
+                                                    <li class="hvr-underline-from-right" style="vertical-align: initial;">
                                                         <h1 class="price"><font size=6>@formatNumber((response.internet.downUp.upDaily.map(x => x._2).sum  * 1024 / 28).toLong)</font></h1>
                                                         <span class="price-tax">Upload/day (MB)</span>
                                                     </li>
                                                 </ul>
                                                 <br />
                                                 @if(response.internet.session != null) {
-                                                <div class="x-content" id="payInfor">
+                                                <div class="x-content hvr-wobble-top" style="display: inherit;">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
                                                             <h4>Session information</h4>
@@ -431,7 +436,7 @@
                                                 }
                                                 <br />
                                                 @if(response.internet.sessiontType != null) {
-                                                <div class="x-content" id="payInfor">
+                                                <div class="x-content hvr-wobble-top" style="display: inherit;">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
                                                             <h4>Ticket information</h4>
@@ -471,11 +476,11 @@
                                             <div class="col-md-9 col-sm-9 col-xs-12">
                                                 <div class="row">
                                                 @if(response.paytv != null) {
-                                                   <div class="col-md-6 col-sm-6 col-xs-12">
+                                                   <div class="col-md-6 col-sm-6 col-xs-12 hvr-wobble-top">
                                                 }else{
-                                                    <div class="col-xs-12">
+                                                    <div class="col-xs-12 hvr-wobble-top">
                                                 }
-                                                <div class="x-content" id="payInfor">
+                                                <div class="x-content">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
                                                             <h2>Internet Info</h2>
@@ -548,9 +553,9 @@
                                                 </div>
                                                 </div>
                                                     @if(response.paytv != null) {
-                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                <div class="col-md-6 col-sm-6 col-xs-12 hvr-wobble-top">
 
-                                                <div class="x-content" id="payInfor">
+                                                <div class="x-content">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
                                                             <h2>PayTV Info</h2>
@@ -787,10 +792,35 @@
 
                                                         </div>
                                                         <div role="tabpanel" class="tab-pane fade" id="tab_device" aria-labelledby="device-tab">
-
                                                             <div class="profile_title row">
-
-                                                                <div class="col-lg-9 col-sm-9 col-md-9  col-xs-12">
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 boxCss animated flipInY">
+                                                                    <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
+                                                                        <div class="count ">@response.internet.device.numberOfDevice</div>
+                                                                        <span class="numText">Number of devices</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 boxCss animated flipInY ">
+                                                                    <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
+                                                                        <div class="count"> @response.internet.device.numberOfVender</div>
+                                                                        <span class="numText">Number of vendors</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 boxCss animated flipInY ">
+                                                                    <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
+                                                                        <div class="count">@response.internet.device.numberOfDeviceType</div>
+                                                                        <span class="numText"> Number of device types </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 boxCss animated flipInY ">
+                                                                    <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
+                                                                        <div class="count" style="color: ">@response.internet.device.numberOfMobile</div>
+                                                                        <span class="numText"> Number of mobiles </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <br>
+                                                            <div class="profile_title row">
+                                                                <div class="col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
                                                                             <h2>Device types</h2>
@@ -840,38 +870,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12" style="padding: 20px;margin-top: 20px">
-                                                                    <div class="boxCss animated flipInY ">
-                                                                        <div class="tile-stats">
-                                                                            <div class="count ">@response.internet.device.numberOfDevice</div>
-                                                                            <span class="price-tax">Number of devices</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="boxCss animated flipInY ">
-                                                                        <div class="tile-stats">
-                                                                            <div class="count"> @response.internet.device.numberOfVender</div>
-                                                                            <span class="price-tax">Number of venders</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="boxCss animated flipInY ">
-                                                                        <div class="tile-stats">
-                                                                            <div class="count">@response.internet.device.numberOfDeviceType</div>
-                                                                            <span class="price-tax"> Number of device types </span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="boxCss animated flipInY ">
-                                                                        <div class="tile-stats">
-                                                                            <div class="count">@response.internet.device.numberOfMobile</div>
-                                                                            <span class="price-tax"> Number of mobiles </span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="boxCss animated flipInY ">
-                                                                        <div class="tile-stats">
-                                                                            <div class="count">@response.internet.device.numberOfPermanent</div>
-                                                                            <span class="price-tax"> Number of permanent </span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
+
 
                                                             </div>
                                                         </div>

@@ -34,6 +34,7 @@
                         <!-- Custom Theme Style -->
                     <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
                     <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
+                    <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
                         <!--  Datepicker -->
                     <link href="../assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
 
@@ -103,6 +104,15 @@
                             }
                             .right_col{
                                 min-height: inherit!important;
+                            }
+                            .disInline{
+                                width: 100%;
+                                display: -webkit-inline-flex;
+                                display: -ms-inline-flexbox;
+                                display: inline-flex;
+                            }
+                            .titleChild{
+                                width: 20%;padding-right: 15px;padding-left: 15px;
                             }
                     </style>
                 </head>
@@ -178,234 +188,239 @@
 
                 <!-- page content -->
             <div class="right_col" role="main">
-                    <!-- top tiles -->
-                @tile(response.current, response.previous)
-                    <!-- /top tiles -->
-                <div class="row x_title"></div>
+                @if(response != null) {
+                        <!-- top tiles -->
+                    @tile(response.current, response.previous)
+                        <!-- /top tiles -->
+                    <div class="row x_title"></div>
 
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="dashboard_graph">
-                            <!--
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="dashboard_graph">
+                                    <!--
                             <div class="row x_title">
                                 <div class="col-md-6">
                                     <h3>Hourly Activities <small>Number of query and client by hour</small></h3>
                                 </div>
                             </div>
                             -->
-                            <div class="col-md-7 col-sm-7 col-xs-12">
-                                <div id="chart-line" style="min-width: 310px; height: 400px; margin-top: 50px"></div>
-                            </div>
+                                <div class="col-md-7 col-sm-7 col-xs-12">
+                                    <div id="chart-line" style="min-width: 310px;
+                                        height: 400px;
+                                        margin-top: 50px"></div>
+                                </div>
 
-                            <div class="col-md-5 col-sm-5 col-xs-12 bg-white">
-                                <!--
+                                <div class="col-md-5 col-sm-5 col-xs-12 bg-white">
+                                        <!--
                                 <div class="x_title">
                                     <h2>Classify Labels</h2>
                                     <div class="clearfix"></div>
                                 </div>
                                 -->
-                                <div class="col-md-12">
-                                    <div class="panel with-nav-tabs panel-default">
-                                        <div class="panel-heading">
-                                            <ul class="nav nav-tabs">
-                                                <li class="active"><a href="#tab1default" data-toggle="tab">Query</a></li>
-                                                <li><a href="#tab2default" data-toggle="tab">Client</a></li>
-                                                <li><a href="#tab3default" data-toggle="tab">Second Domain</a></li>
+                                    <div class="col-md-12">
+                                        <div class="panel with-nav-tabs panel-default">
+                                            <div class="panel-heading">
+                                                <ul class="nav nav-tabs">
+                                                    <li class="active"><a href="#tab1default" data-toggle="tab">
+                                                        Query</a></li>
+                                                    <li><a href="#tab2default" data-toggle="tab">Client</a></li>
+                                                    <li><a href="#tab3default" data-toggle="tab">Second Domain</a></li>
 
-                                            </ul>
-                                        </div>
-                                        <div class="panel-body">
-                                            <div class="tab-content">
-                                                <div class="tab-pane fade in active" id="tab1default">
-                                                    <div id="echart_pie1" style="height:300px;"></div>
-                                                </div>
-                                                <div class="tab-pane fade" id="tab2default">
-                                                    <div id="echart_pie2" style="height:300px;"></div>
-                                                </div>
-                                                <div class="tab-pane fade" id="tab3default">
-                                                    <div id="echart_pie3" style="height:300px;"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
-
-                </div>
-                <br />
-
-                <div class="row">
-
-
-                    <div class="col-md-4 col-sm-4 col-xs-12">
-                        <div class="x_panel tile fixed_height_320">
-                            <div class="x_title">
-                                <h2> Top 5 Domain</h2>
-                                <ul class="nav navbar-right panel_toolbox">
-                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li><a href="#">Settings 1</a>
-                                            </li>
-                                            <li><a href="#">Settings 2</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                    </li>
-                                </ul>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div id="top5Main" style="height:400px;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 col-sm-4 col-xs-12">
-                        <div class="x_panel tile fixed_height_320">
-                            <div class="x_title">
-                                <h2> Top 5 Organization</h2>
-                                <ul class="nav navbar-right panel_toolbox">
-                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li><a href="#">Settings 1</a>
-                                            </li>
-                                            <li><a href="#">Settings 2</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                    </li>
-                                </ul>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                              @topOrg(response.current, response.org)
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 col-sm-4 col-xs-12">
-                        <div class="x_panel tile fixed_height_320">
-                            <input type="hidden" id="ttBlackQ"/>
-                            <div class="x_title">
-                                <h2> Top 5 Malware</h2>
-                                <ul class="nav navbar-right panel_toolbox">
-                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li><a href="#">Settings 1</a>
-                                            </li>
-                                            <li><a href="#">Settings 2</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                    </li>
-                                </ul>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div id="top5Malware" style="height:400px;"></div>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-
-
-                <div class="row">
-
-                    <div class="col-md-7 col-sm-7 col-xs-12">
-                        <div class="x_panel">
-                            <div class="x_title">
-                                <h2>Top 100 Main Domain Black</h2>
-                                <ul class="nav navbar-right panel_toolbox">
-                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li><a href="#">Settings 1</a>
-                                            </li>
-                                            <li><a href="#">Settings 2</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                    </li>
-                                </ul>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                            @topRankTable(
-                                Array[String]("Domain", "Malware", "Queries", "Clients"),
-                                response.blacks.map(x => Array[Any](
-                                    x.name,
-                                    x.malware,
-                                    formatNumber(x.queries),
-                                    formatNumber(x.clients))
-                                ).toArray,
-                                "top-1000-domain-black"
-                            )
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-5 col-sm-5 col-xs-12">
-
-                        <div class="row">
-
-                            <div class="col-md-12 col-sm-12 col-xs-12">
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Domains location</h2>
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                            </li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Settings 1</a>
-                                                    </li>
-                                                    <li><a href="#">Settings 2</a>
-                                                    </li>
                                                 </ul>
-                                            </li>
-                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                            </li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div class="dashboard-widget-content">
-                                            <div class="col-md-3 hidden-small">
-                                                @topCountry(response.country)
                                             </div>
-                                            <div id="wdmap" class="col-md-9 col-sm-12 col-xs-12" style="height:300px;"></div>
+                                            <div class="panel-body">
+                                                <div class="tab-content">
+                                                    <div class="tab-pane fade in active animated zoomIn" id="tab1default">
+                                                        <div id="echart_pie1" style="height: 300px;"></div>
+                                                    </div>
+                                                    <div class="tab-pane fade animated zoomIn" id="tab2default">
+                                                        <div id="echart_pie2" style="height: 300px;"></div>
+                                                    </div>
+                                                    <div class="tab-pane fade animated zoomIn" id="tab3default">
+                                                        <div id="echart_pie3" style="height: 300px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
+                                <div class="clearfix"></div>
+                            </div>
                         </div>
+
+                    </div>
+                    <br />
+
+                    <div class="row">
+
+
+                        <div class="col-md-4 col-sm-4 col-xs-12 hvr-wobble-bottom">
+                            <div class="x_panel tile fixed_height_320">
+                                <div class="x_title">
+                                    <h2> Top 5 Domain</h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="top5Main" style="height: 400px;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4 col-xs-12 hvr-wobble-bottom">
+                            <div class="x_panel tile fixed_height_320">
+                                <div class="x_title">
+                                    <h2> Top 5 Organization</h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                @topOrg(response.current, response.org)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4 col-xs-12 hvr-wobble-bottom">
+                            <div class="x_panel tile fixed_height_320">
+                                <input type="hidden" id="ttBlackQ"/>
+                                <div class="x_title">
+                                    <h2> Top 5 Malware</h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="top5Malware" style="height: 400px;"></div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
 
-                </div>
+
+                    <div class="row">
+
+                        <div class="col-md-7 col-sm-7 col-xs-12">
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Top 100 Main Domain Black</h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                @topRankTable(
+                                    Array[String]("Domain", "Malware", "Queries", "Clients"),
+                                    response.blacks.map(x => Array[Any](
+                                        x.name,
+                                        x.malware,
+                                        formatNumber(x.queries),
+                                        formatNumber(x.clients))
+                                    ).toArray,
+                                    "top-1000-domain-black"
+                                )
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5 col-sm-5 col-xs-12">
+
+                            <div class="row">
+
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2>Domains location</h2>
+                                            <ul class="nav navbar-right panel_toolbox">
+                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                </li>
+                                                <li class="dropdown">
+                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                    <ul class="dropdown-menu" role="menu">
+                                                        <li><a href="#">Settings 1</a>
+                                                        </li>
+                                                        <li><a href="#">Settings 2</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                </li>
+                                            </ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div class="dashboard-widget-content">
+                                                <div class="col-md-12 hidden-small">
+                                                @topCountry(response.country)
+                                                </div>
+                                                <div id="wdmap" class="col-md-12 col-sm-12 col-xs-12" style="height: 390px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                }
             </div>
                 <!-- /page content -->
 
@@ -473,6 +488,35 @@
     <script src="../assets/javascripts/jquery.counterup.min.js"></script>
         <!--  Datepicker -->
     <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
-    @scripts(day, response.labels, response,response.current.queries)
+    <script type="text/javascript">
+            $(document).ready(function () {
+
+                        $(function () {
+                            $('[data-toggle="tooltip"]').tooltip({trigger: 'manual'}).tooltip('show');
+                        });
+                        $('#dateTime').datepicker({
+                            format: "dd/mm/yyyy",
+                            autoclose: true,
+                            endDate: '+0d',
+                            todayHighlight: true
+                        }).on('changeDate', function (e) {
+                            window.location.href = '/report?day=' + e.date.format('Y-m-d')
+                        });
+
+                        $(".progress-bar").each(function () {
+                            each_bar_width = $(this).attr('aria-valuenow');
+                            $(this).width(each_bar_width + '%');
+                        });
+
+                        // auto count number
+                        $('.counter').counterUp({
+                            delay: 10,
+                            time: 1000
+                        });
+                    });
+     </script>
+    @if(response != null) {
+        @scripts(day, response.labels, response, response.current.queries)
+    }
 </body>
  </html>

@@ -35,6 +35,7 @@
             <!-- Custom Theme Style -->
         <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
         <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
+        <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
 
         <link href="../assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
@@ -168,10 +169,6 @@
                 .subTitle{
                     font-weight: 600;
                     color: green;
-                }
-                .tile-stats:hover{
-                    color: white!important;
-                    background: #fbb450;
                 }
                 .spanTit{
                     position: relative;
@@ -396,14 +393,14 @@
                                                     <br>
                                                     <div class="row">
                                                         <div class="col-xs-12">
-                                                            <span class="nameTitle">@domain</span>
+                                                            <span class="nameTitle hvr-pulse">@domain</span>
                                                         </div>
                                                     </div>
                                                     <br>
 
                                                     <div class="row">
                                                         <div class="col-xs-12">
-                                                            <div class="col-lg-4 col-md-4 col-xs-12" style="padding-left: 0px">
+                                                            <div class="col-lg-4 col-md-4 col-xs-12 hvr-bounce-out" style="padding-left: 0px">
                                                         @{
                                                             if (response.current.label == "black") {
                                                                 <h5 class="tit" style="background-color: #E74C3C">
@@ -428,7 +425,8 @@
                                                         }
                                                             </div>
                                                             <div class="col-lg-8 col-md-8 col-xs-12">
-                                                                <div class="col-xs-12 boxGroup">
+                                                                <div class="col-xs-12 boxGroup hvr-underline-from-left">
+
                                                                     <div class="col-md-2 col-xs-2">
                                                                         <div class="iconPurple">
                                                                             <i class="fa fa-star" style="margin-left: -13px"></i>
@@ -471,7 +469,7 @@
                                                                     }
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-md-12 col-xs-12 boxGroup">
+                                                                <div class="col-md-12 col-xs-12 boxGroup hvr-underline-from-right">
                                                                     <div class="col-md-2 col-xs-2">
                                                                         <div class="iconGreen">
                                                                             <i class="fa fa-star" style="margin-left: -13px"></i>
@@ -568,21 +566,21 @@
                                                 <div class="col-lg-8 col-sm-12 col-xs-12">
                                                     <div class="row top_tiles">
                                                         <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                                            <div class="tile-stats">
+                                                            <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
                                                                 <div class="icon"><i class="fa fa-users green"></i></div>
                                                                 <div class="count ">@formatNumber(response.current.queries)</div>
                                                                 <span class="spanTit">Queries</span>
                                                             </div>
                                                         </div>
                                                         <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                                            <div class="tile-stats">
+                                                            <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
                                                                 <div class="icon"><i class="fa fa-user green"></i></div>
                                                                 <div class="count">@formatNumber(response.current.clients)</div>
                                                                 <span class="spanTit">Clients</span>
                                                             </div>
                                                         </div>
                                                         <div class="boxCss animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                                            <div class="tile-stats">
+                                                            <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
                                                                 <div class="icon"><i class="fa fa-server green"></i></div>
                                                                 <div class="count">@formatNumber(response.current.domains)</div>
                                                                 <span class="spanTit">Domains</span>
@@ -730,9 +728,6 @@
                     if($('#ulWhois li').length==0)
                         $('#ulWhois').css('display','none');
                     // autocomplete
-                    var listDomain = [
-                        "24h.com.vn","google.com","facebook.com","zing.vn","vnexpress.net"
-                     ];
                     jQuery.get('../assets/seconds.txt', function(data) {
                         $(".autocomplete").autocomplete({
                             source: data.split('\n'),
