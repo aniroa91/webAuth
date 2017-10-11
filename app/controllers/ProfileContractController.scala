@@ -20,32 +20,30 @@ import services.user.ProfileService
 case class SearchContract(q: String)
 
 /**
-  * This controller creates an `Action` to handle HTTP requests to the
-  * application's home page.
-  */
+ * This controller creates an `Action` to handle HTTP requests to the
+ * application's home page.
+ */
 @Singleton
 class ProfileContractController @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)
-  extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] with I18nSupport {
+    extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] with I18nSupport {
 
   val form = Form(
     mapping(
-      "ct" -> text
-    )(SearchContract.apply)(SearchContract.unapply)
-  )
+      "ct" -> text)(SearchContract.apply)(SearchContract.unapply))
 
   def index = Action { implicit request: Request[AnyContent] =>
     val formValidationResult = form.bindFromRequest
-    try{
+    try {
       if (!formValidationResult.hasErrors) {
         val domain = formValidationResult.get.q.trim()
         val response = ProfileService.get(domain)
         Ok(views.html.dns_v2.profile.contract.index(form, response, domain))
       } else {
-        Ok(views.html.dns_v2.profile.contract.index(form, null,null))
+        Ok(views.html.dns_v2.profile.contract.index(form, null, null))
       }
+    } catch {
+      case e: Exception => Ok(views.html.dns_v2.profile.contract.index(form, null, null))
     }
-    catch{
-      case e: Exception => Ok(views.html.dns_v2.profile.contract.index(form, null, null))  }
   }
 }
 
