@@ -1,6 +1,7 @@
 @(day: String, response: model.ReportResponse)
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
+@import services.domain.CommonService.formatDateDDMMYY
 
 <!DOCTYPE html>
 
@@ -33,6 +34,8 @@
                         <!-- Custom Theme Style -->
                     <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
                     <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
+                        <!--  Datepicker -->
+                    <link href="../assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
 
                     <link href="../assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
                     <link href="../assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
@@ -115,7 +118,7 @@
                             <li class="dropdown">
                                 <a data-toggle="dropdown" class="site_title curSor dropdown-toggle"><i class="fa fa-globe"></i> DNS <span class="fa fa-chevron-down downTopMenu"></span></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="/report">DNS <i class="fa fa-globe pull-right"></i></a></li>
+                                    <li><a href="/">DNS <i class="fa fa-globe pull-right"></i></a></li>
                                     <li class="divider"></li>
                                     <li><a href="/paytv">Profile <i class="fa fa-user pull-right"></i></a></li>
                                     <li class="divider"></li>
@@ -155,12 +158,20 @@
 
                 <!-- top navigation -->
             <div class="top_nav">
-                <div class="nav_menu">
+                <div class="nav_menu" style="padding-right: 15px">
                     <nav>
                         <div class="nav toggle" style="margin-bottom: 10px">
                             <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                         </div>
                     </nav>
+                    <div class="form-group pull-right" style="margin-top: 13px">
+
+                        <div class="input-group date" id="dateTime" style="width: 200px">
+                            <input type="text" class="form-control" value="@formatDateDDMMYY(day)">
+                            <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true" style="color:#1ABB9C"></i>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
                 <!-- /top navigation -->
@@ -171,7 +182,7 @@
                 @tile(response.current, response.previous)
                     <!-- /top tiles -->
                 <div class="row x_title"></div>
-                                
+
                 <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="dashboard_graph">
@@ -185,7 +196,7 @@
                             <div class="col-md-7 col-sm-7 col-xs-12">
                                 <div id="chart-line" style="min-width: 310px; height: 400px; margin-top: 50px"></div>
                             </div>
-                            
+
                             <div class="col-md-5 col-sm-5 col-xs-12 bg-white">
                                 <!--
                                 <div class="x_title">
@@ -460,6 +471,8 @@
     <!-- Counter number -->
     <script src="../assets/javascripts/waypoints.min.js"></script>
     <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+        <!--  Datepicker -->
+    <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     @scripts(day, response.labels, response,response.current.queries)
 </body>
  </html>
