@@ -1,6 +1,8 @@
 @(form: Form[SearchContract],domain: String, response: model.ProfileResponse, logo: String)(implicit messages: Messages)
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
+@import services.domain.CommonService.formatNumHour
+
 
 <!DOCTYPE html>
 
@@ -249,6 +251,12 @@
                     -moz-transform: translate(-50%, -50%);
                     transform: translate(-50%, -50%);
                 }
+                .editable{
+                    color: white;
+                    background: #1ABB9C;
+                    padding: 2px;
+                    padding-top: 0px;
+                }
         </style>
     </head>
 
@@ -263,7 +271,7 @@
                                 <li class="dropdown">
                                     <a data-toggle="dropdown" class="site_title curSor dropdown-toggle"><i class="fa fa-globe"></i> DNS <span class="fa fa-chevron-down downTopMenu"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/report">DNS <i class="fa fa-globe pull-right"></i></a></li>
+                                        <li><a href="/">DNS <i class="fa fa-globe pull-right"></i></a></li>
                                         <li class="divider"></li>
                                         <li><a href="/paytv">Profile <i class="fa fa-user pull-right"></i></a></li>
                                         <li class="divider"></li>
@@ -366,19 +374,19 @@
                                                                    <i class="fa fa-map-marker"></i> @response.loc.country - @response.loc.region
                                                                </li>
                                                            }
-                                                           @if(response.loc.timezone != "") {
+                                                         @*  @if(response.loc.timezone != "") {
                                                                <li class="text-highlight">
                                                                    <i class="fa fa-location-arrow"></i> @response.loc.timezone
                                                                </li>
-                                                           }
+                                                           }*@
                                                            @if(response.loc.org != "") {
                                                                <li class="text-highlight">
                                                                    <i class="fa fa-users"></i> @response.loc.org
                                                                </li>
                                                            }
                                                            @if(response.category != "N/A") {
-                                                               <li class="text-highlight">
-                                                                   <i class="fa fa-tags"></i> @response.category
+                                                               <li class="text-highlight" style="font-size: 20px">
+                                                                   <i class="fa fa-tags"></i>   @response.category
                                                                </li>
                                                            }
                                                            </ul>
@@ -394,8 +402,8 @@
                                                             if (response.current.label == "black") {
                                                                 <h5 class="tit" style="background-color: #E74C3C;margin-left:10px">
                                                                     <label> {response.current.malware.toUpperCase()} </label>
-                                                                    <span class="fa fa-bug" style="font-size:30px;color:white;top:60%!important">
-                                                                     5600
+                                                                    <span class="fa fa-bug counter" style="font-size:30px;color:white;top:60%!important">
+                                                                     {formatNumHour(response.score * 3600)}
                                                                     </span>
                                                                 </h5>
                                                             } else if (response.current.label == "white") {
@@ -442,9 +450,19 @@
                                                                     val valuePrev = prev.rankFtel
                                                                     val diff = valuePrev - value
                                                                     if (diff >= 0) {
-                                                                            <span class="percent down iconUpPurple animated bounceInDown"> <i class="fa fa-caret-up"></i> {diff}</span>
+                                                                        if(diff>9999){
+                                                                                <span class="percent down iconUpPurple animated bounceInDown" style="font-size:14px"> <i class="fa fa-caret-up"></i> {diff}</span>
+                                                                        }
+                                                                        else {
+                                                                                <span class="percent down iconUpPurple animated bounceInDown"> <i class="fa fa-caret-up"></i> {diff}</span>
+                                                                        }
                                                                     } else {
-                                                                            <span class="percent down spanIconDown animated bounceInDown"> <i class="fa fa-caret-down"></i> {diff}</span>
+                                                                        if(diff< -999){
+                                                                                <span class="percent down spanIconDown animated bounceInDown" style="font-size:14px"> <i class="fa fa-caret-down"></i> {diff}</span>
+                                                                        }
+                                                                        else {
+                                                                                <span class="percent down spanIconDown animated bounceInDown"> <i class="fa fa-caret-down"></i> {diff}</span>
+                                                                        }
                                                                     }
                                                                 }
                                                             </div>
@@ -475,14 +493,25 @@
                                                                     val valuePrev = prev.rankAlexa
                                                                     val diff = valuePrev - value
                                                                     if (diff >= 0) {
-                                                                            <span class="percent down iconUp animated bounceInDown"> <i class="fa fa-caret-up "></i> {diff}</span>
+                                                                        if(diff>9999){
+                                                                             <span class="percent down iconUp animated bounceInDown" style="font-size:14px"><i class="fa fa-caret-up "></i>{diff}</span>
+                                                                        }
+                                                                        else {
+                                                                             <span class="percent down iconUp animated bounceInDown"><i class="fa fa-caret-up "></i>{diff}</span>
+                                                                        }
                                                                     } else {
-                                                                            <span class="percent down spanIconDown animated bounceInDown"> <i class="fa fa-caret-down"></i> {diff}</span>
+                                                                        if(diff< -999){
+                                                                                <span class="percent down spanIconDown animated bounceInDown" style="font-size:14px"> <i class="fa fa-caret-down"></i> {diff}</span>
+                                                                        }
+                                                                        else {
+                                                                                <span class="percent down spanIconDown animated bounceInDown"> <i class="fa fa-caret-down"></i> {diff}</span>
+                                                                        }
                                                                     }
                                                                 }
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <br>
                                                     <ul class="list-group clear-list" id="ulWhois">
                                                         @if(response.whois.registrar != null && response.whois.registrar != "") {
                                                             <li class="list-group-item fist-item">
@@ -496,14 +525,18 @@
                                                                 <span class="subTitle">Whois Server</span>
                                                             </li>
                                                         }
-                                                        @if(response.whois.nameServer != null && response.whois.nameServer.length>0) {
-                                                            <li class="list-group-item">
-                                                                <span class="pull-right">
+                                                        @if(response.whois.nameServer.length >0){
+                                                            <li class="list-group-item row">
+                                                                <span class="col-lg-9 pull-right" style="text-align: right">
                                                                 @for(nameserver <- response.whois.nameServer) {
-                                                                    <span class="editable">@nameserver</span>
+                                                                    @if(nameserver != "") {
+                                                                      <span class="editable">@nameserver</span>
+                                                                    }
                                                                 }
                                                                 </span>
-                                                                <span class="subTitle">Name Server</span>
+                                                                @if(response.whois.nameServer.length >1 || (response.whois.nameServer.length == 1 && response.whois.nameServer(0) != "") ) {
+                                                                    <span class="subTitle col-lg-3">Name Server</span>
+                                                                }
                                                             </li>
                                                         }
                                                         @if(response.whois.create != null && response.whois.create != "") {
