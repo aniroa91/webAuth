@@ -219,6 +219,36 @@
                     top: -20px;
                     color: #9B59B6;
                 }
+                .text-highlight {
+                    color: #00c191;
+                }
+                .tit {
+                    border-radius: 50%;
+                    padding: 80px;
+                    width: 20px;
+                    height: 20px;
+                    text-align: center;
+                    word-wrap: break-word;
+                    position: relative;
+                }
+                .tit span {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    -webkit-transform: translate(-50%, -50%);
+                    -moz-transform: translate(-50%, -50%);
+                    transform: translate(-50%, -50%);
+                }
+                .tit label{
+                    color:white;
+                    border-bottom:2px solid white;
+                    position: absolute;
+                    top: 30%;
+                    left: 50%;
+                    -webkit-transform: translate(-50%, -50%);
+                    -moz-transform: translate(-50%, -50%);
+                    transform: translate(-50%, -50%);
+                }
         </style>
     </head>
 
@@ -320,35 +350,70 @@
                                                             <div class="profile_img">
                                                               <div id="crop-avatar">
                                                                 <!-- Current avatar -->
-                                                               <img class="img-responsive avatar-view" onerror="this.src='../assets/images/logo/fpt.jpg'" src="@logo">
+                                                               <img class="img-responsive avatar-view" style="width: 150px; display:table-cell;vertical-align:middle;margin:auto;" onerror="this.src='../assets/images/logo/fpt.jpg'" src="@logo">
                                                               </div>
                                                             </div>
-                                                            <span class="fa fa-check nameTitle">@domain</span>
                                                         </div>
                                                         <div class="col-lg-6 col-sm-6 col-xs-12 col-md-12">
                                                             <ul class="list-unstyled user_data">
 
-                                                            <li>
+                                                            @*<li>
                                                                 <i class="fa fa-internet-explorer"></i> @response.loc.ip
-                                                            </li>
+                                                            </li>*@
 
-                                                            <li>
-                                                                <i class="fa fa-map-marker"></i> @response.loc.country - @response.loc.region
-                                                            </li>
-
-                                                            <li>
-                                                               <i class="fa fa-location-arrow"></i> @response.loc.timezone
-                                                            </li>
-
-                                                            <li>
-                                                                <i class="fa fa-users"></i> @response.loc.org
-                                                            </li>
-
-                                                            <li>
-                                                                <i class="fa fa-tags"></i> @response.category
-                                                            </li></ul></div>
+                                                           @if(response.loc.country != ""  && response.loc.region != "") {
+                                                               <li class="text-highlight">
+                                                                   <i class="fa fa-map-marker"></i> @response.loc.country - @response.loc.region
+                                                               </li>
+                                                           }
+                                                           @if(response.loc.timezone != "") {
+                                                               <li class="text-highlight">
+                                                                   <i class="fa fa-location-arrow"></i> @response.loc.timezone
+                                                               </li>
+                                                           }
+                                                           @if(response.loc.org != "") {
+                                                               <li class="text-highlight">
+                                                                   <i class="fa fa-users"></i> @response.loc.org
+                                                               </li>
+                                                           }
+                                                           @if(response.category != "N/A") {
+                                                               <li class="text-highlight">
+                                                                   <i class="fa fa-tags"></i> @response.category
+                                                               </li>
+                                                           }
+                                                           </ul>
+                                                        </div>
                                                     </div>
-
+                                                    <br>
+                                                    <div class="row">
+                                                        <div class="col-lg-6 col-xs-12" style="margin-top: 55px">
+                                                           <span class="nameTitle">@domain</span>
+                                                        </div>
+                                                        <div class="col-lg-6 col-xs-12">
+                                                        @{
+                                                            if (response.current.label == "black") {
+                                                                <h5 class="tit" style="background-color: #E74C3C;margin-left:10px">
+                                                                    <label> {response.current.malware.toUpperCase()} </label>
+                                                                    <span class="fa fa-bug" style="font-size:30px;color:white;top:60%!important">
+                                                                     5600
+                                                                    </span>
+                                                                </h5>
+                                                            } else if (response.current.label == "white") {
+                                                                <h5 class="tit" style="background-color: green;margin-left:10px">
+                                                                    <span class="fa fa-check" style="font-size:30px;color:white">
+                                                                    SAFE
+                                                                    </span>
+                                                                </h5>
+                                                            } else {
+                                                                <h5 class="tit" style="background-color: grey;margin-left:10px">
+                                                                    <span class="fa fa-question-circle" style="font-size:28px;color:white">
+                                                                    UNKNOW
+                                                                    </span>
+                                                                </h5>
+                                                            }
+                                                        }
+                                                        </div>
+                                                    </div>
                                                     <br>
                                                     <div class="row">
                                                         <div class="col-md-6 col-xs-12 boxGroup">
@@ -629,12 +694,14 @@
                     var listDomain = [
                         "24h.com.vn","google.com","facebook.com","zing.vn","vnexpress.net"
                      ];
-                    $(".autocomplete").autocomplete({
-                        source: listDomain,
-                        select: function (event, ui) {
-                            $("#ct").val(ui.item.value);
-                            $("#ctSearch").submit();
-                        }
+                    jQuery.get('../assets/seconds.txt', function(data) {
+                        $(".autocomplete").autocomplete({
+                            source: data.split('\n'),
+                            select: function (event, ui) {
+                                $("#ct").val(ui.item.value);
+                                $("#ctSearch").submit();
+                            }
+                        });
                     });
                 });
         </script>
