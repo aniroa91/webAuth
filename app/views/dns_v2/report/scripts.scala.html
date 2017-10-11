@@ -8,6 +8,14 @@
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip({trigger: 'manual'}).tooltip('show');
             });
+            $('#dateTime').datepicker({
+                format: "dd/mm/yyyy",
+                autoclose: true,
+                endDate: '+0d',
+                todayHighlight: true
+            }).on('changeDate', function (e) {
+                window.location.href = '/report?day='+e.date.format('Y-m-d')
+            });
 
             $(".progress-bar").each(function(){
                 each_bar_width = $(this).attr('aria-valuenow');

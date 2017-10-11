@@ -1,5 +1,7 @@
 package services.domain
 
+import java.time.format.DateTimeFormatter
+
 import org.elasticsearch.search.sort.SortOrder
 import org.joda.time.DateTime
 
@@ -31,7 +33,7 @@ import play.api.libs.json.JsObject
 import com.ftel.bigdata.utils.StringUtil
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
-
+import java.time.format.DateTimeFormatter
 
 object CommonService extends AbstractService {
 
@@ -324,6 +326,12 @@ object CommonService extends AbstractService {
 
   def formatDateYYMMDD( date : DateTime) : String = {
     date.toString(DateTimeFormat.forPattern("yyyy/MM/dd"))
+  }
+
+  def formatDateDDMMYY( date : String) : String = {
+    val formatter = DateTimeFormat.forPattern("yyyy-mm-dd")
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.toString(DateTimeFormat.forPattern("dd/mm/yyyy"))
   }
   
   def formatSecond(seconds: Double) : String = {
