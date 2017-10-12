@@ -1022,7 +1022,6 @@
             });
 
             // Build the chart line hourly vector
-            hourly = @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => "Q" + x._1.toString))));
             Highcharts.chart('int-line-hourVector', {
                 chart: {
                     type: 'column'
@@ -1042,7 +1041,7 @@
                     '#1ABB9C','#9B59B6'
                 ],
                 xAxis: {
-                    categories: hourly
+                    categories: ["7h-13h","13h-19h","19h-1h","1h-7h"]
 
                 },
                 yAxis: {

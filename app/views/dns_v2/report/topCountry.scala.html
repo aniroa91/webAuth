@@ -1,13 +1,14 @@
 @(countries:Array[(String, Int)])
 @import services.domain.CommonService.formatNumber
 
-<table class="countries_list">
-    <tbody>
-        @for(country <- countries.slice(0,5)){
-        <tr>
-            <td>@country._1</td>
-            <td class="fs15 fw700 text-right">@formatNumber(country._2)</td>
-        </tr>
-        }
-    </tbody>
-</table>
+<div class=" weather-days disInline">
+    @for(country <- countries.slice(0,5)) {
+        <div class="titleChild hvr-bounce-to-right">
+            <div class="daily-weather">
+                <h2 class="day" style="font-weight: 600;border-top: transparent">@country._1</h2>
+                <h4 style="font-weight: 600">@formatNumber(country._2)</h4>
+            </div>
+        </div>
+    }
+</div>
+

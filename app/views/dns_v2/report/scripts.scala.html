@@ -4,30 +4,6 @@
 
 <script type="text/javascript">
         $(document).ready(function () {
-
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip({trigger: 'manual'}).tooltip('show');
-            });
-            $('#dateTime').datepicker({
-                format: "dd/mm/yyyy",
-                autoclose: true,
-                endDate: '+0d',
-                todayHighlight: true
-            }).on('changeDate', function (e) {
-                window.location.href = '/report?day='+e.date.format('Y-m-d')
-            });
-
-            $(".progress-bar").each(function(){
-                each_bar_width = $(this).attr('aria-valuenow');
-                $(this).width(each_bar_width + '%');
-            });
-
-            // auto count number
-            $('.counter').counterUp({
-                delay: 10,
-                time: 1000
-            });
-
             // chart bar top 5 domain
             Highcharts.chart('top5Main', {
                 chart: {
@@ -440,21 +416,22 @@
                 title: {
                     text: ''
                 },
-
+                colorAxis:{
+                    min:0
+                },
                 mapNavigation: {
                     enabled: true,
                     buttonOptions: {
-                        verticalAlign: 'top'
+                        verticalAlign: 'bottom'
                     }
                 },
-                legend:false,
                 plotOptions: {
                     column: {
                         colorByPoint: true
                     }
                 },
                 colors: [
-                    '#1ABB9C'
+                    'red'
                 ],
                 series: [{
                     data: lower(country),
