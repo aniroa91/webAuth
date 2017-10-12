@@ -19,9 +19,11 @@
                     window.location.href = '/rank';
                 }
                 else if(it == "lweek"){
+                    $("#lstLabel").val("all").change();
                     getLastWeekorMonth(lastWeek)
                 }
                 else {
+                    $("#lstLabel").val("all").change();
                     getLastWeekorMonth(lastMonth)
                 }
             })
