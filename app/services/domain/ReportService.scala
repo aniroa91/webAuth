@@ -47,7 +47,7 @@ object ReportService extends AbstractService {
         search(s"dns-client-${day}" / "docs"),
         search(s"dns-client-${prev}" / "docs"),
         search(s"dns-org-${day}" / "docs") sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC) size 10, // org
-        search(s"dns-country-${day}" / "docs") sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC) size 10, // countr
+        search(s"dns-country-${day}" / "docs") sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC) size 100, // countr
         search(s"dns-hourly-day-${day}" / "docs") size 24 // hourly
         )).await
     val time1 = System.currentTimeMillis()

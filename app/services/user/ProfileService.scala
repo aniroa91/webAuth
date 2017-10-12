@@ -104,7 +104,7 @@ object ProfileService extends AbstractService {
   }
   
   private def getDevice(mac: String): SearchDefinition = {
-    search(s"user-device-*" / "docs") query { must(termQuery("mac", mac)) }
+    search(s"user-device-*" / "docs") query { must(termQuery("mac", mac)) } limit (SIZE_DEFAULT * 10)
   }
 //
 //    private def getVOD(to: String, boxId: String): SearchDefinition = {
@@ -355,7 +355,7 @@ object ProfileService extends AbstractService {
     
     val numberOfVender = venders.size
     val numberOfDeviceType = deviceTypes.size
-    val numberOfMobile = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "member")).filter(x => x == "true").distinct.length
+    val numberOfMobile = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "members").toBoolean).filter(x => x).length
     val numberOfPermanent = numberOfDevice - numberOfMobile
     val device = Device(numberOfDevice, numberOfVender, numberOfDeviceType, numberOfMobile, numberOfPermanent, venders, deviceTypes)
     InternetResponse(internetInfo, segment, downup, duration, suyhout, error, formatArray2(module), formatArray2(disconnet), session, checkList, bill, device)
@@ -561,7 +561,7 @@ object ProfileService extends AbstractService {
     
     //val map3 = mergeArrayMap(array)
     //map3.foreach(println)
-    val response = ProfileService.get("SGB000000")
+    val response = ProfileService.get("SGH096823")
     //val a = response.paytv.vectors.get("445814").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
@@ -576,6 +576,7 @@ object ProfileService extends AbstractService {
     response.internet.device.venders.foreach(println)
     response.internet.device.deviceTypes.foreach(println)
     println(response.internet.device.numberOfDevice)
+    println(response.internet.device.numberOfMobile)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
