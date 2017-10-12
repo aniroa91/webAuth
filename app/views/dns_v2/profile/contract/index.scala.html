@@ -186,6 +186,32 @@
                 .fade{
                     display: none;
                 }
+                .tit {
+                    border-radius: 50%;
+                    padding: 80px;
+                    width: 20px;
+                    height: 20px;
+                    text-align: center;
+                    word-wrap: break-word;
+                    position: relative;
+                }
+                .tit label{
+                    color:white;
+                    position: absolute;
+                    top: 30%;
+                    left: 50%;
+                    -webkit-transform: translate(-50%, -50%);
+                    -moz-transform: translate(-50%, -50%);
+                    transform: translate(-50%, -50%);
+                }
+                .tile-stats{
+                    text-align: center;
+                    color: green;
+                }
+                .tile-stats .price-tax{
+                    color: #73879C;
+                    font-weight: bold;
+                }
         </style>
     </head>
 
@@ -200,7 +226,7 @@
                                 <li class="dropdown">
                                     <a data-toggle="dropdown" class="site_title curSor dropdown-toggle"><i class="fa fa-user"></i> Profile <span class="fa fa-chevron-down downTopMenu"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/">DNS <i class="fa fa-globe pull-right"></i></a></li>
+                                        <li><a href="/report">DNS <i class="fa fa-globe pull-right"></i></a></li>
                                         <li class="divider"></li>
                                         <li><a href="/paytv">Profile <i class="fa fa-user pull-right"></i></a></li>
                                         <li class="divider"></li>
@@ -285,7 +311,7 @@
                                                         <img class="img-responsive avatar-view" src="../assets/images/logo/default.png" alt="Avatar" title="Change the avatar">
                                                     </div>
                                                 </div>
-                                                <h3 class="name_title">@response.internet.contract.contract</h3>
+                                                <h3 class="name_title" style="color: green">@response.internet.contract.contract</h3>
                                                 
                                                 <ul class="list-unstyled user_data">
                                                     <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.contract.province - @response.internet.contract.region
@@ -444,7 +470,11 @@
                                             </div>
                                             <div class="col-md-9 col-sm-9 col-xs-12">
                                                 <div class="row">
-                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                @if(response.paytv != null) {
+                                                   <div class="col-md-6 col-sm-6 col-xs-12">
+                                                }else{
+                                                    <div class="col-xs-12">
+                                                }
                                                 <div class="x-content" id="payInfor">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
@@ -513,12 +543,13 @@
                                                                 </div>
                                                             </div>
                                                         </li>
-                                                        
+
                                                     </ul>
                                                 </div>
                                                 </div>
+                                                    @if(response.paytv != null) {
                                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                                @if(response.paytv != null) {
+
                                                 <div class="x-content" id="payInfor">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
@@ -590,19 +621,23 @@
                                                         
                                                     </ul>
                                                 </div>
-                                                }
+
                                                 </div>
-                                                
+                                                    }
                                                 </div>
 
                                                 <div class="" role="tabpanel" data-example-id="togglable-tabs">
                                                     <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
                                                         <li role="presentation" class="active"><a href="#tab_internet" id="internet-tab" role="tab" data-toggle="tab" aria-expanded="true">Internet profile</a>
                                                         </li>
+                                                        <li role="presentation" class=""><a href="#tab_device" id="device-tab" role="tab" data-toggle="tab" aria-expanded="true">Device</a>
+                                                        </li>
                                                         <li role="presentation" class=""><a href="#tab_inf" id="inf-tab" role="tab" data-toggle="tab" aria-expanded="true">INF</a>
                                                         </li>
+                                                        @if(response.paytv != null) {
                                                         <li role="presentation" class=""><a href="#tab_paytv" role="tab" id="paytv-tab" data-toggle="tab" aria-expanded="false">PayTV profile</a>
                                                         </li>
+                                                        }
                                                     </ul>
                                                     <div id="myTabContent" class="tab-content">
                                                         <div role="tabpanel" class="tab-pane fade active in" id="tab_internet" aria-labelledby="internet-tab">
@@ -750,6 +785,95 @@
                                                                 </div>
                                                             </div>
 
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane fade" id="tab_device" aria-labelledby="device-tab">
+
+                                                            <div class="profile_title row">
+
+                                                                <div class="col-lg-9 col-sm-9 col-md-9  col-xs-12">
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2>Device types</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="pie-deviceType" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="x_panel tile fixed_height_320">
+                                                                        <div class="x_title">
+                                                                            <h2>Venders</h2>
+                                                                            <ul class="nav navbar-right panel_toolbox">
+                                                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                                                                </li>
+                                                                                <li class="dropdown">
+                                                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                                                                    <ul class="dropdown-menu" role="menu">
+                                                                                        <li><a href="#">Settings 1</a>
+                                                                                        </li>
+                                                                                        <li><a href="#">Settings 2</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </li>
+                                                                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                                                                </li>
+                                                                            </ul>
+                                                                            <div class="clearfix"></div>
+                                                                        </div>
+                                                                        <div class="x_content">
+                                                                            <div id="pie-venderType" style="height:250px;"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12" style="padding: 20px;margin-top: 20px">
+                                                                    <div class="boxCss animated flipInY ">
+                                                                        <div class="tile-stats">
+                                                                            <div class="count ">@response.internet.device.numberOfDevice</div>
+                                                                            <span class="price-tax">Number of devices</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="boxCss animated flipInY ">
+                                                                        <div class="tile-stats">
+                                                                            <div class="count"> @response.internet.device.numberOfVender</div>
+                                                                            <span class="price-tax">Number of venders</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="boxCss animated flipInY ">
+                                                                        <div class="tile-stats">
+                                                                            <div class="count">@response.internet.device.numberOfDeviceType</div>
+                                                                            <span class="price-tax"> Number of device types </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="boxCss animated flipInY ">
+                                                                        <div class="tile-stats">
+                                                                            <div class="count">@response.internet.device.numberOfMobile</div>
+                                                                            <span class="price-tax"> Number of mobiles </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="boxCss animated flipInY ">
+                                                                        <div class="tile-stats">
+                                                                            <div class="count">@response.internet.device.numberOfPermanent</div>
+                                                                            <span class="price-tax"> Number of permanent </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
                                                         </div>
                                                         <div role="tabpanel" class="tab-pane fade" id="tab_inf" aria-labelledby="inf-tab">
                                                             <div class="profile_title row">
@@ -1141,7 +1265,7 @@
         <script src="../assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
         <script src="../assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
             <!-- Counter number -->
-        <script src="../assets/javascripts/waypoints.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
 
         <script type="text/javascript">

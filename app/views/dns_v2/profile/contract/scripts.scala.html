@@ -1333,7 +1333,6 @@
             });
                 // chart line error vector
 
-            //console.log( @Html(Json.stringify(Json.toJson(response.internet.errorDisconnect.map(x => x._2)))))
             Highcharts.chart('line-errVector', {
                 chart: {
                     type: 'column'
@@ -1386,6 +1385,80 @@
                         data: @Html(Json.stringify(Json.toJson(response.internet.errorModule.map(x => x._2))))
                     }]
             });
+            // Build the chart pie device types
+            var deviceTypes = @Html(Json.stringify(Json.toJson(response.internet.device.deviceTypes)))
+            Highcharts.chart('pie-deviceType', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        colors: [
+                            '#1ABB9C',
+                            '#9B59B6',
+                            '#3498DB',
+                            '#E74C3C',
+                            '#9CC2CB',
+                            '#73879C'
+                        ],
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true
+                        },
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    name: 'Percent',
+                    innerSize: '40%',
+                    colorByPoint: true,
+                    data: deviceTypes
+                }]
+            });
+            // Build the chart pie device types
+            var venders = @Html(Json.stringify(Json.toJson(response.internet.device.venders)))
+                    Highcharts.chart('pie-venderType', {
+                        chart: {
+                            type: 'pie'
+                        },
+                        title: {
+                            text: ''
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        plotOptions: {
+                            pie: {
+                                /*colors: [
+                                    '#1ABB9C',
+                                    '#E74C3C',
+                                    '#3498DB',
+                                    '#9B59B6',
+                                    '#9CC2CB',
+                                    '#73879C'
+                                ],*/
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: true
+                                },
+                                showInLegend: true
+                            }
+                        },
+                        series: [{
+                            name: 'Percent',
+                            innerSize: '40%',
+                            colorByPoint: true,
+                            data: venders
+                        }]
+                    });
             /* END CHART FOR INTERNET*/
         });
 
