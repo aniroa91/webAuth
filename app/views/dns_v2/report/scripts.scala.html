@@ -396,7 +396,7 @@
 
             // Build the chart geo
 
-            var country = @Html(Json.stringify(Json.toJson(response.country.slice(0,5))));
+            var country = @Html(Json.stringify(Json.toJson(response.country)));
             function lower(obj) {
                 for (var prop in obj) {
                     if (typeof obj[prop] === 'string') {
@@ -451,7 +451,7 @@
 
                     },
 
-                    name: 'Visitors location',
+                    name: 'Number Of Query',
 
                     tooltip: {
 

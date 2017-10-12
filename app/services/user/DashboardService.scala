@@ -7,6 +7,7 @@ import com.sksamuel.elastic4s.searches.SearchDefinition
 import services.domain.AbstractService
 import services.ElasticUtil
 import model.user.DashboardResponse
+import services.Bucket
 
 object DashboardService extends AbstractService {
 
@@ -37,7 +38,7 @@ object DashboardService extends AbstractService {
 //    dayOfWeek.foreach(x => println(x.key -> x.value))
     //province.foreach(x => println(x.key -> x.value))
     
-    DashboardResponse(app, uniqueCustomer, uniqueContract, dayOfWeek, region, province, hourly)
+    DashboardResponse(app, uniqueCustomer, uniqueContract, dayOfWeek.map(x => Bucket(ProfileService.dayOfWeekNumberToLabel(x.key.toInt), x.count, x.value)), region, province, hourly)
   }
 
   private def term(to: String): SearchDefinition = {
