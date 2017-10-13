@@ -18,248 +18,9 @@
         <title>Dashboard Admin </title>
 
             <!-- Bootstrap -->
-        <link href="../assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-            <!-- Font Awesome -->
-        <link href="../assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-            <!-- NProgress -->
-        <link href="../assets/vendors/nprogress/nprogress.css" rel="stylesheet">
-            <!-- iCheck -->
-        <link href="../assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-
-            <!-- bootstrap-progressbar -->
-        <link href="../assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
-            <!-- JQVMap -->
-        <link href="../assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
-            <!-- bootstrap-daterangepicker -->
-        <link href="../assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
-            <!-- Custom Theme Style -->
-        <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
-        <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
-        <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
-
-        <link href="../assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-        <link href="../assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-        <link href="../assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-        <link href="../assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-        <link href="../assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
-        <style type="text/css">
-                .panel-heading {
-                    padding: 10px 10px 0px!important;
-                    border-bottom: 0px solid transparent!important;
-                    border-top-left-radius: 3px;
-                    border-top-right-radius: 3px;}
-                .highcharts-credits{display: none;}
-                .downTopMenu{
-                    font-size: 16px;float: right;margin-top: 20px;margin-right: 13px;
-                }
-                .curSor{
-                    cursor: pointer;
-                }
-                .dropdown-menu li {
-                    width:229px;
-                }
-                .navTop{
-                    margin-left: -41px;
-                    margin-top: -7px;
-                }
-                .fa.pull-right {
-                    margin-left: .3em;
-                    margin-top: 1px;
-                }
-                .dropdown-menu li a{
-                    font-size: 20px;
-                    padding-top: 12px;
-                }
-                .nav-sm .navbar.nav_title a i{
-                    margin:0px!important;
-                }
-                .botLi{
-                    margin-bottom: 12px;
-                }
-                .count{font-size: 35px!important}
-                <!-- Progress bar -->
-                .tooltip{
-                    position:relative;
-                    float:right;
-                }
-                .tooltip > .tooltip-inner {background-color: #9CC2CB; padding:5px 15px; color:white; font-weight:bold; font-size:13px;}
-                .popOver + .tooltip > .tooltip-arrow {	border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid #9CC2CB;}
-
-                section{
-                    margin:100px auto;
-                    height:1000px;
-                }
-                .progress{
-                    border-radius:0;
-                    overflow:visible;
-                }
-                .progress-bar{
-                    background:#1ABB9C;
-                    -webkit-transition: width 1.5s ease-in-out;
-                    transition: width 1.5s ease-in-out;
-                }
-                .tooltip.top .tooltip-arrow{
-                    border-top-color:#9CC2CB
-                }
-                ul.stats-overview {
-                    border-bottom: 1px solid #e8e8e8;
-                    padding-bottom: 10px;
-                    margin-bottom: 10px;
-                    padding-left: 0px;
-                    border-top: 1px solid #e8e8e8;
-                    padding-top: 10px;
-                }
-                ul.stats-overview li {
-                    display: inline-block;
-                    text-align: center;
-                    padding: 0 15px;
-                    width: 45%;
-                    font-size: 14px;
-                    border-right: 1px solid #e8e8e8;
-                }
-                .timeline .tag {
-                    display: block;
-                    height: 30px;
-                    font-size: 13px;
-                    padding: 8px;
-                }
-                .timeline .tags {
-                    position: absolute;
-                    left: 0;
-                    top: 9px;
-                    width: 130px;
-                }
-                .timeline .block {
-                    margin: 0 0 0 155px;
-                    border-left: 3px solid #e8e8e8;
-                    overflow: visible;
-                    padding: 10px 15px;
-                }
-                .x-content{
-                    padding-bottom: 25px;
-                }
-                .right_col{
-                    min-height: inherit!important;
-                }
-                .noData-title {
-                    margin-bottom: 13px;
-                    text-align: center;
-                    text-transform: uppercase;
-                    font-weight: 300;
-                    font-size: 40px;
-                    color: #f60;
-                    font-size: 2.5rem;
-                }
-                .hight-light{    color: #26B99A;font-weight: 600;}
-                .ui-autocomplete {
-                    position: absolute;
-                    z-index: 1000;
-                    cursor: pointer;
-                    max-height: 200px;
-                    overflow: auto;
-                    left:1440px;
-                    padding: 0;
-                    margin-top: 2px;
-                    list-style: none;
-                    background-color: #ffffff;
-                    border: 1px solid #ccc
-                    -webkit-border-radius: 5px;
-                    -moz-border-radius: 5px;
-                    border-radius: 5px;
-                    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-                    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-                    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-                }
-                .ui-autocomplete > li {
-                    padding: 3px 20px;
-                }
-                .ui-autocomplete > li.ui-state-focus {
-                    background-color: #26B99A;
-                    color: white;
-                }
-                .ui-helper-hidden-accessible {
-                    display: none;
-                }
-                .fade.in{
-                    display: block;
-                }
-                .fade{
-                    display: none;
-                }
-                .tit {
-                    border-radius: 50%;
-                    padding: 80px;
-                    width: 20px;
-                    height: 20px;
-                    text-align: center;
-                    word-wrap: break-word;
-                    position: relative;
-                }
-                .tit label{
-                    color:white;
-                    position: absolute;
-                    top: 30%;
-                    left: 50%;
-                    -webkit-transform: translate(-50%, -50%);
-                    -moz-transform: translate(-50%, -50%);
-                    transform: translate(-50%, -50%);
-                }
-                .tile-stats{
-                    text-align: center;
-                    color: #73879C;
-                }
-                .tile-stats .price-tax{
-                    color: #73879C;
-                    font-weight: bold;
-                }
-                .numText{
-                    font-size: 18px;
-                    font-weight: 600;
-                }
-        </style>
+        @views.html.dns_v2.common.css("Contract",1)
     </head>
-
-    <body class="nav-md">
-        <div class="container body">
-            <div class="main_container">
-                <div class="col-md-3 left_col">
-                    <div class="left_col scroll-view">
-                        <div class="navbar nav_title" style="border: 0;">
-
-                            <ul class="navTop">
-                                <li class="dropdown">
-                                    <a data-toggle="dropdown" class="site_title curSor dropdown-toggle"><i class="fa fa-user"></i> Profile <span class="fa fa-chevron-down downTopMenu"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="/">DNS <i class="fa fa-globe pull-right"></i></a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="/paytv">Profile <i class="fa fa-user pull-right"></i></a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="#" class="botLi">Device <i class="fa fa-server pull-right"></i></a></li>
-
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="clearfix"></div>
-                        <br />
-                            <!-- sidebar menu -->
-                        <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-                            <div class="menu_section">
-                                    <!-- <h3>General</h3>-->
-                                <ul class="nav side-menu">
-                                    <li><a href="/paytv"><i class="fa fa-television"></i> Dashboard </a>
-                                    </li>
-                                    <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
-                                    </li>
-                                </ul>
-                            </div>
-
-                        </div>
-                            <!-- /sidebar menu -->
-                    </div>
-                </div>
-
+    @views.html.dns_v2.common.top("Contract",1,"")
                     <!-- top navigation -->
                 <div class="top_nav">
                     <div class="nav_menu">
@@ -820,7 +581,7 @@
                                                             </div>
                                                             <br>
                                                             <div class="profile_title row">
-                                                                <div class="col-xs-12">
+                                                                <div class="col-lg-6 col-sm-6 col-md-6 col-lg-12  animated bounceInUp">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
                                                                             <h2>Device types</h2>
@@ -845,9 +606,11 @@
                                                                             <div id="pie-deviceType" style="height:250px;"></div>
                                                                         </div>
                                                                     </div>
+                                                                </div>
+                                                                <div class="col-lg-6 col-sm-6 col-md-6 col-lg-12 animated bounceInUp">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
-                                                                            <h2>Venders</h2>
+                                                                            <h2>Vendors</h2>
                                                                             <ul class="nav navbar-right panel_toolbox">
                                                                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                                                                 </li>
@@ -1207,87 +970,8 @@
                     <!-- /footer content -->
             </div>
         </div>
-
             <!-- jQuery -->
-        <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
-            <!-- Bootstrap -->
-        <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-            <!-- FastClick -->
-        <script src="../assets/vendors/fastclick/lib/fastclick.js"></script>
-            <!-- NProgress -->
-        <script src="../assets/vendors/nprogress/nprogress.js"></script>
-            <!-- Chart.js -->
-        <script src="../assets/vendors/Chart.js/dist/Chart.min.js"></script>
-            <!-- gauge.js -->
-        <script src="../assets/vendors/gauge.js/dist/gauge.min.js"></script>
-            <!-- bootstrap-progressbar -->
-        <script src="../assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-            <!-- iCheck -->
-        <script src="../assets/vendors/iCheck/icheck.min.js"></script>
-            <!-- Skycons -->
-        <script src="../assets/vendors/skycons/skycons.js"></script>
-            <!-- Flot -->
-        <script src="../assets/vendors/Flot/jquery.flot.js"></script>
-        <script src="../assets/vendors/Flot/jquery.flot.pie.js"></script>
-        <script src="../assets/vendors/Flot/jquery.flot.time.js"></script>
-        <script src="../assets/vendors/Flot/jquery.flot.stack.js"></script>
-        <script src="../assets/vendors/Flot/jquery.flot.resize.js"></script>
-            <!-- Flot plugins -->
-        <script src="../assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-        <script src="../assets/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-        <script src="../assets/vendors/flot.curvedlines/curvedLines.js"></script>
-            <!-- DateJS -->
-        <script src="../assets/vendors/DateJS/build/date.js"></script>
-
-            <!-- morris.js -->
-        <script src="../assets/vendors/raphael/raphael.min.js"></script>
-        <script src="../assets/vendors/morris.js/morris.min.js"></script>
-
-            <!-- Custom Theme Scripts -->
-        <script src="../assets/custom/js/custom.min.js"></script>
-            <!-- Hight chart -->
-        <script src="../assets/javascripts/highcharts.js"></script>
-        <script src="../assets/javascripts/exporting.js"></script>
-            <!-- HightChartMap -->
-        <script src="../assets/javascripts/map.js"></script>
-        <script src="../assets/javascripts/world.js"></script>
-            <!-- Autocomplete -->
-        <script src="../assets/javascripts/jquery-ui.js"></script>
-            <!-- Datatable -->
-        <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
-        <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-        <script src="../assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-        <script src="../assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-        <script src="../assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-        <script src="../assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-        <script src="../assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-        <script src="../assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-        <script src="../assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-            <!-- Counter number -->
-        <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
-        <script src="../assets/javascripts/jquery.counterup.min.js"></script>
-
-        <script type="text/javascript">
-                $(document).ready(function () {
-                    // autocomplete
-                    var listContracts = [
-                        "HUFD08955","BDFD02717","DAD048115","DAFD10840","TNFD01957","SLFD00293","LSFD03412","HNH236126","BDD005873","NTFD08246","DNFD21880","DNFD21875","NTFD09091","VLFD01954","SGH209147","HMFD01095","NTFD08147","QTFD00164","LAFD02695","VPFD02046","NTFD08490","BTFD05630","CTD025308","HPFD14341","SGH210510","CTD025308","HNH212346","NBFD02615","SGH210160","QNFD09571","HDFD05936","LSFD03397","HYFD03518","SGH212667","SGH212667","NTFD08534","HTFD00614","LDFD03872","TQFD02416","TNFD01968","HPFD14355","SGH212894","QNFD07990","AGFD05107","SGH212055","SGH212679","TNFD01906","SGH212907","AGFD05055","SGH212654","BDFD06200","BDFD06200","DLFD03323","SGH212169","HNH048249","PTFD01356","DAFD11035","HUFD01005","HPD003862","HPFD14159","HMFD01099","SGH212435","LDFD03853","DAFD11055","NDFD02190","BDD006186","BTFD05475","PTFD01342","BTFD05475","HTFD00623","NDFD01953","HPFD14176","BNFD08634","DNFD37665","BPFD02810","SGH095989","SGH247446","GLFD03947","SGH212852","BDFD06170","HTFD00624","TNFD01952","AGFD04570","QNFD08800","HNH212288","SGH213072","NDFD01928","SGH211382","TNFD01905","NDFD01940","NDFD01929","LSFD03442","SGH211994","HYFD03539","HUFD08758","NDFD02196","GLFD02554","SGH212837","SGH212100","NDFD01951","LSFD03441","VTD026363","AGD018793","NTFD09035","NDFD02205","SGH212403","BDFD06219","SGH213065","SGH212882","QAFD01870","SGH079714","HYFD03475","LSFD03399","HPFD14403","HYFD03475","LDD019743","HPFD14365","DNFD21878","DAD020539","LDD019743","SGH211634","HNH002849","LDFD03897","DNFD21878","HNH212638","GLFD02567","LDFD03882","BDFD05859","SGH212143","BDFD06244","SGH212143","NAFD01028","HNH355436","HNH355151","DND007172","BDD004626","BDD000027","DND003213","BDD006543","SGH018289","BDD005828","CTFD12224","BDD003339","HDD030000","SGD228370","QNFD20988","BDD006410","BDD001071","SGH232074","HDD000066","STD003161","DAFD14440","BGFD10224","SGH223919","HDD007807","HNH253179","DND075401","BGFD08935","HDD023109","DND035949","DNFD37040","HNH251578","DNFD11355","HND440892","SGH264080","SGH293974","DND064819","DNFD12802","HDFD02824","SGH081959","NTFD04756","HDFD03490","SGH081577","DAD054747","HPFD08783","QNFD08897","BIFD02357","VTFD06989","CTFD07354","LAD004040","SGH083516","DNFD17454","QNFD06927","DNFD05895","SGH082650","SGH082847","DND049657","DNFD17454","SGH082121","HPFD08552","SGH081934","SGH082131","QND036965","DAFD05955","DAFD05955","BDD064055","HPFD08851","HDFD03555","DLFD02209","SGH084411","QND036965","HPFD08766","HPFD08852","BDD055418","HDFD03566","HDFD03563","SGH082123","HDFD05560","HDFD03562","QNFD03156","HPFD08781","BDD006141","SGH096025","HDD027833","CTFD07441","SGH082141","QTFD05313","SGH083260","TIFD03157","HDFD03570","DAFD23977","BDD005859","DTFD04226","BDD005004","HNH354433","SGH211993","HPFD14413","HPFD14296","HYFD06107","HPFD14242","SGD241237","SGH080337","NBFD04938","HPFD29978","HNH078989","HNH078989","SGH018225","CTFD07406","VTFD08149","SGH200832","NTFD04752","SGH251848","THFD00735","NTFD16250","SGH081567","DLFD02213","DAD017635","HPFD29847","DNFD16408","SGH083132","HBFD02145","HPFD08597","SGH249375","DLFD02212","NTFD04741","BDFD46717","HPFD29862","DAFD21305","QND056190","NTFD04744","SGH083958","HPFD29921","HPFD17796","BDFD70124","NTFD04771","SGH084438","CMFD01712","HYFD06215","SGD523452","HPFD29688","SGH094006","BGFD08883","QNFD06943","HPD020218","LDFD02663","DND084510","DAFD14609","SGH083948","SGD711642","SGH083274","NTD009689","HPFD08778","HPFD29688","HNH354747","HDFD05542","DNFD18945","HPFD29657","HDFD05542","HPD062608","HYFD06217","SGH083953","SGD797354","NTFD04745","HPFD29920","DND084514","HDFD03551","HNH355969","SGH096041","DND057621","LDFD02665","DAD054761","DAD002137","DNFD18905","HPFD08564","TGFD01944","SGH003263","HYFD06188","DAD005828","HNH354632","SGH082855","SGH081415","SGH083968","HNH355728","DND004461","STFD00740","SGH212743","HYFD03514","TNFD01949","BDD006179","VTD000404","SGH211685","SGH211664","NDFD02191","SGH209998","BDD003074","SGH210429","BGFD02555","HPFD09346","NTFD09036","STFD01260","NTD021714","HPFD14367","BGFD02585","HPFD14493","NTFD08504","HMFD01096","NTFD09043","HPD003468","DND003924","NTFD09016","NTFD09131","HDD000537","DND004643","SGH213362","QNFD07977","SGH211757","NTFD08511","SGD084312","LDFD03771","NTFD09028","VTFD09914","VPFD02209","SGH212158","HYFD03475","SGH212067","SGH213192","SGH213128","NTFD08100","SGH212158","SGH212119","BDFD51645","DAFD11145","QNFD09572","SGH212364","BTFD05675","SGH212019","BDFD06207","SGH211150","SGH003596","SGH213139","BDFD52806","SGH213257","BDFD06274","SGH211452","BGFD07816","SGH213298","VTD042108","SGH211558","SGH213498","QNFD09538","QAFD01821","LAFD02855","DAFD11139","QNFD09538","BTFD05585","LCFD03084","VTFD07347","QIFD01300","SGH054448","SGH096889","SGD238938","HDFD10365","DNFD43810","BDD006756","SGH313426","DAD006070","DAD040745","SGH092905","HPFD20039","HNH248717","SGD193994"
-                    ];
-
-                    /*$.get('../assets/contract.txt', function(data){
-                        var array = data.split('\n');
-                        console.log(array);
-                    });*/
-
-                    $(".autocomplete").autocomplete({
-                        source: listContracts,
-                        select: function (event, ui) {
-                            $("#ct").val(ui.item.value);
-                            $("#ctSearch").submit();
-                        }
-                    });
-                });
-                    </script>
+       @views.html.dns_v2.common.bottom("Contract",1)
         @if( response != null) {
             @if(response.paytv != null) {
                 @scripts(response, contract, if(!response.paytv.segments.isEmpty) {
