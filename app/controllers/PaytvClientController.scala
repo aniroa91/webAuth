@@ -16,7 +16,7 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
 
   def index() = Action {
     val response = DashboardService.get()
-    Ok(views.html.dns_v2.profile.paytv.index(response))
+    Ok(views.html.profile.paytv.index(response))
   }
   
 }

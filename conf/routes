@@ -25,8 +25,8 @@ GET     /extassets/*file            controllers.DnsController.getImage(file: Str
 
 #GET     /malware                     controllers.MalwareController.index
 
-#######################################################################
-#GET     /                         controllers.LoginController.index
+#######################################################################dns
+#GET      /                        controllers.LoginController.index
 GET     /                         controllers.DashboardController.index
 GET     /search                   controllers.ProfileController.index
 GET     /rank                     controllers.RankController.index
@@ -37,5 +37,5 @@ GET     /refresh                  controllers.DnsController.refresh
 GET     /analytic                 controllers.AnalyticController.index
 #GET     /report/:day              controllers.DnsController.reportBody(day: String)
 #GET     /ace/tables                 controllers.ACEController.tables
-GET     /paytv                   controllers.PaytvClientController.index
-GET     /profile                   controllers.ProfileContractController.index
+GET     /paytv                    controllers.PaytvClientController.index
+GET     /profile                  controllers.ProfileContractController.index
