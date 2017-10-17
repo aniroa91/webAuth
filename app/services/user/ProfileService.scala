@@ -30,6 +30,19 @@ import model.user.Duration
 import org.joda.time.DateTime
 import model.user.Device
 
+case class DeviceRow(day: String,
+    contract: String,
+    mac: String,
+    name: String,
+    falseField: Double,
+    trueField: Double,
+    signal_mean: Double,
+    mac_device: String,
+    vendor: String,
+    mobile: Boolean) {
+  override def toString = List(day, contract, mac, name, falseField, trueField, signal_mean, mac_device, vendor, mobile).mkString("\t")
+}
+
 object ProfileService extends AbstractService {
   //val client = Configure.client
   val SIZE_DEFAULT = 100
@@ -105,6 +118,27 @@ object ProfileService extends AbstractService {
   
   private def getDevice(mac: String): SearchDefinition = {
     search(s"user-device-*" / "docs") query { must(termQuery("mac", mac)) } limit (SIZE_DEFAULT * 10)
+  }
+  
+  private def getDevice2(contract: String): SearchDefinition = {
+    search(s"user-cpe-*" / "docs") query { must(termQuery("contract.keyword", contract)) } limit (10000)
+  }
+  
+  private def getDevice3(contract: String): SearchDefinition = {
+    search(s"user-cpe-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } aggregations (
+        cardinalityAgg("devices", "mac_device.keyword"),
+        cardinalityAgg("vendors", "vendor.keyword"),
+        cardinalityAgg("deviceType", "name.keyword"),
+        termsAggregation("top")
+          .field("mac_device")
+          .subaggs(
+              termsAggregation("day")
+                .field("day")
+                .subaggs(
+                    sumAgg("sum", "signal_mean")
+                ) size SIZE_DEFAULT
+           ) size SIZE_DEFAULT
+        ) limit (SIZE_DEFAULT * 10)
   }
 //
 //    private def getVOD(to: String, boxId: String): SearchDefinition = {
@@ -205,7 +239,7 @@ object ProfileService extends AbstractService {
       getValueAsInt(internetSource, "onu"),
       getValueAsString(internetSource, "cable_type"),
       getValueAsInt(internetSource, "life_time"))
-    val internetSegmentRes = ESUtil.get(client, "segment-internet", "docs", contract)
+    val internetSegmentRes = ESUtil.get(client, "user-segment-internet-2017-09", "docs", contract)
     val internetSegmentSource = internetSegmentRes.source
     val segment = InternetSegment(
       getValueAsString(internetSegmentSource, "Contract"),
@@ -295,7 +329,7 @@ object ProfileService extends AbstractService {
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1.toInt)
       //.take(28)
-    
+
     val durationDow = getDurationDoW(contract)
     val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
     val pon = client.execute(search(s"user-inf-pon-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
@@ -358,6 +392,28 @@ object ProfileService extends AbstractService {
     val numberOfMobile = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "members").toBoolean).filter(x => x).length
     val numberOfPermanent = numberOfDevice - numberOfMobile
     val device = Device(numberOfDevice, numberOfVender, numberOfDeviceType, numberOfMobile, numberOfPermanent, venders, deviceTypes)
+    
+    val device2Res = client.execute(getDevice2(contract)).await
+    
+    val rows = device2Res.hits.hits.map(x => x.sourceAsMap)
+      .map(x => DeviceRow(
+          getValueAsString(x, "day"),
+          getValueAsString(x, "contract"),
+          getValueAsString(x, "mac"),
+          getValueAsString(x, "name"),
+          getValueAsDouble(x, "falseField"),
+          getValueAsDouble(x, "trueField"),
+          getValueAsDouble(x, "signal_mean"),
+          getValueAsString(x, "mac_device"),
+          getValueAsString(x, "vendor"),
+          getValueAsString(x, "mobile").toBoolean
+          ))
+    //rows.foreach(println)
+    val a = rows.map(x => x.mac_device -> (DateTimeUtil.create(x.day, "yyyy-MM-dd HH:mm:SS.S").dayOfMonth().get.toString, x.signal_mean))
+        .groupBy(x => x._1)
+        .mapValues(x => formatArray(x.map(y => y._2)).map(y => y._2))
+    a.map(x => x._1 + ": " + x._2.mkString(" ")).foreach(println)
+    //rows.map(x => x.mac_device -> (x.day, x.signal_mean)).foreach(println)
     InternetResponse(internetInfo, segment, downup, duration, suyhout, error, formatArray2(module), formatArray2(disconnet), session, checkList, bill, device)
   }
 
@@ -537,9 +593,16 @@ object ProfileService extends AbstractService {
   }
 
   private def formatArray(array: Array[(String, Double)]): Array[(String, Double)] = {
+//    array.foreach(println)
     val seq = 1 until (DateTimeUtil.create("2017-09-01", DateTimeUtil.YMD).dayOfMonth().getMaximumValue + 1)
     val map = array.toMap
-    seq.toArray.map(x => x.toString -> map.getOrElse(x.toString, 0.0))
+//    println("TEST: " + map.getOrElse("2017-09-11", 0))
+    val result = seq.toArray.map(x => {
+      //println(x.toString)
+      x.toString -> map.getOrElse(x.toString, 0.0)
+      })
+    //result.foreach(println)
+    result
   }
   
   private def formatArray2(array: Array[(String, Int)]): Array[(String, Int)] = {
@@ -561,7 +624,7 @@ object ProfileService extends AbstractService {
     
     //val map3 = mergeArrayMap(array)
     //map3.foreach(println)
-    val response = ProfileService.get("SGH096823")
+    val response = ProfileService.get("SGH090877")
     //val a = response.paytv.vectors.get("445814").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
@@ -573,10 +636,11 @@ object ProfileService extends AbstractService {
     //response.paytv.vectors.get("90012").get.daily.foreach(println)
     //response.paytv.vectors.get("356724").get.hourlyInMonths.foreach(println)
     //a.vodgiaitri.foreach(println)
-    response.internet.device.venders.foreach(println)
-    response.internet.device.deviceTypes.foreach(println)
-    println(response.internet.device.numberOfDevice)
-    println(response.internet.device.numberOfMobile)
+    //response.internet.device.venders.foreach(println)
+    //response.internet.device.deviceTypes.foreach(println)
+    //println(response.internet.device.numberOfDevice)
+    //println(response.internet.device.numberOfMobile)
+    println(response.internet.segment)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
