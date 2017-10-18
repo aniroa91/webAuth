@@ -380,18 +380,18 @@ object ProfileService extends AbstractService {
     val billRes = ESUtil.get(client, "user-bill-internet-2017-09", "docs", contract)
     val bill = if (billRes.exists) getValueAsDouble(billRes.source, "SoTienDaThanhToan") else 0
     
-    val mac = internetInfo.macAddress.replace(":", "")
-    val deviceRes = client.execute(getDevice(mac)).await
-    
-    val numberOfDevice = deviceRes.totalHits
-    val venders = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "vendor")).groupBy(x => x).mapValues(x => x.length).toArray
-    val deviceTypes = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "name")).groupBy(x => x).mapValues(x => x.length).toArray
-    
-    val numberOfVender = venders.size
-    val numberOfDeviceType = deviceTypes.size
-    val numberOfMobile = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "members").toBoolean).filter(x => x).length
-    val numberOfPermanent = numberOfDevice - numberOfMobile
-    val device = Device(numberOfDevice, numberOfVender, numberOfDeviceType, numberOfMobile, numberOfPermanent, venders, deviceTypes)
+//    val mac = internetInfo.macAddress.replace(":", "")
+//    val deviceRes = client.execute(getDevice(mac)).await
+//    
+//    val numberOfDevice = deviceRes.totalHits
+//    val venders = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "vendor")).groupBy(x => x).mapValues(x => x.length).toArray
+//    val deviceTypes = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "name")).groupBy(x => x).mapValues(x => x.length).toArray
+//    
+//    val numberOfVender = venders.size
+//    val numberOfDeviceType = deviceTypes.size
+//    val numberOfMobile = deviceRes.hits.hits.map(x => x.sourceAsMap).map(x => getValueAsString(x, "members").toBoolean).filter(x => x).length
+//    val numberOfPermanent = numberOfDevice - numberOfMobile
+//    val device = Device(numberOfDevice, numberOfVender, numberOfDeviceType, numberOfMobile, numberOfPermanent, venders, deviceTypes)
     
     val device2Res = client.execute(getDevice2(contract)).await
     
@@ -408,11 +408,21 @@ object ProfileService extends AbstractService {
           getValueAsString(x, "vendor"),
           getValueAsString(x, "mobile").toBoolean
           ))
+    val numberOfDevice = rows.map(x => x.mac_device).distinct.length
+    val numberOfVender = rows.map(x => x.vendor).distinct.length
+    val numberOfDeviceType = rows.map(x => x.name).distinct.length
+    val numberOfMobile = rows.filter(x => x.mobile).map(x => x.name).distinct.length
+    val numberOfPermanent = rows.filter(x => !x.mobile).map(x => x.name).distinct.length
+    
+    val venders = rows.map(x => x.vendor).groupBy(x => x).mapValues(x => x.length).toArray
+    val deviceTypes = rows.map(x => x.name).groupBy(x => x).mapValues(x => x.length).toArray
+    
     //rows.foreach(println)
-    val a = rows.map(x => x.mac_device -> (DateTimeUtil.create(x.day, "yyyy-MM-dd HH:mm:SS.S").dayOfMonth().get.toString, x.signal_mean))
+    val deviceCharts= rows.map(x => x.mac_device -> (DateTimeUtil.create(x.day, "yyyy-MM-dd HH:mm:SS.S").dayOfMonth().get.toString, x.signal_mean))
         .groupBy(x => x._1)
         .mapValues(x => formatArray(x.map(y => y._2)).map(y => y._2))
-    a.map(x => x._1 + ": " + x._2.mkString(" ")).foreach(println)
+    //a.map(x => x._1 + ": " + x._2.mkString(" ")).foreach(println)
+    val device = Device(numberOfDevice, numberOfVender, numberOfDeviceType, numberOfMobile, numberOfPermanent, venders, deviceTypes, deviceCharts)
     //rows.map(x => x.mac_device -> (x.day, x.signal_mean)).foreach(println)
     InternetResponse(internetInfo, segment, downup, duration, suyhout, error, formatArray2(module), formatArray2(disconnet), session, checkList, bill, device)
   }

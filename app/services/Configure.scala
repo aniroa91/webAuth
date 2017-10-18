@@ -22,8 +22,13 @@ object Configure {
   val REDIS_HOST = ConfigFactory.load().getString("redis.whois.host")
   val REDIS_PORT = ConfigFactory.load().getString("redis.whois.port").toInt
   
+  val KIBANA_HOST = ConfigFactory.load().getString("kibana.host")
+  val KIBANA_PORT = ConfigFactory.load().getString("kibana.port").toInt
+  
   val LOGO_DEFAULT = "../assets/images/logo/domain.png"
   
   val redis = new RedisClient(REDIS_HOST, REDIS_PORT)
   val client = HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
+  
+  val KIBANA = KIBANA_HOST + ":" + KIBANA_PORT
 }

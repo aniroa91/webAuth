@@ -49,7 +49,8 @@ case class Device(
     numberOfMobile: Int,
     numberOfPermanent: Int,
     venders: Array[(String, Int)],
-    deviceTypes: Array[(String, Int)])
+    deviceTypes: Array[(String, Int)],
+    deviceChars: Map[String, Array[Double]])
 
 case class InternetResponse(
     contract: InternetContract,
