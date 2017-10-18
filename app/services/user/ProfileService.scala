@@ -418,7 +418,7 @@ object ProfileService extends AbstractService {
     val deviceTypes = rows.map(x => x.name).groupBy(x => x).mapValues(x => x.length).toArray
     
     //rows.foreach(println)
-    val deviceCharts= rows.map(x => x.mac_device -> (DateTimeUtil.create(x.day, "yyyy-MM-dd HH:mm:SS.S").dayOfMonth().get.toString, x.signal_mean))
+    val deviceCharts= rows.map(x => Array(x.mac_device, x.name, x.vendor).mkString(",") -> (DateTimeUtil.create(x.day, "yyyy-MM-dd HH:mm:SS.S").dayOfMonth().get.toString, x.signal_mean))
         .groupBy(x => x._1)
         .mapValues(x => formatArray(x.map(y => y._2)).map(y => y._2))
     //a.map(x => x._1 + ": " + x._2.mkString(" ")).foreach(println)

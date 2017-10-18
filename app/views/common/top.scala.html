@@ -15,7 +15,11 @@
                                             <i class="fa fa-globe"></i> DNS
                                         }
                                         @if(id == 1) {
-                                            <i class="fa fa-user"></i> Profile
+                                            @if(item == "Paytv"){
+                                                <i class="fa fa-user"></i> Profile
+                                            }else{
+                                                <i class="fa fa-laptop"></i> Demo
+                                            }
                                         }
                                         <span class="fa fa-chevron-down downTopMenu"></span></a>
                                     <ul class="dropdown-menu">
@@ -75,17 +79,27 @@
                                       </li>
                                   </ul>
                               }else{
-                                  <ul class="nav side-menu">
-                                      <li><a href="/paytv"><i class="fa fa-television"></i> Dashboard </a>
-                                      </li>
-                                      @if(day != ""){
-                                          <li class="current-page"><a href="/profile?ct=@day"><i class="fa fa-book"></i> Contract </a>
+                                  @if(item == "Paytv"){
+                                      <ul class="nav side-menu">
+                                          <li><a href="/paytv"><i class="fa fa-television"></i> Dashboard </a>
                                           </li>
-                                      }else{
-                                          <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
+                                          @if(day != ""){
+                                              <li class="current-page"><a href="/profile?ct=@day"><i class="fa fa-book"></i> Contract </a>
+                                              </li>
+                                          }else{
+                                              <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
+                                              </li>
+                                          }
+                                      </ul>
+                                  }else{
+                                      <ul class="nav side-menu">
+                                          <li><a href="/demo"><i class="fa fa-television"></i> Demo </a>
                                           </li>
-                                      }
-                                  </ul>
+                                          <li><a href="/msg"><i class="fa fa-book"></i> Message </a>
+                                          </li>
+                                      </ul>
+                                  }
+
                               }
                             </div>
 
