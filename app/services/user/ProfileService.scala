@@ -411,7 +411,7 @@ object ProfileService extends AbstractService {
     val numberOfDevice = rows.map(x => x.mac_device).distinct.length
     val numberOfVender = rows.map(x => x.vendor).distinct.length
     val numberOfDeviceType = rows.map(x => x.name).distinct.length
-    val numberOfMobile = rows.filter(x => x.mobile).map(x => x.name).distinct.length
+    val numberOfMobile = rows.filter(x => x.mobile).map(x => x.mac_device).distinct.length
     val numberOfPermanent = rows.filter(x => !x.mobile).map(x => x.name).distinct.length
     
     val venders = rows.map(x => x.vendor).groupBy(x => x).mapValues(x => x.length).toArray
