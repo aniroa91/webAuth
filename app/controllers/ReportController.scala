@@ -12,15 +12,15 @@ import services.domain.CommonService
  * application's home page.
  */
 @Singleton
-class ReportController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
+class ReportController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
-  def index(day: String) = Action {
+  def index(day: String) = withAuth { username => implicit request =>
     val key = if (CommonService.isDayValid(day)) {
       day
     } else {
       CommonService.getLatestDay()
     }
     val response = CacheService.getReport(key)
-    Ok(views.html.dns_v2.report.index(key, response._1))
+    Ok(views.html.dns_v2.report.index(key, response._1,username))
   }
 }

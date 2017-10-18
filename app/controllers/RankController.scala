@@ -14,9 +14,9 @@ import services.CacheService
  * application's home page.
  */
 @Singleton
-class RankController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
+class RankController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
-  def index = Action {
-      Ok(views.html.dns_v2.rank.index(CacheService.getRank()._1))
+  def index = withAuth { username => implicit request =>
+      Ok(views.html.dns_v2.rank.index(CacheService.getRank()._1,username))
   }
 }
