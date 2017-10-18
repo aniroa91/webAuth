@@ -205,7 +205,7 @@ object ProfileService extends AbstractService {
       getValueAsInt(internetSource, "onu"),
       getValueAsString(internetSource, "cable_type"),
       getValueAsInt(internetSource, "life_time"))
-    val internetSegmentRes = ESUtil.get(client, "segment-internet", "docs", contract)
+    val internetSegmentRes = ESUtil.get(client, "user-segment-internet-2017-09", "docs", contract)
     val internetSegmentSource = internetSegmentRes.source
     val segment = InternetSegment(
       getValueAsString(internetSegmentSource, "Contract"),

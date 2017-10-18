@@ -25,24 +25,24 @@ case class SearchContract(q: String)
  */
 @Singleton
 class ProfileContractController @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)
-    extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] with I18nSupport {
+    extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] with Secured {
 
   val form = Form(
     mapping(
       "ct" -> text)(SearchContract.apply)(SearchContract.unapply))
 
-  def index = Action { implicit request: Request[AnyContent] =>
+  def index = withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
     try {
       if (!formValidationResult.hasErrors) {
         val domain = formValidationResult.get.q.trim()
         val response = ProfileService.get(domain)
-        Ok(views.html.profile.contract.index(form, response, domain))
+        Ok(views.html.profile.contract.index(form, response, domain,username))
       } else {
-        Ok(views.html.profile.contract.index(form, null, null))
+        Ok(views.html.profile.contract.index(form, null, null,username))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.contract.index(form, null, null))
+      case e: Exception => Ok(views.html.profile.contract.index(form, null, null,username))
     }
   }
 }

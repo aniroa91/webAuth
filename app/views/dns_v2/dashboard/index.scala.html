@@ -1,4 +1,4 @@
-@(response: model.DashboardResponse)
+@(response: model.DashboardResponse,email: String)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -20,6 +20,17 @@
                 <div class="nav toggle" style="margin-bottom: 10px">
                     <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                 </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <img src="../assets/images/user.default.png" alt="">@email
+                            <span class=" fa fa-angle-down"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-usermenu pull-right">
+                            <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </nav>
 
         </div>

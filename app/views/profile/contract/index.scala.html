@@ -1,4 +1,4 @@
-@(form: Form[SearchContract], response: model.user.ProfileResponse, contract: String)(implicit messages: Messages)
+@(form: Form[SearchContract], response: model.user.ProfileResponse, contract: String,email: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -20,7 +20,7 @@
             <!-- Bootstrap -->
         @views.html.common.css("Contract",1)
     </head>
-    @views.html.common.top("Contract",1,"")
+    @views.html.common.top("Contract",1,contract)
                     <!-- top navigation -->
                 <div class="top_nav">
                     <div class="nav_menu">
@@ -28,15 +28,23 @@
                             <div class="nav toggle" style="margin-bottom: 10px">
                                 <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                             </div>
-                        </nav>
-
-                        <div style="margin-top: 10px">
-                            <div class="col-md-3 col-sm-3 col-xs-12 form-group pull-right top_search">
+                            <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
 
                             @views.html.profile.contract.frmSearch(form, routes.ProfileContractController.index)
 
                             </div>
-                        </div>
+                        </nav>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="">
+                                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <img src="../assets/images/user.default.png" alt="">@email
+                                    <span class=" fa fa-angle-down"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu pull-right">
+                                    <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                                </ul>
+                            </li>
+                        </ul>
 
                     </div>
                 </div>
@@ -200,7 +208,7 @@
                                                 <div class="x-content hvr-wobble-top" style="display: inherit;">
                                                     <div class="profile_title">
                                                         <div class="col-md-6">
-                                                            <h4>Ticket information</h4>
+                                                            <h4>Checklist information</h4>
                                                         </div>
                                                     </div>
 
@@ -410,7 +418,7 @@
 
                                                             @segmentInternet(response, response.internet.segment)
 
-                                                            <div class="profile_title row">
+                                                            <div class="row bgRow">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -466,7 +474,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="profile_title row">
+                                                            <div class="bgRow row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -522,7 +530,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="profile_title row">
+                                                            <div class="bgRow row">
                                                                 <div class="col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -553,26 +561,26 @@
 
                                                         </div>
                                                         <div role="tabpanel" class="tab-pane fade" id="tab_device" aria-labelledby="device-tab">
-                                                            <div class="profile_title row">
-                                                                <div class="col-lg-3 col-sm-3 col-md-3 boxCss animated flipInY">
+                                                            <div class="bgRow row">
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12 boxCss animated flipInY">
                                                                     <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
                                                                         <div class="count ">@response.internet.device.numberOfDevice</div>
                                                                         <span class="numText">Number of devices</span>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-lg-3 col-sm-3 col-md-3 boxCss animated flipInY ">
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12 boxCss animated flipInY ">
                                                                     <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
                                                                         <div class="count"> @response.internet.device.numberOfVender</div>
                                                                         <span class="numText">Number of vendors</span>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-lg-3 col-sm-3 col-md-3 boxCss animated flipInY ">
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12 boxCss animated flipInY ">
                                                                     <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
                                                                         <div class="count">@response.internet.device.numberOfDeviceType</div>
                                                                         <span class="numText"> Number of device types </span>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-lg-3 col-sm-3 col-md-3 boxCss animated flipInY ">
+                                                                <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12 boxCss animated flipInY ">
                                                                     <div class="tile-stats hvr-sweep-to-bottom" style="display: inherit">
                                                                         <div class="count" style="color: ">@response.internet.device.numberOfMobile</div>
                                                                         <span class="numText"> Number of mobiles </span>
@@ -580,8 +588,8 @@
                                                                 </div>
                                                             </div>
                                                             <br>
-                                                            <div class="profile_title row">
-                                                                <div class="col-lg-6 col-sm-6 col-md-6 col-lg-12  animated bounceInUp">
+                                                            <div class="bgRow row">
+                                                                <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12  animated bounceInUp">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
                                                                             <h2>Device types</h2>
@@ -607,7 +615,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-lg-6 col-sm-6 col-md-6 col-lg-12 animated bounceInUp">
+                                                                <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12 animated bounceInUp">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
                                                                             <h2>Vendors</h2>
@@ -634,12 +642,13 @@
                                                                     </div>
                                                                 </div>
 
-
                                                             </div>
+                                                            <br>
+                                                                <!--  segmentDevice() -->
                                                         </div>
                                                         <div role="tabpanel" class="tab-pane fade" id="tab_inf" aria-labelledby="inf-tab">
-                                                            <div class="profile_title row">
-                                                                <div class=" col-xs-12">
+                                                            <div class="bgRow row">
+                                                                <div class="col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
                                                                             <h2> Suy hout vector</h2>
@@ -667,7 +676,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="profile_title row">
+                                                            <div class="bgRow row">
                                                                 <div class=" col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -701,7 +710,7 @@
 
                                                             @segmentPayTv(response, response.paytv.segments)
 
-                                                            <div class="profile_title row">
+                                                            <div class="bgRow row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -786,7 +795,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="profile_title row">
+                                                            <div class="bgRow row">
 
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
@@ -834,7 +843,7 @@
 
                                                             </div>
 
-                                                            <div class="profile_title row">
+                                                            <div class="bgRow row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -889,7 +898,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="profile_title row">
+                                                            <div class="bgRow row">
                                                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="x_panel tile fixed_height_320">
                                                                         <div class="x_title">
@@ -966,7 +975,7 @@
                         Dashboard Admin 21/09/2017
                     </div>
                     <div class="clearfix"></div>
-                </footer>UpDow
+                </footer>
                     <!-- /footer content -->
             </div>
         </div>

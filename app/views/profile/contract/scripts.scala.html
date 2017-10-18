@@ -1458,6 +1458,132 @@
                             data: venders
                         }]
                     });
+
+            // Build the chart line device
+            Highcharts.chart('line-device1', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C','#9B59B6','#E74C3C','#ff9600'
+                ],
+                width:'100%',
+                xAxis: {
+                    categories: ["W1","W2","W3","W4"]
+
+                },
+                yAxis: {
+                    title: {
+                        text: ""
+                    }
+
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'spline',
+                        name: 'W1',
+                        data: [12,20,2,31]
+                    },{
+                        type: 'spline',
+                        name: 'W2',
+                        data: [42,10,22,61]
+                    },
+                    {
+                        type: 'spline',
+                        name: 'W3',
+                        data: [4,50,22,41]
+                    },{
+                        type: 'spline',
+                        name: 'W4',
+                        data: [52,32,68,11]
+                    }]
+            });
+            Highcharts.chart('line-device2', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C','#9B59B6','#E74C3C','#ff9600'
+                ],
+                width:'100%',
+                xAxis: {
+                    categories: ["W1","W2","W3","W4"]
+
+                },
+                yAxis: {
+                    title: {
+                        text: ""
+                    }
+
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'spline',
+                        name: 'W1',
+                        data: [12,20,2,31]
+                    },{
+                        type: 'spline',
+                        name: 'W2',
+                        data: [42,10,22,61]
+                    },
+                    {
+                        type: 'spline',
+                        name: 'W3',
+                        data: [4,50,22,41]
+                    },{
+                        type: 'spline',
+                        name: 'W4',
+                        data: [52,32,68,11]
+                    }]
+            });
             /* END CHART FOR INTERNET*/
         });
 

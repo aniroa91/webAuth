@@ -11,10 +11,10 @@ import services.CacheService
  * application's home page.
  */
 @Singleton
-class DashboardController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+class DashboardController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
-  def index = Action {
-    Ok(views.html.dns_v2.dashboard.index(CacheService.getDaskboard()._1))
+  def index =  withAuth { username => implicit request =>
+    Ok(views.html.dns_v2.dashboard.index(CacheService.getDaskboard()._1,username))
   }
 }
 
