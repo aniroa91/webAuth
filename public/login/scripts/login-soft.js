@@ -6,8 +6,9 @@ var Login = function () {
 	            errorClass: 'help-inline', // default input error message class
 	            focusInvalid: false, // do not focus the last invalid input
 	            rules: {
-	                username: {
-	                    required: true
+	                email: {
+	                    required: true,
+                        email: true
 	                },
 	                password: {
 	                    required: true
@@ -18,11 +19,11 @@ var Login = function () {
 	            },
 
 	            messages: {
-	                username: {
-	                    required: "Username is required1."
+	                email: {
+	                    required: "Email is required"
 	                },
 	                password: {
-	                    required: "Password is required2."
+	                    required: "Password is required"
 	                }
 	            },
 
@@ -252,8 +253,7 @@ var Login = function () {
             $.backstretch([
 		        "../assets/login/img/bg/3.jpg",
 		        "../assets/login/img/bg/2.jpg",
-		        "../assets/login/img/bg/1.jpg",
-		        "../assets/login/img/bg/4.jpg"
+                "../assets/login/img/bg/1.jpg"
 		        ], {
 		          fade: 1000,
 		          duration: 8000

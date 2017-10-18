@@ -237,7 +237,7 @@ $.fn.gauge = function(opts) {
       	opts[this.name] = val;
       }
       if(this.name == "currval"){
-      	// update current demo gauge
+      	// update current index gauge
       	demoGauge.set(parseInt(this.value));
       	AnimationUpdater.run();
       }

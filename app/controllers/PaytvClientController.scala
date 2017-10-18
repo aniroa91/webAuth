@@ -12,11 +12,11 @@ import services.user.DashboardService
   * application's home page.
   */
 @Singleton
-class PaytvClientController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
+class PaytvClientController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
-  def index() = Action {
+  def index() = withAuth { username => implicit request =>
     val response = DashboardService.get()
-    Ok(views.html.profile.paytv.index(response))
+    Ok(views.html.profile.paytv.index(response,username))
   }
   
 }

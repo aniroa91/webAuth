@@ -24,7 +24,7 @@ import slick.jdbc.JdbcProfile
  */
 @Singleton
 class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)
-      extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] with I18nSupport {
+      extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] with Secured {
 
   val form = Form(
     mapping(
@@ -32,7 +32,7 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
     )(SearchContract.apply)(SearchContract.unapply)
   )
 
-  def index = Action { implicit request: Request[AnyContent] =>
+  def index = withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
     try {
       if (!formValidationResult.hasErrors) {
@@ -40,13 +40,13 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
         val second = DomainUtil.extract(domain).second
         val logo = CommonService.getLogo(second, false)
         val response = CacheService.getDomain(second)
-        Ok(views.html.dns_v2.search.index(form, second, response._1, logo))
+        Ok(views.html.dns_v2.search.index(form, second, response._1, logo,username))
       } else {
-        Ok(views.html.dns_v2.search.index(form, null, null, null))
+        Ok(views.html.dns_v2.search.index(form, null, null, null,username))
       }
     }
     catch{
-      case e: Exception => Ok(views.html.dns_v2.search.index(form, null, null, null))  }
+      case e: Exception => Ok(views.html.dns_v2.search.index(form, null, null, null,username))  }
   }
 }
 

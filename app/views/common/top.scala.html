@@ -15,15 +15,18 @@
                                             <i class="fa fa-globe"></i> DNS
                                         }
                                         @if(id == 1) {
-                                            <i class="fa fa-user"></i> Pr
+                                            <i class="fa fa-user"></i> Profile
                                         }
                                         <span class="fa fa-chevron-down downTopMenu"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/" class="topLi">DNS <i class="fa fa-globe pull-right"></i></a></li>
+                                        <li><a href="/dns" class="topLi">DNS <i class="fa fa-globe pull-right"></i></a></li>
                                         <li class="divider"></li>
                                         <li><a href="/paytv">Profile <i class="fa fa-user pull-right"></i></a></li>
                                         <li class="divider"></li>
                                         <li><a href="#" class="botLi">Device <i class="fa fa-server pull-right"></i></a></li>
+                                        <li>
+                                            <a href="/demo" class="botLi">Demo <i class="fa fa-laptop pull-right"></i></a>
+                                        </li>
 
                                     </ul>
                                 </li>
@@ -36,7 +39,7 @@
                             <div class="menu_section">
                               @if(id == 0) {
                                   <ul class="nav side-menu">
-                                      <li><a href="/"><i class="fa fa-home"></i> Dashboard </a>
+                                      <li><a href="/dns"><i class="fa fa-home"></i> Dashboard </a>
                                       </li>
                                       @if(item == "Search"){
                                           @if(day != null) {
@@ -75,8 +78,13 @@
                                   <ul class="nav side-menu">
                                       <li><a href="/paytv"><i class="fa fa-television"></i> Dashboard </a>
                                       </li>
-                                      <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
-                                      </li>
+                                      @if(day != ""){
+                                          <li class="current-page"><a href="/profile?ct=@day"><i class="fa fa-book"></i> Contract </a>
+                                          </li>
+                                      }else{
+                                          <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
+                                          </li>
+                                      }
                                   </ul>
                               }
                             </div>
