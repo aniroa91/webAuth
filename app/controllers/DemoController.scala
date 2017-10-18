@@ -31,6 +31,10 @@ class DemoController @Inject()(cc: ControllerComponents) extends AbstractControl
       Ok(views.html.dns_v2.demo.index(form, username, null))
     }
   }
+
+  def message =  withAuth { username => implicit request =>
+    Ok(views.html.dns_v2.demo.message(username))
+  }
 }
 
 

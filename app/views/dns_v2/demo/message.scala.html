@@ -1,4 +1,4 @@
-@(form: Form[SearchContract],email: String,mac: String)
+@(email: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -80,11 +80,6 @@
                 <div class="nav toggle" style="margin-bottom: 10px">
                     <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                 </div>
-                <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group top_search">
-
-                @views.html.profile.contract.frmSearch(form, routes.DemoController.index)
-
-                </div>
             </nav>
             <ul class="nav navbar-nav navbar-right">
                 <li class="">
@@ -101,12 +96,11 @@
     </div>
         <!-- /top navigation -->
         <!-- page content -->
-    <div class="right_col" role="main">
-       @if(mac != null){
-          <iframe src="http://@services.Configure.KIBANA/app/kibana#/dashboard/33e5f190-b32c-11e7-b775-c9b736eeb13b?embed=true&_g=(refreshInterval:('$$hashKey':'object:15014',display:'5+seconds',pause:!f,section:1,value:5000),time:(from:now-15m,mode:quick,to:now))&_a=(filters:!(),options:(darkTheme:!f),panels:!((col:1,id:'9e15da00-b32a-11e7-b775-c9b736eeb13b',panelIndex:1,row:1,size_x:3,size_y:4,type:visualization),(col:1,id:a1564280-b32b-11e7-b775-c9b736eeb13b,panelIndex:3,row:11,size_x:12,size_y:4,type:visualization),(col:4,columns:!(mac,bssid,essid,probedESSIDs,id,wlan_type),id:'347c9dc0-b3a4-11e7-a88c-45367dc0b459',panelIndex:4,row:5,size_x:9,size_y:6,sort:!(_score,desc),type:search),(col:4,id:fabc6ab0-b3a4-11e7-a88c-45367dc0b459,panelIndex:5,row:1,size_x:9,size_y:4,type:visualization),(col:1,id:d1505cd0-b3a5-11e7-a88c-45367dc0b459,panelIndex:6,row:5,size_x:3,size_y:6,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'mac:%22@mac%22')),timeRestore:!f,title:USER-IOT-DASHBOARD,uiState:(P-5:(vis:(legendOpen:!t)),P-6:(vis:(params:(sort:(columnIndex:!n,direction:!n))))),viewMode:view)" height="1200" width="100%"></iframe>    </div>
-       } else {
-    <iframe src="http://@services.Configure.KIBANA/app/kibana#/dashboard/33e5f190-b32c-11e7-b775-c9b736eeb13b?embed=true&_g=(refreshInterval:('$$hashKey':'object:15014',display:'5+seconds',pause:!f,section:1,value:5000),time:(from:now-15m,mode:quick,to:now))&_a=(filters:!(),options:(darkTheme:!f),panels:!((col:1,id:'9e15da00-b32a-11e7-b775-c9b736eeb13b',panelIndex:1,row:1,size_x:3,size_y:4,type:visualization),(col:1,id:a1564280-b32b-11e7-b775-c9b736eeb13b,panelIndex:3,row:11,size_x:12,size_y:4,type:visualization),(col:4,columns:!(mac,bssid,essid,probedESSIDs,id,wlan_type),id:'347c9dc0-b3a4-11e7-a88c-45367dc0b459',panelIndex:4,row:5,size_x:9,size_y:6,sort:!(_score,desc),type:search),(col:4,id:fabc6ab0-b3a4-11e7-a88c-45367dc0b459,panelIndex:5,row:1,size_x:9,size_y:4,type:visualization),(col:1,id:d1505cd0-b3a5-11e7-a88c-45367dc0b459,panelIndex:6,row:5,size_x:3,size_y:6,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),timeRestore:!f,title:USER-IOT-DASHBOARD,uiState:(P-5:(vis:(legendOpen:!t)),P-6:(vis:(params:(sort:(columnIndex:!n,direction:!n))))),viewMode:view)" height="1200" width="100%"></iframe>
-       }
+    <div class="right_col" role="main" style="height: 2000px;background: white">
+        <div class="row" id="main-content" style="text-align: center">
+
+        </div>
+    </div>
         <!-- /page content -->
         <!-- footer content -->
     <footer>
@@ -125,5 +119,20 @@
     <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
         <!-- Custom Theme Scripts -->
     <script src="../assets/custom/js/custom.min.js"></script>
+    <script type="text/javascript">
+            function executeQuery() {
+                $.ajax({
+                    url: '/msg',
+                    success: function(data) {
+                        $('#main-content').append("<h1>Test realtime</h1>")
+                    }
+                });
+                setTimeout(executeQuery, 5000); // you could choose not to continue on failure...
+            }
+
+            $(document).ready(function() {
+                executeQuery()
+            });
+    </script>
     </body>
 </html>

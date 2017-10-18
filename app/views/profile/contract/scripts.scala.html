@@ -1460,7 +1460,9 @@
                     });
 
             // Build the chart line device
-            Highcharts.chart('line-device1', {
+           values =  @Html(Json.stringify(Json.toJson(response.internet.device.deviceChars.map(x => x._2))));
+           var name = @Html(Json.stringify(Json.toJson(response.internet.device.deviceChars.map(x => x._1.split(",")(0)))));
+            Highcharts.chart('line-device', {
                 chart: {
                     type: 'column'
                 },
@@ -1480,8 +1482,7 @@
                 ],
                 width:'100%',
                 xAxis: {
-                    categories: ["W1","W2","W3","W4"]
-
+                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23"]
                 },
                 yAxis: {
                     title: {
@@ -1502,7 +1503,7 @@
                         }
                     }
                 },
-                series: [
+                series: /*[
                     {
                         type: 'spline',
                         name: 'W1',
@@ -1520,69 +1521,8 @@
                         type: 'spline',
                         name: 'W4',
                         data: [52,32,68,11]
-                    }]
-            });
-            Highcharts.chart('line-device2', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                colors: [
-                    '#1ABB9C','#9B59B6','#E74C3C','#ff9600'
-                ],
-                width:'100%',
-                xAxis: {
-                    categories: ["W1","W2","W3","W4"]
-
-                },
-                yAxis: {
-                    title: {
-                        text: ""
-                    }
-
-                },
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                series: [
-                    {
-                        type: 'spline',
-                        name: 'W1',
-                        data: [12,20,2,31]
-                    },{
-                        type: 'spline',
-                        name: 'W2',
-                        data: [42,10,22,61]
-                    },
-                    {
-                        type: 'spline',
-                        name: 'W3',
-                        data: [4,50,22,41]
-                    },{
-                        type: 'spline',
-                        name: 'W4',
-                        data: [52,32,68,11]
-                    }]
+                    }]*/
+                        getJsonDeviceVector(values,name)
             });
             /* END CHART FOR INTERNET*/
         });
@@ -1598,6 +1538,19 @@
             }
             return jsonArr
         }
+
+        function getJsonDeviceVector(arrsData,arrName){
+            var jsonArr = [];
+            for (var i = 0; i < arrsData.length; i++) {
+                jsonArr.push({
+                    type: "spline",
+                    name: arrName[i],
+                    data: arrsData[i]
+                });
+            }
+            return jsonArr
+        }
+
         function convertHourly(arr){
             for(var i=0; i< arr.length;i++){
                 arr[i] = parseFloat((arr[i]/3600).toFixed(2));
