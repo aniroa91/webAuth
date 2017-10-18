@@ -1,4 +1,4 @@
-@(email: String)
+@(email: String, contracts: Array[String])
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -124,7 +124,11 @@
                 $.ajax({
                     url: '/msg',
                     success: function(data) {
-                        $('#main-content').append("<h1>Test realtime</h1>")
+                        $('#main-content').html('')
+                        @for(contract <- contracts) {
+                           $('#main-content').append("<h1>@contract</h1>") 
+                        }
+                        
                     }
                 });
                 setTimeout(executeQuery, 5000); // you could choose not to continue on failure...

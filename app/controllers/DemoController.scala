@@ -8,6 +8,7 @@ import services.CacheService
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
+import services.user.DemoService
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -33,7 +34,9 @@ class DemoController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
   def message =  withAuth { username => implicit request =>
-    Ok(views.html.dns_v2.demo.message(username))
+    val contract = Array("No Implement") //DemoService.get().map(x => x._2)
+    //println("Contract:" + contract.size)
+    Ok(views.html.dns_v2.demo.message(username, contract))
   }
 }
 
