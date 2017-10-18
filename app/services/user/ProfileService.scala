@@ -634,7 +634,7 @@ object ProfileService extends AbstractService {
     
     //val map3 = mergeArrayMap(array)
     //map3.foreach(println)
-    val response = ProfileService.get("SGH090877")
+    val response = ProfileService.get("HUFD08955")
     //val a = response.paytv.vectors.get("445814").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
@@ -650,7 +650,11 @@ object ProfileService extends AbstractService {
     //response.internet.device.deviceTypes.foreach(println)
     //println(response.internet.device.numberOfDevice)
     //println(response.internet.device.numberOfMobile)
-    println(response.internet.segment)
+//    println(response.internet.segment)
+    response.internet.device.deviceChars.foreach(x => {
+      println(x._1)
+      x._2.foreach(println)
+    })
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
