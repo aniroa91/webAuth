@@ -15,11 +15,14 @@
                                             <i class="fa fa-globe"></i> DNS
                                         }
                                         @if(id == 1) {
-                                            @if(item == "Paytv"){
+                                            @if(item == "Paytv" || item == "Contract"){
                                                 <i class="fa fa-user"></i> Profile
                                             }else{
                                                 <i class="fa fa-laptop"></i> Demo
                                             }
+                                        }
+                                        @if(id == 2){
+                                            <i class="fa fa-server"></i> Device
                                         }
                                         <span class="fa fa-chevron-down downTopMenu"></span></a>
                                     <ul class="dropdown-menu">
@@ -27,7 +30,8 @@
                                         <li class="divider"></li>
                                         <li><a href="/paytv">Profile <i class="fa fa-user pull-right"></i></a></li>
                                         <li class="divider"></li>
-                                        <li><a href="#" class="botLi">Device <i class="fa fa-server pull-right"></i></a></li>
+                                        <li><a href="/device" class="botLi">Device <i class="fa fa-server pull-right"></i></a></li>
+                                        <li class="divider"></li>
                                         <li>
                                             <a href="/demo" class="botLi">Demo <i class="fa fa-laptop pull-right"></i></a>
                                         </li>
@@ -78,10 +82,10 @@
                                       <li><a href="/report"><i class="fa fa-edit"></i> Report </a>
                                       </li>
                                   </ul>
-                              }else{
-                                  @if(item == "Paytv"){
+                              }else if(id == 1){
+                                  @if(item == "Paytv" || item == "Contract"){
                                       <ul class="nav side-menu">
-                                          <li><a href="/paytv"><i class="fa fa-television"></i> Dashboard </a>
+                                          <li><a href="/paytv"><i class="fa fa-home"></i> Dashboard </a>
                                           </li>
                                           @if(day != ""){
                                               <li class="current-page"><a href="/profile?ct=@day"><i class="fa fa-book"></i> Contract </a>
@@ -100,6 +104,11 @@
                                       </ul>
                                   }
 
+                              }else{
+                                <ul class="nav side-menu">
+                                    <li><a href="/device"><i class="fa fa-home"></i> Dashboard </a>
+                                    </li>
+                                </ul>
                               }
                             </div>
 
