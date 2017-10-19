@@ -34,4 +34,6 @@ object Configure {
   def main(args: Array[String]) {
     println(KIBANA)
   }
+  
+  val CACHE_CONTRACT_FIRST = scala.collection.mutable.Map[String, String]()
 }

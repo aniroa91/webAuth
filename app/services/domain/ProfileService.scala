@@ -50,10 +50,10 @@ object ProfileService extends AbstractService {
     //val whoisResponse = multiSearchResponse.responses(2)
     val hourlyResponse = multiSearchResponse.responses(2)
 
-    println(secondResponse.took)
-    println(domainResponse.took)
-//    println(whoisResponse.took)
-    println(hourlyResponse.took)
+    //println(secondResponse.took)
+    //println(domainResponse.took)
+    //println(whoisResponse.took)
+    //println(hourlyResponse.took)
     
     
     
