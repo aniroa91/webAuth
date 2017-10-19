@@ -33,8 +33,8 @@
     </thead>
     <tbody>
         @for(device <- devices.deviceChars.toList) {
-            <tr>
-                <td>@device._1.split(',')(0)</td>
+            <tr onclick="activeDevice(this)">
+                <td style="cursor: pointer">@device._1.split(',')(0)</td>
                 <td>@device._1.split(',')(1)</td>
                 <td>@device._1.split(',')(2)</td>
             </tr>

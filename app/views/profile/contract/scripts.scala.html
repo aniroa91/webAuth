@@ -1478,11 +1478,20 @@
                     }
                 },
                 colors: [
-                    '#1ABB9C','#9B59B6','#E74C3C','#ff9600'
+                    '#9B59B6',
+                    '#1ABB9C',
+                    '#000066',
+                    '#3498DB',
+                    '#9CC2CB',
+                    '#E74C3C',
+                    '#73879C',
+                    '#ff9600',
+                    '#b6a278',
+                    '#ffd6e1'
                 ],
                 width:'100%',
                 xAxis: {
-                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23"]
+                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23","24","25","26","27","28","29"]
                 },
                 yAxis: {
                     title: {
@@ -1527,6 +1536,69 @@
             /* END CHART FOR INTERNET*/
         });
 
+        function activeDevice(element){
+            var mac = $(element).find("td:eq(0)").text();
+            if($(element).hasClass('hight-light'))
+              mac = null;
+            $("#tbDevice").find('.hight-light').removeClass('hight-light');
+            if(mac != null)
+                $(element).addClass('hight-light');
+            var values =  @Html(Json.stringify(Json.toJson(response.internet.device.deviceChars.map(x => x._2))));
+            var name = @Html(Json.stringify(Json.toJson(response.internet.device.deviceChars.map(x => x._1.split(",")(0)))));
+            Highcharts.chart('line-device', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#9B59B6',
+                    '#1ABB9C',
+                    '#000066',
+                    '#3498DB',
+                    '#9CC2CB',
+                    '#E74C3C',
+                    '#73879C',
+                    '#ff9600',
+                    '#b6a278',
+                    '#ffd6e1'
+                ],
+                width:'100%',
+                xAxis: {
+                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23","24","25","26","27","28","29"]
+                },
+                yAxis: {
+                    title: {
+                        text: ""
+                    }
+
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: getJsonDeviceVector(values,name,mac)
+            });
+        }
+
         function getJsonAppVector(appHour){
             var jsonArr = [];
             for (var i = 0; i < appHour.length; i++) {
@@ -1539,14 +1611,23 @@
             return jsonArr
         }
 
-        function getJsonDeviceVector(arrsData,arrName){
+        function getJsonDeviceVector(arrsData,name,mac){
             var jsonArr = [];
             for (var i = 0; i < arrsData.length; i++) {
-                jsonArr.push({
-                    type: "spline",
-                    name: arrName[i],
-                    data: arrsData[i]
-                });
+                if(mac == null) {
+                    jsonArr.push({
+                        type: "spline",
+                        name: name[i],
+                        data: arrsData[i]
+                    });
+                }
+                else if(mac == name[i]) {
+                    jsonArr.push({
+                        type: "spline",
+                        name: mac,
+                        data: arrsData[i]
+                    });
+                }
             }
             return jsonArr
         }
