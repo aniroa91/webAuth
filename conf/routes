@@ -32,6 +32,7 @@ GET      /logout                   controllers.LoginController.logout
 GET      /dns                     controllers.DashboardController.index
 GET      /demo                     controllers.DemoController.index
 GET      /msg                     controllers.DemoController.message
+GET      /device                     controllers.DeviceController.index
 GET     /search                   controllers.ProfileController.index
 GET     /rank                     controllers.RankController.index
 GET     /report                   controllers.ReportController.index(day: String ?= "")
