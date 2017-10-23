@@ -46,8 +46,110 @@
     <div class="right_col" role="main">
 
         <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-
+            <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12">
+                <div class="x_panel">
+                    <div id="mapVn" style="height: 500px;"></div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-sm-9 col-md-9 col-xs-12">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel">
+                        <div id="bras" style="height: 500px"></div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                    <div class="x_panel" style="height: 250px">
+                        <table class="data table no-margin" id="tbBras">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Kibana</th>
+                                    <th>Opsview</th>
+                                </tr>
+                                <tr>
+                                    <th>Bras_id</th>
+                                    <th><span style="border-right:1px solid #eee;margin-right: 5px">Error Name</span><span style="border-right:1px solid #eee;margin-right: 5px">Severity</span><span>Description</span></th>
+                                    <th><span style="border-right:1px solid #eee;margin-right: 5px">Service Name</span><span>Service Status</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bras1</td>
+                                    <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span>Error 1</span></td>
+                                    <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span>Error 1</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Bras2</td>
+                                    <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 2</span><span style="border-right:1px solid #eee;margin-right: 5px">Error 2</span><span>Error 2</span></td>
+                                    <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 2</span><span>Error 2</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="background: white;height: 250px;border: 1px solid #E6E9ED;">
+                            <table class="data table no-margin " id="tbCard">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Card1</th>
+                                        <th>Card2</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Linecard1</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Linecard2</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Linecard3</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div id="line-bras" style="height:250px;border: 1px solid #E6E9ED;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
+                <div class="x_panel">
+                   <div id="host" style="height: 350px"></div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
+                <div class="x_panel" style="height: 370px;">
+                    <table class="data table no-margin border" id="tbHost" >
+                        <thead>
+                            <tr>
+                                <th>SF</th>
+                                <th>LOFI</th>
+                                <th>Lost Signal</th>
+                                <th>User Down</th>
+                                <th>Inf Down</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Host1</td>
+                                <td>...</td>
+                                <td>...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -76,5 +178,221 @@
         <!-- Counter number -->
     <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
     <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
+        <!-- HightChartMap -->
+    <script src="../assets/javascripts/map.js"></script>
+    <script src="../assets/javascripts/vn-all.js"></script>
+
+    <script type="text/javascript">
+            Highcharts.chart('line-bras', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Bras1'
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colors: [
+                    '#1ABB9C','#9B59B6'
+                ],
+                xAxis: {
+                    categories: [1,2,3,4,5,6,7,8,9,10,11]
+                },
+
+                yAxis: [{ // Primary yAxis
+                    title: {
+                        text: ' Client'
+                    }
+                }],
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'spline',
+                        name: 'Signin',
+                        data:[77.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 23.3, 18.3, 13.9, 99.6]
+                    }, {
+                        type: 'spline',
+                        name: 'Logoff',
+                        data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6]
+                    }]
+            });
+            // Nodes BRAS
+            var nodeBras = new vis.DataSet([
+                {id: 0, label: 'Root',color:'#9B59B6'},
+                {id: 1, label: 'Bras1',color:'#1ABB9C'},
+                {id: 2, label: 'Bras2',color:'#1ABB9C'},
+                {id: 6, label: 'LineCard1'},
+                {id: 3, label: 'Card1'},
+                {id: 4, label: 'Card2'},
+                {id: 5, label: 'LineCard2'}
+            ]);
+            // create an array with edges to represent the network
+            var edgeBras = new vis.DataSet([
+                {from: 1, to: 6},
+                {from: 1, to: 5},
+                {from: 6, to: 3},
+                {from: 6, to: 4},
+                {from: 0, to: 2},
+                {from: 0, to: 1},
+            ]);
+            // Find contained in document
+            var divBras = document.getElementById('bras');
+            //Define data object and the options of the network
+            var arrBras = {
+                nodes: nodeBras,
+                edges: edgeBras
+            };
+            var optionsBras = {
+                autoResize: true,
+                height: '100%',
+                width: '100%'
+            };
+            //Define the network object to be rendered.
+            var bras = new vis.Network(divBras, arrBras, optionsBras);
+            //Simply declare an event with callback.
+            bras.on("click", function (params) {
+                console.log(params['nodes']['0']);
+                var id = params['nodes']['0'] -1;
+                $('#tbBras tbody tr').hide();
+                $('#tbBras tbody tr:eq('+id+')').removeAttr("style");
+            });
+
+            // ----------------//
+            // Nodes HOST
+            var nodeHost = new vis.DataSet([
+                {id: 0, label: 'Root',color:'#9B59B6'},
+                {id: 1, label: 'Host1',color:'#1ABB9C'},
+                {id: 2, label: 'Host2',color:'#1ABB9C'},
+                {id: 11,label: 'Module1'},
+                {id: 12,label: 'Module2'},
+                {id: 111,label: 'Splitter1'},
+                {id: 112,label: 'Splitter2'}
+            ]);
+            // create an array with edges to represent the network
+            var edgeHost = new vis.DataSet([
+                {from: 0, to: 1},
+                {from: 0, to: 2},
+                {from: 1, to: 11},
+                {from: 1, to: 12},
+                {from: 11, to: 111},
+                {from: 11, to: 112}
+            ]);
+            // Find contained in document
+            var divHost = document.getElementById('host');
+            //Define data object and the options of the network
+            var arrHost = {
+                nodes: nodeHost,
+                edges: edgeHost
+            };
+            var optionsHost = {
+                autoResize: true,
+                height: '100%',
+                width: '100%'
+            };
+            //Define the network object to be rendered.
+            var host = new vis.Network(divHost, arrHost, optionsHost);
+            //Simply declare an event with callback.
+            host.on("click", function (params) {
+                console.log(params['nodes']['0']);
+            });
+
+            // Map country
+            Highcharts.mapChart('mapVn', {
+                chart: {
+                    map: 'countries/vn/vn-all'
+                },
+
+                title: {
+                    text: ''
+                },
+                colorAxis:{
+                    min:0
+                },
+                mapNavigation: {
+                    enabled: true,
+                    buttonOptions: {
+                        verticalAlign: 'bottom'
+                    }
+                },
+                plotOptions: {
+                    column: {
+                        colorByPoint: true
+                    }
+                },
+                colorAxis: {
+
+                    dataClasses: [{
+                        from: -100,
+                        to: 0,
+                        color: '#E74C3C',
+                        name: 'NOC'
+                    }, {
+                        from: 0,
+                        to: 100,
+                        color: '#9B59B6',
+                        name: 'INF'
+                    }]
+                },
+                legend: {
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: -30,
+                    y: 70,
+                    floating: true,
+                    layout: 'vertical',
+                    valueDecimals: 0,
+                },
+                series: [{
+                    data: [ ['vn-yb', 0],
+                        ['vn-pt', 1],
+                        ['vn-3655', 2],
+                        ['vn-qn', 3],
+                        ['vn-kh', -4],
+                        ['vn-tg', 5],
+                        ['vn-bv', 6],
+                        ['vn-bu', -7]],
+                    name: 'Random data',
+                    states: {
+                        hover: {
+                            color: '#BADA55'
+                        }
+                    },
+                    dataLabels: {
+
+                        enabled: true,
+
+                        color: '#FFFFFF',
+
+                        format: '{point.code}'
+
+                    },
+
+                    name: 'Number Of Query',
+
+                    tooltip: {
+
+                        pointFormat:  '{point.name}: {point.value}'
+
+                    }
+                }]
+            });
+
+    </script>
     </body>
 </html>

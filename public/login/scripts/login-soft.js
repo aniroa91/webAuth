@@ -7,8 +7,8 @@ var Login = function () {
 	            focusInvalid: false, // do not focus the last invalid input
 	            rules: {
 	                email: {
-	                    required: true,
-                        email: true
+	                    required: true/*,
+                        email: true*/
 	                },
 	                password: {
 	                    required: true
