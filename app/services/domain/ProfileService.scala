@@ -23,6 +23,7 @@ import model.DomainLocation
 import scala.util.Try
 import model.Label
 import com.ftel.bigdata.utils.ESUtil
+import services.Configure
 
 object ProfileService extends AbstractService {
 
@@ -80,13 +81,19 @@ object ProfileService extends AbstractService {
       val category = CommonService.getCategory(domain)
       CommonService.backgroupJob(CommonService.getLogo(domain, true), "Download Logo")
       //CommonService.backgroupJob(indexLocation(domain), "Download Location")
-      indexLocation(domain)
+      //indexLocation(domain)
       val loc = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await
       val map = loc.sourceAsMap
       val subdomain = domainResponse.hits.hits.map(x => x.sourceAsMap).map(x => x.getOrElse("domain", "").toString -> x.getOrElse("queries", "0").toString.toInt)
       val score = if(current.label == Label.Black) {
         val getRes = ESUtil.get(client, "dns-score", "docs", domain)
-        getValueAsDouble(getRes.source, "score")
+        val value = getValueAsDouble(getRes.source, "score")
+        if (value <= 0) {
+          if (Configure.redisDga == null) 0.75
+          else {
+            if (Configure.redisDga.exists(domain)) 0.95 else 0.75
+          }
+        } else value
       } else 0.0
       val time7 = System.currentTimeMillis()
       printTime(time0,time1,time2,time3,time4,time5, time6, time7)
@@ -106,17 +113,18 @@ object ProfileService extends AbstractService {
   }
 
   private val IP_API_URL = "http://ip-api.com/json/"
-  private def indexLocation(domain: String) {
+  @deprecated
+  private def indexLocationRemove(domain: String) {
     val time0 = System.currentTimeMillis()
     val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await
     if (!getResponse.exists) {
-      val url = IP_API_URL + domain
-      val content = HttpUtil.getContent(url, "172.30.45.220", 80)
-      println(content)
-//      val content = HttpUtil.getContent(url)
-      //println(content)
-      
-      Try(client.execute(indexInto("dns-location" / "docs") doc (content) id domain ).await)
+//      val url = IP_API_URL + domain
+//      val content = HttpUtil.getContent(url, "172.30.45.220", 80)
+//      println(content)
+////      val content = HttpUtil.getContent(url)
+//      //println(content)
+//      
+//      Try(client.execute(indexInto("dns-location" / "docs") doc (content) id domain ).await)
       //Thread.sleep(300)
       
     }
@@ -184,4 +192,6 @@ object ProfileService extends AbstractService {
     }
     
   }
+  
+  
 }

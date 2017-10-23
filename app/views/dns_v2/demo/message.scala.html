@@ -124,9 +124,9 @@
                 $.ajax({
                     url: '/msg2',
                     success: function(data) {
-                        $('#main-content').html('')
+                        //$('#main-content').html('')
                         //@@for(contract <- contracts) {
-                           $('#main-content').append(data)
+                           $('#main-content').prepend(data)
                         //}
                         
                     }

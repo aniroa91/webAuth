@@ -39,7 +39,7 @@ class DemoController @Inject()(cc: ControllerComponents) extends AbstractControl
     //println("Contract:" + contract.size)
     
     val msg = DateTimeUtil.now + " -> No Implement"
-    println(msg)
+    //println(msg)
     Ok(views.html.dns_v2.demo.message(username, msg))
   }
   
@@ -48,10 +48,13 @@ class DemoController @Inject()(cc: ControllerComponents) extends AbstractControl
     val response = DemoService.get()
     response.contracts.map(x => services.Configure.CACHE_CONTRACT_FIRST.put(timeString, x._1 + "->" + x._2))
     val msg = response.contracts.map(x => x._2).map(x => s"<h3><font color='green'>Hello ${x}, Welcome You Here</font></h3>").mkString("<br/>")
+    val macs = response.macs.map(x => s"<h3><font color='blue'>${x}</font></h3>").mkString("<br/>")
     val content = "<div>" +
       s"<h1>Time: ${timeString}</h1>" + 
       "<br/>" +
       s"<h2>There ${if (response.macs.size > 1) "are" else "is"} ${response.macs.size} new mac address device.</h2>" + 
+       "<br/>" +
+       s"${macs}" +
       s"<h2>Found ${response.contracts.size} ${if (response.contracts.size > 1) "contracts" else "contract"} in ${response.macs.size} new mac address.</h2>" +
       "<br/>" +
       s"${msg}" + "</div>"

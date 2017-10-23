@@ -1,0 +1,48 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# An example controller showing a sample home page
+#GET     /                           controllers.HomeController.index
+# An example controller showing how to use dependency injection
+#GET     /count                      controllers.CountController.count
+# An example controller showing how to write asynchronous code
+#GET     /message                    controllers.AsyncController.message
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+# Static resources (not managed by the Play framework)
+#GET     /extassets/*file            controllers.Assets.versioned(path="/home/dungvc/Desktop", file: Asset)
+
+#######################################################################
+# Domain Service
+#GET     /domain/detail/:domain      controllers.DnsController.getDomainDetail(domain: String)
+#GET     /search2/:domain            controllers.DnsController.index(domain)
+#GET     /search                     controllers.DnsController.search
+
+GET     /extassets/*file            controllers.DnsController.getImage(file: String)
+#GET     /formview                       controllers.DnsController.formview
+
+#GET     /malware                     controllers.MalwareController.index
+
+#######################################################################
+GET      /                        controllers.LoginController.index
+GET      /login                   controllers.LoginController.login
+GET      /logout                   controllers.LoginController.logout
+GET      /dns                     controllers.DashboardController.index
+GET      /demo                     controllers.DemoController.index
+GET      /msg                     controllers.DemoController.message
+GET      /msg2                    controllers.DemoController.message2
+GET      /msgHistory              controllers.DemoController.history
+GET      /device                     controllers.DeviceController.index
+GET     /search                   controllers.ProfileController.index
+GET     /rank                     controllers.RankController.index
+GET     /report                   controllers.ReportController.index(day: String ?= "")
+GET     /client                   controllers.ClientController.index
+GET     /history                  controllers.ClientController.history(ip: String ?= "", offset: Int ?= 0)
+GET     /refresh                  controllers.DnsController.refresh
+GET     /analytic                 controllers.AnalyticController.index
+#GET     /report/:day              controllers.DnsController.reportBody(day: String)
+#GET     /ace/tables                 controllers.ACEController.tables
+GET     /paytv                    controllers.PaytvClientController.index
+GET     /profile                  controllers.ProfileContractController.index

@@ -19,8 +19,8 @@ object DemoService extends AbstractService {
   private val ES_INDEX_TEST = "user-iot-hello"
   private val ES_TYPE_TEST = "docs"
   private val FIELD = "first"
-  private val REDIS_CLIENT = new RedisClient("172.27.11.141", 6372)
-  private val REDIS_SUB = new RedisClient("172.27.11.141", 6371)
+  private val REDIS_CLIENT = new RedisClient(Configure.REDIS_CONTRACT_HOST, Configure.REDIS_CONTRACT_PORT)
+  private val REDIS_SUB = new RedisClient(Configure.REDIS_NEWMAC_HOST, Configure.REDIS_NEWMAC_PORT)
 
 //  def getSearchFromMac(mac: String): SearchDefinition = {
 //    search("user-cpe-*" / "docs") query { must(termQuery("mac_device.keyword", mac)) } limit 1
@@ -31,8 +31,9 @@ object DemoService extends AbstractService {
     //println("Run Demo find new device")
 
     val keys = REDIS_SUB.keys("newmac-*").getOrElse(List()).filter(x => !x.isEmpty).map(x => x.get)
+    keys.foreach(println)
     val macs = keys.map(x => x.substring("newmac-".length())).toArray
-
+    macs.foreach(println)
     val contracts = macs.map(x => x.toLowerCase()).map(x => x -> REDIS_CLIENT.get(x)).filter(x => !x._2.isEmpty).map(x => x._1 -> x._2.get).toMap
 
     // Delete Keys
