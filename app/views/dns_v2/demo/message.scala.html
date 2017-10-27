@@ -1,4 +1,4 @@
-@(email: String, contracts: Array[String])
+@(email: String, message: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -122,12 +122,12 @@
     <script type="text/javascript">
             function executeQuery() {
                 $.ajax({
-                    url: '/msg',
+                    url: '/msg2',
                     success: function(data) {
-                        $('#main-content').html('')
-                        @for(contract <- contracts) {
-                           $('#main-content').append("<h1>@contract</h1>") 
-                        }
+                        //$('#main-content').html('')
+                        //@@for(contract <- contracts) {
+                           $('#main-content').prepend(data)
+                        //}
                         
                     }
                 });

@@ -35,6 +35,9 @@ GET      /msg                     controllers.DemoController.message
 GET      /device                   controllers.DeviceController.index
 GET      /bras                     controllers.BrasController.index
 GET      /brasInfo                 controllers.BrasDetailController.index
+GET      /msg2                    controllers.DemoController.message2
+GET      /msgHistory              controllers.DemoController.history
+GET      /device                     controllers.DeviceController.index
 GET     /search                   controllers.ProfileController.index
 GET     /rank                     controllers.RankController.index
 GET     /report                   controllers.ReportController.index(day: String ?= "")
