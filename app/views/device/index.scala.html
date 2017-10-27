@@ -1,7 +1,8 @@
-@(email: String)
+@(email: String,lstBrasAulier : Seq[(String,String,String,String)])
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
+@import play.api.libs.json.Json
 
 <!DOCTYPE html>
 
@@ -44,16 +45,16 @@
         <!-- /top navigation -->
         <!-- page content -->
     <div class="right_col" role="main">
-
         <div class="row">
-            <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12">
+            <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12" id="mapBras">
                 <div class="x_panel">
-                    <div id="mapVn" style="height: 500px;"></div>
+                    <div id="mapVn" style="height: 520px;"></div>
                 </div>
             </div>
-            <div class="col-lg-9 col-sm-9 col-md-9 col-xs-12">
+            <div class="col-lg-9 col-sm-9 col-md-9 col-xs-12" id="grapBras">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="x_panel">
+                        <a data-toggle="toggle" style="cursor: pointer" data-target="grapBras"><i class="fa fa-chevron-left" aria-hidden="true" style="color: #9B59B6"></i></a>
                         <div id="bras" style="height: 500px"></div>
                     </div>
                 </div>
@@ -184,6 +185,12 @@
     <script src="../assets/javascripts/vn-all.js"></script>
 
     <script type="text/javascript">
+        $(document).ready(function () {
+            $("[data-toggle='toggle']").click(function() {
+                $('#mapBras').toggleClass("hideDiv");
+                $(this).children('.fa-chevron-left, .fa-chevron-right').toggleClass("fa-chevron-left fa-chevron-right");
+                $('#grapBras').toggleClass("leftDiv");
+            });
             Highcharts.chart('line-bras', {
                 chart: {
                     type: 'column'
@@ -233,7 +240,7 @@
                     }]
             });
             // Nodes BRAS
-            var nodeBras = new vis.DataSet([
+            /*var nodeBras = new vis.DataSet([
                 {id: 0, label: 'Root',color:'#9B59B6'},
                 {id: 1, label: 'Bras1',color:'#1ABB9C'},
                 {id: 2, label: 'Bras2',color:'#1ABB9C'},
@@ -241,16 +248,24 @@
                 {id: 3, label: 'Card1'},
                 {id: 4, label: 'Card2'},
                 {id: 5, label: 'LineCard2'}
-            ]);
+            ]);*/
+            var dtaLineCard = @Html(Json.stringify(Json.toJson(lstBrasAulier.map(x => (x._1, x._2) -> x._3).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|")))));
+            var dtaCard = @Html(Json.stringify(Json.toJson(lstBrasAulier.map(x => (x._1, x._2, x._3) -> x._4).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|")))));
+            var dtaBras = @Html(Json.stringify(Json.toJson(lstBrasAulier.map(x => (x._1, x._2)).toList.distinct)));
+
+            var nodeBras = new vis.DataSet(getNodeBras(dtaCard,dtaLineCard,dtaBras))
             // create an array with edges to represent the network
-            var edgeBras = new vis.DataSet([
+            /*var edgeBras = new vis.DataSet([
                 {from: 1, to: 6},
                 {from: 1, to: 5},
                 {from: 6, to: 3},
                 {from: 6, to: 4},
                 {from: 0, to: 2},
                 {from: 0, to: 1},
-            ]);
+            ]);*/
+            //console.log(getEdgeBras(dtaCard,dtaLineCard,dtaBras))
+            var edgeBras = new vis.DataSet(getEdgeBras(dtaCard,dtaLineCard,dtaBras))
+
             // Find contained in document
             var divBras = document.getElementById('bras');
             //Define data object and the options of the network
@@ -268,9 +283,6 @@
             //Simply declare an event with callback.
             bras.on("click", function (params) {
                 console.log(params['nodes']['0']);
-                var id = params['nodes']['0'] -1;
-                $('#tbBras tbody tr').hide();
-                $('#tbBras tbody tr:eq('+id+')').removeAttr("style");
             });
 
             // ----------------//
@@ -392,7 +404,75 @@
                     }
                 }]
             });
+          });
+            function getEdgeBras(dtaCard,dtaLine,dtaBras){
+                var jsonArr = [];
+                for (var i = 0; i < dtaBras.length; i++) {
+                    jsonArr.push({
+                        from: 0,
+                        to: dtaBras[i][0]+"/"+dtaBras[i][1]
+                    });
+                }
+                for (var i = 0; i < dtaLine.length; i++) {
+                    var arrLine = distinctArray(dtaLine[i][1].split("|"));
+                    for(var j=0;j<arrLine.length;j++){
+                        jsonArr.push({
+                            from: dtaLine[i][0][0]+"/"+dtaLine[i][0][1],
+                            to: dtaLine[i][0][0]+"/"+dtaLine[i][0][1]+"/"+arrLine[j]
+                        });
+                    }
+                }
+                for (var i = 0; i < dtaCard.length; i++) {
+                    var arrCard = distinctArray(dtaCard[i][1].split("|"));
+                    for(var j=0;j<arrCard.length;j++){
+                        jsonArr.push({
+                            from: dtaCard[i][0][0]+"/"+dtaCard[i][0][1]+"/"+dtaCard[i][0][2],
+                            to: dtaCard[i][0][0]+"/"+dtaCard[i][0][1]+"/"+dtaCard[i][0][2]+"/"+arrCard[j]
+                        });
+                    }
+                }
+                return jsonArr
+            }
 
+            function getNodeBras(dtaCard,dtaLine,dtaBras){
+                var jsonArr = [];
+                jsonArr.push({
+                    id: 0,
+                    label: "Root",
+                    color: "#9B59B6"
+                });
+                for (var i = 0; i < dtaBras.length; i++) {
+                    jsonArr.push({
+                        id: dtaBras[i][0]+"/"+dtaBras[i][1],
+                        title: "Bras: "+dtaBras[i][0]+"<br>Time: "+dtaBras[i][1],
+                        label:"Bras "+dtaBras[i][0].split("-")[0],
+                        color: "#1ABB9C"
+                    });
+                }
+                for (var i = 0; i < dtaLine.length; i++) {
+                    var arrLine = distinctArray(dtaLine[i][1].split("|"));
+                    for(var j=0;j<arrLine.length;j++){
+                        jsonArr.push({
+                            id: dtaLine[i][0][0]+"/"+dtaLine[i][0][1]+"/"+arrLine[j],
+                            label: "LineCard"+arrLine[j]
+                        });
+                    }
+                }
+                for (var i = 0; i < dtaCard.length; i++) {
+                    var arrCard = distinctArray(dtaCard[i][1].split("|"));
+                    for(var j=0;j<arrCard.length;j++){
+                        jsonArr.push({
+                            id: dtaCard[i][0][0]+"/"+dtaCard[i][0][1]+"/"+dtaCard[i][0][2]+"/"+arrCard[j],
+                            label: "Card"+arrCard[j]
+                        });
+                    }
+                }
+                return jsonArr
+            }
+            function distinctArray(items){
+                var uniqueItems = Array.from(new Set(items))
+                return uniqueItems
+            }
     </script>
     </body>
 </html>
