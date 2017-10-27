@@ -1,0 +1,188 @@
+@(email: String,lstBras : Seq[model.device.Bras])
+@import play.api.libs.json.Json
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Dashboard Admin </title>
+
+            <!-- Bootstrap -->
+        @views.html.common.css("Bras",2)
+    </head>
+    @views.html.common.top("Bras",2,"")
+        <!-- top navigation -->
+    <div class="top_nav">
+        <div class="nav_menu">
+            <nav>
+                <div class="nav toggle" style="margin-bottom: 10px">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <img src="../assets/images/user.default.png" alt="">@email
+                            <span class=" fa fa-angle-down"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-usermenu pull-right">
+                            <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+        <!-- /top navigation -->
+        <!-- page content -->
+    <div class="right_col" role="main">
+
+        <div class="row">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2> Top 100 Bras Detail</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <table id="tbBras" class="table table-striped table-bordered animated slideInUp">
+                    <thead>
+                        <tr>
+                            <th>Bras Id</th>
+                            <th>Time</th>
+                            <th>SignIn</th>
+                            <th>Logoff</th>
+                            <th>Actives</th>
+                            <th>Cpe_error</th>
+                            <th>Lostip_error</th>
+                            <th>Crit_kibana</th>
+                            <th>Crit_opsview</th>
+                            <th>Label</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @for(bras <- lstBras){
+                        <tr>
+                            <td><a href="/brasInfo?id=@bras.id&time=@bras.time&sigin=@bras.signin&logoff=@bras.logoff" style="color: #1ABB9C;" class="activeHref">@bras.id</a></td>
+                            <td>@bras.time</td>
+                            <td>@bras.signin</td>
+                            <td>@bras.logoff</td>
+                            <td>@bras.active_user</td>
+                            <td>@bras.cpe_error</td>
+                            <td>@bras.lostip_error</td>
+                            <td>@bras.crit_kibana</td>
+                            <td>@bras.crit_opsview</td>
+                            <td>
+                                @if(bras.label == "normal"){
+                                    <span class="label label-success" style="font-size: 13px">@bras.label</span>
+                                }else{
+                                    <span class="label label-danger" style="font-size: 13px">@bras.label</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+    <footer>
+        <div class="pull-right">
+            Dashboard Admin 21/09/2017
+        </div>
+        <div class="clearfix"></div>
+    </footer>
+        <!-- /footer content -->
+    </div>
+    </div>
+
+        <!-- jQuery -->
+    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- Custom Theme Scripts -->
+    <script src="../assets/custom/js/custom.min.js"></script>
+        <!-- Hight chart -->
+    <script src="../assets/javascripts/highcharts.js"></script>
+    <script src="../assets/javascripts/exporting.js"></script>
+        <!-- Counter number -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
+    <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
+        <!-- Datatable -->
+    <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="../assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="../assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="../assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="../assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+    <script src="../assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+
+    <script type="text/javascript">
+         /*function executeQuery() {
+             $.ajax({
+                 url: '/bras',
+                 success: function(data) {
+                     var rs = Html(Json.stringify(Json.toJson(
+                             lstBras.map { t =>
+                                Map("id" -> t.id, "time" -> t.time,"cpe_error" -> t.cpe_error.toString,
+                                 "label" -> t.label.toString, "crit_kibana" -> t.crit_kibana.toString, "crit_opsview" -> t.crit_opsview.toString,"logoff" -> t.logoff.toString,
+                                 "active_user" -> t.active_user.toString, "lostip_error" -> t.lostip_error.toString,"signin" -> t.signin.toString)
+                             }
+                     )));
+                     var dataTable = $("#tbBras").DataTable();
+                     // get the html table rows then
+                     dataTable.destroy();
+                     $("thead").empty();
+                     $("thead").html("<tr><th>Bras Id</th><th>Time</th><th>SignIn</th><th>Logoff</th><th>Actives</th><th>Cpe_error</th><th>Lostip_error</th><th>Crit_kibana</th><th>Crit_opsview</th><th>Label</th></tr>");
+                     var tbody = ""
+                     for(var i=0;i< rs.length;i++){
+                         var label = ""
+                         if(rs[i].label == "normal")
+                             label = "<span class='label label-success' style='font-size: 13px'>"+rs[i].label+"</span>";
+                         else
+                             label = "<span class='label label-danger' style='font-size: 13px'>"+rs[i].label+"</span>";
+                         tbody += "<tr><td class='activeHref'>"+rs[i].id+"</td><td>"+rs[i].time+"</td><td>"+rs[i].signin+"</td><td>"+rs[i].logoff+"</td><td>"+rs[i].active_user+"</td><td>"+rs[i].cpe_error+"</td><td>"+rs[i].lostip_error+"</td><td>"+rs[i].crit_kibana+"</td><td>"+rs[i].crit_opsview+"</td><td>"+label+"</td></tr>"
+                     }
+                     $("tbody").empty().promise().done(function(){
+                         $("tbody").html(tbody);
+                         dataTable = $("#tbBras").DataTable();
+                     });
+                 }
+             });
+         }
+
+         $(document).ready(function() {
+             $("#tbBras").DataTable({
+                 "pageLength":20
+             });
+             setInterval(function() {
+                 executeQuery()
+             }, 2*60*1000);
+         });*/
+
+         function executeQuery() {
+             window.location.reload(true);
+         }
+         $(document).ready(function() {
+             $("#tbBras").DataTable({
+                 "pageLength":20
+             });
+             setInterval(function() {
+                 executeQuery()
+             }, 2*60*1000);
+         });
+
+
+    </script>
+    </body>
+</html>
