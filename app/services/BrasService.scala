@@ -12,6 +12,10 @@ object BrasService {
     BrasesCard.listBrasOutlier
   }
 
+  def opViewKibana(id : String,time: String,oldTime: String): Future[Seq[(String,String,String,String)]] = {
+    BrasesCard.opViewKibana(id,time,oldTime)
+  }
+
   def getBrasTime(id : String,time: String) : Future[Seq[Bras]] = {
     BrasList.getTime(id,time)
   }

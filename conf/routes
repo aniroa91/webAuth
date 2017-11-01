@@ -27,6 +27,7 @@ GET     /extassets/*file            controllers.DnsController.getImage(file: Str
 
 #######################################################################
 GET      /                        controllers.LoginController.index
+GET      /ajax-call               controllers.DeviceController.ajaxCall
 GET      /login                   controllers.LoginController.login
 GET      /logout                   controllers.LoginController.logout
 GET      /dns                     controllers.DashboardController.index

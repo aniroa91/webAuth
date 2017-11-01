@@ -1,4 +1,4 @@
-@(email: String,lstBrasAulier : Seq[(String,String,String,String)])
+@(email: String,lstBrasAulier : Seq[(String,String,String,String)],opKibana : collection.mutable.Map[String, Seq[(String,String,String,String)]])
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -59,35 +59,78 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                    <div class="x_panel" style="height: 250px">
-                        <table class="data table no-margin" id="tbBras">
+                    <div class="x_panel">
+                        <table class="data table table-bordered" id="tbBras">
                             <thead>
                                 <tr>
-                                    <th></th>
+                                    <th style="width: 30%"></th>
                                     <th>Kibana</th>
                                     <th>Opsview</th>
                                 </tr>
                                 <tr>
                                     <th>Bras_id</th>
-                                    <th><span style="border-right:1px solid #eee;margin-right: 5px">Error Name</span><span style="border-right:1px solid #eee;margin-right: 5px">Severity</span><span>Description</span></th>
-                                    <th><span style="border-right:1px solid #eee;margin-right: 5px">Service Name</span><span>Service Status</span></th>
+                                    <th>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-8 col-xs-8 bdR">Error Name</div>
+                                            <div class="col-lg-6 col-md-6 col-xs-6">Error Level</div>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-xs-6 bdR">Service Name</div>
+                                            <div class="col-lg-6 col-md-6 col-xs-6">Service Status</div>
+                                        </div>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                @if(opKibana != null) {
+                                    @for(opKi <- opKibana) {
+                                        <tr>
+                                            <td>@opKi._1</td>
+                                            <td>
+                                            @for(kiba <- opKi._2) {
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6 col-xs-6 bdR">
+                                                    @if(kiba._1 != null && kiba._1.length > 12) {
+                                                        <span data-toggle="tooltip" title="@kiba._1">@kiba._1.substring(0, 9).
+                                                            ..</span>
+                                                    } else {
+                                                        @kiba._1
+                                                    }
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-xs-6">@kiba._2</div>
+                                                </div>
+                                                <div class="lineDiv"></div>
+                                            }
+                                            </td>
+                                            <td>
+                                            @for(op <- opKi._2) {
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6 col-xs-6 bdR">
+                                                    @if(op._3 != null && op._3.length > 12) {
+                                                        <span data-toggle="tooltip" title="@op._3">@op._3.substring(0, 9).
+                                                            ..</span>
+                                                    } else {
+                                                        @op._3
+                                                    }
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-xs-6">@op._4</div>
+                                                </div>
+                                                <div class="lineDiv"></div>
+                                            }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                @*<tr>
                                     <td>Bras1</td>
                                     <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span>Error 1</span></td>
                                     <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span>Error 1</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Bras2</td>
-                                    <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 2</span><span style="border-right:1px solid #eee;margin-right: 5px">Error 2</span><span>Error 2</span></td>
-                                    <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 2</span><span>Error 2</span></td>
-                                </tr>
+                                </tr>*@
                             </tbody>
                         </table>
                     </div>
-                    <div>
+                    <div style="display: none">
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="background: white;height: 250px;border: 1px solid #E6E9ED;">
                             <table class="data table no-margin " id="tbCard">
                                 <thead>
@@ -124,7 +167,7 @@
             </div>
         </div>
         <br>
-        <div class="row">
+        <div class="row" style="display: none">
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
                 <div class="x_panel">
                    <div id="host" style="height: 350px"></div>
@@ -186,6 +229,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
             $("[data-toggle='toggle']").click(function() {
                 $('#mapBras').toggleClass("hideDiv");
                 $(this).children('.fa-chevron-left, .fa-chevron-right').toggleClass("fa-chevron-left fa-chevron-right");
@@ -283,6 +327,12 @@
             //Simply declare an event with callback.
             bras.on("click", function (params) {
                 console.log(params['nodes']['0']);
+                $.ajax({
+                    url: '/ajax-call',
+                    success: function(data) {
+                        alert(data)
+                    }
+                });
             });
 
             // ----------------//

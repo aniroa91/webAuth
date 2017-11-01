@@ -34,7 +34,7 @@ object BrasesCard {
   def listBrasOutlier: Future[Seq[(String,String,String,String)]] = {
    // try {
       val dt = new DateTime();
-      val threeHoursLater = dt.minusHours(24);
+      val threeHoursLater = dt.minusHours(6);
       val threeTime = threeHoursLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
       dbConfig.db.run(
         sql"""SELECT tbC.bras_id,tbC.time,tbC.line_ol,tbC.card_ol
@@ -45,6 +45,23 @@ object BrasesCard {
                   """
           .as[(String, String, String, String)])
     //}finally dbConfig.db.close
+  }
+
+  def opViewKibana(id : String,time: String,oldTime: String) : Future[Seq[(String,String,String,String)]] = {
+    dbConfig.db.run(
+      sql"""SELECT tbK.error_name,tbK.error_level,tbO.service_name,tbO.service_status
+            FROM
+                (select * from public.dwh_kibana
+                 where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
+                 order by date_time desc
+                ) tbK left join
+                (select * from public.dwh_opsview
+                 where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
+                 order by date_time desc
+                ) tbO on tbO.bras_id = tbK.bras_id and tbO.date_time = tbK.date_time
+            LIMIT 5
+         """
+        .as[(String, String,String,String)])
   }
 
   def getCard(id: String,time: String,sigin: String,logoff: String): Future[Seq[(String,String,String,String,Int,Int)]] = {

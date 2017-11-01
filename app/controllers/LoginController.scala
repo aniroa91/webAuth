@@ -28,12 +28,17 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
   def index = Action { implicit request =>
-    Ok(views.html.login.index(loginForm))
+    val ssId = request.session.get("username").toString
+    if(ssId != "None") {
+      Redirect(routes.DashboardController.index)
+    }
+    else
+       Ok(views.html.login.index(loginForm))
   }
 
   def login = Action { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.login.index(formWithErrors)),
+      formWithErrors => Redirect(routes.LoginController.index),
       user => Redirect(routes.DashboardController.index).withSession(Security.username -> user._1)
     )
   }
