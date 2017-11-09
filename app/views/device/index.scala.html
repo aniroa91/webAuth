@@ -1,4 +1,4 @@
-@(email: String,lstBrasAulier : Seq[(String,String,String,String)],opKibana : collection.mutable.Map[String, Seq[(String,String,String,String)]])
+@(email: String,listNoc: Seq[(String,String)])
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -48,13 +48,22 @@
         <div class="row">
             <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12" id="mapBras">
                 <div class="x_panel">
+                    <div style="border-bottom: 2px solid #E6E9ED;">
+                        <a onclick="reloadData()" class="btn btn-success a-btn-slide-text" style="font-size: 10px">
+                            <i class="fa fa-refresh" aria-hidden="true" style="margin-right: 5px;"></i>
+                            <span><strong>Load</strong></span>
+                        </a>
+                    </div>
                     <div id="mapVn" style="height: 520px;"></div>
                 </div>
             </div>
-            <div class="col-lg-9 col-sm-9 col-md-9 col-xs-12" id="grapBras">
+            <div class="col-lg-9 col-sm-9 col-md-9 col-xs-12" id="grapBras" style="display: none">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+
                     <div class="x_panel">
-                        <a data-toggle="toggle" style="cursor: pointer" data-target="grapBras"><i class="fa fa-chevron-left" aria-hidden="true" style="color: #9B59B6"></i></a>
+                        <div style="border-bottom: 2px solid #E6E9ED;">
+                          <a data-toggle="toggle" style="cursor: pointer" data-target="grapBras"><i class="fa fa-chevron-left" aria-hidden="true" style="margin-right: 5px;color: #C5C7CB"></i><span style="font-size: 16px;font-weight: 400" id="lbBras"></span></a>
+                        </div>
                         <div id="bras" style="height: 500px"></div>
                     </div>
                 </div>
@@ -83,50 +92,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if(opKibana != null) {
-                                    @for(opKi <- opKibana) {
-                                        <tr>
-                                            <td>@opKi._1</td>
-                                            <td>
-                                            @for(kiba <- opKi._2) {
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-md-6 col-xs-6 bdR">
-                                                    @if(kiba._1 != null && kiba._1.length > 12) {
-                                                        <span data-toggle="tooltip" title="@kiba._1">@kiba._1.substring(0, 9).
-                                                            ..</span>
-                                                    } else {
-                                                        @kiba._1
-                                                    }
-                                                    </div>
-                                                    <div class="col-lg-6 col-md-6 col-xs-6">@kiba._2</div>
-                                                </div>
-                                                <div class="lineDiv"></div>
-                                            }
-                                            </td>
-                                            <td>
-                                            @for(op <- opKi._2) {
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-md-6 col-xs-6 bdR">
-                                                    @if(op._3 != null && op._3.length > 12) {
-                                                        <span data-toggle="tooltip" title="@op._3">@op._3.substring(0, 9).
-                                                            ..</span>
-                                                    } else {
-                                                        @op._3
-                                                    }
-                                                    </div>
-                                                    <div class="col-lg-6 col-md-6 col-xs-6">@op._4</div>
-                                                </div>
-                                                <div class="lineDiv"></div>
-                                            }
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                @*<tr>
-                                    <td>Bras1</td>
-                                    <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span>Error 1</span></td>
-                                    <td><span style="border-right:1px solid #eee;margin-right: 5px">Error 1</span><span>Error 1</span></td>
-                                </tr>*@
+
                             </tbody>
                         </table>
                     </div>
@@ -167,30 +133,30 @@
             </div>
         </div>
         <br>
-        <div class="row" style="display: none">
+        <div class="row" id="hostBras" style="display: none">
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
                 <div class="x_panel">
-                   <div id="host" style="height: 350px"></div>
+                    <div style="border-bottom: 2px solid #E6E9ED">
+                        <span style="font-size: 16px;font-weight: 400" id="lbHost"></span>
+                    </div>
+                   <div id="host" style="height: 405px"></div>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
-                <div class="x_panel" style="height: 370px;">
+                <div class="x_panel">
                     <table class="data table no-margin border" id="tbHost" >
                         <thead>
                             <tr>
-                                <th>SF</th>
-                                <th>LOFI</th>
+                                <th>Host</th>
+                                <th>Module</th>
+                                <th>Cpe</th>
+                                <th>Lostip</th>
                                 <th>Lost Signal</th>
                                 <th>User Down</th>
                                 <th>Inf Down</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Host1</td>
-                                <td>...</td>
-                                <td>...</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -226,6 +192,7 @@
         <!-- HightChartMap -->
     <script src="../assets/javascripts/map.js"></script>
     <script src="../assets/javascripts/vn-all.js"></script>
+    <script src="../assets/javascripts/waitMe.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -293,88 +260,199 @@
                 {id: 4, label: 'Card2'},
                 {id: 5, label: 'LineCard2'}
             ]);*/
-            var dtaLineCard = @Html(Json.stringify(Json.toJson(lstBrasAulier.map(x => (x._1, x._2) -> x._3).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|")))));
-            var dtaCard = @Html(Json.stringify(Json.toJson(lstBrasAulier.map(x => (x._1, x._2, x._3) -> x._4).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|")))));
-            var dtaBras = @Html(Json.stringify(Json.toJson(lstBrasAulier.map(x => (x._1, x._2)).toList.distinct)));
 
-            var nodeBras = new vis.DataSet(getNodeBras(dtaCard,dtaLineCard,dtaBras))
-            // create an array with edges to represent the network
-            /*var edgeBras = new vis.DataSet([
-                {from: 1, to: 6},
-                {from: 1, to: 5},
-                {from: 6, to: 3},
-                {from: 6, to: 4},
-                {from: 0, to: 2},
-                {from: 0, to: 1},
-            ]);*/
-            //console.log(getEdgeBras(dtaCard,dtaLineCard,dtaBras))
-            var edgeBras = new vis.DataSet(getEdgeBras(dtaCard,dtaLineCard,dtaBras))
+            function drawGraphBras(data,name){
+                var dtaBras = data.bras;
+                var dtaLineCard = data.linecard;
+                var dtaCard = data.card;
+                var dtaPort = data.host;
 
-            // Find contained in document
-            var divBras = document.getElementById('bras');
-            //Define data object and the options of the network
-            var arrBras = {
-                nodes: nodeBras,
-                edges: edgeBras
-            };
-            var optionsBras = {
-                autoResize: true,
-                height: '100%',
-                width: '100%'
-            };
-            //Define the network object to be rendered.
-            var bras = new vis.Network(divBras, arrBras, optionsBras);
-            //Simply declare an event with callback.
-            bras.on("click", function (params) {
-                console.log(params['nodes']['0']);
-                $.ajax({
-                    url: '/ajax-call',
-                    success: function(data) {
-                        alert(data)
+                var nodeBras = new vis.DataSet(getNodeBras(dtaPort,dtaCard,dtaLineCard,dtaBras,name))
+                // create an array with edges to represent the network
+                /*var edgeBras = new vis.DataSet([
+                    {from: 1, to: 6},
+                    {from: 1, to: 5},
+                    {from: 6, to: 3},
+                    {from: 6, to: 4},
+                    {from: 0, to: 2},
+                    {from: 0, to: 1},
+                ]);*/
+                //console.log(getEdgeBras(dtaCard,dtaLineCard,dtaBras))
+                var edgeBras = new vis.DataSet(getEdgeBras(dtaPort,dtaCard,dtaLineCard,dtaBras))
+
+                // Find contained in document
+                var divBras = document.getElementById('bras');
+                //Define data object and the options of the network
+                var arrBras = {
+                    nodes: nodeBras,
+                    edges: edgeBras
+                };
+                var optionsBras = {
+                    autoResize: true,
+                    height: '100%',
+                    width: '100%'
+                };
+                //Define the network object to be rendered.
+                var bras = new vis.Network(divBras, arrBras, optionsBras);
+                //Simply declare an event with callback.
+                bras.on("click", function (params) {
+                    //console.log(params['nodes']['0']);
+                    var brasNode = params['nodes']['0'];
+                    if(brasNode!= undefined && (brasNode == 0 || brasNode.split('/').length<=2)) {
+                        if(brasNode == 0){
+                            waitMe();
+                            setTimeout(function () {
+                                hideWaitme();
+                                $('#hostBras').hide();
+                                $('#tbBras tbody').find('tr').show();
+                                $('#tbBras tbody').find('tr').removeAttr('style', 'color:#1ABB9C');
+                            }, 2000);
+                        }
+                        else {
+                            var id = brasNode.replace('/', '').replace(' ', '').replace('.', '').replace(/:/g, "");
+                            $.ajax({
+                                url: "/host-json?id=" + brasNode,
+                                cache: false,
+                                beforeSend: function () {
+                                    waitMe();
+                                },
+                                success: function (data) {
+                                    if(data != "Error") {
+                                        $('#lbHost').text("Hosts of " + brasNode)
+                                        $('#tbBras tbody').find('tr').hide();
+                                        $('#' + id).show();
+                                        $('#' + id).attr('style', 'color:#1ABB9C');
+                                        drawHostBras(groupGraphost(data, 'host'), brasNode)
+                                        var html = getTableHost(data)
+                                        $('#tbHost tbody').html('');
+                                        $('#tbHost tbody').append(html);
+                                    }
+                                },
+                                complete: function () {
+                                    hideWaitme()
+                                },
+                            });
+                        }
                     }
                 });
-            });
+            }
+
+            function hideWaitme() {
+                $('#bras').waitMe("hide");
+                $('#tbBras').waitMe("hide");
+                $('#host').waitMe("hide");
+                $('#tbHost').waitMe("hide");
+            }
+
+            function waitMe(){
+                $('#bras').waitMe({
+                    effect: 'roundBounce',
+                    text: 'Please wait...',
+                    bg: 'rgba(255,255,255,0.7)',
+                    color: '#000',
+                    textPos: 'vertical'
+                });
+                $('#tbBras').waitMe({
+                    effect: 'roundBounce',
+                    text: 'Please wait...',
+                    bg: 'rgba(255,255,255,0.7)',
+                    color: '#000',
+                    textPos: 'vertical'
+                });
+                $('#host').waitMe({
+                    effect: 'roundBounce',
+                    text: 'Please wait...',
+                    bg: 'rgba(255,255,255,0.7)',
+                    color: '#000',
+                    textPos: 'vertical'
+                });
+                $('#tbHost').waitMe({
+                    effect: 'roundBounce',
+                    text: 'Please wait...',
+                    bg: 'rgba(255,255,255,0.7)',
+                    color: '#000',
+                    textPos: 'vertical'
+                });
+            }
 
             // ----------------//
-            // Nodes HOST
-            var nodeHost = new vis.DataSet([
-                {id: 0, label: 'Root',color:'#9B59B6'},
-                {id: 1, label: 'Host1',color:'#1ABB9C'},
-                {id: 2, label: 'Host2',color:'#1ABB9C'},
-                {id: 11,label: 'Module1'},
-                {id: 12,label: 'Module2'},
-                {id: 111,label: 'Splitter1'},
-                {id: 112,label: 'Splitter2'}
-            ]);
-            // create an array with edges to represent the network
-            var edgeHost = new vis.DataSet([
-                {from: 0, to: 1},
-                {from: 0, to: 2},
-                {from: 1, to: 11},
-                {from: 1, to: 12},
-                {from: 11, to: 111},
-                {from: 11, to: 112}
-            ]);
-            // Find contained in document
-            var divHost = document.getElementById('host');
-            //Define data object and the options of the network
-            var arrHost = {
-                nodes: nodeHost,
-                edges: edgeHost
-            };
-            var optionsHost = {
-                autoResize: true,
-                height: '100%',
-                width: '100%'
-            };
-            //Define the network object to be rendered.
-            var host = new vis.Network(divHost, arrHost, optionsHost);
-            //Simply declare an event with callback.
-            host.on("click", function (params) {
-                console.log(params['nodes']['0']);
-            });
-
+            function drawHostBras(data,idBras){
+                $('#hostBras').show();
+                // Nodes HOST
+                /*var nodeHost1 = new vis.DataSet([
+                    {id: 0, label: 'Root',color:'#9B59B6'},
+                    {id: 1, label: 'Host1',color:'#1ABB9C'},
+                    {id: 2, label: 'Host2',color:'#1ABB9C'},
+                    {id: 11,label: 'Module1'},
+                    {id: 12,label: 'Module2'},
+                    {id: 111,label: 'Splitter1'},
+                    {id: 112,label: 'Splitter2'}
+                ]);*/
+               // console.log(getNodeHost(data,idBras))
+                var nodeHost = new vis.DataSet(getNodeHost(data,idBras))
+                //console.log(nodeHost)
+                // create an array with edges to represent the network
+                /*var edgeHost1 = new vis.DataSet([
+                    {from: 0, to: 1},
+                    {from: 0, to: 2},
+                    {from: 1, to: 11},
+                    {from: 1, to: 12},
+                    {from: 11, to: 111},
+                    {from: 11, to: 112}
+                ]);*/
+                var edgeHost = new vis.DataSet(getEdgeHost(data))
+                //console.log(edgeHost)
+                // Find contained in document
+                var divHost = document.getElementById('host');
+                //Define data object and the options of the network
+                var arrHost = {
+                    nodes: nodeHost,
+                    edges: edgeHost
+                };
+                var optionsHost = {
+                    autoResize: true,
+                    height: '100%',
+                    width: '100%'
+                };
+                //Define the network object to be rendered.
+                var host = new vis.Network(divHost, arrHost, optionsHost);
+                //Simply declare an event with callback.
+                host.on("click", function (params) {
+                    //console.log(params['nodes']['0']);
+                    var id = params['nodes']['0'];
+                    if(id!= undefined && (id==0 || id.indexOf('/')<0)) {
+                        $('#host').waitMe({
+                            effect: 'roundBounce',
+                            text: 'Please wait...',
+                            bg: 'rgba(255,255,255,0.7)',
+                            color: '#000',
+                            textPos: 'vertical'
+                        });
+                        $('#tbHost').waitMe({
+                            effect: 'roundBounce',
+                            text: 'Please wait...',
+                            bg: 'rgba(255,255,255,0.7)',
+                            color: '#000',
+                            textPos: 'vertical'
+                        });
+                        setTimeout(function () {
+                            $('#host').waitMe("hide");
+                            $('#tbHost').waitMe("hide");
+                            if(id==0){
+                                $('#tbHost tbody').find('tr').show();
+                                $('#tbHost tbody').find('tr').removeAttr('style', 'color:#ff9600');
+                            }else {
+                                $('#tbHost tbody').find('tr').hide();
+                                $('.' + id).show();
+                                $('.' + id).attr('style', 'color:#ff9600');
+                            }
+                        }, 2000);
+                    }
+                });
+            }
             // Map country
+            var nocBras = @Html(Json.stringify(Json.toJson(listNoc.map(x => x._1 -> x._2.toInt))));
+            //console.log(nocBras)
             Highcharts.mapChart('mapVn', {
                 chart: {
                     map: 'countries/vn/vn-all'
@@ -383,16 +461,13 @@
                 title: {
                     text: ''
                 },
-                colorAxis:{
-                    min:0
-                },
                 mapNavigation: {
                     enabled: true,
                     buttonOptions: {
                         verticalAlign: 'bottom'
                     }
                 },
-                plotOptions: {
+                plotOptions:{
                     column: {
                         colorByPoint: true
                     }
@@ -400,16 +475,16 @@
                 colorAxis: {
 
                     dataClasses: [{
-                        from: -100,
-                        to: 0,
-                        color: '#E74C3C',
+                        from: 0,
+                        to: 100000,
+                        color: '#9B59B6',
                         name: 'NOC'
-                    }, {
+                    }/*, {
                         from: 0,
                         to: 100,
-                        color: '#9B59B6',
+                        color: '#E74C3C',
                         name: 'INF'
-                    }]
+                    }*/]
                 },
                 legend: {
                     align: 'right',
@@ -421,15 +496,13 @@
                     valueDecimals: 0,
                 },
                 series: [{
-                    data: [ ['vn-yb', 0],
-                        ['vn-pt', 1],
-                        ['vn-3655', 2],
-                        ['vn-qn', 3],
-                        ['vn-kh', -4],
-                        ['vn-tg', 5],
-                        ['vn-bv', 6],
-                        ['vn-bu', -7]],
-                    name: 'Random data',
+                    data: nocBras
+                    /* [ ['KTM', 0],
+                        ['PTO', 1],
+                        ['KGG', 2],
+                        ['QBH', 3],
+                        ['SLA', -7]]*/,
+                    name: 'Number of bras',
                     states: {
                         hover: {
                             color: '#BADA55'
@@ -445,7 +518,60 @@
 
                     },
 
-                    name: 'Number Of Query',
+                    point: {
+                        events: {
+                            click: function () {
+                                $('#hostBras').hide();
+                                var name = this.name;
+                                var key = JSON.stringify(this.options);
+                                var code = key.substring(11,key.indexOf(',')-1);
+                                $.ajax({
+                                    url: "/bras-json?id=" + code,
+                                    cache: false,
+                                    beforeSend: function () {
+                                        $('#mapVn').waitMe({
+                                            effect: 'roundBounce',
+                                            text: 'Please wait...',
+                                            bg: 'rgba(255,255,255,0.7)',
+                                            color: '#000',
+                                            textPos: 'vertical'
+                                        });
+                                        $('#bras').waitMe({
+                                            effect: 'roundBounce',
+                                            text: 'Please wait...',
+                                            bg: 'rgba(255,255,255,0.7)',
+                                            color: '#000',
+                                            textPos: 'vertical'
+                                        });
+                                        $('#tbBras').waitMe({
+                                            effect: 'roundBounce',
+                                            text: 'Please wait...',
+                                            bg: 'rgba(255,255,255,0.7)',
+                                            color: '#000',
+                                            textPos: 'vertical'
+                                        });
+                                    },
+                                    success: function (data) {
+                                        if(data != "error") {
+                                            $('#lbBras').text("List bras outlier: " + name);
+                                            $('#grapBras').show();
+                                            drawGraphBras(data, name);
+                                            var html = insertTbBras(data.mapBras);
+                                            $('#tbBras tbody').html('');
+                                            $('#tbBras tbody').append(html);
+                                        }
+                                    },
+                                    complete: function () {
+                                        $('#mapVn').waitMe("hide");
+                                        $('#bras').waitMe("hide");
+                                        $('#tbBras').waitMe("hide");
+                                    },
+                                });
+                            }
+                        }
+                    },
+
+                    name: 'Number Of Bras',
 
                     tooltip: {
 
@@ -455,7 +581,43 @@
                 }]
             });
           });
-            function getEdgeBras(dtaCard,dtaLine,dtaBras){
+
+            function getTableHost(dta){
+                var html = "";
+                var nameTest = "";
+                $.each(dta,function(i,dt){
+                    html+= '<tr class="'+dt[0].host+'">';
+                    if(nameTest == dt[0].host){
+                        html+= '<td>'+dt[0].module+'</td>';
+                    }
+                    else{
+                        nameTest=dt[0].host;
+                        var testhost = dt[0].host
+                        var sizeHost=0;
+                        $.each(dta,function(i,dt){
+                            if(testhost == dt[0].host) sizeHost++;
+                        })
+                        html+= '<td rowspan="'+sizeHost+'">'+dt[0].host+'</td><td>'+dt[0].module+'</td>';
+                    }
+                    html+= '<td>'+dt[1].cpe+'</td><td>'+dt[1].lostip+'</td>';
+                    html+= '<td></td><td></td><td></td></tr>';
+                });
+                return html;
+            }
+
+            function groupGraphost(data, column) {
+                var generatedData = {};
+                $.each(data, function(i, dt) {
+                    var key = dt[0][column];
+                    if (!(key in generatedData)) {
+                        generatedData[key] = [];
+                    }
+                    generatedData[key].push(dt[0]);
+                });
+                return generatedData;
+            }
+
+            function getEdgeBras(dtaPort,dtaCard,dtaLine,dtaBras){
                 var jsonArr = [];
                 for (var i = 0; i < dtaBras.length; i++) {
                     jsonArr.push({
@@ -481,14 +643,71 @@
                         });
                     }
                 }
+                for (var i = 0; i < dtaPort.length; i++) {
+                    var arrPort = distinctArray(dtaPort[i][1].split("|"));
+                    for(var j=0;j<arrPort.length;j++){
+                        jsonArr.push({
+                            from: dtaPort[i][0][0]+"/"+dtaPort[i][0][1]+"/"+dtaPort[i][0][2]+"/"+dtaPort[i][0][3],
+                            to: dtaPort[i][0][0]+"/"+dtaPort[i][0][1]+"/"+dtaPort[i][0][2]+"/"+dtaPort[i][0][3]+"/"+arrPort[j]
+                        });
+                    }
+                }
                 return jsonArr
             }
 
-            function getNodeBras(dtaCard,dtaLine,dtaBras){
+            function getEdgeHost(dtaHost){
+                var jsonArr = [];
+                for (var i = 0; i < Object.keys(dtaHost).length; i++) {
+                    jsonArr.push({
+                        from: 0,
+                        to: Object.keys(dtaHost)[i]
+                    });
+                }
+                for (var i = 0; i < Object.keys(dtaHost).length; i++) {
+                    var arrModule = Object.values(dtaHost)[i];
+                    for(var j=0;j<arrModule.length;j++){
+                        jsonArr.push({
+                            from:Object.keys(dtaHost)[i],
+                            to: Object.keys(dtaHost)[i]+"/"+arrModule[j].module
+                        });
+                    }
+                }
+                return jsonArr
+            }
+
+            function getNodeHost(dtaHost,idBras){
                 var jsonArr = [];
                 jsonArr.push({
                     id: 0,
-                    label: "Root",
+                    title:idBras,
+                    label: "Bras "+idBras.split('/')[0].split('-')[0],
+                    color: "#1ABB9C"
+                });
+                for (var i = 0; i < Object.keys(dtaHost).length; i++) {
+                    jsonArr.push({
+                        id: Object.keys(dtaHost)[i],
+                        label:"Host "+ Object.keys(dtaHost)[i],
+                        color: "#ff9600"
+                    });
+                }
+                for (var i = 0; i < Object.keys(dtaHost).length; i++) {
+                    var arrModule = Object.values(dtaHost)[i];
+                    for(var j=0;j<arrModule.length;j++){
+                        jsonArr.push({
+                            id: Object.keys(dtaHost)[i]+"/"+arrModule[j].module,
+                            label:"Module "+arrModule[j].module,
+                            color: "#d8d8d8"
+                        });
+                    }
+                }
+                return jsonArr
+            }
+
+            function getNodeBras(dtaPort,dtaCard,dtaLine,dtaBras,name){
+                var jsonArr = [];
+                jsonArr.push({
+                    id: 0,
+                    label: name,
                     color: "#9B59B6"
                 });
                 for (var i = 0; i < dtaBras.length; i++) {
@@ -517,12 +736,63 @@
                         });
                     }
                 }
+                for (var i = 0; i < dtaPort.length; i++) {
+                    var arrPort = distinctArray(dtaPort[i][1].split("|"));
+                    for(var j=0;j<arrPort.length;j++){
+                        jsonArr.push({
+                            id: dtaPort[i][0][0]+"/"+dtaPort[i][0][1]+"/"+dtaPort[i][0][2]+"/"+dtaPort[i][0][3]+"/"+arrPort[j],
+                            label: "Port"+arrPort[j]
+                        });
+                    }
+                }
                 return jsonArr
             }
+
             function distinctArray(items){
                 var uniqueItems = Array.from(new Set(items))
                 return uniqueItems
             }
+            function insertTbBras(mapBras){
+                var html = '';
+                for(var i=0;i<Object.keys(mapBras).length;i++) {
+                    var idTr = Object.keys(mapBras)[i].replace("/","").replace(" ","").replace(":","").replace(":","").replace(".","");
+                    html += '<tr id="'+idTr+'"><td>'+Object.keys(mapBras)[i]+'</td><td>';
+                    for(var j=0;j<Object.keys(Object.values(mapBras)[i]).length;j++) {
+                        var leg = Object.keys(Object.values(mapBras)[i]).length;
+                        var arrErr = Object.values(Object.values(mapBras)[i])[j];
+                        html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR" style="height: 10px">';
+                        if(arrErr[0] != null && arrErr[0].length > 12) {
+                          html += '<span data-toggle="tooltip" title="'+arrErr[0]+'">'+JSON.stringify(arrErr[0]).substring(1,9)+'...</span>';
+                        } else {
+                          html +=  arrErr[0]
+                        }
+
+                        html += '</div> <div class="col-lg-6 col-md-6 col-xs-6">'+arrErr[1]+'</div></div>';
+                        if(j < (Object.keys(Object.values(mapBras)[i]).length -1))
+                           html += '<div class="lineDiv"></div>';
+                    }
+                    html += '</td><td>';
+                    for(var j=0;j<Object.keys(Object.values(mapBras)[i]).length;j++) {
+                        var arrErr = Object.values(Object.values(mapBras)[i])[j];
+                        html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR" style="height: 10px">'
+                        if(arrErr[2] != null && arrErr[2].length > 12) {
+                          html += '<span data-toggle="tooltip" title="'+arrErr[2]+'">'+JSON.stringify(arrErr[2]).substring(1,9)+'...</span>';
+                        } else {
+                          html += arrErr[2]
+                        }
+                        html += '</div><div class="col-lg-6 col-md-6 col-xs-6">'+arrErr[3]+'</div></div>';
+                        if(j < (Object.keys(Object.values(mapBras)[i]).length -1))
+                            html += '<div class="lineDiv"></div>';
+                    }
+                    html += '</td></tr>';
+                }
+                return html;
+            }
+
+            function reloadData(){
+                window.location.reload(true);
+            }
+
     </script>
     </body>
 </html>
