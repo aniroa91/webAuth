@@ -159,7 +159,8 @@
         <!-- Counter number -->
     <script src="../assets/javascripts/waypoints.min.js"></script>
     <script src="../assets/javascripts/jquery.counterup.min.js"></script>
-
+        <!--  Datepicker -->
+    <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
                 // autocomplete
@@ -178,6 +179,15 @@
                         $("#ct").val(ui.item.value);
                         $("#ctSearch").submit();
                     }
+                });
+                $('#monthPicker').datepicker({
+                    autoclose: true,
+                    minViewMode: 1,
+                    format: 'mm/yyyy'
+                }).on('changeDate', function(selected){
+                    startDate = new Date(selected.date.valueOf());
+                    startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+                    $('.to').datepicker('setStartDate', startDate);
                 });
             });
     </script>
