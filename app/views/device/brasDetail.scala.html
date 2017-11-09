@@ -1,4 +1,4 @@
-@(form: Form[SearchBras],email: String,lstbrasTime: Seq[model.device.Bras],listCard: Seq[(String,String,String,String,Int,Int)],lstBrasChart: Seq[model.device.Bras])
+@(form: Form[SearchBras],email: String,time: String,lstbrasTimeCurrent: Seq[model.device.Bras],lstbrasTime: Seq[model.device.Bras],listCard: Seq[(String,String,String,Int,Int)],lstBrasChart: Seq[model.device.Bras])
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatYYYYmmddHHmmss
 <!DOCTYPE html>
@@ -46,6 +46,59 @@
         <!-- /top navigation -->
         <!-- page content -->
     <div class="right_col" role="main">
+        @if(lstbrasTimeCurrent.size>0) {
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel tile">
+                        <div class="x_content">
+                            <table class="data table table-striped no-margin">
+                                <thead>
+                                    <tr>
+                                        <th>Bras Id</th>
+                                        <th>Time</th>
+                                        <th>SignIn</th>
+                                        <th>Logoff</th>
+                                        <th>Actives</th>
+                                        <th>Cpe_error</th>
+                                        <th>Lostip_error</th>
+                                        <th>Crit_kibana</th>
+                                        <th>Crit_opsview</th>
+                                        <th>Label</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @for(bras <- lstbrasTimeCurrent) {
+                                    @if(bras.time==lstbrasTime(0).time){
+                                        <tr class="hight-light">
+                                    }else{
+                                      <tr>
+                                    }
+                                        <td><a href="/brasInfo?id=@bras.id&time=@bras.time&sigin=@bras.signin&logoff=@bras.logoff&timeCurrent=@time" style="color: #1ABB9C;">@bras.id</a></td>
+                                        <td>@bras.time</td>
+                                        <td>@bras.signin</td>
+                                        <td>@bras.logoff</td>
+                                        <td>@bras.active_user</td>
+                                        <td>@bras.cpe_error</td>
+                                        <td>@bras.lostip_error</td>
+                                        <td>@bras.crit_kibana</td>
+                                        <td>@bras.crit_opsview</td>
+                                        <td>
+                                        @if(bras.label == "normal") {
+                                            <span class="label label-success" style="font-size: 13px">@bras.label</span>
+                                        } else {
+                                            <span class="label label-danger" style="font-size: 13px">@bras.label</span>
+                                        }
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
         <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel tile fixed_height_320">
@@ -74,54 +127,7 @@
                 </div>
             </div>
         </div>
-        @if(lstbrasTime.size>0) {
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="x_panel tile">
-                        <div class="x_content">
-                            <table class="data table table-striped no-margin">
-                                <thead>
-                                    <tr>
-                                        <th>Bras Id</th>
-                                        <th>Time</th>
-                                        <th>SignIn</th>
-                                        <th>Logoff</th>
-                                        <th>Actives</th>
-                                        <th>Cpe_error</th>
-                                        <th>Lostip_error</th>
-                                        <th>Crit_kibana</th>
-                                        <th>Crit_opsview</th>
-                                        <th>Label</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                @for(bras <- lstbrasTime) {
-                                    <tr>
-                                        <td><a href="/brasInfo?id=@bras.id&time=@bras.time&sigin=@bras.signin&logoff=@bras.logoff" style="color: #1ABB9C;">@bras.id</a></td>
-                                        <td>@bras.time</td>
-                                        <td>@bras.signin</td>
-                                        <td>@bras.logoff</td>
-                                        <td>@bras.active_user</td>
-                                        <td>@bras.cpe_error</td>
-                                        <td>@bras.lostip_error</td>
-                                        <td>@bras.crit_kibana</td>
-                                        <td>@bras.crit_opsview</td>
-                                        <td>
-                                        @if(bras.label == "normal") {
-                                            <span class="label label-success" style="font-size: 13px">@bras.label</span>
-                                        } else {
-                                            <span class="label label-danger" style="font-size: 13px">@bras.label</span>
-                                        }
-                                        </td>
-                                    </tr>
-                                }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
+
         <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel tile">
@@ -283,14 +289,18 @@
                     }]
                 });
                 // heat map line cards
-                var card = @Html(Json.stringify(Json.toJson(listCard.map { t => t._4})));
-                var linecard = @Html(Json.stringify(Json.toJson(listCard.map { t => t._3})));
+                var card = @Html(Json.stringify(Json.toJson(listCard.map { t => t._3})));
+                var linecard = @Html(Json.stringify(Json.toJson(listCard.map { t => t._2})));
                 var data = @Html(Json.stringify(Json.toJson(listCard)));
                 var numSignin = @Html(Json.stringify(Json.toJson(lstbrasTime(0).signin)));
                 var numLogoff = @Html(Json.stringify(Json.toJson(lstbrasTime(0).logoff)));
                 var titUser = " users log off"
+                var cardLabel = getCard(card,1)
+                var linecardLabel = getCard(linecard,0)
+                var dta = getData(data)
                 if(Number(numSignin)>=Number(numLogoff))
                     titUser=" users signin"
+
                 Highcharts.chart('heat_map', {
 
                     chart: {
@@ -305,11 +315,11 @@
                     },
 
                     xAxis: {
-                        categories: getCard(card,1)
+                        categories: cardLabel
                     },
 
                     yAxis: {
-                        categories: getCard(linecard,0),
+                        categories: linecardLabel,
                         title: null
                     },
 
@@ -338,7 +348,7 @@
                     series: [{
                         name: 'Logoff per card',
                         borderWidth: 1,
-                        data: getData(data),
+                        data: dta,
                         dataLabels: {
                             enabled: true,
                             color: '#000000'
@@ -353,7 +363,8 @@
                     var title ="Card"
                 else
                     var title = "Linecard"
-                for (var i = arrCard[0]; i <= arrCard[arrCard.length-1]; i++) {
+                var arrNum = arrCard.map(Number)
+                for (var i = 0; i <= Math.max.apply(null, arrNum); i++) {
                     jsonArr.push( title+" "+i);
                 }
                 return jsonArr
@@ -361,9 +372,9 @@
             function getData(data){
                 var jsonArr = [];
                 for (var i =0 ; i < data.length; i++) {
-                    var user = data[i][5]
-                    if(data[i][4]>=data[i][5]) user = data[i][4]
-                    jsonArr.push([Number(data[i][3]),Number(data[i][2]),user]);
+                    var user = data[i][4]
+                    if(data[i][3]>=data[i][4]) user = data[i][3]
+                    jsonArr.push([Number(data[i][2]),Number(data[i][1]),user]);
                 }
                 return jsonArr
             }

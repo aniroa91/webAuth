@@ -27,11 +27,18 @@ GET     /extassets/*file            controllers.DnsController.getImage(file: Str
 
 #######################################################################
 GET      /                        controllers.LoginController.index
+GET      /host-json              controllers.DeviceController.getHostJson(id: String ?= "")
+GET      /bras-json              controllers.DeviceController.getBrasJson(id: String ?= "")
+GET      /confirmLabel          controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
+GET      /rejectLabel          controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
 GET      /login                   controllers.LoginController.login
 GET      /logout                   controllers.LoginController.logout
 GET      /dns                     controllers.DashboardController.index
 GET      /demo                     controllers.DemoController.index
 GET      /msg                     controllers.DemoController.message
+GET      /device                   controllers.DeviceController.index
+GET      /bras                     controllers.BrasController.index
+GET      /brasInfo                 controllers.BrasDetailController.index
 GET      /msg2                    controllers.DemoController.message2
 GET      /msgHistory              controllers.DemoController.history
 GET      /device                     controllers.DeviceController.index

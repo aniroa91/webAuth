@@ -1,4 +1,4 @@
-@(email: String,lstBras : Seq[model.device.Bras])
+@(email: String,lstBras : Seq[(String,String,String,String,String, String, String, String,String,String)])
 @import play.api.libs.json.Json
 
 <!DOCTYPE html>
@@ -46,7 +46,7 @@
         <div class="row">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2> Top 100 Bras Detail</h2>
+                    <h2> List Bras Detail</h2>
                     <div class="clearfix"></div>
                 </div>
                 <table id="tbBras" class="table table-striped table-bordered animated slideInUp">
@@ -62,26 +62,40 @@
                             <th>Crit_kibana</th>
                             <th>Crit_opsview</th>
                             <th>Label</th>
+                            <th>Outlier</th>
+                            <th>Normal</th>
                         </tr>
                     </thead>
                     <tbody>
                     @for(bras <- lstBras){
                         <tr>
-                            <td><a href="/brasInfo?id=@bras.id&time=@bras.time&sigin=@bras.signin&logoff=@bras.logoff" style="color: #1ABB9C;" class="activeHref">@bras.id</a></td>
-                            <td>@bras.time</td>
-                            <td>@bras.signin</td>
-                            <td>@bras.logoff</td>
-                            <td>@bras.active_user</td>
-                            <td>@bras.cpe_error</td>
-                            <td>@bras.lostip_error</td>
-                            <td>@bras.crit_kibana</td>
-                            <td>@bras.crit_opsview</td>
+                            <td><a href="/brasInfo?id=@bras._1&time=@bras._2&sigin=@bras._4&logoff=@bras._5&timeCurrent=@bras._2" style="color: #1ABB9C;" class="activeHref">@bras._1</a></td>
+                            <td>@bras._2</td>
+                            <td>@bras._4</td>
+                            <td>@bras._5</td>
+                            <td>@bras._3</td>
+                            <td>@bras._6</td>
+                            <td>@bras._7</td>
+                            <td>@bras._8</td>
+                            <td>@bras._9</td>
                             <td>
-                                @if(bras.label == "normal"){
-                                    <span class="label label-success" style="font-size: 13px">@bras.label</span>
+                                @if(bras._10 == "1"){
+                                    <span class="label label-success lbOutlier" style="font-size: 13px">Outlier</span>
                                 }else{
-                                    <span class="label label-danger" style="font-size: 13px">@bras.label</span>
+                                    <span class="label label-danger lbOutlier" style="font-size: 13px">Outlier</span>
                                 }
+                            </td>
+                            <td style="padding-top: 5px">
+                                <a onclick="confirmOutlier(this)" id="@bras._1/@bras._2.replace(" ","=").replace(":","_").replace(":","_").replace(".","%")" class="btn btn-primary a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    <span><strong>Confirm</strong></span>
+                                </a>
+                            </td>
+                            <td style="padding-top: 5px">
+                                <a onclick="rejectOutlier(this)" id="@bras._1/@bras._2" class="btn btn-primary a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    <span><strong>Reject</strong></span>
+                                </a>
                             </td>
                         </tr>
                     }
@@ -100,6 +114,26 @@
         <div class="clearfix"></div>
     </footer>
         <!-- /footer content -->
+        <!-- modal content -->
+
+    <div class="modal fade" id="modalError" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    System error, Please review operation!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>
     </div>
 
@@ -128,47 +162,36 @@
     <script src="../assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
 
     <script type="text/javascript">
-         /*function executeQuery() {
+
+         function rejectOutlier(element){
+             var strId = $(element).attr('id')
+             var id = strId.split("/")[0]
+             var time = strId.split("/")[1].replace('=',' ').replace('%', '.').replace(/_/g, ":");
              $.ajax({
-                 url: '/bras',
-                 success: function(data) {
-                     var rs = Html(Json.stringify(Json.toJson(
-                             lstBras.map { t =>
-                                Map("id" -> t.id, "time" -> t.time,"cpe_error" -> t.cpe_error.toString,
-                                 "label" -> t.label.toString, "crit_kibana" -> t.crit_kibana.toString, "crit_opsview" -> t.crit_opsview.toString,"logoff" -> t.logoff.toString,
-                                 "active_user" -> t.active_user.toString, "lostip_error" -> t.lostip_error.toString,"signin" -> t.signin.toString)
-                             }
-                     )));
-                     var dataTable = $("#tbBras").DataTable();
-                     // get the html table rows then
-                     dataTable.destroy();
-                     $("thead").empty();
-                     $("thead").html("<tr><th>Bras Id</th><th>Time</th><th>SignIn</th><th>Logoff</th><th>Actives</th><th>Cpe_error</th><th>Lostip_error</th><th>Crit_kibana</th><th>Crit_opsview</th><th>Label</th></tr>");
-                     var tbody = ""
-                     for(var i=0;i< rs.length;i++){
-                         var label = ""
-                         if(rs[i].label == "normal")
-                             label = "<span class='label label-success' style='font-size: 13px'>"+rs[i].label+"</span>";
-                         else
-                             label = "<span class='label label-danger' style='font-size: 13px'>"+rs[i].label+"</span>";
-                         tbody += "<tr><td class='activeHref'>"+rs[i].id+"</td><td>"+rs[i].time+"</td><td>"+rs[i].signin+"</td><td>"+rs[i].logoff+"</td><td>"+rs[i].active_user+"</td><td>"+rs[i].cpe_error+"</td><td>"+rs[i].lostip_error+"</td><td>"+rs[i].crit_kibana+"</td><td>"+rs[i].crit_opsview+"</td><td>"+label+"</td></tr>"
-                     }
-                     $("tbody").empty().promise().done(function(){
-                         $("tbody").html(tbody);
-                         dataTable = $("#tbBras").DataTable();
-                     });
+                 url: "/rejectLabel?id="+id+"&time="+time,
+                 success: function (data) {
+                     if(data!= "error")
+                        $(element).parent().parent().find('.lbOutlier').removeClass('label-success').addClass('label-danger');
+                     else
+                         $('#modalError').show();
                  }
              });
          }
 
-         $(document).ready(function() {
-             $("#tbBras").DataTable({
-                 "pageLength":20
+         function confirmOutlier(element){
+             var strId = $(element).attr('id')
+             var id = strId.split("/")[0]
+             var time = strId.split("/")[1].replace('=',' ').replace('%', '.').replace(/_/g, ":");
+             $.ajax({
+                 url: "/confirmLabel?id="+id+"&time="+time,
+                 success: function (data) {
+                     if(data!= "error")
+                        $(element).parent().parent().find('.lbOutlier').removeClass('label-danger').addClass('label-success');
+                     else
+                         $('#modalError').show();
+                 }
              });
-             setInterval(function() {
-                 executeQuery()
-             }, 2*60*1000);
-         });*/
+         }
 
          function executeQuery() {
              window.location.reload(true);

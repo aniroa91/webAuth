@@ -27,6 +27,26 @@ class BrasController @Inject()(cc: ControllerComponents) extends AbstractControl
     }
   }
 
+  def confirmLabel(id: String,time: String) = Action { implicit request =>
+    try{
+      val res =  Await.result(BrasService.confirmLabel(id,time), Duration.Inf)
+      Ok(Json.toJson(res))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
+
+  def rejectLabel(id: String,time: String) = Action { implicit request =>
+    try{
+      val res =  Await.result(BrasService.rejectLabel(id,time), Duration.Inf)
+      Ok(Json.toJson(res))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
+
 }
 
 

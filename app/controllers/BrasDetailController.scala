@@ -26,7 +26,7 @@ import scala.concurrent.duration.Duration
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
   */
-case class SearchBras(id: String,time: String,sigin: String, logoff: String)
+case class SearchBras(id: String,time: String,sigin: String, logoff: String,timeCurrent: String)
 
 @Singleton
 class BrasDetailController @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)
@@ -37,7 +37,8 @@ class BrasDetailController @Inject() (protected val dbConfigProvider: DatabaseCo
       "id" -> text,
       "time" -> text,
       "sigin" -> text,
-      "logoff" -> text
+      "logoff" -> text,
+      "timeCurrent" -> text
     )(SearchBras.apply)(SearchBras.unapply)
   )
 
@@ -49,18 +50,18 @@ class BrasDetailController @Inject() (protected val dbConfigProvider: DatabaseCo
         val time = formValidationResult.get.time.trim()
         val sigin = formValidationResult.get.sigin.trim()
         val logoff = formValidationResult.get.logoff.trim()
-
+        val timeCurrent = formValidationResult.get.timeCurrent.trim()
+        val brasTimeCurrent = Await.result(BrasService.getBrasTime(id, timeCurrent), Duration.Inf)
+        val brasTime = Await.result(BrasService.getBrasTime(id, time), Duration.Inf)
         val brasChart = Await.result(BrasService.getBrasChart(id,time),Duration.Inf)
-        val brasTime = Await.result(BrasService.getBrasTime(id,time),Duration.Inf)
         val brasCard = Await.result(BrasService.getBrasCard(id,time,sigin,logoff),Duration.Inf)
-
-        Ok(views.html.device.brasDetail(form, username,brasTime,brasCard,brasChart))
+        Ok(views.html.device.brasDetail(form, username,timeCurrent,brasTimeCurrent,brasTime,brasCard,brasChart))
       } else {
-        Ok(views.html.device.brasDetail(form, username,null,null,null))
+        Ok(views.html.device.brasDetail(form, username,null,null,null,null,null))
       }
     }
     catch{
-      case e: Exception => Ok(views.html.device.brasDetail(form, username,null,null,null))
+      case e: Exception => Ok(views.html.device.brasDetail(form, username,null,null,null,null,null))
     }
   }
 }

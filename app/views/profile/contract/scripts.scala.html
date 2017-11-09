@@ -1068,11 +1068,11 @@
                     type: 'spline',
                     name: 'Download',
                     // change down and up 11/10
-                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upQuad.map(x => x._2))))
+                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upQuad.map(x => BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
                 },{
                 type: 'spline',
                         name: 'Upload',
-                        data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => x._2))))
+                        data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
                 }]
             });
             // Build the chart line hourly vector
