@@ -64,7 +64,7 @@
                         <div style="border-bottom: 2px solid #E6E9ED;">
                           <a data-toggle="toggle" style="cursor: pointer" data-target="grapBras"><i class="fa fa-chevron-left" aria-hidden="true" style="margin-right: 5px;color: #C5C7CB"></i><span style="font-size: 16px;font-weight: 400" id="lbBras"></span></a>
                         </div>
-                        <div id="bras" style="height: 500px"></div>
+                        <div id="bras" style="height: 530px"></div>
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -86,8 +86,8 @@
                                     </th>
                                     <th>
                                         <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-xs-6 bdR">Service Name</div>
-                                            <div class="col-lg-6 col-md-6 col-xs-6">Service Status</div>
+                                            <div class="col-lg-8 col-md-8 col-xs-8 bdR">Service Name</div>
+                                            <div class="col-lg-4 col-md-4 col-xs-4">Service Status</div>
                                         </div>
                                 </tr>
                             </thead>
@@ -139,7 +139,7 @@
                     <div style="border-bottom: 2px solid #E6E9ED">
                         <span style="font-size: 16px;font-weight: 400" id="lbHost"></span>
                     </div>
-                   <div id="host" style="height: 405px"></div>
+                   <div id="host" style="height: 500px"></div>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
@@ -760,9 +760,9 @@
                     for(var j=0;j<Object.keys(Object.values(mapBras)[i]).length;j++) {
                         var leg = Object.keys(Object.values(mapBras)[i]).length;
                         var arrErr = Object.values(Object.values(mapBras)[i])[j];
-                        html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR" style="height: 10px">';
+                        html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR">';
                         if(arrErr[0] != null && arrErr[0].length > 12) {
-                          html += '<span data-toggle="tooltip" title="'+arrErr[0]+'">'+JSON.stringify(arrErr[0]).substring(1,9)+'...</span>';
+                          html += '<span style="line-height: 0px" data-toggle="tooltip" title="'+arrErr[0]+'">'+JSON.stringify(arrErr[0]).substring(1,9)+'...</span>';
                         } else {
                           html +=  arrErr[0]
                         }
@@ -774,13 +774,13 @@
                     html += '</td><td>';
                     for(var j=0;j<Object.keys(Object.values(mapBras)[i]).length;j++) {
                         var arrErr = Object.values(Object.values(mapBras)[i])[j];
-                        html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR" style="height: 10px">'
-                        if(arrErr[2] != null && arrErr[2].length > 12) {
-                          html += '<span data-toggle="tooltip" title="'+arrErr[2]+'">'+JSON.stringify(arrErr[2]).substring(1,9)+'...</span>';
-                        } else {
+                        html += '<div class="row"><div class="col-lg-8 col-md-8 col-xs-8 bdR">'
+                        /*if(arrErr[2] != null && arrErr[2].length > 12) {
+                          html += '<span style="line-height: 0px" data-toggle="tooltip" title="'+arrErr[2]+'">'+JSON.stringify(arrErr[2]).substring(1,9)+'...</span>';
+                        } else {*/
                           html += arrErr[2]
-                        }
-                        html += '</div><div class="col-lg-6 col-md-6 col-xs-6">'+arrErr[3]+'</div></div>';
+                        //}
+                        html += '</div><div class="col-lg-4 col-md-4 col-xs-4">'+arrErr[3]+'</div></div>';
                         if(j < (Object.keys(Object.values(mapBras)[i]).length -1))
                             html += '<div class="lineDiv"></div>';
                     }

@@ -36,7 +36,7 @@ object BrasesCard {
     val time = strId.split('/')(1)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
     val dateTime = DateTime.parse(time, formatter)
-    val oldTime  = dateTime.minusHours(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""SELECT host,module,sum(cpe_error),sum(lostip_error) from dwh_inf_module
             WHERE bras_id=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP
@@ -93,7 +93,7 @@ object BrasesCard {
 
   def opViewKibana(id : String,time: String,oldTime: String) : Future[Seq[(String,String,String,String)]] = {
     dbConfig.db.run(
-      sql"""SELECT tbK.error_name,tbK.error_level,tbO.service_name,tbO.service_status
+      sql"""SELECT distinct tbK.error_name,tbK.error_level,tbO.service_name,tbO.service_status
             FROM
                 (select * from public.dwh_kibana
                  where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
@@ -102,8 +102,7 @@ object BrasesCard {
                 (select * from public.dwh_opsview
                  where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
                  order by date_time desc
-                ) tbO on tbO.bras_id = tbK.bras_id and tbO.date_time = tbK.date_time
-            LIMIT 5
+                ) tbO on tbO.bras_id = tbK.bras_id and date_trunc('minute', tbO.date_time)=date_trunc('minute', tbK.date_time)
          """
         .as[(String, String,String,String)])
   }
