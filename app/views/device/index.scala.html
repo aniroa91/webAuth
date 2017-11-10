@@ -96,8 +96,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <div style="display: none">
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="background: white;height: 250px;border: 1px solid #E6E9ED;">
+                    <div style="display: none" id="line-chart">
+                       @* <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="background: white;height: 360px;border: 1px solid #E6E9ED;">
                             <table class="data table no-margin " id="tbCard">
                                 <thead>
                                     <tr>
@@ -124,9 +124,9 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                            <div id="line-bras" style="height:250px;border: 1px solid #E6E9ED;"></div>
+                        </div>*@
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div id="line-bras" style="height:360px;border: 1px solid #E6E9ED;padding: 5px"></div>
                         </div>
                     </div>
                 </div>
@@ -202,54 +202,7 @@
                 $(this).children('.fa-chevron-left, .fa-chevron-right').toggleClass("fa-chevron-left fa-chevron-right");
                 $('#grapBras').toggleClass("leftDiv");
             });
-            Highcharts.chart('line-bras', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: 'Bras1'
-                },
-                plotOptions: {
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                colors: [
-                    '#1ABB9C','#9B59B6'
-                ],
-                xAxis: {
-                    categories: [1,2,3,4,5,6,7,8,9,10,11]
-                },
 
-                yAxis: [{ // Primary yAxis
-                    title: {
-                        text: ' Client'
-                    }
-                }],
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                series: [
-                    {
-                        type: 'spline',
-                        name: 'Signin',
-                        data:[77.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 23.3, 18.3, 13.9, 99.6]
-                    }, {
-                        type: 'spline',
-                        name: 'Logoff',
-                        data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6]
-                    }]
-            });
             // Nodes BRAS
             /*var nodeBras = new vis.DataSet([
                 {id: 0, label: 'Root',color:'#9B59B6'},
@@ -304,6 +257,7 @@
                             setTimeout(function () {
                                 hideWaitme();
                                 $('#hostBras').hide();
+                                $('#line-chart').hide();
                                 $('#tbBras tbody').find('tr').show();
                                 $('#tbBras tbody').find('tr').removeAttr('style', 'color:#1ABB9C');
                             }, 2000);
@@ -316,14 +270,17 @@
                                 beforeSend: function () {
                                     waitMe();
                                 },
-                                success: function (data) {
+                                success: function (dtBras) {
                                     if(data != "Error") {
+                                        var dtHost = dtBras.host;
+                                        $('#line-chart').show();
+                                        drawChart(dtBras);
                                         $('#lbHost').text("Hosts of " + brasNode)
                                         $('#tbBras tbody').find('tr').hide();
                                         $('#' + id).show();
                                         $('#' + id).attr('style', 'color:#1ABB9C');
-                                        drawHostBras(groupGraphost(data, 'host'), brasNode)
-                                        var html = getTableHost(data)
+                                        drawHostBras(groupGraphost(dtHost, 'host'), brasNode)
+                                        var html = getTableHost(dtHost)
                                         $('#tbHost tbody').html('');
                                         $('#tbHost tbody').append(html);
                                     }
@@ -334,6 +291,86 @@
                             });
                         }
                     }
+                });
+            }
+
+            function drawChart(dta){
+                // Build the chart line day of month vector
+                var category = dta.time;
+                var logoff = dta.logoff;
+                var signin = dta.signin;
+                var users = dta.users;
+                //console.log(category)
+                Highcharts.chart('line-bras', {
+                    chart: {
+                        zoomType: 'xy'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: [{
+                        categories: category
+                    }],
+                    yAxis: [{ // Secondary yAxis
+                        gridLineWidth: 0,
+                        title: {
+                            text: 'SignIn - LogOff Users',
+                        }
+                    },
+                        { // Primary yAxis
+                            labels: {
+                                format: '{value}',
+                                style: {
+                                    color: "red"
+                                }
+                            },
+                            title: {
+                                text: 'Active users',
+                                style: {
+                                    color: "red"
+                                }
+                            },
+                            opposite: true
+
+                        }],
+                    tooltip: {
+                        shared: true
+                    },
+                    labels: {
+                        items: [{
+                            html: '',
+                            style: {
+                                left: '50px',
+                                top: '18px',
+                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                            }
+                        }]
+                    },
+
+                    series: [{
+                        type: 'column',
+                        name: 'Sign In',
+                        yAxis: 0,
+                        color: "#f0ad4e",
+                        data: signin
+                    }, {
+                        type: 'column',
+                        name: 'Log Off',
+                        yAxis: 0,
+                        color: "#9073da",
+                        data: logoff
+                    }, {
+                        type: 'spline',
+                        name: 'Actives user',
+                        yAxis: 1,
+                        data: users,
+                        color: "#FF0000",
+                        marker: {
+                            lineWidth: 2,
+                            lineColor: "white",
+                            fillColor: '#FF0000'
+                        }
+                    }]
                 });
             }
 
@@ -565,6 +602,7 @@
                                         $('#mapVn').waitMe("hide");
                                         $('#bras').waitMe("hide");
                                         $('#tbBras').waitMe("hide");
+                                        $('#line-chart').hide();
                                     },
                                 });
                             }

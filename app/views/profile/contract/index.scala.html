@@ -1,4 +1,4 @@
-@(form: Form[SearchContract], response: model.user.ProfileResponse, contract: String,email: String)
+@(form: Form[SearchContract], response: model.user.ProfileResponse, contract: String,email: String,time: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -30,7 +30,7 @@
                             </div>
                             <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
 
-                            @views.html.profile.contract.frmSearch(form, routes.ProfileContractController.index)
+                            @views.html.profile.contract.frmSearch(form, routes.ProfileContractController.index(""))
 
                             </div>
                         </nav>
@@ -47,7 +47,7 @@
                             <li class="form-group pull-right" style="margin-top: 13px;right: 10px">
 
                                 <div class="input-group date" id="monthPicker" style="width: 200px">
-                                    <input type="text" class="form-control" readonly="true" style="background-color: white" >
+                                    <input type="text" class="form-control" value="@time" readonly="true" style="background-color: white" >
                                     <span class="input-group-addon" style="background-color: #5A738E"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
                                     </span>
                                 </div>
@@ -60,7 +60,7 @@
                     <!-- page content -->
                 <div class="right_col" role="main">
                     <div >
-
+                        <input type="hidden" id="time" value="@time"/>
                         <div class="clearfix"></div>
                         @if( response != null){
                             <div class="row">
@@ -93,7 +93,7 @@
                                                         <img class="img-responsive avatar-view" src="../assets/images/logo/fpt.jpg" alt="Avatar" title="Change the avatar">
                                                     </div>
                                                 </div>
-                                                <h3 class="name_title hvr-pulse" style="color: green">@response.internet.contract.contract</h3>
+                                                <h3 class="name_title hvr-pulse" id="lbContract" style="color: green">@response.internet.contract.contract</h3>
                                                 
                                                 <ul class="list-unstyled user_data">
                                                     <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.contract.province - @response.internet.contract.region

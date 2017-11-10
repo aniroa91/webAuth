@@ -4,7 +4,7 @@ import model.device.{Bras, BrasList,BrasesCard}
 import scala.concurrent.Future
 
 object BrasService {
-  def listTop100Bras: Future[Seq[(String,String,String,String,String, String, String, String,String,String)]] = {
+  def listTop100Bras: Future[Seq[(String,String,String,String,String, String, String, String,String,Option[String])]] = {
     BrasList.top100
   }
 
@@ -42,6 +42,10 @@ object BrasService {
 
   def getBrasChart(id : String,time: String) : Future[Seq[Bras]] = {
     BrasList.getChart(id,time)
+  }
+
+  def getJsonBrasChart(id : String,time: String) : Future[Seq[(String,Int, Int,Int)]] = {
+    BrasList.getJsonChart(id,time)
   }
 
   def getBrasCard(id : String,time: String,sigin: String,logoff: String) : Future[Seq[(String,String,String,Int,Int)]] = {

@@ -11,6 +11,8 @@ import org.joda.time.format.DateTimeFormat
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import play.api.libs.json.Json
+import services.domain.CommonService.formatYYYYmmddHHmmss
+
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -45,7 +47,17 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
                     "lostip" -> iter._4
                   )
       )
-      Ok(Json.toJson(re))
+      val idBras = id.split('/')(0)
+      val time = id.split('/')(1)
+      val brasChart = Await.result(BrasService.getJsonBrasChart(idBras,time),Duration.Inf)
+      val jsBras = Json.obj(
+        "host" -> re,
+        "time" -> brasChart.map({ t => formatYYYYmmddHHmmss(t._1.toString)}),
+        "logoff" -> brasChart.map({ t =>t._2}),
+        "signin" -> brasChart.map({ t => t._3}),
+        "users" -> brasChart.map({ t => t._4})
+      )
+      Ok(Json.toJson(jsBras))
     }
     catch{
       case e: Exception => Ok("error")
