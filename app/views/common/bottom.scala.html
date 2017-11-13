@@ -183,11 +183,19 @@
                 $('#monthPicker').datepicker({
                     autoclose: true,
                     minViewMode: 1,
-                    format: 'mm/yyyy'
+                    endDate: '+0d',
+                    format: 'yyyy-mm'
                 }).on('changeDate', function(selected){
-                    startDate = new Date(selected.date.valueOf());
-                    startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
-                    $('.to').datepicker('setStartDate', startDate);
+                    var startDate = new Date(selected.date.valueOf());
+                    var yr = startDate.getFullYear();
+                    var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
+                    var newDate = yr + '-' + month;
+                    console.log(newDate);
+                    var x = $('#lbContract').text()
+                    if($('#lbContract').text()!= "")
+                        window.location.href = '/profile?ct='+$('#lbContract').text()+'&day=' +newDate
+                    else
+                        window.location.href = '/profile?day=' +newDate
                 });
             });
     </script>

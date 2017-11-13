@@ -10,26 +10,9 @@ import slick.driver.PostgresDriver.api._
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
-case class BrasCard(id: String, time: String,card: String, linecard: String,logoff: Int,signin: Int)
-
-class BrasCardTableDef(tag: Tag) extends Table[BrasCard](tag, "bras_count_by_card") {
-
-  def id = column[String]("bras_id")
-  def time = column[String]("time")
-  def card = column[String]("card_ol")
-  def linecard = column[String]("line_ol")
-  def logoff = column[Int]("logoff_total_count_by_card")
-  def signin = column[Int]("signin_total_count_by_card")
-
-  override def * =
-    (id, time,card, linecard,logoff,signin) <>(BrasCard.tupled, BrasCard.unapply)
-}
-
 object BrasesCard {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
-
-  var brases = TableQuery[BrasCardTableDef]
 
   def getHostCard(strId: String): Future[Seq[(String,String,String, String)]] = {
     val id = strId.split('/')(0)
@@ -63,7 +46,7 @@ object BrasesCard {
 
   def listBrasById(id: String): Future[Seq[(String,String,String,String,String)]] = {
     val dt = new DateTime();
-    val aDayLater = dt.minusMinutes(60);
+    val aDayLater = dt.minusMinutes(120);
     val aDayTime = aDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""SELECT distinct tbC.bras_id,tbB.date_time,tbC.line_ol,tbC.card_ol,tbC.port_ol

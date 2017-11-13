@@ -13,7 +13,7 @@ import slick.driver.PostgresDriver.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class Bras(id: String, time: String,logoff: Int, signin: Int,lostip_error: Int, active_user: Int,crit_kibana: Int, crit_opsview: Int,cpe_error: Int, label: String,verified: String)
+case class Bras(id: String, time: String,logoff: Int, signin: Int,lostip_error: Int, active_user: Int,crit_kibana: Int, crit_opsview: Int,cpe_error: Int, label: String,verified: Option[String])
 
 class BrasTableDef(tag: Tag) extends Table[Bras](tag, "dwh_radius_bras_detail") {
 
@@ -27,7 +27,7 @@ class BrasTableDef(tag: Tag) extends Table[Bras](tag, "dwh_radius_bras_detail") 
   def crit_opsview = column[Int]("crit_opsview")
   def cpe_error = column[Int]("cpe_error")
   def label = column[String]("label")
-  def verified = column[String]("verified")
+  def verified = column[Option[String]]("verified")
 
   override def * =
     (id, time,logoff, signin,lostip_error, active_user,crit_kibana, crit_opsview,cpe_error, label,verified) <>(Bras.tupled, Bras.unapply)
@@ -39,7 +39,7 @@ object BrasList {
 
   var brases = TableQuery[BrasTableDef]
 
-  def top100: Future[Seq[(String,String,String,String,String, String, String, String,String,String)]] = {
+  def top100: Future[Seq[(String,String,String,String,String, String, String, String,String,Option[String])]] = {
     val dt = new DateTime();
     val oneDayLater = dt.minusHours(48);
     val oldDay  = oneDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
@@ -53,7 +53,7 @@ object BrasList {
             join dwh_radius_bras_detail tbD
             on tbD.bras_id = tbB.bras_id and tbD.date_time=tbB.time and tbD.date_time>=$oldDay::TIMESTAMP
                   """
-        .as[(String, String, String, String,String,String, String, String, String,String)])
+        .as[(String, String, String, String,String,String, String, String, String,Option[String])])
   }
 
 /*  def get(id: String,time: String): Future[Option[Bras]] = {
@@ -75,6 +75,20 @@ object BrasList {
     val addHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
 
     dbConfig.db.run(brases.filter(_.id === id).filter(_.time >= oldHalfHour).filter(_.time <= addHalfHour).sortBy(_.time.asc).result)
+  }
+
+  def getJsonChart(id: String,time: String): Future[Seq[(String,Int, Int,Int)]] = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+
+    dbConfig.db.run(
+      sql"""SELECT date_time,logoff_total_count,signin_total_count,active_user FROM dwh_radius_bras_detail
+            WHERE bras_id =$id and date_time >=$oldHalfHour::TIMESTAMP and date_time >=$time::TIMESTAMP
+            ORDER BY date_time desc
+                  """
+        .as[(String, Int, Int,Int)])
+    //dbConfig.db.run(brases.filter(_.id === id).filter(_.time >= oldHalfHour).filter(_.time <= addHalfHour).sortBy(_.time.asc).result)
   }
 
   def confirmLabel(id: String,time: String) = {

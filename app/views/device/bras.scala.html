@@ -1,4 +1,4 @@
-@(email: String,lstBras : Seq[(String,String,String,String,String, String, String, String,String,String)])
+@(email: String,lstBras : Seq[(String,String,String,String,String, String, String, String,String,Option[String])])
 @import play.api.libs.json.Json
 
 <!DOCTYPE html>
@@ -79,10 +79,10 @@
                             <td>@bras._8</td>
                             <td>@bras._9</td>
                             <td>
-                                @if(bras._10 == "1"){
-                                    <span class="label label-success lbOutlier" style="font-size: 13px">Outlier</span>
-                                }else{
+                                @if(bras._10.isEmpty || bras._10.get == "0"){
                                     <span class="label label-danger lbOutlier" style="font-size: 13px">Outlier</span>
+                                }else{
+                                    <span class="label label-success lbOutlier" style="font-size: 13px">Outlier</span>
                                 }
                             </td>
                             <td style="padding-top: 5px">

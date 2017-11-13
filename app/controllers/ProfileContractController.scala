@@ -31,18 +31,18 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
     mapping(
       "ct" -> text)(SearchContract.apply)(SearchContract.unapply))
 
-  def index = withAuth { username => implicit request =>
+  def index(day: String) = withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
     try {
       if (!formValidationResult.hasErrors) {
         val domain = formValidationResult.get.q.trim()
-        val response = ProfileService.get(domain)
-        Ok(views.html.profile.contract.index(form, response, domain,username))
+        val response = ProfileService.get(domain,day)
+        Ok(views.html.profile.contract.index(form, response, domain,username,day))
       } else {
-        Ok(views.html.profile.contract.index(form, null, null,username))
+        Ok(views.html.profile.contract.index(form, null, null,username,day))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.contract.index(form, null, null,username))
+      case e: Exception => Ok(views.html.profile.contract.index(form, null, null,username,null))
     }
   }
 }

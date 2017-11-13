@@ -210,11 +210,11 @@ object ProfileService extends AbstractService {
      (download, upload)
   }
   
-  def get(contract: String): ProfileResponse = {
-    ProfileResponse(getInternetResponse(contract), getPayTVResponse(contract))
+  def get(contract: String,day: String): ProfileResponse = {
+    ProfileResponse(getInternetResponse(contract,day), getPayTVResponse(contract,day))
   }
 
-  private def getInternetResponse(contract: String): InternetResponse = {
+  private def getInternetResponse(contract: String,day: String): InternetResponse = {
     val internetRes = ESUtil.get(client, "user-contract-internet", "docs", contract)
     val internetSource = internetRes.source
     val internetInfo = InternetContract(
@@ -427,7 +427,7 @@ object ProfileService extends AbstractService {
     InternetResponse(internetInfo, segment, downup, duration, suyhout, error, formatArray2(module), formatArray2(disconnet), session, checkList, bill, device)
   }
 
-  private def getPayTVResponse(contract: String): PayTVResponse = {
+  private def getPayTVResponse(contract: String,day: String): PayTVResponse = {
     val payTVRes = ESUtil.get(client, "user-contract-paytv", "docs", contract)
     if (payTVRes.exists) {
       // payTV contract
@@ -634,7 +634,7 @@ object ProfileService extends AbstractService {
     
     //val map3 = mergeArrayMap(array)
     //map3.foreach(println)
-    val response = ProfileService.get("HUFD08955")
+    val response = ProfileService.get("HUFD08955","")
     //val a = response.paytv.vectors.get("445814").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
