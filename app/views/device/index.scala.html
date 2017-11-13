@@ -321,13 +321,13 @@
                             labels: {
                                 format: '{value}',
                                 style: {
-                                    color: "red"
+                                    color: "#f0ad4e"
                                 }
                             },
                             title: {
                                 text: 'Active users',
                                 style: {
-                                    color: "red"
+                                    color: "#f0ad4e"
                                 }
                             },
                             opposite: true
@@ -351,7 +351,7 @@
                         type: 'column',
                         name: 'Sign In',
                         yAxis: 0,
-                        color: "#f0ad4e",
+                        color: "#FF0000",
                         data: signin
                     }, {
                         type: 'column',
@@ -364,11 +364,11 @@
                         name: 'Actives user',
                         yAxis: 1,
                         data: users,
-                        color: "#FF0000",
+                        color: "#f0ad4e",
                         marker: {
                             lineWidth: 2,
                             lineColor: "white",
-                            fillColor: '#FF0000'
+                            fillColor: '#f0ad4e'
                         }
                     }]
                 });
@@ -379,10 +379,18 @@
                 $('#tbBras').waitMe("hide");
                 $('#host').waitMe("hide");
                 $('#tbHost').waitMe("hide");
+                $('#line-bras').waitMe("hide");
             }
 
             function waitMe(){
                 $('#bras').waitMe({
+                    effect: 'roundBounce',
+                    text: 'Please wait...',
+                    bg: 'rgba(255,255,255,0.7)',
+                    color: '#000',
+                    textPos: 'vertical'
+                });
+                $('#line-bras').waitMe({
                     effect: 'roundBounce',
                     text: 'Please wait...',
                     bg: 'rgba(255,255,255,0.7)',

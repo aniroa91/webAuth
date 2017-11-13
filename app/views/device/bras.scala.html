@@ -78,11 +78,11 @@
                             <td>@bras._7</td>
                             <td>@bras._8</td>
                             <td>@bras._9</td>
-                            <td>@bras._10
-                                @if(bras._10 != null && bras._10 == "1"){
-                                    <span class="label label-success lbOutlier" style="font-size: 13px">Outlier</span>
-                                }else{
+                            <td>
+                                @if(bras._10.isEmpty || bras._10.get == "0"){
                                     <span class="label label-danger lbOutlier" style="font-size: 13px">Outlier</span>
+                                }else{
+                                    <span class="label label-success lbOutlier" style="font-size: 13px">Outlier</span>
                                 }
                             </td>
                             <td style="padding-top: 5px">
