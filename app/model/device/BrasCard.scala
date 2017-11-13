@@ -46,7 +46,7 @@ object BrasesCard {
 
   def listBrasById(id: String): Future[Seq[(String,String,String,String,String)]] = {
     val dt = new DateTime();
-    val aDayLater = dt.minusMinutes(120);
+    val aDayLater = dt.minusMinutes(60);
     val aDayTime = aDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""SELECT distinct tbC.bras_id,tbB.date_time,tbC.line_ol,tbC.card_ol,tbC.port_ol
@@ -91,8 +91,9 @@ object BrasesCard {
   }
 
   def getCard(id: String,time: String,sigin: String,logoff: String): Future[Seq[(String,String,String,Int,Int)]] = {
+    val strTime = time.substring(0,time.indexOf(".")+3)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    val dateTime = DateTime.parse(time, formatter)
+    val dateTime = DateTime.parse(strTime, formatter)
     val oldTime  = dateTime.minusMinutes(5).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     val newTime  = dateTime.plusMinutes(5).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
       dbConfig.db.run(

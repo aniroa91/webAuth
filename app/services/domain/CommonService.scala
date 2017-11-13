@@ -335,8 +335,9 @@ object CommonService extends AbstractService {
   }
 
   def formatYYYYmmddHHmmss( date : String) : String = {
+    val strTime = date.substring(0,date.indexOf(".")+3)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    val dateTime = DateTime.parse(date, formatter)
+    val dateTime = DateTime.parse(strTime, formatter)
     dateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
   }
   

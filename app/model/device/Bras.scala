@@ -61,16 +61,18 @@ object BrasList {
   }*/
 
   def getTime(id: String,time: String): Future[Seq[Bras]] = {
+    val strTime = time.substring(0,time.indexOf(".")+3)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    val dateTime = DateTime.parse(time, formatter)
+    val dateTime = DateTime.parse(strTime, formatter)
     val oldTime  = dateTime.minusHours(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
 
     dbConfig.db.run(brases.filter(_.id === id).filter(_.time >= oldTime).filter(_.time <= time).filter(_.label ==="outlier").sortBy(_.time.desc).take(5).result)
   }
 
   def getChart(id: String,time: String): Future[Seq[Bras]] = {
+    val strTime = time.substring(0,time.indexOf(".")+3)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    val dateTime = DateTime.parse(time, formatter)
+    val dateTime = DateTime.parse(strTime, formatter)
     val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     val addHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
 
