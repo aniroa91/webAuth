@@ -68,7 +68,7 @@
                                 </thead>
                                 <tbody>
                                 @for(bras <- lstbrasTimeCurrent) {
-                                    @if(bras.time==lstbrasTime(0).time){
+                                    @if(bras.time.contains(lstbrasTime(0).time) || lstbrasTime(0).time.contains(bras.time)){
                                         <tr class="hight-light">
                                     }else{
                                       <tr>
@@ -83,11 +83,11 @@
                                         <td>@bras.crit_kibana</td>
                                         <td>@bras.crit_opsview</td>
                                         <td>
-                                        @if(bras.label == "normal") {
-                                            <span class="label label-success" style="font-size: 13px">@bras.label</span>
-                                        } else {
-                                            <span class="label label-danger" style="font-size: 13px">@bras.label</span>
-                                        }
+                                            @if(bras.verified.isEmpty || bras.verified.get == "0"){
+                                                <span class="label label-danger" style="font-size: 13px">Outlier</span>
+                                            }else{
+                                                <span class="label label-success" style="font-size: 13px">Outlier</span>
+                                            }
                                         </td>
                                     </tr>
                                 }
