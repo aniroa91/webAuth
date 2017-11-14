@@ -198,7 +198,8 @@
          }
          $(document).ready(function() {
              $("#tbBras").DataTable({
-                 "pageLength":20
+                 "pageLength":20,
+                 "order": [[ 1, "desc" ]]
              });
              setInterval(function() {
                  executeQuery()
