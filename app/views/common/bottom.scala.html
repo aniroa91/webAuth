@@ -190,10 +190,8 @@
                     var yr = startDate.getFullYear();
                     var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
                     var newDate = yr + '-' + month;
-                    console.log(newDate);
-                    var x = $('#lbContract').text()
-                    if($('#lbContract').text()!= "")
-                        window.location.href = '/profile?ct='+$('#lbContract').text()+'&day=' +newDate
+                    if($('#lbContract').val()!= "")
+                        window.location.href = '/profile?ct='+$('#lbContract').val()+'&day=' +newDate
                     else
                         window.location.href = '/profile?day=' +newDate
                 });
