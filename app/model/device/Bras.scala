@@ -52,11 +52,12 @@ object BrasList {
             group by bras_id) tbB
             join dwh_radius_bras_detail tbD
             on tbD.bras_id = tbB.bras_id and tbD.date_time=tbB.time and tbD.date_time>=$oldDay::TIMESTAMP
+            order by tbD.date_time desc
                   """
         .as[(String, String, String, String,String,String, String, String, String,Option[String])])
   }
 
-/*  def get(id: String,time: String): Future[Option[Bras]] = {
+ /*  def get(id: String,time: String): Future[Option[Bras]] = {
     dbConfig.db.run(brases.filter(_.id === id).filter(_.time === time).result.headOption)
   }*/
 

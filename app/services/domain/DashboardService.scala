@@ -62,9 +62,11 @@ object DashboardService extends AbstractService {
     val begin = daily.head._1
     //println(Days.daysBetween(date.toLocalDate(), DateTimeUtil.create(begin, DateTimeUtil.YMD).toLocalDate()).getDays())
     val seq = 0 until Days.daysBetween(DateTimeUtil.create(begin, DateTimeUtil.YMD).toLocalDate(), date.toLocalDate()).getDays() + 1
-    val days = seq.map(x => date.minusDays(x))
+    val arrDays = seq.map(x => date.minusDays(x))
        .map(x => x.toString(DateTimeUtil.YMD))
        .toArray.reverse
+    //println("hoang"+arrDays.length)
+    val days = arrDays.slice(arrDays.length-30,arrDays.length)
     val map = daily.toMap
     if (report != null) {
       //val daily = getTotalInfoDaily(response)

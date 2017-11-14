@@ -15,6 +15,8 @@ import play.api.mvc.AnyContent
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Request
 import slick.jdbc.JdbcProfile
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import services.user.ProfileService
 
 case class SearchContract(q: String)
@@ -31,15 +33,20 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
     mapping(
       "ct" -> text)(SearchContract.apply)(SearchContract.unapply))
 
-  def index(day: String) = withAuth { username => implicit request =>
+  def index(month: String) = withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
+    var strMonth = month
     try {
       if (!formValidationResult.hasErrors) {
         val domain = formValidationResult.get.q.trim()
-        val response = ProfileService.get(domain,day)
-        Ok(views.html.profile.contract.index(form, response, domain,username,day))
+        if(month == ""){
+          val now = DateTime.now
+          strMonth = now.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
+        }
+        val response = ProfileService.get(domain,strMonth)
+        Ok(views.html.profile.contract.index(form, response, domain+"&day="+strMonth,username,strMonth))
       } else {
-        Ok(views.html.profile.contract.index(form, null, null,username,day))
+        Ok(views.html.profile.contract.index(form, null, null,username,month))
       }
     } catch {
       case e: Exception => Ok(views.html.profile.contract.index(form, null, null,username,null))

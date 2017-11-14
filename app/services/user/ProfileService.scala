@@ -47,55 +47,55 @@ object ProfileService extends AbstractService {
   //val client = Configure.client
   val SIZE_DEFAULT = 100
 
-  private def getHourly(boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-hourly-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+  private def getHourly(boxId: String,month:String): SearchDefinition = {
+    search(s"paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("hour")
       .subaggs(
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
-  private def getHourlyInMonth(boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-hourly-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+  private def getHourlyInMonth(boxId: String,month:String): SearchDefinition = {
+    search(s"paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("hour")
       .subaggs(
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
-  private def getApp(boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+  private def getApp(boxId: String,month:String): SearchDefinition = {
+    search(s"paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("app")
       .subaggs(
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
-  private def getDayOfWeek(boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+  private def getDayOfWeek(boxId: String,month:String): SearchDefinition = {
+    search(s"paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("dayOfWeek")
       .subaggs(
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
-  private def getIPTV(boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-iptv-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+  private def getIPTV(boxId: String,month:String): SearchDefinition = {
+    search(s"paytv-weekly-iptv-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("cate")
       .subaggs(
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
-  private def getAppHourly(boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-hourly-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+  private def getAppHourly(boxId: String,month:String): SearchDefinition = {
+    search(s"paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top").field("app")
       .subaggs(termsAggregation("sub").field("hour")
         .subaggs(sumAgg("sum", "value")) size SIZE_DEFAULT) size SIZE_DEFAULT) limit SIZE_DEFAULT
   }
 
-  private def getAppDayOfWeek(boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+  private def getAppDayOfWeek(boxId: String,month:String): SearchDefinition = {
+    search(s"paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("app")
       .subaggs(
@@ -104,16 +104,16 @@ object ProfileService extends AbstractService {
 
   }
   
-  private def getVod(boxId: String): SearchDefinition = {
-    search(s"user-paytv-vod-2017-09-*" / "docs") query { must(termQuery("customer_id", boxId)) }
+  private def getVod(boxId: String,month: String): SearchDefinition = {
+    search(s"user-paytv-weekly-vod-$month-*" / "docs") query { must(termQuery("customer_id", boxId)) }
   }
   
-  private def getVodGiaitri(boxId: String): SearchDefinition = {
-    search(s"user-paytv-vod-giaitri-2017-09-*" / "docs") query { must(termQuery("customer_id", boxId)) }
+  private def getVodGiaitri(boxId: String,month: String): SearchDefinition = {
+    search(s"user-paytv-weekly-vod-giaitri-$month-*" / "docs") query { must(termQuery("customer_id", boxId)) }
   }
   
-  private def getVodThieuNhi(boxId: String): SearchDefinition = {
-    search(s"user-paytv-vod-thieunhi-2017-09-*" / "docs") query { must(termQuery("customer_id", boxId)) }
+  private def getVodThieuNhi(boxId: String,month: String): SearchDefinition = {
+    search(s"user-paytv-weekly-vod-thieunhi-$month-*" / "docs") query { must(termQuery("customer_id", boxId)) }
   }
   
   private def getDevice(mac: String): SearchDefinition = {
@@ -210,11 +210,11 @@ object ProfileService extends AbstractService {
      (download, upload)
   }
   
-  def get(contract: String,day: String): ProfileResponse = {
-    ProfileResponse(getInternetResponse(contract,day), getPayTVResponse(contract,day))
+  def get(contract: String,month: String): ProfileResponse = {
+    ProfileResponse(getInternetResponse(contract,month), getPayTVResponse(contract,month))
   }
 
-  private def getInternetResponse(contract: String,day: String): InternetResponse = {
+  private def getInternetResponse(contract: String,month: String): InternetResponse = {
     val internetRes = ESUtil.get(client, "user-contract-internet", "docs", contract)
     val internetSource = internetRes.source
     val internetInfo = InternetContract(
@@ -239,7 +239,7 @@ object ProfileService extends AbstractService {
       getValueAsInt(internetSource, "onu"),
       getValueAsString(internetSource, "cable_type"),
       getValueAsInt(internetSource, "life_time"))
-    val internetSegmentRes = ESUtil.get(client, "user-segment-internet-2017-09", "docs", contract)
+    val internetSegmentRes = ESUtil.get(client, "user-segment-internet-"+month, "docs", contract)
     val internetSegmentSource = internetSegmentRes.source
     val segment = InternetSegment(
       getValueAsString(internetSegmentSource, "Contract"),
@@ -266,7 +266,7 @@ object ProfileService extends AbstractService {
       getValueAsString(internetSegmentSource, "So_Ngay_Loi_Ha_Tang"))
 
     
-    val downupQuadRes = ESUtil.get(client, "user-downup-quad-2017-09", "docs", contract)
+    val downupQuadRes = ESUtil.get(client, "user-downup-quad-"+month, "docs", contract)
     val downupQuadSource = downupQuadRes.source
     //    downupSource.keySet.filter(x => x.contains("Download")).foreach(println)
     val downloadQuad = downupQuadSource.keySet
@@ -304,7 +304,7 @@ object ProfileService extends AbstractService {
     val downupDow = getDownloadDoW(contract)
     val downup = DownUp(downloadQuad, uploadQuad, downupDow._1, downupDow._2, formatArray(downloadDaily), formatArray(uploadDaily))
     
-    val durationDailyRes = ESUtil.get(client, "user-duration-daily-2017-09", "docs", contract)
+    val durationDailyRes = ESUtil.get(client, "user-duration-daily-"+month, "docs", contract)
     val durationDailySource = durationDailyRes.source
     val durationDaily = durationDailySource.keySet
       .filter(x => x.contains("sum(Size"))
@@ -315,7 +315,7 @@ object ProfileService extends AbstractService {
       .sortBy(x => x._1)
       //.take(28)
 
-    val durationHourlyRes = ESUtil.get(client, "user-duration-hourly-2017-09", "docs", contract)
+    val durationHourlyRes = ESUtil.get(client, "user-duration-hourly-"+month, "docs", contract)
     val durationHourlySource = durationHourlyRes.source
     //println(durationHourlySource)
     val durationHourly = durationHourlySource.keySet
@@ -332,19 +332,18 @@ object ProfileService extends AbstractService {
 
     val durationDow = getDurationDoW(contract)
     val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
-    val pon = client.execute(search(s"user-inf-pon-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    val pon = client.execute(search(s"user-inf-pon-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val suyhoutSource = if (pon.totalHits <= 0) {
-      client.execute(search(s"user-inf-adsl-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+      client.execute(search(s"user-inf-adsl-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     } else pon
 
-    //println(suyhout.totalHits)
     val suyhout = suyhoutSource.hits.hits.map(x => x.sourceAsMap)
       .map(x => (getValueAsLong(x, "date") / 1000) -> getValueAsString(x, "passed"))
       .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
       .sortBy(x => x._1)
       //.toMap.toArray
     //println(client.show(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000))
-    val errorRes = client.execute(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    val errorRes = client.execute(search(s"user-inf-error-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     val error = errorRes.hits.hits.map(x => {
         //println(x.sourceAsMap)
         x.sourceAsMap
@@ -371,13 +370,13 @@ object ProfileService extends AbstractService {
         getValueAsDouble(map, "ssOnline_Mean"),
         getValueAsDouble(map, "ssOnline_Std"))
     } else null
-    val checkListRes = ESUtil.get(client, "user-ticket-2017-09", "docs", contract)
+    val checkListRes = ESUtil.get(client, "user-ticket-"+month, "docs", contract)
     val checkList = if (checkListRes.exists) {
       val map = checkListRes.source
       getValueAsString(map, "Nhom_CheckList") -> getValueAsInt(map, "So_checklist")
     } else null
     
-    val billRes = ESUtil.get(client, "user-bill-internet-2017-09", "docs", contract)
+    val billRes = ESUtil.get(client, "user-bill-internet-"+month, "docs", contract)
     val bill = if (billRes.exists) getValueAsDouble(billRes.source, "SoTienDaThanhToan") else 0
     
 //    val mac = internetInfo.macAddress.replace(":", "")
@@ -427,7 +426,7 @@ object ProfileService extends AbstractService {
     InternetResponse(internetInfo, segment, downup, duration, suyhout, error, formatArray2(module), formatArray2(disconnet), session, checkList, bill, device)
   }
 
-  private def getPayTVResponse(contract: String,day: String): PayTVResponse = {
+  private def getPayTVResponse(contract: String,month: String): PayTVResponse = {
     val payTVRes = ESUtil.get(client, "user-contract-paytv", "docs", contract)
     if (payTVRes.exists) {
       // payTV contract
@@ -450,7 +449,8 @@ object ProfileService extends AbstractService {
           getValueAsString(x, "mac_address")))
 
       // Get Segment
-      val segments = boxs.map(x => x -> ESUtil.get(client, "user-segment-paytv-2017-10-02", "docs", x.id))
+      println("Month:"+month)
+      val segments = boxs.map(x => x -> ESUtil.get(client, "user-segment-paytv-"+month, "docs", x.id))
         .map(x => {
             //println(x._2.source)
             x._1 -> x._2.source
@@ -468,20 +468,20 @@ object ProfileService extends AbstractService {
           x._1.status)).toMap
       // Vector
       val vectors = boxs.map(x => x.id).map(x => {
-        val hourly = getHourly(x)
-        val hourlyInMonth = getHourlyInMonth(x)
-        val app = getApp(x)
-        val dayOfWeek = getDayOfWeek(x)
-        val iptv = getIPTV(x)
-        val appHourly = getAppHourly(x)
+        val hourly = getHourly(x,month)
+        val hourlyInMonth = getHourlyInMonth(x,month)
+        val app = getApp(x,month)
+        val dayOfWeek = getDayOfWeek(x,month)
+        val iptv = getIPTV(x,month)
+        val appHourly = getAppHourly(x,month)
         //println(client.show(appHourly))
-        val appDaily = getAppDayOfWeek(x)
+        val appDaily = getAppDayOfWeek(x,month)
         val daily = getDaily(x)
         
-        val vodRequest = getVod(x)
+        val vodRequest = getVod(x,month)
         //println(client.show(vodRequest))
-        val vodgiaitriRequest = getVodGiaitri(x)
-        val vodthieunhiRequest = getVodThieuNhi(x)
+        val vodgiaitriRequest = getVodGiaitri(x,month)
+        val vodthieunhiRequest = getVodThieuNhi(x,month)
         val multiSearchResponse = client.execute(multi(hourly, app, dayOfWeek, iptv, appHourly, appDaily, daily, hourlyInMonth, vodRequest, vodgiaitriRequest, vodthieunhiRequest)).await
 
         //multiSearchResponse.responses(4).aggregations.foreach(println)
