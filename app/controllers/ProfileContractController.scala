@@ -36,9 +36,10 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
   def index(month: String) = withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
     var strMonth = month
+    var domain = ""
     try {
       if (!formValidationResult.hasErrors) {
-        val domain = formValidationResult.get.q.trim()
+        domain = formValidationResult.get.q.trim()
         if(month == ""){
           val now = DateTime.now
           strMonth = now.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
@@ -49,7 +50,7 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
         Ok(views.html.profile.contract.index(form, null, null,username,month))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.contract.index(form, null, null,username,null))
+      case e: Exception => Ok(views.html.profile.contract.index(form, null, domain+"&day="+month,username,month))
     }
   }
 }

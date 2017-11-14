@@ -61,6 +61,11 @@
                 <div class="right_col" role="main">
                     <div >
                         <input type="hidden" id="time" value="@time"/>
+                        @if(contract != null){
+                            <input type="hidden" id="lbContract" value="@contract.substring(0,contract.indexOf('&'))"/>
+                        }else {
+                            <input type="hidden" id="lbContract"/>
+                        }
                         <div class="clearfix"></div>
                         @if( response != null){
                             <div class="row">
@@ -93,7 +98,7 @@
                                                         <img class="img-responsive avatar-view" src="../assets/images/logo/fpt.jpg" alt="Avatar" title="Change the avatar">
                                                     </div>
                                                 </div>
-                                                <h3 class="name_title hvr-pulse" id="lbContract" style="color: green">@response.internet.contract.contract</h3>
+                                                <h3 class="name_title hvr-pulse" style="color: green">@response.internet.contract.contract</h3>
                                                 
                                                 <ul class="list-unstyled user_data">
                                                     <li><i class="fa fa-map-marker user-profile-icon"></i> @response.internet.contract.province - @response.internet.contract.region
