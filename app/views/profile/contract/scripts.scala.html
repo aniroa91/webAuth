@@ -1066,12 +1066,12 @@
                 series: [
                 {
                     type: 'spline',
-                    name: 'Download',
+                    name: 'Upload',
                     // change down and up 11/10
                     data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upQuad.map(x => BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
                 },{
                 type: 'spline',
-                        name: 'Upload',
+                        name: 'Download',
                         data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
                 }]
             });

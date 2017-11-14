@@ -360,7 +360,7 @@ object ProfileService extends AbstractService {
       .toArray
       .sortBy(x => x._1)
 
-    val sessionRes = ESUtil.get(client, "session", "docs", contract)
+    val sessionRes = ESUtil.get(client, s"user-session-${month}", "docs", contract)
     val session: Session = if (sessionRes.exists) {
       val map = sessionRes.source
       Session(contract,
