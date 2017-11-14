@@ -65,7 +65,7 @@ object DashboardService extends AbstractService {
     val arrDays = seq.map(x => date.minusDays(x))
        .map(x => x.toString(DateTimeUtil.YMD))
        .toArray.reverse
-    println("hoang"+arrDays.length)
+    //println("hoang"+arrDays.length)
     val days = arrDays.slice(arrDays.length-30,arrDays.length)
     val map = daily.toMap
     if (report != null) {

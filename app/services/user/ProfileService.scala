@@ -332,9 +332,7 @@ object ProfileService extends AbstractService {
 
     val durationDow = getDurationDoW(contract)
     val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
-    println("anhhh"+month)
     val pon = client.execute(search(s"user-inf-pon-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
-    println("pon: "+pon.totalHits)
     val suyhoutSource = if (pon.totalHits <= 0) {
       client.execute(search(s"user-inf-adsl-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
     } else pon
