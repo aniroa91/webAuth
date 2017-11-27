@@ -53,3 +53,7 @@ GET     /analytic                 controllers.AnalyticController.index
 #GET     /ace/tables                 controllers.ACEController.tables
 GET     /paytv                    controllers.PaytvClientController.index
 GET     /profile                  controllers.ProfileContractController.index(day: String ?= "")
+
+### DNS Service Public
+GET     /dev/dns/dashboard        dns.controllers.DashboardController.index
+GET     /dev/dns/category         dns.controllers.CategoryController.index

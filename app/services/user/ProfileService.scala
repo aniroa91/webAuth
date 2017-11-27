@@ -377,7 +377,7 @@ object ProfileService extends AbstractService {
     } else null
     
     val billRes = ESUtil.get(client, "user-bill-internet-"+month, "docs", contract)
-    val bill = if (billRes.exists) getValueAsDouble(billRes.source, "SoTienDaThanhToan") else 0
+    val bill = if (billRes.exists) getValueAsDouble(billRes.source, "SoTien") else 0
     
 //    val mac = internetInfo.macAddress.replace(":", "")
 //    val deviceRes = client.execute(getDevice(mac)).await
@@ -634,7 +634,8 @@ object ProfileService extends AbstractService {
     
     //val map3 = mergeArrayMap(array)
     //map3.foreach(println)
-    val response = ProfileService.get("HUFD08955","")
+    //val response = ProfileService.get("HUFD08955","")
+    val response = ProfileService.get("AGD000110", "2017-10")
     //val a = response.paytv.vectors.get("445814").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
@@ -651,10 +652,11 @@ object ProfileService extends AbstractService {
     //println(response.internet.device.numberOfDevice)
     //println(response.internet.device.numberOfMobile)
 //    println(response.internet.segment)
-    response.internet.device.deviceChars.foreach(x => {
-      println(x._1)
-      x._2.foreach(println)
-    })
+//    response.internet.device.deviceChars.foreach(x => {
+//      println(x._1)
+//      x._2.foreach(println)
+//    })
+    println("BILL: " + response.internet.bill)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
     client.close()
