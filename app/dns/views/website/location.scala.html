@@ -1,0 +1,91 @@
+@(provinces: Array[(String, Int)])
+
+@import services.domain.CommonService.getImageTag2
+@import services.domain.CommonService.getLinkTag
+
+<!DOCTYPE html>
+<html lang="en">
+  @_root_.dns.views.html.common.head("")
+
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        @_root_.dns.views.html.common.sidebar()
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="">
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>@Html.apply(getImageTag2("google.com")) @Html.apply(getLinkTag("google.com"))</h2>
+                    
+                    <div class="clearfix"></div>
+
+                  </div>
+                  <div class="x_content">
+                    <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12" id="mapBras">
+                      <div class="x_panel">
+                        <div id="mapVn" style="height: 810px;"></div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12" id="mapBras">
+                      <div class="x_panel">
+                        <div class="x_title">
+                          <h2>Table<small></small></h2>
+                          <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                          <table class="table table-hover">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <!--<th>Chart</th>-->
+                                <th>Percent</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              @for(i <- 0 until 20) {
+                              <tr>
+                                <th scope="row">@(i+1)</th>
+                                <td>@provinces(i)._1</td>
+                                <!--
+                                <td>
+                                  <div class="progress">
+                                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 40%;"></div>
+                                  </div>
+                                </td>
+                                -->
+                                <td>@provinces(i)._2</td>
+                              </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="pull-right">
+            Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+    @_root_.dns.views.html.common.scripts("")
+  </body>
+</html>

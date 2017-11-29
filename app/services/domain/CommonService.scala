@@ -355,7 +355,14 @@ object CommonService extends AbstractService {
     val logo = getLogo(domain, false)
     //"<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
     //<img id="currentPhoto" src="SomeImage.jpg" onerror="this.src='Default.jpg'" width="100" height="120">
-    "<a href=\"/search?ct=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='../assets/images/logo/default.png'\" width=\"30\" height=\"30\"></a>"
+    "<a href=\"/search?ct=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='/assets/images/logo/default.png'\" width=\"30\" height=\"30\"></a>"
+  }
+  
+  def getImageTag2(domain: String): String = {
+    val logo = getLogo(domain, false)
+    //"<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
+    //<img id="currentPhoto" src="SomeImage.jpg" onerror="this.src='Default.jpg'" width="100" height="120">
+    "<a href=\"/search?ct=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='/assets/images/logo/default.png'\" width=\"20\" height=\"20\"></a>"
   }
   
   def getLinkTag(domain: String): String = {
@@ -381,7 +388,7 @@ object CommonService extends AbstractService {
   def getLogo(secondDomain: String, download: Boolean): String = {
     val logoUrl = Configure.LOGO_API_URL + secondDomain
     val path = Configure.LOGO_PATH + secondDomain + ".png"
-    val logo = "../extassets/" + secondDomain + ".png"
+    val logo = "/extassets/" + secondDomain + ".png"
     if (download) {
       if (!FileUtil.isExist(path)) {
         println("Download logo to " + path)

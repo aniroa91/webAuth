@@ -55,5 +55,10 @@ GET     /paytv                    controllers.PaytvClientController.index
 GET     /profile                  controllers.ProfileContractController.index(day: String ?= "")
 
 ### DNS Service Public
-GET     /dev/dns/dashboard        dns.controllers.DashboardController.index
-GET     /dev/dns/category         dns.controllers.CategoryController.index
+GET     /dev/dns/dashboard        	dns.controllers.DashboardController.index
+GET     /dev/dns/category         	dns.controllers.CategoryController.index
+GET     /dev/dns/website          	dns.controllers.WebsiteController.index
+GET     /dev/dns/website/subdomain  dns.controllers.WebsiteController.subdomain
+GET     /dev/dns/website/location   dns.controllers.WebsiteController.location
+GET     /dev/dns/website/similar    dns.controllers.WebsiteController.similar
+GET     /dev/dns/malware    		dns.controllers.MalwareController.index
