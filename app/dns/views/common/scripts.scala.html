@@ -40,22 +40,27 @@
 <!-- Custom Theme Scripts -->
 <script src="/assets/build/js/custom.min.js"></script>
 
-    <!-- Custom Theme Scripts -->
-<script src="/assets/custom/js/custom.min.js"></script>
     <!-- Hight chart -->
 <script src="/assets/javascripts/highcharts.js"></script>
 <script src="/assets/javascripts/exporting.js"></script>
     <!-- Counter number -->
 
 <script src="/assets/javascripts/jquery.counterup.min.js"></script>
-<script type="text/javascript" src="/assets/javascripts/vis.min.js"></script>
+<script src="/assets/javascripts/vis.min.js" type="text/javascript"></script>
     <!-- HightChartMap -->
 <script src="/assets/javascripts/map.js"></script>
 <script src="/assets/javascripts/vn-all.js"></script>
 <script src="/assets/javascripts/waitMe.js"></script>
 
 <script type="text/javascript">
-	
+	// Hide .calendar.left and .calendar.right
+	$(document).ready(function () {
+         $('.calendar.left').hide();
+         $('.calendar.right').hide();
+         $('.ranges li:last-child' ).hide();
+         $('.range_inputs' ).hide();
+	});
+
 	function alert_input()
 	{
 

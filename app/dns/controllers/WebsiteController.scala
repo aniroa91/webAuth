@@ -8,6 +8,7 @@ import services.CacheService
 import controllers.Secured
 import java.text.NumberFormat
 import com.ftel.bigdata.utils.NumberUtil
+import dns.utils.DataSampleUtil
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -24,25 +25,7 @@ class WebsiteController @Inject()(cc: ControllerComponents) extends AbstractCont
   }
 
   def subdomain = Action {
-    val subdomain = Map(
-      "r1---sn-a5mekn7k.c.drive.google.com  " -> 8,
-      "www.nb0.923809482949.google.com      " -> 1,
-      "r2---sn-ogueln7r.c.docs.google.com   " -> 8,
-      "r3.sn-a5mekney.c.drive.google.com    " -> 4,
-      "code.l.google.com                    " -> 1056,
-      "mail-it0-f78.google.com              " -> 4,
-      "r3---sn-oguesn7d.c.mail.google.com   " -> 9,
-      "r6---sn-i3belnel.c.drive.google.com  " -> 913,
-      "google-proxy-66-249-82-124.google.com" -> 30,
-      "r1---sn-5hne6nsk.c.drive.google.com  " -> 1,
-      "r3.sn-npoeen76.c.drive.google.com    " -> 61,
-      "r13---sn-i3b7knez.c.drive.google.com " -> 21,
-      "voice-search.l.google.com            " -> 4519,
-      "r14---sn-a5m7ln7k.c.docs.google.com  " -> 2,
-      "r1---sn-4g5e6ney.c.docs.google.com   " -> 2,
-      "r2---sn-4g5e6n7k.c.drive.google.com  " -> 3,
-      "r6---sn-oguesnss.c.drive.google.com  " -> 13)
-    val array = subdomain.toArray.sortBy(x => x._2).reverse
+    val array = DataSampleUtil.getSubDomainSample().sortBy(x => x._2).reverse
     val sum = array.map(x => x._2).sum
     Ok(dns.views.html.website.subdomain(array, sum))
   }
@@ -119,7 +102,8 @@ Cần Thơ City 	Ninh Kiều District 	1,401.6 	1,188,435 	847.9 	65.9 	Mekong D
       .filter(x => !x.startsWith("#") && x != "")
        .map(x => x.split("\t"))
     def parse(s: String): Int = NumberFormat.getNumberInstance(java.util.Locale.US).parse(s).toString().toInt
-    Ok(dns.views.html.website.location(provinces.map(x => x(0) -> parse(x(3).trim())).sortBy(x => x._2).reverse))
+    val array = provinces.map(x => x(0) -> parse(x(3).trim())).sortBy(x => x._2).reverse
+    Ok(dns.views.html.website.location(array, array.map(x => x._2).sum))
   }
   
   def similar =  Action {
