@@ -1,6 +1,5 @@
 @(form: Form[SearchBras],email: String,time: String,lstbrasTimeCurrent: Seq[model.device.Bras],lstbrasTime: Seq[model.device.Bras],listCard: Seq[(String,String,String,Int,Int)],lstBrasChart: Seq[model.device.Bras])
 @import play.api.libs.json.Json
-@import services.domain.CommonService.formatYYYYmmddHHmmss
 <!DOCTYPE html>
 
 <html lang="en">
@@ -203,7 +202,7 @@
     <script type="text/javascript">
             $(document).ready(function () {
                 // Build the chart line day of month vector
-                var category = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t => formatYYYYmmddHHmmss(t.time.toString)})));
+                var category = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t => t.time.toString})));
                 var logoff = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t =>t.logoff})));
                 var signin = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t =>t.signin})));
                 var users = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t => t.active_user})));

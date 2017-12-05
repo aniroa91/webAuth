@@ -70,11 +70,14 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       var mapBras = collection.mutable.Map[String, Seq[(String,String,String,String)]]()
       val arrOutlier = lstBras.map(x => (x._1->x._2)).toList.distinct
       for(outlier <- arrOutlier){
+        val t= new DateTime().getMillis();
         val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
         val dateTime = DateTime.parse(outlier._2, formatter)
         val oldTime  = dateTime.minusMinutes(5).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
         val brasKey = Await.result(BrasService.opViewKibana(outlier._1,dateTime.toString,oldTime), Duration.Inf)
         mapBras += (outlier._1+"/"+outlier._2-> brasKey)
+        val tt = new DateTime().getMillis().toLong-t;
+        System.out.println("Time: "+tt/1000);
       }
       val arrLine = lstBras.map(x => (x._1, x._2) -> x._3).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
       val arrCard = lstBras.map(x => (x._1, x._2, x._3) -> x._4).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))

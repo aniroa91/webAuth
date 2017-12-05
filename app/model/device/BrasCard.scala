@@ -46,7 +46,7 @@ object BrasesCard {
 
   def listBrasById(id: String): Future[Seq[(String,String,String,String,String)]] = {
     val dt = new DateTime();
-    val aDayLater = dt.minusMinutes(60);
+    val aDayLater = dt.minusMinutes(200);
     val aDayTime = aDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""SELECT distinct tbC.bras_id,tbB.date_time,tbC.line_ol,tbC.card_ol,tbC.port_ol

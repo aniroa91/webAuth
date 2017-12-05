@@ -40,9 +40,10 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
     try {
       if (!formValidationResult.hasErrors) {
         domain = formValidationResult.get.q.trim()
-        if(month == ""){
-          val now = DateTime.now
-          strMonth = now.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
+        if(month == null || month ==""){
+          val now = new DateTime()
+          val lastMonth = now.minusMonths(1)
+          strMonth = lastMonth.toString(DateTimeFormat.forPattern("yyyy-MM"))
         }
         val response = ProfileService.get(domain,strMonth)
         Ok(views.html.profile.contract.index(form, response, domain+"&day="+strMonth,username,strMonth))
@@ -50,7 +51,7 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
         Ok(views.html.profile.contract.index(form, null, null,username,month))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.contract.index(form, null, domain+"&day="+month,username,month))
+      case e: Exception => Ok(views.html.profile.contract.index(form, null, domain+"&day="+strMonth,username,strMonth))
     }
   }
 }
