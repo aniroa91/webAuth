@@ -377,8 +377,8 @@ object ProfileService extends AbstractService {
     } else null
     
     val billRes = ESUtil.get(client, "user-bill-internet-"+month, "docs", contract)
-    val bill = if (billRes.exists) getValueAsDouble(billRes.source, "SoTien") else 0
-    
+    val bill = if (billRes.exists) getValueAsDouble(billRes.source, "BillFee") else 0
+
 //    val mac = internetInfo.macAddress.replace(":", "")
 //    val deviceRes = client.execute(getDevice(mac)).await
 //    
@@ -583,7 +583,7 @@ object ProfileService extends AbstractService {
           vod, vodthieunhi, vodgiaitri, formatArray(dailyBucket.map(x => x.key -> x.value)))
       }).toMap
 
-      val billRes = ESUtil.get(client, "user-bill-paytv-2017-09", "docs", contract)
+      val billRes = ESUtil.get(client, s"user-bill-paytv-$month", "docs", contract)
       val bill = if (billRes.exists) getValueAsDouble(billRes.source, "BillFee") else 0
 
       PayTVResponse(payTVContract, boxs, segments, vectors, bill)

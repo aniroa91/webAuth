@@ -44,7 +44,7 @@ class BrasDetailController @Inject() (protected val dbConfigProvider: DatabaseCo
 
   def index = withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
-    //try {
+    try {
       if (!formValidationResult.hasErrors) {
         val id = formValidationResult.get.id.trim()
         val time = formValidationResult.get.time.trim()
@@ -59,10 +59,10 @@ class BrasDetailController @Inject() (protected val dbConfigProvider: DatabaseCo
       } else {
         Ok(views.html.device.brasDetail(form, username,null,null,null,null,null))
       }
-    /*}
+    }
     catch{
       case e: Exception => Ok(views.html.device.brasDetail(form, username,null,null,null,null,null))
-    }*/
+    }
   }
 }
 
