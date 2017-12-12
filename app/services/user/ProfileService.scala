@@ -48,7 +48,7 @@ object ProfileService extends AbstractService {
   val SIZE_DEFAULT = 100
 
   private def getHourly(boxId: String,month:String): SearchDefinition = {
-    search(s"paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+    search(s"user-paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("hour")
       .subaggs(
@@ -56,7 +56,7 @@ object ProfileService extends AbstractService {
   }
 
   private def getHourlyInMonth(boxId: String,month:String): SearchDefinition = {
-    search(s"paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+    search(s"user-paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("hour")
       .subaggs(
@@ -72,7 +72,7 @@ object ProfileService extends AbstractService {
   }
 
   private def getDayOfWeek(boxId: String,month:String): SearchDefinition = {
-    search(s"paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+    search(s"user-paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("dayOfWeek")
       .subaggs(
@@ -80,24 +80,24 @@ object ProfileService extends AbstractService {
   }
 
   private def getIPTV(boxId: String,month:String): SearchDefinition = {
-    search(s"paytv-weekly-iptv-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+    search(s"user-paytv-weekly-iptv-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
-      .field("cate")
+      .field("cate.keyword")
       .subaggs(
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
 
   private def getAppHourly(boxId: String,month:String): SearchDefinition = {
-    search(s"paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
-      termsAggregation("top").field("app")
+    search(s"user-paytv-weekly-hourly-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+      termsAggregation("top").field("app.keyword")
       .subaggs(termsAggregation("sub").field("hour")
         .subaggs(sumAgg("sum", "value")) size SIZE_DEFAULT) size SIZE_DEFAULT) limit SIZE_DEFAULT
   }
 
   private def getAppDayOfWeek(boxId: String,month:String): SearchDefinition = {
-    search(s"paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+    search(s"user-paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
-      .field("app")
+      .field("app.keyword")
       .subaggs(
         termsAggregation("sub").field("dayOfWeek").subaggs(
           sumAgg("sum", "value")) size SIZE_DEFAULT) size SIZE_DEFAULT) limit (SIZE_DEFAULT * 10)
@@ -166,7 +166,7 @@ object ProfileService extends AbstractService {
 //    }
 
   private def getDaily(boxId: String): SearchDefinition = {
-    search(s"paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+    search(s"user-paytv-weekly-daily-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
       .field("day")
       .subaggs(
@@ -449,7 +449,7 @@ object ProfileService extends AbstractService {
           getValueAsString(x, "mac_address")))
 
       // Get Segment
-      println("Month:"+month)
+      //println("Month:"+month)
       val segments = boxs.map(x => x -> ESUtil.get(client, "user-segment-paytv-"+month, "docs", x.id))
         .map(x => {
             //println(x._2.source)
