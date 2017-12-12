@@ -51,7 +51,7 @@ object CategoryUtil {
     Business and Industry > E Commerce
     Business and Industry > Energy
     Business and Industry > Industrial Goods and Services
-    Business and Industry > Marketing and Advertising
+    #Business and Industry > Marketing and Advertising
     Business and Industry > Metals and Mining
     Business and Industry > Publishing and Printing
     Business and Industry > Real Estate
@@ -132,7 +132,7 @@ object CategoryUtil {
     Internet and Telecom > Email
     Internet and Telecom > File Sharing
     Internet and Telecom > Mobile Developers
-    Internet and Telecom > Online Marketing
+    #Internet and Telecom > Online Marketing
     Internet and Telecom > Search Engine
     Internet and Telecom > Social Network
     Internet and Telecom > Telecommunications
@@ -247,10 +247,13 @@ object CategoryUtil {
     Travel > Airlines and Airports
     Travel > Roads and Highways
     Travel > Tourism
-    Adult"""
+    Adult
+    Marketing and Advertising
+    Blog
+    """
 
   private val CATEGORY = CATEGORY_STRING.split("\n")
-    .filter(x => x != "")
+    .filter(x => x != "" && !x.startsWith("#"))
     .map(x => x.split(">"))
     .map(x => {
       if (x.length == 2) x(0).trim() -> x(1).trim() else x(0).trim() -> x(0).trim()
