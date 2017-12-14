@@ -1,200 +1,398 @@
 @(msg: String)
 <!-- jQuery -->
-<script src="/assets/vendors/jquery/dist/jquery.min.js"></script>
-<!-- Bootstrap -->
-<script src="/assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- FastClick -->
-<script src="/assets/vendors/fastclick/lib/fastclick.js"></script>
-<!-- NProgress -->
-<script src="/assets/vendors/nprogress/nprogress.js"></script>
-<!-- Chart.js -->
-<script src="/assets/vendors/Chart.js/dist/Chart.min.js"></script>
-<!-- gauge.js -->
-<script src="/assets/vendors/gauge.js/dist/gauge.min.js"></script>
-<!-- bootstrap-progressbar -->
-<script src="/assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-<!-- iCheck -->
-<script src="/assets/vendors/iCheck/icheck.min.js"></script>
-<!-- Skycons -->
-<script src="/assets/vendors/skycons/skycons.js"></script>
-<!-- Flot -->
-<script src="/assets/vendors/Flot/jquery.flot.js"></script>
-<script src="/assets/vendors/Flot/jquery.flot.pie.js"></script>
-<script src="/assets/vendors/Flot/jquery.flot.time.js"></script>
-<script src="/assets/vendors/Flot/jquery.flot.stack.js"></script>
-<script src="/assets/vendors/Flot/jquery.flot.resize.js"></script>
-<!-- Flot plugins -->
-<script src="/assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-<script src="/assets/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-<script src="/assets/vendors/flot.curvedlines/curvedLines.js"></script>
-<!-- DateJS -->
-<script src="/assets/vendors/DateJS/build/date.js"></script>
-<!-- JQVMap -->
-<script src="/assets/vendors/jqvmap/dist/jquery.vmap.js"></script>
-<script src="/assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-<script src="/assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
-<!-- bootstrap-daterangepicker -->
-<script src="/assets/vendors/moment/min/moment.min.js"></script>
-<script src="/assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+<script src="../../assets/vendors/jquery/dist/jquery.min.js"></script>
+	<!-- Bootstrap -->
+<script src="../../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+	<!-- NProgress -->
+<script src="../../assets/vendors/nprogress/nprogress.js"></script>
+	<!-- Chart.js -->
+<script src="../../assets/vendors/Chart.js/dist/Chart.min.js"></script>
+	<!-- Hight chart -->
+<script src="../../assets/javascripts/highcharts.js"></script>
+<script src="../../assets/javascripts/exporting.js"></script>
+	<!-- bootstrap-progressbar -->
+<script src="../../assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+	<!-- Flot -->
+<script src="../../assets/vendors/Flot/jquery.flot.js"></script>
+<script src="../../assets/vendors/Flot/jquery.flot.pie.js"></script>
+	<!-- DateJS -->
+<script src="../../assets/vendors/DateJS/build/date.js"></script>
+	<!-- bootstrap-daterangepicker -->
+<script src="../../assets/vendors/moment/min/moment.min.js"></script>
+<script src="../../assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
-<!-- Custom Theme Scripts -->
-<script src="/assets/build/js/custom.min.js"></script>
-
-    <!-- Hight chart -->
-<script src="/assets/javascripts/highcharts.js"></script>
-<script src="/assets/javascripts/exporting.js"></script>
-    <!-- Counter number -->
-
-<script src="/assets/javascripts/jquery.counterup.min.js"></script>
-<script src="/assets/javascripts/vis.min.js" type="text/javascript"></script>
-    <!-- HightChartMap -->
-<script src="/assets/javascripts/map.js"></script>
-<script src="/assets/javascripts/vn-all.js"></script>
-<script src="/assets/javascripts/waitMe.js"></script>
+	<!-- Custom Theme Scripts -->
+<script src="../../assets/build/js/custom.min.js"></script>
+<script src="../../assets/javascripts/jquery-ui.js"></script>
 
 <script type="text/javascript">
-	// Hide .calendar.left and .calendar.right
-	$(document).ready(function () {
-         $('.calendar.left').hide();
-         $('.calendar.right').hide();
-         $('.ranges li:last-child' ).hide();
-         $('.range_inputs' ).hide();
-	});
+		// Hide .calendar.left and .calendar.right
+		$(document).ready(function () {
+			// autocomplete
+			var listDomains = [
+			  "google.com","24h.com.vn","zing.vn","dantri.com.vn","similarweb.com","baomoi.com","vnexpress.net"
+			];
 
-	function alert_input()
-	{
+			$(".autocomplete").autocomplete({
+				source: listDomains,
+				select: function (event, ui) {
+					$('#dm0').val(ui.item.value);
+					$(this).addClass('hideCss');
+					$('#lbDomain0').text(ui.item.value);
+					$('#div-lb0').removeClass('hideCss');
+					$('#div-lb0').addClass('inlineCss');
+					$('#div-domain').append('<div><input type="text" id="dm1" class="form-control autocomplete" placeholder="Add domain to compare" style="margin-bottom: 5px">'+
+							'<div id="div-lb1" class="divLbCss hideCss">' +
+							'<label id="lbDomain1" style="float: left;"></label>' +
+							'<i class="fa fa-times" aria-hidden="true" style="float: right;cursor: pointer" onclick="removeDomain(this)"></i>' +
+							'</div></div>');
+					autocomple();
+				}
+			});
+			$('.calendar.left').hide();
+			$('.calendar.right').hide();
+			$('.ranges li:last-child' ).hide();
+			$('.range_inputs' ).hide();
 
-     	location.href = "/search?ct=" + $('#goValue').val();
-     	//alert();
-	}
+			Highcharts.chart('col-channel', {
 
-	Highcharts.mapChart('mapVn', {
-	    chart: {
-	        map: 'countries/vn/vn-all'
-	    },
+				chart: {
+					type: 'column'
+				},
 
-	    title: {
-	        text: ''
-	    },
-	    mapNavigation: {
-	        enabled: true,
-	        buttonOptions: {
-	            verticalAlign: 'bottom'
-	        }
-	    },
-	    plotOptions:{
-	        column: {
-	            colorByPoint: true
-	        }
-	    },
-	    colorAxis: {
+				title: {
+					text: ''
+				},
 
-	        dataClasses: [{
-	            from: 0,
-	            to: 100000,
-	            color: '#9B59B6',
-	            name: 'NOC'
-	        }/*, {
-	            from: 0,
-	            to: 100,
-	            color: '#E74C3C',
-	            name: 'INF'
-	        }*/]
-	    },
-	    legend: {
-	        align: 'right',
-	        verticalAlign: 'top',
-	        x: -30,
-	        y: 70,
-	        floating: true,
-	        layout: 'vertical',
-	        valueDecimals: 0,
-	    },
-	    series: [{
-	        data: [ ['KTM', 0],
-	            ['PTO', 1],
-	            ['KGG', 2],
-	            ['QBH', 3],
-	            ['SLA', -7]],
-	        name: 'Number of bras',
-	        states: {
-	            hover: {
-	                color: '#BADA55'
-	            }
-	        },
-	        dataLabels: {
+				xAxis: {
+					categories: ['Direct', 'Email','Social']
+				},
 
-	            enabled: true,
+				yAxis: {
+					allowDecimals: false,
+					min: 0,
+					title: {
+						text: 'Number of traffic'
+					}
+				},
+				colors: [
+					'#1ABB9C','#9B59B6'
+				],
+				tooltip: {
+					formatter: function () {
+						return '<b>' + this.x + '</b><br/>' +
+								this.series.name + ': ' + this.y + '<br/>'
+					}
+				},
 
-	            color: '#FFFFFF',
+				series: [{
+					name: '24h.com.vn',
+					data: [522, 322,1000]
+				}, {
+					name: 'google.com',
+					data: [344, 422,20]
+				}]
+			});
 
-	            format: '{point.code}'
+			Highcharts.chart('col-social', {
 
-	        },
-	        /*
-	        point: {
-	            events: {
+				chart: {
+					type: 'column'
+				},
 
-	                click: function () {
-	                    $('#hostBras').hide();
-	                    var name = this.name;
-	                    var key = JSON.stringify(this.options);
-	                    var code = key.substring(11,key.indexOf(',')-1);
-	                    $.ajax({
-	                        url: "/bras-json?id=" + code,
-	                        cache: false,
-	                        beforeSend: function () {
-	                            $('#mapVn').waitMe({
-	                                effect: 'roundBounce',
-	                                text: 'Please wait...',
-	                                bg: 'rgba(255,255,255,0.7)',
-	                                color: '#000',
-	                                textPos: 'vertical'
-	                            });
-	                            $('#bras').waitMe({
-	                                effect: 'roundBounce',
-	                                text: 'Please wait...',
-	                                bg: 'rgba(255,255,255,0.7)',
-	                                color: '#000',
-	                                textPos: 'vertical'
-	                            });
-	                            $('#tbBras').waitMe({
-	                                effect: 'roundBounce',
-	                                text: 'Please wait...',
-	                                bg: 'rgba(255,255,255,0.7)',
-	                                color: '#000',
-	                                textPos: 'vertical'
-	                            });
-	                        },
-	                        success: function (data) {
-	                            if(data != "error") {
-	                                $('#lbBras').text("List bras outlier: " + name);
-	                                $('#grapBras').show();
-	                                drawGraphBras(data, name);
-	                                var html = insertTbBras(data.mapBras);
-	                                $('#tbBras tbody').html('');
-	                                $('#tbBras tbody').append(html);
-	                            }
-	                        },
-	                        complete: function () {
-	                            $('#mapVn').waitMe("hide");
-	                            $('#bras').waitMe("hide");
-	                            $('#tbBras').waitMe("hide");
-	                            $('#line-chart').hide();
-	                        },
-	                    });
-	                }
-	            }
-	        },
-			*/
-	        name: 'Number Of Bras',
+				title: {
+					text: ''
+				},
 
-	        tooltip: {
+				xAxis: {
+					categories: ['Facebook', 'Youtube','Twitter','Other']
+				},
+				colors: [
+					'#1ABB9C','#9B59B6'
+				],
+				yAxis: {
+					allowDecimals: false,
+					min: 0,
+					title: {
+						text: 'Number of traffic'
+					}
+				},
 
-	            pointFormat:  '{point.name}: {point.value}'
+				tooltip: {
+					formatter: function () {
+						return '<b>' + this.x + '</b><br/>' +
+								this.series.name + ': ' + this.y + '<br/>'
+					}
+				},
 
-	        }
-	    }]
-	});
+				series: [{
+					name: '24h.com.vn',
+					data: [53, 22,30,10]
+				}, {
+					name: 'google.com',
+					data: [44, 22,20,60]
+				}]
+			});
+		});
+
+		Highcharts.chart('line-Monthly', {
+			chart: {
+				type: 'column'
+			},
+			title: {
+				text: ''
+			},
+			subtitle: {
+				text: ''
+			},
+			plotOptions: {
+				column: {
+					colorByPoint: true
+				}
+			},
+			colors: [
+				'#1ABB9C','#9B59B6'
+			],
+			xAxis: {
+				categories: ['06/2017','07/2017','08/2017','09/2017','10/2017','11/2017','12/2017']
+			},
+			yAxis: {
+				title: {
+					text: "Visits"
+				}
+
+			},
+			tooltip: {
+				crosshairs: true,
+				shared: true
+			},
+			plotOptions: {
+				spline: {
+					marker: {
+						radius: 4,
+						lineColor: '#666666',
+						lineWidth: 1
+					}
+				}
+			},
+			series: [{
+				type: 'spline',
+				name: '24h.com.vn',
+				data: [12,22,44,10,2,55,21]
+			},
+				{
+					type: 'spline',
+					name: 'google.com.vn',
+					data:  [312,22,144,410,222,525,121]
+				}]
+		});
+		Highcharts.chart('line-Duration', {
+			chart: {
+				type: 'column'
+			},
+			title: {
+				text: ''
+			},
+			subtitle: {
+				text: ''
+			},
+			plotOptions: {
+				column: {
+					colorByPoint: true
+				}
+			},
+			colors: [
+				'#1ABB9C','#9B59B6'
+			],
+			xAxis: {
+				categories: ['06/2017','07/2017','08/2017','09/2017','10/2017','11/2017','12/2017']
+			},
+			yAxis: {
+				title: {
+					text: "Duration"
+				}
+
+			},
+			tooltip: {
+				crosshairs: true,
+				shared: true
+			},
+			plotOptions: {
+				spline: {
+					marker: {
+						radius: 4,
+						lineColor: '#666666',
+						lineWidth: 1
+					}
+				}
+			},
+			series: [{
+				type: 'spline',
+				name: '24h.com.vn',
+				data: [12,22,44,120,22,55,221]
+			},
+				{
+					type: 'spline',
+					name: 'google.com.vn',
+					data:  [312,222,1244,410,222,5225,121]
+				}]
+		});
+		Highcharts.chart('line-Pages', {
+			chart: {
+				type: 'column'
+			},
+			title: {
+				text: ''
+			},
+			subtitle: {
+				text: ''
+			},
+			plotOptions: {
+				column: {
+					colorByPoint: true
+				}
+			},
+			colors: [
+				'#1ABB9C','#9B59B6'
+			],
+			xAxis: {
+				categories: ['06/2017','07/2017','08/2017','09/2017','10/2017','11/2017','12/2017']
+			},
+			yAxis: {
+				title: {
+					text: "Visits pages"
+				}
+
+			},
+			tooltip: {
+				crosshairs: true,
+				shared: true
+			},
+			plotOptions: {
+				spline: {
+					marker: {
+						radius: 4,
+						lineColor: '#666666',
+						lineWidth: 1
+					}
+				}
+			},
+			series: [{
+				type: 'spline',
+				name: '24h.com.vn',
+				data: [212,22,424,10,2,55,241]
+			},
+				{
+					type: 'spline',
+					name: 'google.com.vn',
+					data:  [12,22,44,410,222,525,121]
+				}]
+		});
+		Highcharts.chart('line-Bounce', {
+			chart: {
+				type: 'column'
+			},
+			title: {
+				text: ''
+			},
+			subtitle: {
+				text: ''
+			},
+			plotOptions: {
+				column: {
+					colorByPoint: true
+				}
+			},
+			colors: [
+				'#1ABB9C','#9B59B6'
+			],
+			xAxis: {
+				categories: ['06/2017','07/2017','08/2017','09/2017','10/2017','11/2017','12/2017']
+			},
+			yAxis: {
+				title: {
+					text: "Bounce rate"
+				}
+
+			},
+			tooltip: {
+				crosshairs: true,
+				shared: true
+			},
+			plotOptions: {
+				spline: {
+					marker: {
+						radius: 4,
+						lineColor: '#666666',
+						lineWidth: 1
+					}
+				}
+			},
+			series: [{
+				type: 'spline',
+				name: '24h.com.vn',
+				data: [112,822,44,120,22,55,21]
+			},
+				{
+					type: 'spline',
+					name: 'google.com.vn',
+					data:  [312,2222,144,410,2422,525,1221]
+				}]
+		});
+
+		function removeDomain(element){
+		    $(element).parent().remove();
+		}
+
+		function refreshDomain(){
+			var numDomain = $('#div-domain').find('input').length-1;
+			var vlDomain = $('#ipDomain').val();
+			for(var i=0;i<numDomain;i++){
+				vlDomain+= ',' + $('#dm'+i).val();
+			}
+			$('#ipDomain').val(vlDomain);
+			location.href = "/dev/dns/compare?domain=" + $('#ipDomain').val();
+		}
+
+		function autocomple(){
+			// autocomplete
+			var listDomains = [
+				"google.com","24h.com.vn","zing.vn","dantri.com.vn","similarweb.com","baomoi.com","vnexpress.net"
+			];
+
+			$(".autocomplete").autocomplete({
+				source: listDomains,
+				select: function (event, ui) {
+				    var numDomain = $('#div-domain').find('input').length-1;
+					var newDomain = $('#div-domain').find('input').length;
+					$('#dm'+numDomain).val(ui.item.value);
+					$(this).addClass('hideCss');
+					$('#lbDomain'+numDomain).text(ui.item.value);
+					$('#div-lb'+numDomain).removeClass('hideCss');
+					$('#div-lb'+numDomain).addClass('inlineCss');
+					$('#div-domain').append('<div><input type="text" id="dm'+newDomain+'" class="form-control autocomplete" placeholder="Add domain to compare" style="margin-bottom: 5px">'+
+					        '<div id="div-lb'+newDomain+'" class="hideCss divLbCss">' +
+							'<label id="lbDomain'+newDomain+'" style="float: left"></label>' +
+							'<i class="fa fa-times" aria-hidden="true" style="cursor: pointer;float: right;" onclick="removeDomain(this)"></i>' +
+							'</div></div>');
+					autocomple();
+				}
+			});
+		}
+
+		function submitCompare(){
+			var numDomain = $('#div-domain').find('input').length-1;
+			var vlDomain = $('#ipDomain').val();
+			for(var i=0;i<numDomain;i++){
+			    vlDomain+= ',' + $('#dm'+i).val();
+			}
+			$('#ipDomain').val(vlDomain);
+			location.href = "/dev/dns/compare?domain=" + $('#ipDomain').val();
+		}
+
+		function alert_input()
+		{
+			location.href = "/search?ct=" + $('#goValue').val();
+		}
 </script>
 

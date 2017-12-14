@@ -19,7 +19,11 @@
                 <div class="x_panel">
                   <div class="x_title">
                     <h2>@Html.apply(getImageTag2("google.com")) @Html.apply(getLinkTag("google.com"))</h2>
-                    
+                    <div class="compare-btn">
+                      <label class="btn btn-success" style="margin-left: 10px;" data-toggle="modal" data-target="#fr-compare">
+                         <i class="fa fa-bar-chart">&nbsp;&nbsp;</i><span style="color: white">Compare</span>
+                      </label>
+                    </div>
                     <div class="clearfix"></div>
 
                   </div>
@@ -401,7 +405,32 @@
           </div>
         </div>
         <!-- /page content -->
-
+        <!-- Modal -->
+      <div class="modal fade" id="fr-compare" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="width: 420px">
+          <div class="modal-content">
+            <div class="modal-body" style="text-align: center;">
+              <form id="frmDomain" class="form-vertical login-form" action="/dev/dns/compare" method="get">
+                <input type="hidden" id="ipDomain" value="google.com">
+              </form>
+              <h3 style="margin-bottom: 25px">Add / Remove Competitors</h3>
+              <div id="div-domain" style="overflow: auto;max-height:400px;padding:0px 30px 0px 30px">
+                <div>
+                  <input type="text" id="dm0" class="form-control autocomplete" placeholder="Add domain to compare" style="margin-bottom: 5px">
+                  <div id="div-lb0" class="divLbCss hideCss">
+                    <label id="lbDomain0" style="float: left;"></label>
+                    <i class="fa fa-times" aria-hidden="true" style="float: right;" onclick="removeDomain(this)"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary" onclick="submitCompare()">Update</button>
+            </div>
+          </div>
+        </div>
+      </div>
         <!-- footer content -->
         <footer>
           <div class="pull-right">

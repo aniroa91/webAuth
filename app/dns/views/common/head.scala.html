@@ -9,27 +9,79 @@
   <title>Website Analytic! | </title>
 
   <!-- Bootstrap -->
-  <link href="/assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome -->
-  <link href="/assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="../../assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
   <!-- NProgress -->
-  <link href="/assets/vendors/nprogress/nprogress.css" rel="stylesheet">
-  <!-- iCheck -->
-  <link href="/assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-
+  <link href="../../assets/vendors/nprogress/nprogress.css" rel="stylesheet">
   <!-- bootstrap-progressbar -->
-  <link href="/assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+  <link href="../../assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
   <!-- JQVMap -->
-  <link href="/assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+  <link href="../../assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
   <!-- bootstrap-daterangepicker -->
-  <link href="/assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
+  <link href="../../assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+  <link href="../../assets/custom/css/animate.min.css" rel="stylesheet">
   <!-- Custom Theme Style -->
-  <link href="/assets/build/css/custom.min.css" rel="stylesheet">
-
+  <link href="../../assets/build/css/custom.min.css" rel="stylesheet">
   <style>
     /* Hide Custom in DatePicker */
     .ranges li:last-child { display: none; }
+    .ui-autocomplete {
+      position: absolute;
+      z-index: 2000;
+      cursor: pointer;
+      max-height: 200px;
+      overflow: auto;
+      left:1440px;
+      padding: 0;
+      margin-top: 2px;
+      list-style: none;
+      background-color: #ffffff;
+      border: 1px solid #ccc
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    .ui-autocomplete > li {
+      padding: 3px 20px;
+    }
+    .ui-autocomplete > li.ui-state-focus {
+      background-color: #26B99A;
+      color: white;
+    }
+    .inlineCss{
+      width: 100%;
+      display: inline-block;
+    }
+    .hideCss{
+      display: none;
+    }
+    .divLbCss{
+      font-size: 16px;
+      padding: 0px 10px 0px 10px;
+      border-bottom: 1px solid #E6E9ED;
+    }
+    .iconDomain{
+      font-size: 18px;color: green;margin-right: 15px
+    }
+    .lbDomain{
+      font-size: 18px;color: green;margin-right: 15px;
+      background-color: #E6E9ED;
+      padding: 5px;
+    }
+    .iconRemove{
+      margin-left: 15px;
+      cursor: pointer;
+    }
+    .disInline{
+      width: 100%;
+      display: -webkit-inline-flex;
+      display: -ms-inline-flexbox;
+      display: inline-flex;
+    }
   </style>
 
   
