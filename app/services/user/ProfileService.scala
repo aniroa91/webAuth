@@ -64,9 +64,9 @@ object ProfileService extends AbstractService {
   }
 
   private def getApp(boxId: String,month:String): SearchDefinition = {
-    search(s"paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
+    search(s"user-paytv-weekly-daily-$month-*" / "docs") query { must(termQuery("customer", boxId)) } aggregations (
       termsAggregation("top")
-      .field("app")
+      .field("app.keyword")
       .subaggs(
         sumAgg("sum", "value")) size SIZE_DEFAULT)
   }
@@ -471,6 +471,7 @@ object ProfileService extends AbstractService {
         val hourly = getHourly(x,month)
         val hourlyInMonth = getHourlyInMonth(x,month)
         val app = getApp(x,month)
+        println(client.show(app))
         val dayOfWeek = getDayOfWeek(x,month)
         val iptv = getIPTV(x,month)
         val appHourly = getAppHourly(x,month)
@@ -635,7 +636,7 @@ object ProfileService extends AbstractService {
     //val map3 = mergeArrayMap(array)
     //map3.foreach(println)
     //val response = ProfileService.get("HUFD08955","")
-    val response = ProfileService.get("AGD000110", "2017-10")
+    val response = ProfileService.get("SGH210510", "2017-10")
     //val a = response.paytv.vectors.get("445814").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
@@ -656,6 +657,8 @@ object ProfileService extends AbstractService {
 //      println(x._1)
 //      x._2.foreach(println)
 //    })
+    
+    response.paytv.vectors.get("624956").get.app.foreach(println)
     println("BILL: " + response.internet.bill)
     val time1 = System.currentTimeMillis()
     println(time1 - time0)
