@@ -54,6 +54,11 @@ GET     /analytic                 controllers.AnalyticController.index
 GET     /paytv                    controllers.PaytvClientController.index
 GET     /profile                  controllers.ProfileContractController.index(day: String ?= "")
 
+### ADD MORE FEATURE FOR SERVICE INTERNAL
+GET     /search/compare             controllers.CompareController.index
+GET     /search/subdomain           controllers.SubdomainController.index
+
+
 ### DNS Service Public
 GET     /dev/dns/dashboard          dns.controllers.DashboardController.index
 GET     /dev/dns/category           dns.controllers.CategoryController.index
@@ -65,4 +70,5 @@ GET     /dev/dns/malware            dns.controllers.MalwareController.index
 GET     /dev/dns/malware/domain     dns.controllers.MalwareController.domain
 GET     /dev/dns/malware/virus      dns.controllers.MalwareController.virus
 GET     /dev/dns/report             dns.controllers.ReportController.index(day: String ?= "")
-GET     /dev/dns/compare            dns.controllers.CompareDomainController.index
+#GET     /dev/dns/compare            dns.controllers.CompareDomainController.index
+
