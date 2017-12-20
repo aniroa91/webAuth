@@ -17,7 +17,7 @@
        @views.html.common.css("Compare",0)
 
     </head>
-                @views.html.common.top("Search",0,"")
+                @views.html.common.top("Compare",0,"")
                     <!-- top navigation -->
                 <div class="top_nav">
                     <div class="nav_menu">
@@ -632,10 +632,6 @@
                     autocomple();
                 }
             });
-            $('.calendar.left').hide();
-            $('.calendar.right').hide();
-            $('.ranges li:last-child' ).hide();
-            $('.range_inputs' ).hide();
 
            /* var ranking = Html(Json.stringify(Json.toJson(responses.map(x => x._1 -> Array(x._2.current.rankAlexa, x._2.current.rankFtel)).toArray)));
             Highcharts.chart('col-ranking', {
@@ -673,7 +669,7 @@
                 series: getColumnJsonSeries(ranking)
             });
 */
-            Highcharts.chart('col-social', {
+            /*Highcharts.chart('col-social', {
 
                 chart: {
                     type: 'column'
@@ -686,9 +682,9 @@
                 xAxis: {
                     categories: ['Facebook', 'Youtube','Twitter','Other']
                 },
-              /*  colors: [
+              /!*  colors: [
                     '#1ABB9C','#9B59B6'
-                ],*/
+                ],*!/
                 yAxis: {
                     allowDecimals: false,
                     min: 0,
@@ -711,7 +707,7 @@
                     name: 'google.com',
                     data: [44, 22,20,60]
                 }]
-            });
+            });*/
         });
 
         var categories = @Html(Json.stringify(Json.toJson(responses.head._2.history.map(x => x.day))));
