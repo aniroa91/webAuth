@@ -55,9 +55,9 @@
                                         <i class="fa fa-bar-chart">&nbsp;&nbsp;</i><span style="color: white">Compare</span>
                                     </label>
                                 </div>
-                            <div style="padding:5px 0px 0px 20px">
+                            <div id="lbDomain" style="padding:5px 0px 0px 20px">
                             @for(d <- responses) {
-                                <span class="lbDomain"><i class="fa fa-twitter"></i> @d._1 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshDomain()"></i></span>
+                                <span class="lbDomain"><i class="fa fa-twitter"></i><input type="hidden" value="@d._1"> @d._1 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshDomain(this)"></i></span>
                             }
                                 <!--
                                 <span class="lbDomain"><i class="fa fa-twitter"></i> 24h.com.vn <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshDomain()"></i></span>
@@ -928,14 +928,15 @@
             $(element).parent().remove();
         }
 
-        function refreshDomain(){
-            var numDomain = $('#div-domain').find('input').length-1;
-            var vlDomain = $('#ipDomain').val();
-            for(var i=0;i<numDomain;i++){
-                vlDomain+= ',' + $('#dm'+i).val();
-            }
-            $('#ipDomain').val(vlDomain);
-            location.href = "/dev/dns/compare?domain=" + $('#ipDomain').val();
+        function refreshDomain(element){
+            $(element).parent().remove();
+            var isDot = "";
+            var vlDomain="";
+            $('#lbDomain').find('input').each(function(){
+                vlDomain+=","+this.value;
+            });
+
+            location.href = "/search/compare?domains=" + vlDomain;
         }
 
         function autocomple(){
@@ -965,13 +966,16 @@
         }
 
         function submitCompare(){
-            var numDomain = $('#div-domain').find('input').length-1;
-            var vlDomain = $('#ipDomain').val();
+            var numDomain = $('#div-domain').find('input').length;
+            var url = window.location.href;
+            var vlDomain = url.substring(url.indexOf("=")+1);
+            var isDot = "";
             for(var i=0;i<numDomain;i++){
-                vlDomain+= ',' + $('#dm'+i).val();
+                if(vlDomain != "" || i>0) isDot=",";
+                vlDomain+= isDot + $('#dm'+i).val();
             }
             $('#ipDomain').val(vlDomain);
-            location.href = "/search/compare?domain=" + $('#ipDomain').val();
+            location.href = "/search/compare?domains=" + vlDomain;
         }
 
         function alert_input()
@@ -1044,7 +1048,7 @@
                 vlDomain+= ',' + $('#dm'+i).val();
             }
             $('#ipDomain').val(vlDomain);
-            location.href = "/dev/dns/compare?domain=" + $('#ipDomain').val();
+            location.href = "/search/compare?domain=" + $('#ipDomain').val();
         }
 
         function autocomple(){
@@ -1074,10 +1078,12 @@
         }
 
         function submitCompare(){
-            var numDomain = $('#div-domain').find('input').length-1;
+            var numDomain = $('#div-domain').find('input').length;
             var vlDomain = $('#ipDomain').val();
+            var isDot = "";
             for(var i=0;i<numDomain;i++){
-                vlDomain+= ',' + $('#dm'+i).val();
+                if(vlDomain != "" || i>0) isDot=",";
+                vlDomain+= isDot + $('#dm'+i).val();
             }
             $('#ipDomain').val(vlDomain);
             location.href = "/search/compare?domains=" + $('#ipDomain').val();
