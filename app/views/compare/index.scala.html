@@ -1,4 +1,4 @@
-@(responses: Map[String, model.ProfileResponse])
+@(responses: Map[String, model.ProfileResponse], dailyCate: Array[String], dailyQueries: Array[(String, Array[Long])], dailyClients: Array[(String, Array[Long])])
 @import services.domain.CommonService.formatNumber
 @import play.api.libs.json.Json
 @import services.domain.CommonService.getImageTag
@@ -713,9 +713,9 @@
             });*/
         });
 
-        var categories = @Html(Json.stringify(Json.toJson(responses.head._2.history.map(x => x.day))));
-        var queries = @Html(Json.stringify(Json.toJson(responses.map(x => x._1 -> x._2.history.map(y => y.queries)).toArray)));
-        var clients = @Html(Json.stringify(Json.toJson(responses.map(x => x._1 -> x._2.history.map(y => y.clients)).toArray)));
+        var categories = @Html(Json.stringify(Json.toJson(dailyCate)));
+        var queries = @Html(Json.stringify(Json.toJson(dailyQueries)));
+        var clients = @Html(Json.stringify(Json.toJson(dailyClients)));
         //var domains = @@Html(Json.stringify(Json.toJson(responses.map(x => x._1 -> x._2.history.map(y => y.domains)).toArray)));
 
         //alert(queries.length);
