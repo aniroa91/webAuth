@@ -1,0 +1,856 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>controllers - controllers</title>
+          <meta name="description" content="controllers - controllers" />
+          <meta name="keywords" content="controllers controllers" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'controllers.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../lib/package_big.png" />
+        
+        <h1>controllers</h1><span class="permalink">
+      <a href="../index.html#controllers.package" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">controllers</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="controllers.AnalyticController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AnalyticControllerextendsAbstractController"></a>
+      <a id="AnalyticController:AnalyticController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AnalyticController.html"><span class="name">AnalyticController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@AnalyticControllerextendsAbstractController" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.BrasController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="BrasControllerextendsAbstractControllerwithSecured"></a>
+      <a id="BrasController:BrasController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BrasController.html"><span class="name">BrasController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@BrasControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.BrasDetailController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="BrasDetailControllerextendsAbstractControllerwithHasDatabaseConfigProvider[slick.jdbc.JdbcProfile]withSecured"></a>
+      <a id="BrasDetailController:BrasDetailController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BrasDetailController.html"><span class="name">BrasDetailController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <span class="extype" name="play.api.db.slick.HasDatabaseConfigProvider">HasDatabaseConfigProvider</span>[<span class="extype" name="slick.jdbc.JdbcProfile">JdbcProfile</span>] with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@BrasDetailControllerextendsAbstractControllerwithHasDatabaseConfigProvider[slick.jdbc.JdbcProfile]withSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.ClientController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ClientControllerextendsAbstractControllerwithI18nSupport"></a>
+      <a id="ClientController:ClientController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ClientController.html"><span class="name">ClientController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <span class="extype" name="play.api.i18n.I18nSupport">I18nSupport</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ClientControllerextendsAbstractControllerwithI18nSupport" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.CompareController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CompareControllerextendsAbstractControllerwithSecured"></a>
+      <a id="CompareController:CompareController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CompareController.html"><span class="name">CompareController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@CompareControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.DashboardController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DashboardControllerextendsAbstractControllerwithSecured"></a>
+      <a id="DashboardController:DashboardController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DashboardController.html"><span class="name">DashboardController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@DashboardControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.DemoController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DemoControllerextendsAbstractControllerwithSecured"></a>
+      <a id="DemoController:DemoController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DemoController.html"><span class="name">DemoController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@DemoControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.DeviceController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DeviceControllerextendsAbstractControllerwithSecured"></a>
+      <a id="DeviceController:DeviceController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DeviceController.html"><span class="name">DeviceController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@DeviceControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.DnsController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DnsControllerextendsAbstractControllerwithHasDatabaseConfigProvider[slick.jdbc.JdbcProfile]withI18nSupport"></a>
+      <a id="DnsController:DnsController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DnsController.html"><span class="name">DnsController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <span class="extype" name="play.api.db.slick.HasDatabaseConfigProvider">HasDatabaseConfigProvider</span>[<span class="extype" name="slick.jdbc.JdbcProfile">JdbcProfile</span>] with <span class="extype" name="play.api.i18n.I18nSupport">I18nSupport</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@DnsControllerextendsAbstractControllerwithHasDatabaseConfigProvider[slick.jdbc.JdbcProfile]withI18nSupport" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.LoginController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LoginControllerextendsAbstractController"></a>
+      <a id="LoginController:LoginController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="LoginController.html"><span class="name">LoginController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@LoginControllerextendsAbstractController" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.PaytvClientController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PaytvClientControllerextendsAbstractControllerwithSecured"></a>
+      <a id="PaytvClientController:PaytvClientController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PaytvClientController.html"><span class="name">PaytvClientController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@PaytvClientControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.ProfileContractController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ProfileContractControllerextendsAbstractControllerwithHasDatabaseConfigProvider[slick.jdbc.JdbcProfile]withSecured"></a>
+      <a id="ProfileContractController:ProfileContractController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ProfileContractController.html"><span class="name">ProfileContractController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <span class="extype" name="play.api.db.slick.HasDatabaseConfigProvider">HasDatabaseConfigProvider</span>[<span class="extype" name="slick.jdbc.JdbcProfile">JdbcProfile</span>] with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ProfileContractControllerextendsAbstractControllerwithHasDatabaseConfigProvider[slick.jdbc.JdbcProfile]withSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.ProfileController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ProfileControllerextendsAbstractControllerwithHasDatabaseConfigProvider[slick.jdbc.JdbcProfile]withSecured"></a>
+      <a id="ProfileController:ProfileController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ProfileController.html"><span class="name">ProfileController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <span class="extype" name="play.api.db.slick.HasDatabaseConfigProvider">HasDatabaseConfigProvider</span>[<span class="extype" name="slick.jdbc.JdbcProfile">JdbcProfile</span>] with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ProfileControllerextendsAbstractControllerwithHasDatabaseConfigProvider[slick.jdbc.JdbcProfile]withSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.RankController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RankControllerextendsAbstractControllerwithSecured"></a>
+      <a id="RankController:RankController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RankController.html"><span class="name">RankController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@RankControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.ReportController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ReportControllerextendsAbstractControllerwithSecured"></a>
+      <a id="ReportController:ReportController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReportController.html"><span class="name">ReportController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReportControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.ReverseAnalyticController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseAnalyticControllerextendsAnyRef"></a>
+      <a id="ReverseAnalyticController:ReverseAnalyticController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseAnalyticController.html"><span class="name">ReverseAnalyticController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseAnalyticControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseAssets" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseAssetsextendsAnyRef"></a>
+      <a id="ReverseAssets:ReverseAssets"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseAssets.html"><span class="name">ReverseAssets</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseAssetsextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseBrasController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseBrasControllerextendsAnyRef"></a>
+      <a id="ReverseBrasController:ReverseBrasController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseBrasController.html"><span class="name">ReverseBrasController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseBrasControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseBrasDetailController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseBrasDetailControllerextendsAnyRef"></a>
+      <a id="ReverseBrasDetailController:ReverseBrasDetailController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseBrasDetailController.html"><span class="name">ReverseBrasDetailController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseBrasDetailControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseClientController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseClientControllerextendsAnyRef"></a>
+      <a id="ReverseClientController:ReverseClientController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseClientController.html"><span class="name">ReverseClientController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseClientControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseCompareController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseCompareControllerextendsAnyRef"></a>
+      <a id="ReverseCompareController:ReverseCompareController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseCompareController.html"><span class="name">ReverseCompareController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseCompareControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseDashboardController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseDashboardControllerextendsAnyRef"></a>
+      <a id="ReverseDashboardController:ReverseDashboardController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseDashboardController.html"><span class="name">ReverseDashboardController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseDashboardControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseDemoController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseDemoControllerextendsAnyRef"></a>
+      <a id="ReverseDemoController:ReverseDemoController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseDemoController.html"><span class="name">ReverseDemoController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseDemoControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseDeviceController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseDeviceControllerextendsAnyRef"></a>
+      <a id="ReverseDeviceController:ReverseDeviceController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseDeviceController.html"><span class="name">ReverseDeviceController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseDeviceControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseDnsController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseDnsControllerextendsAnyRef"></a>
+      <a id="ReverseDnsController:ReverseDnsController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseDnsController.html"><span class="name">ReverseDnsController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseDnsControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseLoginController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseLoginControllerextendsAnyRef"></a>
+      <a id="ReverseLoginController:ReverseLoginController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseLoginController.html"><span class="name">ReverseLoginController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseLoginControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReversePaytvClientController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReversePaytvClientControllerextendsAnyRef"></a>
+      <a id="ReversePaytvClientController:ReversePaytvClientController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReversePaytvClientController.html"><span class="name">ReversePaytvClientController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReversePaytvClientControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseProfileContractController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseProfileContractControllerextendsAnyRef"></a>
+      <a id="ReverseProfileContractController:ReverseProfileContractController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseProfileContractController.html"><span class="name">ReverseProfileContractController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseProfileContractControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseProfileController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseProfileControllerextendsAnyRef"></a>
+      <a id="ReverseProfileController:ReverseProfileController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseProfileController.html"><span class="name">ReverseProfileController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseProfileControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseRankController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseRankControllerextendsAnyRef"></a>
+      <a id="ReverseRankController:ReverseRankController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseRankController.html"><span class="name">ReverseRankController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseRankControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseReportController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseReportControllerextendsAnyRef"></a>
+      <a id="ReverseReportController:ReverseReportController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseReportController.html"><span class="name">ReverseReportController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseReportControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.ReverseSubdomainController" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ReverseSubdomainControllerextendsAnyRef"></a>
+      <a id="ReverseSubdomainController:ReverseSubdomainController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ReverseSubdomainController.html"><span class="name">ReverseSubdomainController</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@ReverseSubdomainControllerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.SearchBras" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SearchBrasextendsProductwithSerializable"></a>
+      <a id="SearchBras:SearchBras"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SearchBras.html"><span class="name">SearchBras</span></a><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="time">time: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="sigin">sigin: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="logoff">logoff: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="timeCurrent">timeCurrent: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@SearchBrasextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p>
+    </li><li name="controllers.SearchContract" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SearchContractextendsProductwithSerializable"></a>
+      <a id="SearchContract:SearchContract"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SearchContract.html"><span class="name">SearchContract</span></a><span class="params">(<span name="q">q: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@SearchContractextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.SearchData" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SearchDataextendsProductwithSerializable"></a>
+      <a id="SearchData:SearchData"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SearchData.html"><span class="name">SearchData</span></a><span class="params">(<span name="q">q: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@SearchDataextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p>
+    </li><li name="controllers.Secured" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SecuredextendsAnyRef"></a>
+      <a id="Secured:Secured"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Secured.html"><span class="name">Secured</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@SecuredextendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="controllers.SubdomainController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SubdomainControllerextendsAbstractControllerwithSecured"></a>
+      <a id="SubdomainController:SubdomainController"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SubdomainController.html"><span class="name">SubdomainController</span></a><span class="result"> extends <span class="extype" name="play.api.mvc.AbstractController">AbstractController</span> with <a href="Secured.html" class="extype" name="controllers.Secured">Secured</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@SubdomainControllerextendsAbstractControllerwithSecured" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.</p><div class="fullcomment"><div class="comment cmt"><p>This controller creates an <code>Action</code> to handle HTTP requests to the
+application's home page.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@Singleton</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="controllers.routes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="routesextendsObject"></a>
+      <a id="routes:routes"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="routes.html"><span class="name">routes</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@routesextendsObject" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="controllers.javascript" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="javascript"></a>
+      <a id="javascript:javascript"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="javascript/package.html"><span class="name">javascript</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#controllers.package@javascript" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

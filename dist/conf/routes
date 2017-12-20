@@ -1,0 +1,74 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# An example controller showing a sample home page
+#GET     /                           controllers.HomeController.index
+# An example controller showing how to use dependency injection
+#GET     /count                      controllers.CountController.count
+# An example controller showing how to write asynchronous code
+#GET     /message                    controllers.AsyncController.message
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+# Static resources (not managed by the Play framework)
+#GET     /extassets/*file            controllers.Assets.versioned(path="/home/dungvc/Desktop", file: Asset)
+
+#######################################################################
+# Domain Service
+#GET     /domain/detail/:domain      controllers.DnsController.getDomainDetail(domain: String)
+#GET     /search2/:domain            controllers.DnsController.index(domain)
+#GET     /search                     controllers.DnsController.search
+
+GET     /extassets/*file            controllers.DnsController.getImage(file: String)
+#GET     /formview                       controllers.DnsController.formview
+
+#GET     /malware                     controllers.MalwareController.index
+
+#######################################################################
+GET      /                        controllers.LoginController.index
+GET      /host-json              controllers.DeviceController.getHostJson(id: String ?= "")
+GET      /bras-json              controllers.DeviceController.getBrasJson(id: String ?= "")
+GET      /confirmLabel          controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
+GET      /rejectLabel          controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
+GET      /login                   controllers.LoginController.login
+GET      /logout                   controllers.LoginController.logout
+GET      /dns                     controllers.DashboardController.index
+GET      /demo                     controllers.DemoController.index
+GET      /msg                     controllers.DemoController.message
+GET      /device                   controllers.DeviceController.index
+GET      /bras                     controllers.BrasController.index
+GET      /brasInfo                 controllers.BrasDetailController.index
+GET      /msg2                    controllers.DemoController.message2
+GET      /msgHistory              controllers.DemoController.history
+GET      /device                     controllers.DeviceController.index
+GET     /search                   controllers.ProfileController.index
+GET     /rank                     controllers.RankController.index
+GET     /report                   controllers.ReportController.index(day: String ?= "")
+GET     /client                   controllers.ClientController.index
+GET     /history                  controllers.ClientController.history(ip: String ?= "", offset: Int ?= 0)
+GET     /refresh                  controllers.DnsController.refresh
+GET     /analytic                 controllers.AnalyticController.index
+#GET     /report/:day              controllers.DnsController.reportBody(day: String)
+#GET     /ace/tables                 controllers.ACEController.tables
+GET     /paytv                    controllers.PaytvClientController.index
+GET     /profile                  controllers.ProfileContractController.index(day: String ?= "")
+
+### ADD MORE FEATURE FOR SERVICE INTERNAL
+GET     /search/compare             controllers.CompareController.index(domains: String ?= "")
+GET     /search/subdomain           controllers.SubdomainController.index(domain: String ?= "")
+
+
+### DNS Service Public
+GET     /dev/dns/dashboard          dns.controllers.DashboardController.index
+GET     /dev/dns/category           dns.controllers.CategoryController.index
+GET     /dev/dns/website            dns.controllers.WebsiteController.index
+GET     /dev/dns/website/subdomain  dns.controllers.WebsiteController.subdomain
+GET     /dev/dns/website/location   dns.controllers.WebsiteController.location
+GET     /dev/dns/website/similar    dns.controllers.WebsiteController.similar
+GET     /dev/dns/malware            dns.controllers.MalwareController.index
+GET     /dev/dns/malware/domain     dns.controllers.MalwareController.domain
+GET     /dev/dns/malware/virus      dns.controllers.MalwareController.virus
+GET     /dev/dns/report             dns.controllers.ReportController.index(day: String ?= "")
+#GET     /dev/dns/compare            dns.controllers.CompareDomainController.index
+
