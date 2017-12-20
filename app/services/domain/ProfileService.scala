@@ -70,12 +70,13 @@ object ProfileService extends AbstractService {
       val answers = null//answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
       val time5 = System.currentTimeMillis()
       //val hourly = Array[(Int, Long)]() //getHourly(domain, current)
-      val hourly = hourlyResponse.hits.hits.map(x => {
+      val hourlyMap = hourlyResponse.hits.hits.map(x => {
         val map = x.sourceAsMap
         val hour = map.getOrElse("hour", "0").toString.toInt
         val queries = map.getOrElse("queries", "0").toString.toLong
         hour -> queries
-      }).sorted
+      }).sorted.toMap
+      val hourly = (0 until 24).toArray.map(x => x -> hourlyMap.getOrElse(x, 0L)).sorted
       //hourly.foreach(println)
       val time6 = System.currentTimeMillis()
       val category = CommonService.getCategory(domain)

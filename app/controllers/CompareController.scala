@@ -20,6 +20,11 @@ class CompareController @Inject()(cc: ControllerComponents) extends AbstractCont
 //    Ok(views.html.compare.index())
 //    Ok(domains)
     val responses = domains.split(",").map(x => x -> CacheService.getDomain(x)._1).toMap
+    
+//    responses.foreach(x => {
+//      println(x._1)
+//      println(x._2.hourly.map(y => y._1 + ":" + y._2).mkString("\t"))
+//    })
     Ok(views.html.compare.index(responses.filter(x => x._2 != null)))
   }
 

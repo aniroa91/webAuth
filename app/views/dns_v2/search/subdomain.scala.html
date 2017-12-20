@@ -61,7 +61,7 @@
                                   </div>
                                   <div class="x_content">
                                     <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
-                                      @views.html.compare.table(Array("Domain", "Percent Traffic"), response.subdomain.slice(0,10), response.subdomain.map(x=>x._2).sum)
+                                      @views.html.compare.table(Array("Domain", "Percent Traffic"), response.subdomain, response.subdomain.map(x=>x._2).sum)
                                     </div>
                                   </div>
                                 </div>

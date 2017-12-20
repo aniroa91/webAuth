@@ -1,6 +1,9 @@
 @(responses: Map[String, model.ProfileResponse])
 @import services.domain.CommonService.formatNumber
 @import play.api.libs.json.Json
+@import services.domain.CommonService.getImageTag
+@import services.domain.CommonService.getImageTag2
+@import services.domain.CommonService.getLinkTag
 
 <!DOCTYPE html>
 
@@ -57,7 +60,7 @@
                                 </div>
                             <div id="lbDomain" style="padding:5px 0px 0px 20px">
                             @for(d <- responses) {
-                                <span class="lbDomain"><i class="fa fa-twitter"></i><input type="hidden" value="@d._1"> @d._1 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshDomain(this)"></i></span>
+                                <span class="lbDomain"><input type="hidden" value="@d._1">@Html.apply(getImageTag2(d._1)) @Html.apply(getLinkTag(d._1))<i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshDomain(this)"></i></span>
                             }
                                 <!--
                                 <span class="lbDomain"><i class="fa fa-twitter"></i> 24h.com.vn <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshDomain()"></i></span>
@@ -95,7 +98,7 @@
                             @for(d <- responses) {
                                 <div class="widget_summary" style="padding: 0px 30px 0px 30px;line-height: 2.5">
                                 <div class="w_left" style="width: 19%">
-                                    <span style="color: green">@d._1</span>
+                                    <span style="color: green">@Html.apply(getImageTag2(d._1)) @Html.apply(getLinkTag(d._1))</span>
                                 </div>
                                 <div style="width: 16%">
                                     <span>@formatNumber(d._2.current.queries)</span>
