@@ -112,7 +112,8 @@ object CacheService {
       latest = day
     }
     val res = if (domainCache.contains(domain)) {
-      domainCache.get(domain).get.updateCategory()
+      val response = domainCache.get(domain).get
+      if (response != null) response.updateCategory() else response
     } else {
       val response = ProfileService.get(domain)
       domainCache.put(domain, response)

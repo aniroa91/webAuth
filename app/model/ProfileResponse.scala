@@ -23,6 +23,13 @@ case class ProfileResponse (
     else this
   }
   
+  def getHistoryQuery(second: String): (String, Array[Long]) = {
+    
+    val res = second -> history.map(x => x.queries)
+    println(res)
+    res
+  }
+  
   def toJsonObject: JsonObject = ???
   /*
   def toJsonObject: JsonObject = if (current != null) {

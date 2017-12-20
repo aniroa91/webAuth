@@ -55,7 +55,7 @@ GET     /paytv                    controllers.PaytvClientController.index
 GET     /profile                  controllers.ProfileContractController.index(day: String ?= "")
 
 ### ADD MORE FEATURE FOR SERVICE INTERNAL
-GET     /search/compare             controllers.CompareController.index
+GET     /search/compare             controllers.CompareController.index(domains: String ?= "")
 GET     /search/subdomain           controllers.SubdomainController.index
 
 

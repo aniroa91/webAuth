@@ -16,8 +16,11 @@ import dns.utils.DataSampleUtil
 @Singleton
 class CompareController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured {
 
-  def index =  Action {
-    Ok(views.html.compare.index())
+  def index(domains: String) =  Action {
+//    Ok(views.html.compare.index())
+//    Ok(domains)
+    val responses = domains.split(",").map(x => x -> CacheService.getDomain(x)._1).toMap
+    Ok(views.html.compare.index(responses.filter(x => x._2 != null)))
   }
 
 }

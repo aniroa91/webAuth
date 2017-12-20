@@ -40,7 +40,7 @@ class ProfileController @Inject() (protected val dbConfigProvider: DatabaseConfi
         val second = DomainUtil.extract(domain).second
         val logo = CommonService.getLogo(second, false)
         val response = CacheService.getDomain(second)
-        Ok(views.html.dns_v2.search.index(form, second, response._1, logo,username))
+        Ok(views.html.dns_v2.search.index(form, second, response._1, logo, username))
       } else {
         Ok(views.html.dns_v2.search.index(form, null, null, null,username))
       }
