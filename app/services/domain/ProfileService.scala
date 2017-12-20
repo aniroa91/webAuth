@@ -41,7 +41,15 @@ object ProfileService extends AbstractService {
         search(s"dns-domain-${latestDay}" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } sortBy { fieldSort("queries") order SortOrder.DESC } limit 100,
         //aggregations (cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
         //search(("dns-service-domain-whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) },
-        search(s"dns-hourly-second-${latestDay}" / "docs") query {boolQuery().must(termQuery("name", domain))} size 24
+        search(s"dns-hourly-second-*" / "docs")
+          query {boolQuery().must(termQuery("name", domain))}
+          aggregations (
+            termsAggregation("term")
+              .field("hour")
+              .subaggs(
+                  avgAgg("avg", "queries")
+              ) size 240
+          ) size 240
         )).await
 
     val time1 = System.currentTimeMillis()
@@ -70,12 +78,16 @@ object ProfileService extends AbstractService {
       val answers = null//answerResponse.hits.hits.map(x => x.sourceAsMap.getOrElse("answer", "").toString()).filter(x => x != "")
       val time5 = System.currentTimeMillis()
       //val hourly = Array[(Int, Long)]() //getHourly(domain, current)
+      //hourlyResponse.aggregations.foreach(println)
+      /*
       val hourlyMap = hourlyResponse.hits.hits.map(x => {
         val map = x.sourceAsMap
         val hour = map.getOrElse("hour", "0").toString.toInt
         val queries = map.getOrElse("queries", "0").toString.toLong
         hour -> queries
       }).sorted.toMap
+      */
+      val hourlyMap = CommonService.getTerm(hourlyResponse, "term", "avg").map(x => x._1.toInt -> x._2).toMap
       val hourly = (0 until 24).toArray.map(x => x -> hourlyMap.getOrElse(x, 0L)).sorted
       //hourly.foreach(println)
       val time6 = System.currentTimeMillis()
