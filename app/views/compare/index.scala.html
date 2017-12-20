@@ -1,5 +1,5 @@
 @(responses: Map[String, model.ProfileResponse])
-
+@import services.domain.CommonService.formatNumber
 @import play.api.libs.json.Json
 
 <!DOCTYPE html>
@@ -100,10 +100,10 @@
                                     <span>@d._1</span>
                                 </div>
                                 <div style="width: 25%">
-                                    <span>@d._2.current.queries</span>
+                                    <span>@formatNumber(d._2.current.queries)</span>
                                 </div>
                                 <div style="width: 25%">
-                                    <span>@d._2.current.clients</span>
+                                    <span>@formatNumber(d._2.current.clients)</span>
                                 </div>
                                 <!--
                                 <div style="width: 14%">
@@ -117,7 +117,7 @@
                                 </div>
                                 -->
                                 <div class="w_right" style="width: 25%">
-                                    <span>@d._2.current.domains</span>
+                                    <span>@formatNumber(d._2.current.domains)</span>
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
@@ -609,7 +609,7 @@
         $(document).ready(function () {
             // autocomplete
             var listDomains = [
-              "google.com","24h.com.vn","zing.vn","dantri.com.vn","similarweb.com","baomoi.com","vnexpress.net"
+              "vtvgo.vn","cliptv.vn","vtv.vn","fim-live.com","kplus.vn","hplus.com.vn","htv.com.vn","pub.vn","mobitv.vn", "mobitv.com", "mobitv.net.vn"
             ];
 
             $(".autocomplete").autocomplete({
@@ -655,9 +655,10 @@
                         text: 'Number of traffic'
                     }
                 },
+                /*
                 colors: [
                     '#1ABB9C','#9B59B6'
-                ],
+                ],*/
                 tooltip: {
                     formatter: function () {
                         return '<b>' + this.x + '</b><br/>' +
@@ -734,9 +735,10 @@
                     colorByPoint: true
                 }
             },
+            /*
             colors: [
                 '#1ABB9C','#9B59B6'
-            ],
+            ],*/
             xAxis: {
                 categories: categories
             },
@@ -942,7 +944,7 @@
         function autocomple(){
             // autocomplete
             var listDomains = [
-                "google.com","24h.com.vn","zing.vn","dantri.com.vn","similarweb.com","baomoi.com","vnexpress.net"
+                "vtvgo.vn","cliptv.vn","vtv.vn","fim-live.com","kplus.vn","hplus.com.vn","htv.com.vn","pub.vn","mobitv.vn", "mobitv.com", "mobitv.net.vn"
             ];
 
             $(".autocomplete").autocomplete({
@@ -989,7 +991,7 @@
         $(document).ready(function () {
             // autocomplete
             var listDomains = [
-              "google.com","24h.com.vn","zing.vn","dantri.com.vn","similarweb.com","baomoi.com","vnexpress.net"
+              "vtvgo.vn","cliptv.vn","vtv.vn","fim-live.com","kplus.vn","hplus.com.vn","htv.com.vn","pub.vn","mobitv.vn", "mobitv.com", "mobitv.net.vn"
             ];
 
             $(".autocomplete").autocomplete({
@@ -1054,7 +1056,7 @@
         function autocomple(){
             // autocomplete
             var listDomains = [
-                "google.com","24h.com.vn","zing.vn","dantri.com.vn","similarweb.com","baomoi.com","vnexpress.net"
+                "vtvgo.vn","cliptv.vn","vtv.vn","fim-live.com","kplus.vn","hplus.com.vn","htv.com.vn","pub.vn","mobitv.vn", "mobitv.com", "mobitv.net.vn"
             ];
 
             $(".autocomplete").autocomplete({

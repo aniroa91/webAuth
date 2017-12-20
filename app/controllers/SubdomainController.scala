@@ -8,6 +8,9 @@ import services.CacheService
 import java.text.NumberFormat
 import com.ftel.bigdata.utils.NumberUtil
 import dns.utils.DataSampleUtil
+import com.ftel.bigdata.utils.DomainUtil
+import services.domain.CommonService
+import com.ftel.bigdata.utils.StringUtil
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -16,9 +19,16 @@ import dns.utils.DataSampleUtil
 @Singleton
 class SubdomainController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured {
 
-  def index =  withAuth { username => implicit request =>
-    Ok(views.html.dns_v2.search.subdomain(null, null, null, null, username))
+  def index(domain: String) =  withAuth { username => implicit request =>
+    if (StringUtil.isNullOrEmpty(domain)) {
+      Ok(views.html.dns_v2.search.subdomain(null, null, null, username))
+    } else {
+      val second = DomainUtil.extract(domain).second
+      val logo = CommonService.getLogo(second, false)
+      val response = CacheService.getDomain(second)
+      Ok(views.html.dns_v2.search.subdomain(domain, response._1, logo, username))
+    }
+    
   }
-
 }
 

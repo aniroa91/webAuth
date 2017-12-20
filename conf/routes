@@ -56,7 +56,7 @@ GET     /profile                  controllers.ProfileContractController.index(da
 
 ### ADD MORE FEATURE FOR SERVICE INTERNAL
 GET     /search/compare             controllers.CompareController.index(domains: String ?= "")
-GET     /search/subdomain           controllers.SubdomainController.index
+GET     /search/subdomain           controllers.SubdomainController.index(domain: String ?= "")
 
 
 ### DNS Service Public
