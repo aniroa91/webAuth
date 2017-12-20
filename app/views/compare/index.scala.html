@@ -76,33 +76,37 @@
                     <div class=" col-xs-12">
                         <div class="tile-stats">
                             <div class="count" style="font-size: 30px"> Overview <i class="fa fa-info-circle" style="font-size: 17px" title="The average engagement metrics are calculated for the selected time range."></i></div>
-                            <p style="padding:0px 30px 20px 20px">
-                                <!--<a>@@responses.head._2.current.day</a>--><!--<span style="color: green;margin-left: 10px">Worldwide</span>-->
-                            </p>
-
                             <div class="widget_summary" style="padding: 0px 30px 10px 30px">
-                                <div class="w_left" style="width: 25%;border-bottom: 1px solid #CCCCCC">
+                                <div class="w_left" style="width: 19%;border-bottom: 1px solid #CCCCCC">
                                     <span style="font-weight: 600;">Domain</span>
                                 </div>
-                                <div style="width: 25%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Query</div>
+                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Query</div>
                                 <!--
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC"></div>
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Visit/Unique Visitors</div>
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Avg. Visit Duration</div>
                                 -->
-                                <div style="width: 25%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Client</div>
-                                <div class="w_right" style="width: 25%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Num Of sub domain</div>
+                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Alaxa</div>
+                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">FPT Telecom</div>
+                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Client</div>
+                                <div style="width: 17%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Num of sub domain</div>
                                 <div class="clearfix"></div>
                             </div>
                             @for(d <- responses) {
-                                <div class="widget_summary" style="padding: 0px 30px 0px 30px">
-                                <div class="w_left" style="width: 25%">
-                                    <span>@d._1</span>
+                                <div class="widget_summary" style="padding: 0px 30px 0px 30px;line-height: 2.5">
+                                <div class="w_left" style="width: 19%">
+                                    <span style="color: green">@d._1</span>
                                 </div>
-                                <div style="width: 25%">
+                                <div style="width: 16%">
                                     <span>@formatNumber(d._2.current.queries)</span>
                                 </div>
-                                <div style="width: 25%">
+                                <div style="width: 16%">
+                                    <span>@formatNumber(d._2.current.rankAlexa)</span>
+                                </div>
+                                <div style="width: 16%">
+                                    <span>@formatNumber(d._2.current.rankFtel)</span>
+                                </div>
+                                <div style="width: 16%">
                                     <span>@formatNumber(d._2.current.clients)</span>
                                 </div>
                                 <!--
@@ -116,7 +120,7 @@
                                     <span>22</span>
                                 </div>
                                 -->
-                                <div class="w_right" style="width: 25%">
+                                <div style="width: 17%">
                                     <span>@formatNumber(d._2.current.domains)</span>
                                 </div>
                                 <div class="clearfix"></div>
@@ -174,7 +178,7 @@
                     </div>
 
 
-                    <div class="col-xs-12">
+                    @*<div class="col-xs-12">
                         <div class="x_panel tile">
                             <!--
                             <div class="x_title">
@@ -190,7 +194,7 @@
                                 <div id="col-ranking" style="height:250px;"></div>
                             </div>
                         </div>
-                    </div>
+                    </div>*@
                     <!--
                     <div class="col-xs-12">
                         <div class="x_panel tile">
@@ -633,7 +637,7 @@
             $('.ranges li:last-child' ).hide();
             $('.range_inputs' ).hide();
 
-            var ranking = @Html(Json.stringify(Json.toJson(responses.map(x => x._1 -> Array(x._2.current.rankAlexa, x._2.current.rankFtel)).toArray)));
+           /* var ranking = Html(Json.stringify(Json.toJson(responses.map(x => x._1 -> Array(x._2.current.rankAlexa, x._2.current.rankFtel)).toArray)));
             Highcharts.chart('col-ranking', {
 
                 chart: {
@@ -655,10 +659,10 @@
                         text: 'Number of traffic'
                     }
                 },
-                /*
+                /!*
                 colors: [
                     '#1ABB9C','#9B59B6'
-                ],*/
+                ],*!/
                 tooltip: {
                     formatter: function () {
                         return '<b>' + this.x + '</b><br/>' +
@@ -668,7 +672,7 @@
 
                 series: getColumnJsonSeries(ranking)
             });
-
+*/
             Highcharts.chart('col-social', {
 
                 chart: {
@@ -682,9 +686,9 @@
                 xAxis: {
                     categories: ['Facebook', 'Youtube','Twitter','Other']
                 },
-                colors: [
+              /*  colors: [
                     '#1ABB9C','#9B59B6'
-                ],
+                ],*/
                 yAxis: {
                     allowDecimals: false,
                     min: 0,
@@ -779,9 +783,9 @@
                     colorByPoint: true
                 }
             },
-            colors: [
+            /*colors: [
                 '#1ABB9C','#9B59B6'
-            ],
+            ],*/
             xAxis: {
                 categories: categories
             },
@@ -870,9 +874,9 @@
                     colorByPoint: true
                 }
             },
-            colors: [
+            /*colors: [
                 '#1ABB9C','#9B59B6'
-            ],
+            ],*/
             xAxis: {
                 categories: hourly
             },
