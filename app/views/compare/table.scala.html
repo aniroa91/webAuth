@@ -1,15 +1,16 @@
-@(headers: Array[String], array: Array[(String, Int)], sum: Int)
-
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th style="height: 10px; width: 5%">#</th>
-      @for(header <- headers) {
-        <th>@header</th>
-      }
-    </tr>
-  </thead>
-  <tbody>
+@(headers: Array[String], array: Array[(String, Int)], sum: Int,tp: String)
+@if(tp == "sub"){
+  <table class="table table-striped" id="tbSub">
+    <thead>
+      <tr>
+        <th style="height: 10px; width: 5%">#</th>
+        @for(header <- headers) {
+          <th>@header</th>
+        }
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
     @for(i <- 0 until array.size) {
       <tr>
         <th>@(i+1)</th>
@@ -17,11 +18,38 @@
         <td>
           <div class="progress" style="margin-bottom: 2px">
             <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                 style="width: @(array(i)._2 * 100 / sum)%;"></div>
+            style="width: @(array(i)._2 * 100 / sum)%;"></div>
           </div>
         </td>
         <td>@(array(i)._2 * 100 / sum)%</td>
       </tr>
     }
-  </tbody>
-</table>
+    </tbody>
+  </table>
+}else{
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th style="height: 10px; width: 5%">#</th>
+        @for(header <- headers) {
+          <th>@header</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+    @for(i <- 0 until array.size) {
+      <tr>
+        <th>@(i+1)</th>
+        <td style="width: 40%">@array(i)._1</td>
+        <td>
+          <div class="progress" style="margin-bottom: 2px">
+            <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+            style="width: @(array(i)._2 * 100 / sum)%;"></div>
+          </div>
+        </td>
+        <td>@(array(i)._2 * 100 / sum)%</td>
+      </tr>
+    }
+    </tbody>
+  </table>
+}

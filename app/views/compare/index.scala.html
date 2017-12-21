@@ -230,7 +230,7 @@
                       @for(d <- responses) {
                         <div class="col-lg-@{12 / responses.size} col-sm-@{12 / responses.size} col-md-@{12 / responses.size} col-xs-12">
                         <h2>@d._1</h2>
-                          @views.html.compare.table(Array("Domain", "Percent Traffic"), d._2.subdomain.slice(0,10), d._2.subdomain.map(x=>x._2).sum)
+                          @views.html.compare.table(Array("Domain", "Percent Traffic"), d._2.subdomain.slice(0,10), d._2.subdomain.map(x=>x._2).sum,"")
                         </div>
                       }
                       </div>
