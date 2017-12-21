@@ -83,14 +83,14 @@
                                 <div class="w_left" style="width: 19%;border-bottom: 1px solid #CCCCCC">
                                     <span style="font-weight: 600;">Domain</span>
                                 </div>
-                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Query</div>
+                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Alaxa</div>
                                 <!--
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC"></div>
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Visit/Unique Visitors</div>
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Avg. Visit Duration</div>
                                 -->
-                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Alaxa</div>
                                 <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">FPT Telecom</div>
+                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Query</div>
                                 <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Client</div>
                                 <div style="width: 17%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Num of sub domain</div>
                                 <div class="clearfix"></div>
@@ -101,13 +101,13 @@
                                     <span style="color: green">@Html.apply(getImageTag2(d._1)) @Html.apply(getLinkTag(d._1))</span>
                                 </div>
                                 <div style="width: 16%">
-                                    <span>@formatNumber(d._2.current.queries)</span>
-                                </div>
-                                <div style="width: 16%">
                                     <span>@formatNumber(d._2.current.rankAlexa)</span>
                                 </div>
                                 <div style="width: 16%">
                                     <span>@formatNumber(d._2.current.rankFtel)</span>
+                                </div>
+                                <div style="width: 16%">
+                                    <span>@formatNumber(d._2.current.queries)</span>
                                 </div>
                                 <div style="width: 16%">
                                     <span>@formatNumber(d._2.current.clients)</span>
