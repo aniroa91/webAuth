@@ -366,7 +366,7 @@ object CommonService extends AbstractService {
   }
   
   def getLinkTag(domain: String): String = {
-    "<a href=\"/search?ct=" + domain + "\" style = \" color:#1ABB9C;cursor: pointer;\">" + domain + "</a>"
+    "<a href=\"/search?ct=" + domain + "\" class=\"titDomain\">" + domain + "</a>"
   }
 
   /**

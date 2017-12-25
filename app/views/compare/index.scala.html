@@ -20,7 +20,7 @@
        @views.html.common.css("Compare",0)
 
     </head>
-                @views.html.common.top("Compare",0,"")
+                @views.html.common.top("Compare",0,responses.map(x=>x._1).mkString(","))
                     <!-- top navigation -->
                 <div class="top_nav">
                     <div class="nav_menu">
@@ -54,7 +54,7 @@
                     <div class="col-md-12">
                         <div class="x_panel disInline">
                                 <div class="compare-btn">
-                                    <label class="btn btn-success" style="margin-left: 10px;" data-toggle="modal" data-target="#fr-compare">
+                                    <label class="btn btn-success" style="margin-left: 10px;"  onclick="showModalCp()">
                                         <i class="fa fa-bar-chart">&nbsp;&nbsp;</i><span style="color: white">Compare</span>
                                     </label>
                                 </div>
@@ -77,28 +77,28 @@
 
                 <div class="row top_tiles">
                     <div class=" col-xs-12">
-                        <div class="tile-stats">
+                        <div class="tile-stats" id="tbContent" style="padding: 10px 0px 20px 0px">
                             <div class="count" style="font-size: 30px"> Overview <i class="fa fa-info-circle" style="font-size: 17px" title="The average engagement metrics are calculated for the selected time range."></i></div>
                             <div class="widget_summary" style="padding: 0px 30px 10px 30px">
-                                <div class="w_left" style="width: 19%;border-bottom: 1px solid #CCCCCC">
-                                    <span style="font-weight: 600;">Domain</span>
+                                <div class="w_left thCss" style="width: 19%">
+                                    <span>Domain</span>
                                 </div>
-                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Alaxa</div>
+                                <div class="thCss" style="width: 16%;">Alaxa</div>
                                 <!--
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC"></div>
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Visit/Unique Visitors</div>
                                 <div style="width: 14%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Avg. Visit Duration</div>
                                 -->
-                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">FPT Telecom</div>
-                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Query</div>
-                                <div style="width: 16%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Client</div>
-                                <div style="width: 17%;font-weight: 600;border-bottom: 1px solid #CCCCCC">Num of sub domain</div>
+                                <div style="width: 16%;" class="thCss">FPT Telecom</div>
+                                <div style="width: 16%;" class="thCss">Query</div>
+                                <div style="width: 16%;" class="thCss">Client</div>
+                                <div style="width: 17%;" class="thCss">Num of sub domain</div>
                                 <div class="clearfix"></div>
                             </div>
                             @for(d <- responses) {
-                                <div class="widget_summary" style="padding: 0px 30px 0px 30px;line-height: 2.5">
+                             <div class="widget_summary" style="font-size: 15px;padding: 0px 30px 0px 30px;line-height: 2.5">
                                 <div class="w_left" style="width: 19%">
-                                    <span style="color: green">@Html.apply(getImageTag2(d._1)) @Html.apply(getLinkTag(d._1))</span>
+                                    <span style="cursor: pointer;">@Html.apply(getImageTag2(d._1)) @Html.apply(getLinkTag(d._1))</span>
                                 </div>
                                 <div style="width: 16%">
                                     <span>@formatNumber(d._2.current.rankAlexa)</span>
@@ -137,8 +137,8 @@
                 <div class="row">
 
                     <div class="col-xs-12">
-                        <div class="x_panel tile fixed_height_320 overflow_hidden">
-                            <div>
+                        <div class="x_panel tile overflow_hidden">
+                            <div style="margin-bottom: 20px">
                                 <div class="tabbable-panel">
                                     <div class="tabbable-line">
                                         <ul class="nav nav-tabs ">
@@ -220,11 +220,11 @@
                 <div class="row">
                   <div class="col-md-12">
                     <div class="x_panel">
-
-                      <div class="x_content">
+                      <div id="divAll" class="x_content">
+                          <input type="hidden" value="@responses.size" id="numDomain"/>
                       @for(d <- responses) {
-                        <div class="col-lg-@{12 / responses.size} col-sm-@{12 / responses.size} col-md-@{12 / responses.size} col-xs-12">
-                        <h2 style="font-weight: 600;color: green">@d._1</h2>
+                        <div class="divCont col-lg-@{12 / responses.size} col-md-@{12 / responses.size} col-sm-12 col-xs-12">
+                        <h2 class="titDomain" style="font-weight: 600;color: green">@d._1</h2>
                           @views.html.compare.table(Array("Domain", "Percent Traffic"), d._2.subdomain.slice(0,10), d._2.subdomain.map(x=>x._2).sum,"")
                         </div>
                       }
@@ -563,38 +563,67 @@
             </div>
         </div>
     </div>
+
 }
-            <!-- /page content -->
-            <!-- Modal -->
-        <div class="modal fade" id="fr-compare" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document" style="width: 420px">
-                <div class="modal-content">
-                    <div class="modal-body" style="text-align: center;">
-                        <form id="frmDomain" class="form-vertical login-form" action="/dev/dns/compare" method="get">
-                            <input type="hidden" id="ipDomain">
-                        </form>
-                        <h3 style="margin-bottom: 25px">Add / Remove Competitors</h3>
-                        <div id="div-domain" style="overflow: auto;max-height:400px;padding:0px 30px 0px 30px">
-                            <div>
-                                <input type="text" id="dm0" class="form-control autocomplete" placeholder="Add domain to compare" style="margin-bottom: 5px">
-                                <div id="div-lb0" class="divLbCss hideCss">
-                                    <label id="lbDomain0" style="float: left;"></label>
-                                    <i class="fa fa-times" aria-hidden="true" style="cursor: pointer;float: right;" onclick="removeDomain(this)"></i>
-                                </div>
+        <!-- Modal -->
+    <div class="modal fade" id="fr-compare" tabindex="-1" role="dialog" data-keyboard="false"  data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="width: 435px">
+            <div class="modal-content">
+                <div class="modal-body" style="text-align: center;">
+                    <form id="frmDomain" class="form-vertical login-form" action="/dev/dns/compare" method="get">
+                        <input type="hidden" id="ipDomain">
+                    </form>
+                    <h3 style="margin-bottom: 25px">Add / Remove Competitors</h3>
+                    <div id="div-domain" style="overflow: auto;max-height:400px;padding:0px 30px 0px 30px">
+                        <div class="divInputCp">
+                            <div id="divIp_0" class="divIp hideCss">
+                                <input type="text" id="dm0" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
+                                <i class="fa fa-remove iCss" id="ic_0" onclick="removeDomain(this)"></i>
                             </div>
+                            <div id="lbCp_0" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                        </div>
+                        <div class="divInputCp">
+                            <div id="divIp_1" class="divIp hideCss">
+                                <input type="text" id="dm1" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
+                                <i class="fa fa-remove iCss" id="ic_1" onclick="removeDomain(this)"></i>
+                            </div>
+                            <div id="lbCp_1" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                        </div>
+                        <div class="divInputCp">
+                            <div id="divIp_2" class="divIp hideCss">
+                                <input type="text" id="dm2" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
+                                <i class="fa fa-remove iCss" id="ic_2" onclick="removeDomain(this)"></i>
+                            </div>
+                            <div id="lbCp_2" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                        </div>
+                        <div class="divInputCp">
+                            <div id="divIp_3" class="divIp hideCss">
+                                <input type="text" id="dm3" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
+                                <i class="fa fa-remove iCss" id="ic_3" onclick="removeDomain(this)"></i>
+                            </div>
+                            <div id="lbCp_3" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                        </div>
+                        <div class="divInputCp">
+                            <div id="divIp_4" class="divIp hideCss">
+                                <input type="text" id="dm4" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
+                                <i class="fa fa-remove iCss" id="ic_4" onclick="removeDomain(this)"></i>
+                            </div>
+                            <div id="lbCp_4" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="submitCompare()">Update</button>
-                    </div>
+                </div>
+                <div class="modal-footer" style="background: #fafafa">
+                    <button type="button" class="btn btn-secondary" onclick="cancelInputCp()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCompare()">Update</button>
                 </div>
             </div>
         </div>
+    </div>
+            <!-- /page content -->
             <!-- footer content -->
         <footer>
             <div class="pull-right">
-            Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>
+                Dashboard Admin 21/09/2017
           </div>
             <div class="clearfix"></div>
         </footer>
@@ -609,6 +638,31 @@
     <script type="text/javascript">
         // Hide .calendar.left and .calendar.right
         $(document).ready(function () {
+            if($('#numDomain').val() >2){
+                for(var i=0;i<$('#numDomain').val();i++){
+                    $('#divAll').find('.divCont:eq('+i+')').alterClass( 'col-lg-*', 'col-lg-6' );
+                    $('#divAll').find('.divCont:eq('+i+')').alterClass( 'col-md-*', 'col-md-6' );
+                }
+            }
+            /* set auto color by domain */
+            var countD = 0;
+            var arrColor = ['rgb(252, 159, 82)','rgb(88, 196, 185)','#9B59B6','rgb(70, 106, 144)','rgb(233, 95, 95)'];
+            $('#divAll').find('.titDomain').each(function(){
+               $(this).attr('style','color:'+arrColor[countD]);
+               countD++;
+            });
+            countD =0;
+            $('#tbContent').find('.titDomain').each(function(){
+                $(this).attr('style','color:'+arrColor[countD]);
+                countD++;
+            });
+            var dm = "";
+            $('#lbDomain').find('.titDomain').each(function(){
+                dm += $(this).text()+",";
+            });
+            $('#ipDomain').val(dm);
+            /* END color by domain */
+
             // autocomplete
             var listDomains = [
               "vtvgo.vn","cliptv.vn","vtv.vn","fim-live.com","kplus.vn","hplus.com.vn","htv.com.vn","pub.vn","mobitv.vn", "mobitv.com", "mobitv.net.vn"
@@ -617,17 +671,21 @@
             $(".autocomplete").autocomplete({
                 source: listDomains,
                 select: function (event, ui) {
-                    $('#dm0').val(ui.item.value);
-                    $(this).addClass('hideCss');
-                    $('#lbDomain0').text(ui.item.value);
-                    $('#div-lb0').removeClass('hideCss');
-                    $('#div-lb0').addClass('inlineCss');
-                    $('#div-domain').append('<div><input type="text" id="dm1" class="form-control autocomplete" placeholder="Add domain to compare" style="margin-bottom: 5px">'+
-                            '<div id="div-lb1" class="divLbCss hideCss">' +
-                            '<label id="lbDomain1" style="float: left;"></label>' +
-                            '<i class="fa fa-times" aria-hidden="true" style="float: right;cursor: pointer" onclick="removeDomain(this)"></i>' +
-                            '</div></div>');
-                    autocomple();
+                    event.preventDefault();
+                    var numDomain = 0;
+                    $('#div-domain').find('.divInputCp input').each(function(){
+                        if(ui.item.value ==this.value)
+                            numDomain ++;
+                    });
+                    if(numDomain >0){
+                        $(this).val("");
+                        $(this).parent().addClass('hideCss');
+                    }
+                    else{
+                        $(this).val(ui.item.value);
+                        $(this).attr('disabled','true');
+                        $(this).parent().addClass('hideCss');
+                    }
                 }
             });
 
@@ -733,10 +791,9 @@
                     colorByPoint: true
                 }
             },
-            /*
             colors: [
-                '#1ABB9C','#9B59B6'
-            ],*/
+                'rgb(252, 159, 82)','rgb(88, 196, 185)','#9B59B6','rgb(70, 106, 144)','rgb(233, 95, 95)'
+            ],
             xAxis: {
                 categories: categories
             },
@@ -777,9 +834,9 @@
                     colorByPoint: true
                 }
             },
-            /*colors: [
-                '#1ABB9C','#9B59B6'
-            ],*/
+            colors: [
+                'rgb(252, 159, 82)','rgb(88, 196, 185)','#9B59B6','rgb(70, 106, 144)','rgb(233, 95, 95)'
+            ],
             xAxis: {
                 categories: categories
             },
@@ -868,9 +925,9 @@
                     colorByPoint: true
                 }
             },
-            /*colors: [
-                '#1ABB9C','#9B59B6'
-            ],*/
+            colors: [
+                'rgb(252, 159, 82)','rgb(88, 196, 185)','#9B59B6','rgb(70, 106, 144)','rgb(233, 95, 95)'
+            ],
             xAxis: {
                 categories: hourly
             },
@@ -895,7 +952,6 @@
             },
             series: getJsonSeries(queriesHourly)
         });
-
         function getJsonSeries(arr) {
 
             var jsonArr = [];
@@ -922,65 +978,6 @@
                 });
             }
             return jsonArr
-        }
-
-        function removeDomain(element){
-            $(element).parent().remove();
-        }
-
-        function refreshDomain(element){
-            $(element).parent().remove();
-            var isDot = "";
-            var vlDomain="";
-            $('#lbDomain').find('input').each(function(){
-                vlDomain+=","+this.value;
-            });
-
-            location.href = "/search/compare?domains=" + vlDomain;
-        }
-
-        function autocomple(){
-            // autocomplete
-            var listDomains = [
-                "vtvgo.vn","cliptv.vn","vtv.vn","fim-live.com","kplus.vn","hplus.com.vn","htv.com.vn","pub.vn","mobitv.vn", "mobitv.com", "mobitv.net.vn"
-            ];
-
-            $(".autocomplete").autocomplete({
-                source: listDomains,
-                select: function (event, ui) {
-                    var numDomain = $('#div-domain').find('input').length-1;
-                    var newDomain = $('#div-domain').find('input').length;
-                    $('#dm'+numDomain).val(ui.item.value);
-                    $(this).addClass('hideCss');
-                    $('#lbDomain'+numDomain).text(ui.item.value);
-                    $('#div-lb'+numDomain).removeClass('hideCss');
-                    $('#div-lb'+numDomain).addClass('inlineCss');
-                    $('#div-domain').append('<div><input type="text" id="dm'+newDomain+'" class="form-control autocomplete" placeholder="Add domain to compare" style="margin-bottom: 5px">'+
-                            '<div id="div-lb'+newDomain+'" class="hideCss divLbCss">' +
-                            '<label id="lbDomain'+newDomain+'" style="float: left"></label>' +
-                            '<i class="fa fa-times" aria-hidden="true" style="cursor: pointer;float: right;" onclick="removeDomain(this)"></i>' +
-                            '</div></div>');
-                    autocomple();
-                }
-            });
-        }
-
-        function submitCompare(){
-            var numDomain = $('#div-domain').find('input').length;
-            var url = window.location.href;
-            var vlDomain = url.substring(url.indexOf("=")+1);
-            var isDot = "";
-            for(var i=0;i<numDomain;i++){
-                if(vlDomain != "" || i>0) isDot=",";
-                vlDomain+= isDot + $('#dm'+i).val();
-            }
-            $('#ipDomain').val(vlDomain);
-            location.href = "/search/compare?domains=" + vlDomain;
-        }
-
-        function alert_input()
-        {
-            location.href = "/search?ct=" + $('#goValue').val();
         }
     </script>
 } else {
@@ -995,108 +992,129 @@
             $(".autocomplete").autocomplete({
                 source: listDomains,
                 select: function (event, ui) {
-                    $('#dm0').val(ui.item.value);
-                    $(this).addClass('hideCss');
-                    $('#lbDomain0').text(ui.item.value);
-                    $('#div-lb0').removeClass('hideCss');
-                    $('#div-lb0').addClass('inlineCss');
-                    $('#div-domain').append('<div><input type="text" id="dm1" class="form-control autocomplete" placeholder="Add domain to compare" style="margin-bottom: 5px">'+
-                            '<div id="div-lb1" class="divLbCss hideCss">' +
-                            '<label id="lbDomain1" style="float: left;"></label>' +
-                            '<i class="fa fa-times" aria-hidden="true" style="float: right;cursor: pointer" onclick="removeDomain(this)"></i>' +
-                            '</div></div>');
-                    autocomple();
+                    event.preventDefault();
+                    var numDomain = 0;
+                    $('#div-domain').find('.divInputCp input').each(function(){
+                        if(ui.item.value ==this.value)
+                            numDomain ++;
+                    });
+                    if(numDomain >0){
+                        $(this).val("");
+                        $(this).parent().addClass('hideCss');
+                    }
+                    else{
+                        $(this).val(ui.item.value);
+                        $(this).attr('disabled','true');
+                        $(this).parent().addClass('hideCss');
+                    }
                 }
             });
         });
-        function getJsonSeries(arr) {
 
-            var jsonArr = [];
-            for (var i = 0; i < arr.length; i++) {
-
-                jsonArr.push({
-                    type: "spline",
-                    name: arr[i][0],
-                    data: arr[i][1]
-                });
-            }
-            return jsonArr
-        }
-
-        function getColumnJsonSeries(arr) {
-
-            var jsonArr = [];
-            for (var i = 0; i < arr.length; i++) {
-
-                jsonArr.push({
-                    type: "column",
-                    name: arr[i][0],
-                    data: arr[i][1]
-                });
-            }
-            return jsonArr
-        }
-
-        function removeDomain(element){
-            $(element).parent().remove();
-        }
-
-        function refreshDomain(){
-            var numDomain = $('#div-domain').find('input').length-1;
-            var vlDomain = $('#ipDomain').val();
-            for(var i=0;i<numDomain;i++){
-                vlDomain+= ',' + $('#dm'+i).val();
-            }
-            $('#ipDomain').val(vlDomain);
-            location.href = "/search/compare?domain=" + $('#ipDomain').val();
-        }
-
-        function autocomple(){
-            // autocomplete
-            var listDomains = [
-                "vtvgo.vn","cliptv.vn","vtv.vn","fim-live.com","kplus.vn","hplus.com.vn","htv.com.vn","pub.vn","mobitv.vn", "mobitv.com", "mobitv.net.vn"
-            ];
-
-            $(".autocomplete").autocomplete({
-                source: listDomains,
-                select: function (event, ui) {
-                    var numDomain = $('#div-domain').find('input').length-1;
-                    var newDomain = $('#div-domain').find('input').length;
-                    $('#dm'+numDomain).val(ui.item.value);
-                    $(this).addClass('hideCss');
-                    $('#lbDomain'+numDomain).text(ui.item.value);
-                    $('#div-lb'+numDomain).removeClass('hideCss');
-                    $('#div-lb'+numDomain).addClass('inlineCss');
-                    $('#div-domain').append('<div><input type="text" id="dm'+newDomain+'" class="form-control autocomplete" placeholder="Add domain to compare" style="margin-bottom: 5px">'+
-                            '<div id="div-lb'+newDomain+'" class="hideCss divLbCss">' +
-                            '<label id="lbDomain'+newDomain+'" style="float: left"></label>' +
-                            '<i class="fa fa-times" aria-hidden="true" style="cursor: pointer;float: right;" onclick="removeDomain(this)"></i>' +
-                            '</div></div>');
-                    autocomple();
-                }
-            });
-        }
-
-        function submitCompare(){
-            var numDomain = $('#div-domain').find('input').length;
-            var vlDomain = $('#ipDomain').val();
-            var isDot = "";
-            for(var i=0;i<numDomain;i++){
-                if(vlDomain != "" || i>0) isDot=",";
-                vlDomain+= isDot + $('#dm'+i).val();
-            }
-            $('#ipDomain').val(vlDomain);
-            location.href = "/search/compare?domains=" + $('#ipDomain').val();
-        }
-
-        function alert_input()
-        {
-            location.href = "/search?ct=" + $('#goValue').val();
-        }
     </script>
 }
+    <script type="text/javascript">
+            function blurValueDomain(element){
+                var numDomain = 0;
+                $('#div-domain').find('.divInputCp input').each(function(){
+                    if($(element).val() == this.value)
+                        numDomain ++;
+                });
+                if(numDomain >1 || numDomain ==0 && $(element).val() != ""){
+                    $(element).val("");
+                    $(element).parent().addClass('hideCss');
+                    $(element).focus();
+                }
+                else{
+                    $(element).attr('disabled','true');
+                    $(element).parent().addClass('hideCss');
+                }
+            }
 
-    
+            function showInputCp(element){
+                $(element).addClass('hideCss');
+                $(element).parent().removeClass('lbPd');
+                $(element).parent().parent().find('.divIp').removeClass('hideCss');
+                $(element).parent().parent().find('.divIp').addClass('disInline');
+                $(element).parent().parent().find('.divIp input').focus();
+            }
+            function cancelInputCp(){
+                $('#div-domain').find('.divInputCp input').each(function(){
+                    $(this).val("");
+                    $(this).removeAttr('disabled');
+                    $(this).parent().removeClass('disInline');
+                    $(this).parent().addClass('hideCss');
+                    $(this).parent().parent().find('.lbCp').addClass('lbPd');
+                    $(this).parent().parent().find('.lbCp a').removeClass('hideCss');
+                    $('#fr-compare').modal('hide');
+                });
+            }
+
+            function removeDomain(element){
+                var id = $(element).attr('id');
+                $('#dm'+id.substring(id.indexOf('_')+1)).val("");
+                $('#dm'+id.substring(id.indexOf('_')+1)).removeAttr('disabled');
+                $(element).parent().parent().find('.lbCp').addClass('lbPd');
+                $(element).parent().parent().find('.lbCp a').removeClass('hideCss');
+                $(element).parent().removeClass('disInline');
+                $(element).parent().addClass('hideCss');
+            }
+
+            function refreshDomain(element){
+                $(element).parent().remove();
+                var isDot = "";
+                var vlDomain="";
+                $('#lbDomain').find('input').each(function(){
+                    vlDomain+=","+this.value;
+                });
+
+                location.href = "/search/compare?domains=" + vlDomain;
+            }
+
+            function showModalCp() {
+                var url = window.location.href;
+                var vlDomain = "";
+                if(url.indexOf('=')>=0){
+                    vlDomain = url.substring(url.indexOf('=')+1);
+                    var arrDomain = vlDomain.split(',');
+                    vlDomain = "";
+                    for(var i=0;i<arrDomain.length;i++){
+                        if(arrDomain[i] != ""){
+                            $('#lbCp_'+i).removeClass('lbPd');
+                            $('#lbCp_'+i+' a').addClass('hideCss');
+                            $('#divIp_'+i).removeClass('hideCss');
+                            $('#divIp_'+i).addClass('disInline');
+                            $('#dm'+i).val(arrDomain[i]);
+                            $('#dm'+i).attr('disabled','true');
+                        }
+                    }
+                }
+                $('#fr-compare').modal('show');
+            }
+
+            function submitCompare(){
+                var vlDomain = "";
+                var isDot = "";
+                var checkNull = 0,count=0;
+                $('#div-domain').find('input').each(function(){
+                    if(vlDomain != "" || count>0) isDot=",";
+                    if(this.value != ""){
+                        checkNull =1;
+                        vlDomain+= isDot + this.value;
+                    }
+                    count++;
+                });
+                if(checkNull == 0)
+                    location.href = "/search/compare";
+                else
+                   location.href = "/search/compare?domains=" + vlDomain;
+            }
+
+            function alert_input()
+            {
+                location.href = "/search?ct=" + $('#goValue').val();
+            }
+    </script>
 
 </body>
 </html>
