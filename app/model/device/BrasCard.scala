@@ -46,12 +46,12 @@ object BrasesCard {
 
   def listBrasById(id: String): Future[Seq[(String,String,String,String,String)]] = {
     val dt = new DateTime();
-    val aDayLater = dt.minusMinutes(200);
+    val aDayLater = dt.minusMinutes(60*24);
     val aDayTime = aDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""SELECT distinct tbC.bras_id,tbB.date_time,tbC.line_ol,tbC.card_ol,tbC.port_ol
              FROM (SELECT bras_id,date_time FROM dwh_radius_bras_detail WHERE date_time >= $aDayTime::TIMESTAMP and label = 'outlier' and bras_id  LIKE $id || '%') tbB join
-               (SELECT * FROM bras_count_by_port WHERE bras_id LIKE  $id || '%') tbC
+               (SELECT * FROM bras_count_by_port WHERE bras_id LIKE  $id || '%' and time >= $aDayTime::TIMESTAMP) tbC
              on tbB.bras_id=tbC.bras_id and  date_trunc('minute', tbC.time) between date_trunc('minute', tbB.date_time) - INTERVAL '3' MINUTE and date_trunc('minute', tbB.date_time)
              ORDER BY tbC.bras_id desc,tbC.line_ol desc,tbC.port_ol desc,tbB.date_time desc
                   """

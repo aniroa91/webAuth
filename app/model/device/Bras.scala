@@ -41,17 +41,17 @@ object BrasList {
 
   def top100: Future[Seq[(String,String,String,String,String, String, String, String,String,Option[String])]] = {
     val dt = new DateTime();
-    val oneDayLater = dt.minusHours(48);
+    val oneDayLater = dt.minusHours(30);
     val oldDay  = oneDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
    // dbConfig.db.run(brases.sortBy(_.time.desc).filter(_.time >= oldDay).filter(_.label ==="outlier").take(100).result)
     dbConfig.db.run(
       sql"""select tbD.bras_id,tbD.date_time,tbD.active_user,tbD.signin_total_count,tbD.logoff_total_count,tbD.lostip_error,tbD.cpe_error,tbD.crit_kibana,tbD.crit_opsview,tbD.verified
             from
             (select bras_id,max(date_time) as time from dwh_radius_bras_detail
-            where label='outlier'
+            where label='outlier' and date_time>=$oldDay::TIMESTAMP
             group by bras_id) tbB
-            join dwh_radius_bras_detail tbD
-            on tbD.bras_id = tbB.bras_id and tbD.date_time=tbB.time and tbD.date_time>=$oldDay::TIMESTAMP
+            join (select * from dwh_radius_bras_detail where date_time>=$oldDay::TIMESTAMP) tbD
+            on tbD.bras_id = tbB.bras_id and tbD.date_time=tbB.time
             order by tbD.date_time desc
                   """
         .as[(String, String, String, String,String,String, String, String, String,Option[String])])
@@ -74,8 +74,8 @@ object BrasList {
     val strTime = time.substring(0,time.indexOf(".")+3)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
     val dateTime = DateTime.parse(strTime, formatter)
-    val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-    val addHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val oldHalfHour  = dateTime.minusMinutes(60).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    val addHalfHour  = dateTime.plusMinutes(60).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
 
     dbConfig.db.run(brases.filter(_.id === id).filter(_.time >= oldHalfHour).filter(_.time <= addHalfHour).sortBy(_.time.asc).result)
   }
@@ -83,7 +83,7 @@ object BrasList {
   def getJsonChart(id: String,time: String): Future[Seq[(String,Int, Int,Int)]] = {
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
     val dateTime = DateTime.parse(time, formatter)
-    val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    val oldHalfHour  = dateTime.minusMinutes(60).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
 
     dbConfig.db.run(
       sql"""SELECT date_time,logoff_total_count,signin_total_count,active_user FROM dwh_radius_bras_detail
