@@ -17,8 +17,9 @@ object BrasesCard {
   def getHostCard(strId: String): Future[Seq[(String,String,String, String)]] = {
     val id = strId.split('/')(0)
     val time = strId.split('/')(1)
+    val strTime = time.substring(0,time.indexOf(".")+2)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    val dateTime = DateTime.parse(time, formatter)
+    val dateTime = DateTime.parse(strTime, formatter)
     val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""SELECT host,module,sum(cpe_error),sum(lostip_error) from dwh_inf_module
@@ -59,45 +60,47 @@ object BrasesCard {
   }
 
   def listBrasOutlier: Future[Seq[(String,String,String,String,String)]] = {
-   // try {
-      val dt = new DateTime();
-      val aDayLater = dt.minusHours(1);
-      val aDayTime = aDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-      dbConfig.db.run(
-        sql"""SELECT tbC.bras_id,tbC.time,tbC.line_ol,tbC.card_ol,tbC.port_ol
+    // try {
+    val dt = new DateTime();
+    val aDayLater = dt.minusHours(1);
+    val aDayTime = aDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""SELECT tbC.bras_id,tbC.time,tbC.line_ol,tbC.card_ol,tbC.port_ol
                  FROM (SELECT bras_id,date_time FROM dwh_radius_bras_detail WHERE label = 'outlier' and date_time >= $aDayTime::TIMESTAMP) tbB join
                  (SELECT * FROM bras_count_by_port WHERE time >= $aDayTime::TIMESTAMP) tbC
                   on tbB.bras_id=tbC.bras_id and to_char(tbB.date_time, 'YYYY-MM-DD HH:mm:ss') = to_char(tbC.time, 'YYYY-MM-DD HH:mm:ss')
                   ORDER BY tbC.bras_id desc,tbC.line_ol desc,tbC.port_ol desc,tbC.time desc limit 10
                   """
-          .as[(String, String, String, String,String)])
+        .as[(String, String, String, String,String)])
     //}finally dbConfig.db.close
   }
 
   def opViewKibana(id : String,time: String,oldTime: String) : Future[Seq[(String,String,String,String)]] = {
+    val strTime = time.substring(0,time.indexOf(".")+2)
+    val strOld = oldTime.substring(0,oldTime.indexOf(".")+2)
     dbConfig.db.run(
       sql"""SELECT distinct tbK.error_name,tbK.error_level,tbO.service_name,tbO.service_status
             FROM
                 (select * from public.dwh_kibana
-                 where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
+                 where bras_id=$id and date_time>=$strOld::TIMESTAMP and date_time <=$strTime::TIMESTAMP
                  order by date_time desc
                 ) tbK left join
                 (select * from public.dwh_opsview
-                 where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
+                 where bras_id=$id and date_time>=$strOld::TIMESTAMP and date_time <=$strTime::TIMESTAMP
                  order by date_time desc
-                ) tbO on tbO.bras_id = tbK.bras_id and date_trunc('minute', tbO.date_time)=date_trunc('minute', tbK.date_time)
+                ) tbO on tbO.bras_id = tbK.bras_id and date_trunc('minute', tbO.date_time) between date_trunc('minute', tbK.date_time) - INTERVAL '3' MINUTE and date_trunc('minute', tbK.date_time)
          """
         .as[(String, String,String,String)])
   }
 
   def getCard(id: String,time: String,sigin: String,logoff: String): Future[Seq[(String,String,String,Int,Int)]] = {
-    val strTime = time.substring(0,time.indexOf(".")+3)
+    val strTime = time.substring(0,time.indexOf(".")+2)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
     val dateTime = DateTime.parse(strTime, formatter)
-    val oldTime  = dateTime.minusMinutes(5).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-    val newTime  = dateTime.plusMinutes(5).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-      dbConfig.db.run(
-        sql"""SELECT bras_id,line_ol, card_ol,SUM(logoff_total_count_by_card),SUM(signin_total_count_by_card)
+    val oldTime  = dateTime.minusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    val newTime  = dateTime.plusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""SELECT bras_id,line_ol, card_ol,SUM(logoff_total_count_by_card) logoff,SUM(signin_total_count_by_card) sigin
               FROM bras_count_by_card WHERE bras_id=$id AND time>=$oldTime::TIMESTAMP AND time <= $newTime::TIMESTAMP GROUP BY bras_id,line_ol, card_ol ORDER BY line_ol, card_ol"""
         .as[(String,String,String,Int,Int)])
   }

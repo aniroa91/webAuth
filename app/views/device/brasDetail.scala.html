@@ -70,25 +70,25 @@
                                     @if(bras.time.contains(lstbrasTime(0).time) || lstbrasTime(0).time.contains(bras.time)){
                                         <tr class="hight-light">
                                     }else{
-                                      <tr>
+                                        <tr>
+                                        }
+                                    <td><a href="/brasInfo?id=@bras.id&time=@bras.time&sigin=@bras.signin&logoff=@bras.logoff&timeCurrent=@time" style="color: #1ABB9C;">@bras.id</a></td>
+                                    <td>@bras.time</td>
+                                    <td>@bras.signin</td>
+                                    <td>@bras.logoff</td>
+                                    <td>@bras.active_user</td>
+                                    <td>@bras.cpe_error</td>
+                                    <td>@bras.lostip_error</td>
+                                    <td>@bras.crit_kibana</td>
+                                    <td>@bras.crit_opsview</td>
+                                    <td>
+                                    @if(bras.verified.isEmpty || bras.verified.get == "0"){
+                                        <span class="label label-danger" style="font-size: 13px">Outlier</span>
+                                    }else{
+                                        <span class="label label-success" style="font-size: 13px">Outlier</span>
                                     }
-                                        <td><a href="/brasInfo?id=@bras.id&time=@bras.time&sigin=@bras.signin&logoff=@bras.logoff&timeCurrent=@time" style="color: #1ABB9C;">@bras.id</a></td>
-                                        <td>@bras.time</td>
-                                        <td>@bras.signin</td>
-                                        <td>@bras.logoff</td>
-                                        <td>@bras.active_user</td>
-                                        <td>@bras.cpe_error</td>
-                                        <td>@bras.lostip_error</td>
-                                        <td>@bras.crit_kibana</td>
-                                        <td>@bras.crit_opsview</td>
-                                        <td>
-                                            @if(bras.verified.isEmpty || bras.verified.get == "0"){
-                                                <span class="label label-danger" style="font-size: 13px">Outlier</span>
-                                            }else{
-                                                <span class="label label-success" style="font-size: 13px">Outlier</span>
-                                            }
-                                        </td>
-                                    </tr>
+                                    </td>
+                                </tr>
                                 }
                                 </tbody>
                             </table>
@@ -184,7 +184,7 @@
     <script src="../assets/javascripts/exporting.js"></script>
     <script src="../assets/javascripts/heatmap.js"></script>
 
-    <!-- Counter number -->
+        <!-- Counter number -->
     <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
     <script src="../assets/javascripts/jquery.counterup.min.js"></script>
     <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
@@ -294,11 +294,14 @@
                 var numSignin = @Html(Json.stringify(Json.toJson(lstbrasTime(0).signin)));
                 var numLogoff = @Html(Json.stringify(Json.toJson(lstbrasTime(0).logoff)));
                 var titUser = " users log off"
+                var isLog = 0
+                if(Number(numSignin)>=Number(numLogoff)){
+                    titUser=" users signin";
+                    isLog = 1;
+                }
                 var cardLabel = getCard(card,1)
                 var linecardLabel = getCard(linecard,0)
-                var dta = getData(data)
-                if(Number(numSignin)>=Number(numLogoff))
-                    titUser=" users signin"
+                var dta = getData(data,isLog)
 
                 Highcharts.chart('heat_map', {
 
@@ -368,11 +371,11 @@
                 }
                 return jsonArr
             }
-            function getData(data){
+            function getData(data,isLog){
                 var jsonArr = [];
                 for (var i =0 ; i < data.length; i++) {
                     var user = data[i][4]
-                    if(data[i][3]>=data[i][4]) user = data[i][3]
+                    if(isLog == 0) user = data[i][3]
                     jsonArr.push([Number(data[i][2]),Number(data[i][1]),user]);
                 }
                 return jsonArr

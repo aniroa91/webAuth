@@ -38,24 +38,31 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val rsHost = Await.result(BrasService.getHostBras(id), Duration.Inf)
       val re = rsHost.map(
         iter =>
-                Json.obj(
-                  "host" -> iter._1,
-                  "module" -> iter._2
-                ) ->
-                  Json.obj(
-                    "cpe" -> iter._3,
-                    "lostip" -> iter._4
-                  )
+          Json.obj(
+            "host" -> iter._1,
+            "module" -> iter._2
+          ) ->
+            Json.obj(
+              "cpe" -> iter._3,
+              "lostip" -> iter._4
+            )
       )
       val idBras = id.split('/')(0)
       val time = id.split('/')(1)
       val brasChart = Await.result(BrasService.getJsonBrasChart(idBras,time),Duration.Inf)
+      val listCard = Await.result(BrasService.getBrasCard(idBras,time,"",""),Duration.Inf)
+      val sigLog = brasChart.map({ t => (t._1.substring(0,t._1.indexOf(".")+2),t._2,t._3)}).filter(t => t._1 == time.substring(0,time.indexOf(".")+2))
+      //System.out.println(s"x $sigLog")
       val jsBras = Json.obj(
         "host" -> re,
-        "time" -> brasChart.map({ t => formatYYYYmmddHHmmss(t._1.toString)}),
+        "sigLog" -> sigLog,
+        "time" -> brasChart.map({ t => t._1.toString}),
         "logoff" -> brasChart.map({ t =>t._2}),
         "signin" -> brasChart.map({ t => t._3}),
-        "users" -> brasChart.map({ t => t._4})
+        "users" -> brasChart.map({ t => t._4}),
+        "heatCard" -> listCard.map { t => t._3},
+        "heatLinecard" -> listCard.map { t => t._2},
+        "dtaCard" -> listCard
       )
       Ok(Json.toJson(jsBras))
     }
@@ -70,9 +77,10 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       var mapBras = collection.mutable.Map[String, Seq[(String,String,String,String)]]()
       val arrOutlier = lstBras.map(x => (x._1->x._2)).toList.distinct
       for(outlier <- arrOutlier){
+        val tm = outlier._2.substring(0,outlier._2.indexOf(".")+3)
         val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-        val dateTime = DateTime.parse(outlier._2, formatter)
-        val oldTime  = dateTime.minusMinutes(5).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+        val dateTime = DateTime.parse(tm, formatter)
+        val oldTime  = dateTime.minusMinutes(15).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
         val brasKey = Await.result(BrasService.opViewKibana(outlier._1,dateTime.toString,oldTime), Duration.Inf)
         mapBras += (outlier._1+"/"+outlier._2-> brasKey)
       }
@@ -94,5 +102,3 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
   }
 
 }
-
-

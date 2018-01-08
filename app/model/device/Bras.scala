@@ -43,7 +43,7 @@ object BrasList {
     val dt = new DateTime();
     val oneDayLater = dt.minusHours(30);
     val oldDay  = oneDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-   // dbConfig.db.run(brases.sortBy(_.time.desc).filter(_.time >= oldDay).filter(_.label ==="outlier").take(100).result)
+    // dbConfig.db.run(brases.sortBy(_.time.desc).filter(_.time >= oldDay).filter(_.label ==="outlier").take(100).result)
     dbConfig.db.run(
       sql"""select tbD.bras_id,tbD.date_time,tbD.active_user,tbD.signin_total_count,tbD.logoff_total_count,tbD.lostip_error,tbD.cpe_error,tbD.crit_kibana,tbD.crit_opsview,tbD.verified
             from
@@ -57,9 +57,9 @@ object BrasList {
         .as[(String, String, String, String,String,String, String, String, String,Option[String])])
   }
 
- /*  def get(id: String,time: String): Future[Option[Bras]] = {
-    dbConfig.db.run(brases.filter(_.id === id).filter(_.time === time).result.headOption)
-  }*/
+  /*  def get(id: String,time: String): Future[Option[Bras]] = {
+     dbConfig.db.run(brases.filter(_.id === id).filter(_.time === time).result.headOption)
+   }*/
 
   def getTime(id: String,time: String): Future[Seq[Bras]] = {
     val strTime = time.substring(0,time.indexOf(".")+3)
@@ -81,13 +81,14 @@ object BrasList {
   }
 
   def getJsonChart(id: String,time: String): Future[Seq[(String,Int, Int,Int)]] = {
+    val strTime = time.substring(0,time.indexOf(".")+2)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    val dateTime = DateTime.parse(time, formatter)
-    val oldHalfHour  = dateTime.minusMinutes(60).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-
+    val dateTime = DateTime.parse(strTime, formatter)
+    val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    val addHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""SELECT date_time,logoff_total_count,signin_total_count,active_user FROM dwh_radius_bras_detail
-            WHERE bras_id =$id and date_time >=$oldHalfHour::TIMESTAMP and date_time >=$time::TIMESTAMP
+            WHERE bras_id =$id and date_time >=$oldHalfHour::TIMESTAMP and date_time <=$addHalfHour::TIMESTAMP
             ORDER BY date_time desc
                   """
         .as[(String, Int, Int,Int)])

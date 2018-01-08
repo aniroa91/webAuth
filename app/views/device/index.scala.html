@@ -62,7 +62,7 @@
 
                     <div class="x_panel">
                         <div style="border-bottom: 2px solid #E6E9ED;">
-                          <a data-toggle="toggle" style="cursor: pointer" data-target="grapBras"><i class="fa fa-chevron-left" aria-hidden="true" style="margin-right: 5px;color: #C5C7CB"></i><span style="font-size: 16px;font-weight: 400" id="lbBras"></span></a>
+                            <a data-toggle="toggle" style="cursor: pointer" data-target="grapBras"><i class="fa fa-chevron-left" aria-hidden="true" style="margin-right: 5px;color: #C5C7CB"></i><span style="font-size: 16px;font-weight: 400" id="lbBras"></span></a>
                         </div>
                         <div id="bras" style="height: 530px"></div>
                     </div>
@@ -96,39 +96,46 @@
                             </tbody>
                         </table>
                     </div>
-                    <div style="display: none" id="line-chart">
-                       @* <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="background: white;height: 360px;border: 1px solid #E6E9ED;">
-                            <table class="data table no-margin " id="tbCard">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Card1</th>
-                                        <th>Card2</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Linecard1</td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Linecard2</td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Linecard3</td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>*@
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 0px">
-                            <div id="line-bras" style="height:360px;border: 1px solid #E6E9ED"></div>
+                    <div id="heat-mapChart" class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="x_panel tile">
+                                <div class="x_title">
+                                    <h2 id="titLineCard"></h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Settings 1</a>
+                                                </li>
+                                                <li><a href="#">Settings 2</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="heat_map" style="height:320px;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div style="display: none" id="line-chart">
+            <div class="x_panel tile">
+                <div class="x_title">
+                    <h2> Detail information</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div id="line-bras" style="height:360px;"></div>
                 </div>
             </div>
         </div>
@@ -139,7 +146,7 @@
                     <div style="border-bottom: 2px solid #E6E9ED">
                         <span style="font-size: 16px;font-weight: 400" id="lbHost"></span>
                     </div>
-                   <div id="host" style="height: 500px"></div>
+                    <div id="host" style="height: 300px"></div>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
@@ -147,13 +154,13 @@
                     <table class="data table no-margin border" id="tbHost" >
                         <thead>
                             <tr>
-                                <th>Host</th>
+                                <th style="width: 30%">Host</th>
                                 <th>Module</th>
                                 <th>Cpe</th>
                                 <th>Lostip</th>
-                                <th>Lost Signal</th>
+                                @*<th>Lost Signal</th>
                                 <th>User Down</th>
-                                <th>Inf Down</th>
+                                <th>Inf Down</th>*@
                             </tr>
                         </thead>
                         <tbody>
@@ -162,6 +169,7 @@
                 </div>
             </div>
         </div>
+        <br>
     </div>
         <!-- /page content -->
 
@@ -195,438 +203,554 @@
     <script src="../assets/javascripts/waitMe.js"></script>
 
     <script type="text/javascript">
-        $(document).ready(function () {
-            $('[data-toggle="tooltip"]').tooltip();
-            $("[data-toggle='toggle']").click(function() {
-                $('#mapBras').toggleClass("hideDiv");
-                $(this).children('.fa-chevron-left, .fa-chevron-right').toggleClass("fa-chevron-left fa-chevron-right");
-                $('#grapBras').toggleClass("leftDiv");
-            });
+            $(document).ready(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+                $("[data-toggle='toggle']").click(function() {
+                    $('#mapBras').toggleClass("hideDiv");
+                    $(this).children('.fa-chevron-left, .fa-chevron-right').toggleClass("fa-chevron-left fa-chevron-right");
+                    $('#grapBras').toggleClass("leftDiv");
+                });
 
-            // Nodes BRAS
-            /*var nodeBras = new vis.DataSet([
-                {id: 0, label: 'Root',color:'#9B59B6'},
-                {id: 1, label: 'Bras1',color:'#1ABB9C'},
-                {id: 2, label: 'Bras2',color:'#1ABB9C'},
-                {id: 6, label: 'LineCard1'},
-                {id: 3, label: 'Card1'},
-                {id: 4, label: 'Card2'},
-                {id: 5, label: 'LineCard2'}
-            ]);*/
-
-            function drawGraphBras(data,name){
-                var dtaBras = data.bras;
-                var dtaLineCard = data.linecard;
-                var dtaCard = data.card;
-                var dtaPort = data.host;
-
-                var nodeBras = new vis.DataSet(getNodeBras(dtaPort,dtaCard,dtaLineCard,dtaBras,name))
-                // create an array with edges to represent the network
-                /*var edgeBras = new vis.DataSet([
-                    {from: 1, to: 6},
-                    {from: 1, to: 5},
-                    {from: 6, to: 3},
-                    {from: 6, to: 4},
-                    {from: 0, to: 2},
-                    {from: 0, to: 1},
+                // Nodes BRAS
+                /*var nodeBras = new vis.DataSet([
+                    {id: 0, label: 'Root',color:'#9B59B6'},
+                    {id: 1, label: 'Bras1',color:'#1ABB9C'},
+                    {id: 2, label: 'Bras2',color:'#1ABB9C'},
+                    {id: 6, label: 'LineCard1'},
+                    {id: 3, label: 'Card1'},
+                    {id: 4, label: 'Card2'},
+                    {id: 5, label: 'LineCard2'}
                 ]);*/
-                //console.log(getEdgeBras(dtaCard,dtaLineCard,dtaBras))
-                var edgeBras = new vis.DataSet(getEdgeBras(dtaPort,dtaCard,dtaLineCard,dtaBras))
 
-                // Find contained in document
-                var divBras = document.getElementById('bras');
-                //Define data object and the options of the network
-                var arrBras = {
-                    nodes: nodeBras,
-                    edges: edgeBras
-                };
-                var optionsBras = {
-                    autoResize: true,
-                    height: '100%',
-                    width: '100%'
-                };
-                //Define the network object to be rendered.
-                var bras = new vis.Network(divBras, arrBras, optionsBras);
-                //Simply declare an event with callback.
-                bras.on("click", function (params) {
-                    //console.log(params['nodes']['0']);
-                    var brasNode = params['nodes']['0'];
-                    if(brasNode!= undefined && (brasNode == 0 || brasNode.split('/').length<=2)) {
-                        if(brasNode == 0){
-                            waitMe();
-                            setTimeout(function () {
-                                hideWaitme();
-                                $('#hostBras').hide();
-                                $('#line-chart').hide();
-                                $('#tbBras tbody').find('tr').show();
-                                $('#tbBras tbody').find('tr').removeAttr('style', 'color:#1ABB9C');
-                            }, 1000);
+                function drawGraphBras(data,name){
+                    var dtaBras = data.bras;
+                    var dtaLineCard = data.linecard;
+                    var dtaCard = data.card;
+                    var dtaPort = data.host;
+
+                    var nodeBras = new vis.DataSet(getNodeBras(dtaPort,dtaCard,dtaLineCard,dtaBras,name))
+                    // create an array with edges to represent the network
+                    /*var edgeBras = new vis.DataSet([
+                        {from: 1, to: 6},
+                        {from: 1, to: 5},
+                        {from: 6, to: 3},
+                        {from: 6, to: 4},
+                        {from: 0, to: 2},
+                        {from: 0, to: 1},
+                    ]);*/
+                    //console.log(getEdgeBras(dtaCard,dtaLineCard,dtaBras))
+                    var edgeBras = new vis.DataSet(getEdgeBras(dtaPort,dtaCard,dtaLineCard,dtaBras))
+
+                    // Find contained in document
+                    var divBras = document.getElementById('bras');
+                    //Define data object and the options of the network
+                    var arrBras = {
+                        nodes: nodeBras,
+                        edges: edgeBras
+                    };
+                    var optionsBras = {
+                        autoResize: true,
+                        height: '100%',
+                        width: '100%'
+                    };
+                    //Define the network object to be rendered.
+                    var bras = new vis.Network(divBras, arrBras, optionsBras);
+                    //Simply declare an event with callback.
+                    bras.on("click", function (params) {
+                        //console.log(params['nodes']['0']);
+                        var brasNode = params['nodes']['0'];
+                        if(brasNode!= undefined && (brasNode == 0 || brasNode.split('/').length<=2)) {
+                            if(brasNode == 0){
+                                waitMe();
+                                setTimeout(function () {
+                                    hideWaitme();
+                                    $('#hostBras').hide();
+                                    $('#line-chart').hide();
+                                    $('#heat-mapChart').hide();
+                                    $('#tbBras tbody').find('tr').show();
+                                    $('#tbBras tbody').find('tr').removeAttr('style', 'color:#1ABB9C');
+                                }, 1000);
+                            }
+                            else {
+                                var id = brasNode.replace('/', '').replace(' ', '').replace('.', '').replace(/:/g, "");
+                                $.ajax({
+                                    url: "/host-json?id=" + brasNode,
+                                    cache: false,
+                                    beforeSend: function () {
+                                        waitMe();
+                                    },
+                                    success: function (dtBras) {
+                                        if(dtBras != "error") {
+                                            var dtHost = dtBras.host;
+                                            $('#heat-mapChart').show();
+                                            drawHeatMapChart(dtBras);
+                                            $('#line-chart').show();
+                                            drawChart(dtBras);
+                                            $('#lbHost').text("Hosts of " + brasNode)
+                                            $('#tbBras tbody').find('tr').hide();
+                                            $('#' + id).show();
+                                            $('#' + id).attr('style', 'color:#1ABB9C');
+                                            drawHostBras(groupGraphost(dtHost, 'host'), brasNode)
+                                            var html = getTableHost(dtHost);
+                                            if(html == "") html = "<tr><td colspan='4' style='font-size: 15px;color: #ddd;text-align: center'>No matching records found </td></tr>"
+                                            $('#tbHost tbody').html('');
+                                            $('#tbHost tbody').append(html);
+                                        }
+                                        else{
+                                            location.href = "/device";
+                                        }
+                                    },
+                                    complete: function () {
+                                        hideWaitme()
+                                    },
+                                });
+                            }
                         }
-                        else {
-                            var id = brasNode.replace('/', '').replace(' ', '').replace('.', '').replace(/:/g, "");
-                            $.ajax({
-                                url: "/host-json?id=" + brasNode,
-                                cache: false,
-                                beforeSend: function () {
-                                    waitMe();
-                                },
-                                success: function (dtBras) {
-                                    if(data != "Error") {
-                                        var dtHost = dtBras.host;
-                                        $('#line-chart').show();
-                                        drawChart(dtBras);
-                                        $('#lbHost').text("Hosts of " + brasNode)
-                                        $('#tbBras tbody').find('tr').hide();
-                                        $('#' + id).show();
-                                        $('#' + id).attr('style', 'color:#1ABB9C');
-                                        drawHostBras(groupGraphost(dtHost, 'host'), brasNode)
-                                        var html = getTableHost(dtHost)
-                                        $('#tbHost tbody').html('');
-                                        $('#tbHost tbody').append(html);
+                    });
+                }
+
+                function getData(data,isCheck){
+                    var jsonArr = [];
+                    for (var i =0 ; i < data.length; i++) {
+                        var user = data[i][4];
+                        if(isCheck == 0) user = data[i][3]
+                        jsonArr.push([Number(data[i][2]),Number(data[i][1]),user]);
+                    }
+                    return jsonArr
+                }
+
+                function getCard(arrCard,type){
+                    var jsonArr = [];
+                    if(type == 1)
+                        var title ="Card"
+                    else
+                        var title = "Linecard"
+                    var arrNum = arrCard.map(Number)
+                    for (var i = 0; i <= Math.max.apply(null, arrNum); i++) {
+                        jsonArr.push( title+" "+i);
+                    }
+                    return jsonArr
+                }
+
+                function drawHeatMapChart(dta){
+                    var sigLog = dta.sigLog
+                    var isLog = 0;
+                    var titUser = " users log off"
+                    if(sigLog[0][1] <= sigLog[0][2]){
+                        $('#titLineCard').text("SignIn per card per line-cards");
+                        titUser=" users signin";
+                        isLog =1;
+                    }
+                    else{
+                        $('#titLineCard').text("Logoff per card per line-cards");
+                    }
+                    var cardLabel = getCard(dta.heatCard,1)
+                    var linecardLabel = getCard(dta.heatLinecard,0)
+                    var dtCard = getData(dta.dtaCard,isLog)
+                    Highcharts.chart('heat_map', {
+
+                        chart: {
+                            type: 'heatmap',
+                            marginTop: 40,
+                            marginBottom: 80,
+                            plotBorderWidth: 1
+                        },
+
+                        title: {
+                            text: ''
+                        },
+
+                        xAxis: {
+                            categories: cardLabel
+                        },
+
+                        yAxis: {
+                            categories: linecardLabel,
+                            title: null
+                        },
+
+                        colorAxis: {
+                            min: 0,
+                            minColor: '#FFFFFF',
+                            maxColor: '#1ABB9C'
+                        },
+
+                        legend: {
+                            align: 'right',
+                            layout: 'vertical',
+                            margin: 0,
+                            verticalAlign: 'top',
+                            y: 25,
+                            symbolHeight: 280
+                        },
+
+                        tooltip: {
+                            formatter: function () {
+                                return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> has <br><b>' +
+                                        this.point.value + '</b> '+titUser+' <br><b>'+  this.series.yAxis.categories[this.point.y] + '</b>';
+                            }
+                        },
+
+                        series: [{
+                            name: 'Logoff per card',
+                            borderWidth: 1,
+                            data: dtCard,
+                            dataLabels: {
+                                enabled: true,
+                                color: '#000000'
+                            }
+                        }]
+
+                    });
+                }
+
+                function drawChart(dta){
+                    // Build the chart line day of month vector
+                    var category = dta.time;
+                    var logoff = dta.logoff;
+                    var signin = dta.signin;
+                    var users = dta.users;
+                    //console.log(category)
+                    Highcharts.chart('line-bras', {
+                        chart: {
+                            zoomType: 'xy'
+                        },
+                        title: {
+                            text: ''
+                        },
+                        xAxis: [{
+                            categories: category
+                        }],
+                        yAxis: [{ // Secondary yAxis
+                            gridLineWidth: 0,
+                            title: {
+                                text: 'SignIn - LogOff Users',
+                            }
+                        },
+                            { // Primary yAxis
+                                labels: {
+                                    format: '{value}',
+                                    style: {
+                                        color: "#f0ad4e"
                                     }
                                 },
-                                complete: function () {
-                                    hideWaitme()
+                                title: {
+                                    text: 'Active users',
+                                    style: {
+                                        color: "#f0ad4e"
+                                    }
                                 },
-                            });
-                        }
-                    }
-                });
-            }
+                                opposite: true
 
-            function drawChart(dta){
-                // Build the chart line day of month vector
-                var category = dta.time;
-                var logoff = dta.logoff;
-                var signin = dta.signin;
-                var users = dta.users;
-                //console.log(category)
-                Highcharts.chart('line-bras', {
+                            }],
+                        tooltip: {
+                            shared: true
+                        },
+                        labels: {
+                            items: [{
+                                html: '',
+                                style: {
+                                    left: '50px',
+                                    top: '18px',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                                }
+                            }]
+                        },
+
+                        series: [{
+                            type: 'column',
+                            name: 'Sign In',
+                            yAxis: 0,
+                            color: "#FF0000",
+                            data: signin
+                        }, {
+                            type: 'column',
+                            name: 'Log Off',
+                            yAxis: 0,
+                            color: "#9073da",
+                            data: logoff
+                        }, {
+                            type: 'spline',
+                            name: 'Actives user',
+                            yAxis: 1,
+                            data: users,
+                            color: "#f0ad4e",
+                            marker: {
+                                lineWidth: 2,
+                                lineColor: "white",
+                                fillColor: '#f0ad4e'
+                            }
+                        }]
+                    });
+                }
+
+                function hideWaitme() {
+                    $('#bras').waitMe("hide");
+                    $('#tbBras').waitMe("hide");
+                    $('#host').waitMe("hide");
+                    $('#tbHost').waitMe("hide");
+                    $('#line-bras').waitMe("hide");
+                    $('#heat-mapChart').waitMe("hide");
+                }
+
+                function waitMe(){
+                    $('#heat-mapChart').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                    $('#bras').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                    $('#line-bras').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                    $('#tbBras').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                    $('#host').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                    $('#tbHost').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                }
+
+                // ----------------//
+                function drawHostBras(data,idBras){
+                    console.log(Object.keys(data).length)
+                    if(Object.keys(data).length == 0 )
+                        $('#host').attr('style','height:150px');
+                    else
+                        $('#host').attr('style','height:400px');
+                    $('#hostBras').show();
+                    // Nodes HOST
+                    /*var nodeHost1 = new vis.DataSet([
+                        {id: 0, label: 'Root',color:'#9B59B6'},
+                        {id: 1, label: 'Host1',color:'#1ABB9C'},
+                        {id: 2, label: 'Host2',color:'#1ABB9C'},
+                        {id: 11,label: 'Module1'},
+                        {id: 12,label: 'Module2'},
+                        {id: 111,label: 'Splitter1'},
+                        {id: 112,label: 'Splitter2'}
+                    ]);*/
+                    // console.log(getNodeHost(data,idBras))
+                    var nodeHost = new vis.DataSet(getNodeHost(data,idBras))
+                    //console.log(nodeHost)
+                    // create an array with edges to represent the network
+                    /*var edgeHost1 = new vis.DataSet([
+                        {from: 0, to: 1},
+                        {from: 0, to: 2},
+                        {from: 1, to: 11},
+                        {from: 1, to: 12},
+                        {from: 11, to: 111},
+                        {from: 11, to: 112}
+                    ]);*/
+                    var edgeHost = new vis.DataSet(getEdgeHost(data))
+                    //console.log(edgeHost)
+                    // Find contained in document
+                    var divHost = document.getElementById('host');
+                    //Define data object and the options of the network
+                    var arrHost = {
+                        nodes: nodeHost,
+                        edges: edgeHost
+                    };
+                    var optionsHost = {
+                        autoResize: true,
+                        height: '100%',
+                        width: '100%'
+                    };
+                    //Define the network object to be rendered.
+                    var host = new vis.Network(divHost, arrHost, optionsHost);
+                    //Simply declare an event with callback.
+                    host.on("click", function (params) {
+                        //console.log(params['nodes']['0']);
+                        var id = params['nodes']['0'];
+                        if(id!= undefined && (id==0 || id.indexOf('/')<0)) {
+                            $('#host').waitMe({
+                                effect: 'roundBounce',
+                                text: 'Please wait...',
+                                bg: 'rgba(255,255,255,0.7)',
+                                color: '#000',
+                                textPos: 'vertical'
+                            });
+                            $('#tbHost').waitMe({
+                                effect: 'roundBounce',
+                                text: 'Please wait...',
+                                bg: 'rgba(255,255,255,0.7)',
+                                color: '#000',
+                                textPos: 'vertical'
+                            });
+                            setTimeout(function () {
+                                $('#host').waitMe("hide");
+                                $('#tbHost').waitMe("hide");
+                                if(id==0){
+                                    $('#tbHost tbody').find('tr').show();
+                                    $('#tbHost tbody').find('tr').removeAttr('style', 'color:#ff9600');
+                                }else {
+                                    $('#tbHost tbody').find('tr').hide();
+                                    $('.' + id).show();
+                                    $('.' + id).attr('style', 'color:#ff9600');
+                                }
+                            }, 1000);
+                        }
+                    });
+                }
+                // Map country
+                var nocBras = @Html(Json.stringify(Json.toJson(listNoc.map(x => x._1 -> x._2.toInt))));
+                //console.log(nocBras)
+                Highcharts.mapChart('mapVn', {
                     chart: {
-                        zoomType: 'xy'
+                        map: 'countries/vn/vn-all'
                     },
+
                     title: {
                         text: ''
                     },
-                    xAxis: [{
-                        categories: category
-                    }],
-                    yAxis: [{ // Secondary yAxis
-                        gridLineWidth: 0,
-                        title: {
-                            text: 'SignIn - LogOff Users',
+                    mapNavigation: {
+                        enabled: true,
+                        buttonOptions: {
+                            verticalAlign: 'bottom'
                         }
                     },
-                        { // Primary yAxis
-                            labels: {
-                                format: '{value}',
-                                style: {
-                                    color: "#f0ad4e"
-                                }
-                            },
-                            title: {
-                                text: 'Active users',
-                                style: {
-                                    color: "#f0ad4e"
-                                }
-                            },
-                            opposite: true
-
-                        }],
-                    tooltip: {
-                        shared: true
-                    },
-                    labels: {
-                        items: [{
-                            html: '',
-                            style: {
-                                left: '50px',
-                                top: '18px',
-                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
-                            }
-                        }]
-                    },
-
-                    series: [{
-                        type: 'column',
-                        name: 'Sign In',
-                        yAxis: 0,
-                        color: "#FF0000",
-                        data: signin
-                    }, {
-                        type: 'column',
-                        name: 'Log Off',
-                        yAxis: 0,
-                        color: "#9073da",
-                        data: logoff
-                    }, {
-                        type: 'spline',
-                        name: 'Actives user',
-                        yAxis: 1,
-                        data: users,
-                        color: "#f0ad4e",
-                        marker: {
-                            lineWidth: 2,
-                            lineColor: "white",
-                            fillColor: '#f0ad4e'
+                    plotOptions:{
+                        column: {
+                            colorByPoint: true
                         }
-                    }]
-                });
-            }
+                    },
+                    colorAxis: {
 
-            function hideWaitme() {
-                $('#bras').waitMe("hide");
-                $('#tbBras').waitMe("hide");
-                $('#host').waitMe("hide");
-                $('#tbHost').waitMe("hide");
-                $('#line-bras').waitMe("hide");
-            }
-
-            function waitMe(){
-                $('#bras').waitMe({
-                    effect: 'roundBounce',
-                    text: 'Please wait...',
-                    bg: 'rgba(255,255,255,0.7)',
-                    color: '#000',
-                    textPos: 'vertical'
-                });
-                $('#line-bras').waitMe({
-                    effect: 'roundBounce',
-                    text: 'Please wait...',
-                    bg: 'rgba(255,255,255,0.7)',
-                    color: '#000',
-                    textPos: 'vertical'
-                });
-                $('#tbBras').waitMe({
-                    effect: 'roundBounce',
-                    text: 'Please wait...',
-                    bg: 'rgba(255,255,255,0.7)',
-                    color: '#000',
-                    textPos: 'vertical'
-                });
-                $('#host').waitMe({
-                    effect: 'roundBounce',
-                    text: 'Please wait...',
-                    bg: 'rgba(255,255,255,0.7)',
-                    color: '#000',
-                    textPos: 'vertical'
-                });
-                $('#tbHost').waitMe({
-                    effect: 'roundBounce',
-                    text: 'Please wait...',
-                    bg: 'rgba(255,255,255,0.7)',
-                    color: '#000',
-                    textPos: 'vertical'
-                });
-            }
-
-            // ----------------//
-            function drawHostBras(data,idBras){
-                $('#hostBras').show();
-                // Nodes HOST
-                /*var nodeHost1 = new vis.DataSet([
-                    {id: 0, label: 'Root',color:'#9B59B6'},
-                    {id: 1, label: 'Host1',color:'#1ABB9C'},
-                    {id: 2, label: 'Host2',color:'#1ABB9C'},
-                    {id: 11,label: 'Module1'},
-                    {id: 12,label: 'Module2'},
-                    {id: 111,label: 'Splitter1'},
-                    {id: 112,label: 'Splitter2'}
-                ]);*/
-               // console.log(getNodeHost(data,idBras))
-                var nodeHost = new vis.DataSet(getNodeHost(data,idBras))
-                //console.log(nodeHost)
-                // create an array with edges to represent the network
-                /*var edgeHost1 = new vis.DataSet([
-                    {from: 0, to: 1},
-                    {from: 0, to: 2},
-                    {from: 1, to: 11},
-                    {from: 1, to: 12},
-                    {from: 11, to: 111},
-                    {from: 11, to: 112}
-                ]);*/
-                var edgeHost = new vis.DataSet(getEdgeHost(data))
-                //console.log(edgeHost)
-                // Find contained in document
-                var divHost = document.getElementById('host');
-                //Define data object and the options of the network
-                var arrHost = {
-                    nodes: nodeHost,
-                    edges: edgeHost
-                };
-                var optionsHost = {
-                    autoResize: true,
-                    height: '100%',
-                    width: '100%'
-                };
-                //Define the network object to be rendered.
-                var host = new vis.Network(divHost, arrHost, optionsHost);
-                //Simply declare an event with callback.
-                host.on("click", function (params) {
-                    //console.log(params['nodes']['0']);
-                    var id = params['nodes']['0'];
-                    if(id!= undefined && (id==0 || id.indexOf('/')<0)) {
-                        $('#host').waitMe({
-                            effect: 'roundBounce',
-                            text: 'Please wait...',
-                            bg: 'rgba(255,255,255,0.7)',
-                            color: '#000',
-                            textPos: 'vertical'
-                        });
-                        $('#tbHost').waitMe({
-                            effect: 'roundBounce',
-                            text: 'Please wait...',
-                            bg: 'rgba(255,255,255,0.7)',
-                            color: '#000',
-                            textPos: 'vertical'
-                        });
-                        setTimeout(function () {
-                            $('#host').waitMe("hide");
-                            $('#tbHost').waitMe("hide");
-                            if(id==0){
-                                $('#tbHost tbody').find('tr').show();
-                                $('#tbHost tbody').find('tr').removeAttr('style', 'color:#ff9600');
-                            }else {
-                                $('#tbHost tbody').find('tr').hide();
-                                $('.' + id).show();
-                                $('.' + id).attr('style', 'color:#ff9600');
-                            }
-                        }, 1000);
-                    }
-                });
-            }
-            // Map country
-            var nocBras = @Html(Json.stringify(Json.toJson(listNoc.map(x => x._1 -> x._2.toInt))));
-            //console.log(nocBras)
-            Highcharts.mapChart('mapVn', {
-                chart: {
-                    map: 'countries/vn/vn-all'
-                },
-
-                title: {
-                    text: ''
-                },
-                mapNavigation: {
-                    enabled: true,
-                    buttonOptions: {
-                        verticalAlign: 'bottom'
-                    }
-                },
-                plotOptions:{
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                colorAxis: {
-
-                    dataClasses: [{
-                        from: 0,
-                        to: 100000,
-                        color: '#9B59B6',
-                        name: 'NOC'
-                    }/*, {
+                        dataClasses: [{
+                            from: 0,
+                            to: 100000,
+                            color: '#9B59B6',
+                            name: 'NOC'
+                        }/*, {
                         from: 0,
                         to: 100,
                         color: '#E74C3C',
                         name: 'INF'
                     }*/]
-                },
-                legend: {
-                    align: 'right',
-                    verticalAlign: 'top',
-                    x: -30,
-                    y: 70,
-                    floating: true,
-                    layout: 'vertical',
-                    valueDecimals: 0,
-                },
-                series: [{
-                    data: nocBras
-                    /* [ ['KTM', 0],
-                        ['PTO', 1],
-                        ['KGG', 2],
-                        ['QBH', 3],
-                        ['SLA', -7]]*/,
-                    name: 'Number of bras',
-                    states: {
-                        hover: {
-                            color: '#BADA55'
-                        }
                     },
-                    dataLabels: {
-
-                        enabled: true,
-
-                        color: '#FFFFFF',
-
-                        format: '{point.code}'
-
+                    legend: {
+                        align: 'right',
+                        verticalAlign: 'top',
+                        x: -30,
+                        y: 70,
+                        floating: true,
+                        layout: 'vertical',
+                        valueDecimals: 0,
                     },
-
-                    point: {
-                        events: {
-                            click: function () {
-                                $('#hostBras').hide();
-                                var name = this.name;
-                                var key = JSON.stringify(this.options);
-                                var code = key.substring(11,key.indexOf(',')-1);
-                                $.ajax({
-                                    url: "/bras-json?id=" + code,
-                                    cache: false,
-                                    beforeSend: function () {
-                                        $('#mapVn').waitMe({
-                                            effect: 'roundBounce',
-                                            text: 'Please wait...',
-                                            bg: 'rgba(255,255,255,0.7)',
-                                            color: '#000',
-                                            textPos: 'vertical'
-                                        });
-                                        $('#bras').waitMe({
-                                            effect: 'roundBounce',
-                                            text: 'Please wait...',
-                                            bg: 'rgba(255,255,255,0.7)',
-                                            color: '#000',
-                                            textPos: 'vertical'
-                                        });
-                                        $('#tbBras').waitMe({
-                                            effect: 'roundBounce',
-                                            text: 'Please wait...',
-                                            bg: 'rgba(255,255,255,0.7)',
-                                            color: '#000',
-                                            textPos: 'vertical'
-                                        });
-                                    },
-                                    success: function (data) {
-                                        if(data != "error") {
-                                            $('#lbBras').text("List bras outlier: " + name);
-                                            $('#grapBras').show();
-                                            drawGraphBras(data, name);
-                                            var html = insertTbBras(data.mapBras);
-                                            $('#tbBras tbody').html('');
-                                            $('#tbBras tbody').append(html);
-                                        }
-                                    },
-                                    complete: function () {
-                                        $('#mapVn').waitMe("hide");
-                                        $('#bras').waitMe("hide");
-                                        $('#tbBras').waitMe("hide");
-                                        $('#line-chart').hide();
-                                    },
-                                });
+                    series: [{
+                        data: nocBras
+                        /* [ ['KTM', 0],
+                            ['PTO', 1],
+                            ['KGG', 2],
+                            ['QBH', 3],
+                            ['SLA', -7]]*/,
+                        name: 'Number of bras',
+                        states: {
+                            hover: {
+                                color: '#BADA55'
                             }
+                        },
+                        dataLabels: {
+
+                            enabled: true,
+
+                            color: '#FFFFFF',
+
+                            format: '{point.code}'
+
+                        },
+
+                        point: {
+                            events: {
+                                click: function () {
+                                    $('#hostBras').hide();
+                                    var name = this.name;
+                                    var key = JSON.stringify(this.options);
+                                    var code = key.substring(11,key.indexOf(',')-1);
+                                    $.ajax({
+                                        url: "/bras-json?id=" + code,
+                                        cache: false,
+                                        beforeSend: function () {
+                                            $('#mapVn').waitMe({
+                                                effect: 'roundBounce',
+                                                text: 'Please wait...',
+                                                bg: 'rgba(255,255,255,0.7)',
+                                                color: '#000',
+                                                textPos: 'vertical'
+                                            });
+                                            $('#bras').waitMe({
+                                                effect: 'roundBounce',
+                                                text: 'Please wait...',
+                                                bg: 'rgba(255,255,255,0.7)',
+                                                color: '#000',
+                                                textPos: 'vertical'
+                                            });
+                                            $('#tbBras').waitMe({
+                                                effect: 'roundBounce',
+                                                text: 'Please wait...',
+                                                bg: 'rgba(255,255,255,0.7)',
+                                                color: '#000',
+                                                textPos: 'vertical'
+                                            });
+                                        },
+                                        success: function (data) {
+                                            if(data != "error") {
+                                                $('#lbBras').text("List bras outlier: " + name);
+                                                $('#grapBras').show();
+                                                drawGraphBras(data, name);
+                                                var html = insertTbBras(data.mapBras);
+                                                $('#tbBras tbody').html('');
+                                                $('#tbBras tbody').append(html);
+                                            }
+                                        },
+                                        complete: function () {
+                                            $('#mapVn').waitMe("hide");
+                                            $('#bras').waitMe("hide");
+                                            $('#tbBras').waitMe("hide");
+                                            $('#line-chart').hide();
+                                            $('#heat-mapChart').hide();
+                                        },
+                                    });
+                                }
+                            }
+                        },
+
+                        name: 'Number Of Bras',
+
+                        tooltip: {
+
+                            pointFormat:  '{point.name}: {point.value}'
+
                         }
-                    },
-
-                    name: 'Number Of Bras',
-
-                    tooltip: {
-
-                        pointFormat:  '{point.name}: {point.value}'
-
-                    }
-                }]
+                    }]
+                });
             });
-          });
 
             function getTableHost(dta){
                 var html = "";
@@ -646,7 +770,7 @@
                         html+= '<td rowspan="'+sizeHost+'">'+dt[0].host+'</td><td>'+dt[0].module+'</td>';
                     }
                     html+= '<td>'+dt[1].cpe+'</td><td>'+dt[1].lostip+'</td>';
-                    html+= '<td></td><td></td><td></td></tr>';
+                    html+= '<!--<td></td><td></td><td></td>--></tr>';
                 });
                 return html;
             }
@@ -808,14 +932,14 @@
                         var arrErr = Object.values(Object.values(mapBras)[i])[j];
                         html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR">';
                         if(arrErr[0] != null && arrErr[0].length > 12) {
-                          html += '<span style="line-height: 0px" data-toggle="tooltip" title="'+arrErr[0]+'">'+JSON.stringify(arrErr[0]).substring(1,9)+'...</span>';
+                            html += '<span style="line-height: 0px" data-toggle="tooltip" title="'+arrErr[0]+'">'+JSON.stringify(arrErr[0]).substring(1,9)+'...</span>';
                         } else {
-                          html +=  arrErr[0]
+                            html +=  arrErr[0]
                         }
 
                         html += '</div> <div class="col-lg-6 col-md-6 col-xs-6">'+arrErr[1]+'</div></div>';
                         if(j < (Object.keys(Object.values(mapBras)[i]).length -1))
-                           html += '<div class="lineDiv"></div>';
+                            html += '<div class="lineDiv"></div>';
                     }
                     html += '</td><td>';
                     for(var j=0;j<Object.keys(Object.values(mapBras)[i]).length;j++) {
@@ -824,7 +948,7 @@
                         /*if(arrErr[2] != null && arrErr[2].length > 12) {
                           html += '<span style="line-height: 0px" data-toggle="tooltip" title="'+arrErr[2]+'">'+JSON.stringify(arrErr[2]).substring(1,9)+'...</span>';
                         } else {*/
-                          html += arrErr[2]
+                        html += arrErr[2]
                         //}
                         html += '</div><div class="col-lg-4 col-md-4 col-xs-4">'+arrErr[3]+'</div></div>';
                         if(j < (Object.keys(Object.values(mapBras)[i]).length -1))
