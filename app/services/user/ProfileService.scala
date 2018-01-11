@@ -6,6 +6,7 @@ import com.ftel.bigdata.utils.ESUtil
 import com.sksamuel.elastic4s.searches.SearchDefinition
 import services.ElasticUtil
 import services.domain.AbstractService
+import scala.concurrent.duration.SECONDS
 //import model.paytv.InternetContract
 import com.ftel.bigdata.utils.DateTimeUtil
 //import model.paytv.PayTVContract
@@ -174,7 +175,7 @@ object ProfileService extends AbstractService {
   }
 
   private def getDurationDoW(contract: String): Array[(String, Array[Double])] = {
-     val response = client.execute(search(s"user-duration-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await
+     val response = client.execute(search(s"user-duration-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await(scala.concurrent.duration.Duration(30, SECONDS))
      val result= response.hits.hits.map(x => x.sourceAsMap)
        .map(x => getValueAsString(x, "wod") -> Array(
            getValueAsDouble(x, "Mon"),
@@ -188,7 +189,7 @@ object ProfileService extends AbstractService {
   }
   
   private def getDownloadDoW(contract: String): (Array[(String, Array[Double])], Array[(String, Array[Double])]) = {
-     val response = client.execute(search(s"user-downup-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await
+     val response = client.execute(search(s"user-downup-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await(scala.concurrent.duration.Duration(30, SECONDS))
      val download= response.hits.hits.map(x => x.sourceAsMap)
        .map(x => getValueAsString(x, "wod") -> Array(
            getValueAsDouble(x, "Mon_Download"),
@@ -307,8 +308,8 @@ object ProfileService extends AbstractService {
     val durationDailyRes = ESUtil.get(client, "user-duration-daily-"+month, "docs", contract)
     val durationDailySource = durationDailyRes.source
     val durationDaily = durationDailySource.keySet
-      .filter(x => x.contains("sum(Size"))
-      .map(x => x.substring(8).replace("Duration)", "") -> getValueAsString(durationDailySource, x))
+      .filter(x => x.contains("Size"))
+      .map(x => x.substring(4).replace("Duration", "") -> getValueAsString(durationDailySource, x))
       .map(x => x._1.toInt.toString -> x._2.toDouble)
       .toArray
       .map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
@@ -332,9 +333,9 @@ object ProfileService extends AbstractService {
 
     val durationDow = getDurationDoW(contract)
     val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
-    val pon = client.execute(search(s"user-inf-pon-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    val pon = client.execute(search(s"user-inf-pon-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
     val suyhoutSource = if (pon.totalHits <= 0) {
-      client.execute(search(s"user-inf-adsl-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+      client.execute(search(s"user-inf-adsl-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
     } else pon
 
     val suyhout = suyhoutSource.hits.hits.map(x => x.sourceAsMap)
@@ -343,7 +344,7 @@ object ProfileService extends AbstractService {
       .sortBy(x => x._1)
       //.toMap.toArray
     //println(client.show(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000))
-    val errorRes = client.execute(search(s"user-inf-error-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await
+    val errorRes = client.execute(search(s"user-inf-error-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
     val error = errorRes.hits.hits.map(x => {
         //println(x.sourceAsMap)
         x.sourceAsMap
@@ -392,8 +393,8 @@ object ProfileService extends AbstractService {
 //    val numberOfPermanent = numberOfDevice - numberOfMobile
 //    val device = Device(numberOfDevice, numberOfVender, numberOfDeviceType, numberOfMobile, numberOfPermanent, venders, deviceTypes)
     
-    val device2Res = client.execute(getDevice2(contract)).await
-    
+    val device2Res = client.execute(getDevice2(contract)).await(scala.concurrent.duration.Duration(30, SECONDS))
+
     val rows = device2Res.hits.hits.map(x => x.sourceAsMap)
       .map(x => DeviceRow(
           getValueAsString(x, "day"),
@@ -440,7 +441,7 @@ object ProfileService extends AbstractService {
         DateTimeUtil.create(getValueAsLong(paytvSource, "change_date") / 1000))
 
       // Box
-      val boxRes = client.execute(search(s"user-contract-box" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 10).await
+      val boxRes = client.execute(search(s"user-contract-box" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 10).await(scala.concurrent.duration.Duration(30, SECONDS))
       val boxs = boxRes.hits.hits.map(x => x.sourceAsMap)
         .map(x => PayTVBox(getValueAsString(x, "customer_id"),
           getValueAsString(x, "contract"),
@@ -483,7 +484,7 @@ object ProfileService extends AbstractService {
         //println(client.show(vodRequest))
         val vodgiaitriRequest = getVodGiaitri(x,month)
         val vodthieunhiRequest = getVodThieuNhi(x,month)
-        val multiSearchResponse = client.execute(multi(hourly, app, dayOfWeek, iptv, appHourly, appDaily, daily, hourlyInMonth, vodRequest, vodgiaitriRequest, vodthieunhiRequest)).await
+        val multiSearchResponse = client.execute(multi(hourly, app, dayOfWeek, iptv, appHourly, appDaily, daily, hourlyInMonth, vodRequest, vodgiaitriRequest, vodthieunhiRequest)).await(scala.concurrent.duration.Duration(30, SECONDS))
 
         //multiSearchResponse.responses(4).aggregations.foreach(println)
 

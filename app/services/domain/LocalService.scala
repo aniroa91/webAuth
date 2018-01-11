@@ -1,9 +1,7 @@
 package services.domain
 
 import org.elasticsearch.search.sort.SortOrder
-
 import com.sksamuel.elastic4s.http.ElasticDsl._
-
 import model.MainDomainInfo
 import model.ProfileResponse
 import utils.SearchReponseUtil
@@ -15,12 +13,16 @@ import org.apache.http.client.methods.HttpPost
 import org.apache.http.HttpHost
 import org.apache.http.conn.params.ConnRoutePNames
 import org.apache.http.HttpStatus
+
 import scala.tools.jline_embedded.internal.InputStreamReader
 import java.io.BufferedReader
+
 import scalaj.http.Http
 import services.Configure
 import play.api.libs.json.Json
 import model.Bubble
+
+import scala.concurrent.duration.{Duration, SECONDS}
 
 case class Post(id: Int, tags: String)
 
@@ -101,7 +103,7 @@ object LocalService extends AbstractService {
       multi(
         search(s"dns-statslog-${day}" / "docs") query { must(termQuery("client", clientIP)) } aggregations (
           termsAggregation("domain").field("domain").subagg(sumAgg("sum", "queries")) size 1000
-      ))).await
+      ))).await(Duration(30, SECONDS))
     
     val time1 = System.currentTimeMillis()
     val response = multiSearchResponse.responses(0)
@@ -167,7 +169,7 @@ object LocalService extends AbstractService {
       multi(
         search(s"dns-statslog-${day}" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } aggregations (
             termsAggregation("hourly").field("hour").subagg(sumAgg("sum", "queries")) // sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } 
-        ))).await
+        ))).await(Duration(30, SECONDS))
     val time1 = System.currentTimeMillis()
     val response = multiSearchResponse.responses(0)
     

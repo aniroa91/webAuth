@@ -26,6 +26,8 @@ import org.apache.http.HttpHost
 import scalaj.http.Http
 import play.api.libs.json.Json
 import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
+
 import java.util.concurrent.TimeUnit
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
@@ -44,7 +46,7 @@ object CommonService extends AbstractService {
    */
   def getLatestDay(): String = {
     val response = client.execute(
-      search("dns-marker" / "docs") sortBy { fieldSort("day") order SortOrder.DESC } limit 1).await
+      search("dns-marker" / "docs") sortBy { fieldSort("day") order SortOrder.DESC } limit 1).await(Duration(30, SECONDS))
     response.hits.hits.head.id//.sourceAsMap.getOrElse("day", "").toString()
   }
 
@@ -142,14 +144,14 @@ object CommonService extends AbstractService {
         "expire" -> (if (whois.expire.isEmpty()) "2999-12-31" else whois.expire.substring(0, 10)),
         "label" -> "",
         "malware" -> "")
-        id whois.domainName).await
+        id whois.domainName).await(Duration(30, SECONDS))
   }
 
   /**
    * Get Category
    */
   def getCategory(domain: String): String = {
-    val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-category/docs").await
+    val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-category/docs").await(Duration(30, SECONDS))
     println(domain -> getResponse.sourceAsMap)
     val category = getResponse.sourceAsMap.getOrElse("category", "N/A").toString()
     if (category == "N/A") {
@@ -163,7 +165,7 @@ object CommonService extends AbstractService {
     val category = getCategoryFromApiXforceIbmcloud(domain)
 //    println(category)
     if (StringUtil.isNotNullAndEmpty(category)) {
-      client.execute( indexInto("dns-category" / "docs") fields ("category" -> category) id domain).await//(Duration.apply(10, TimeUnit.SECONDS))
+      client.execute( indexInto("dns-category" / "docs") fields ("category" -> category) id domain).await(Duration(30, SECONDS))//(Duration.apply(10, TimeUnit.SECONDS))
     }
   }
   
@@ -234,7 +236,7 @@ object CommonService extends AbstractService {
         boolQuery().must(termQuery("day", day), termQuery("label", label))
       } sortBy {
         fieldSort("queries") order (SortOrder.DESC)
-      } limit MAX_SIZE_RETURN).await
+      } limit MAX_SIZE_RETURN).await(Duration(30, SECONDS))
     println(s"Time(${day} ${label}): " + response.took)
     getMainDomainInfo(response)
   }
@@ -253,7 +255,7 @@ object CommonService extends AbstractService {
             .subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size MAX_SIZE_RETURN * 1000
       ) sortBy {
         fieldSort("queries") order (SortOrder.DESC)
-      } limit MAX_SIZE_RETURN).await
+      } limit MAX_SIZE_RETURN).await(Duration(30, SECONDS))
     println(s"Time(${fromDay} ${endDay}): " + response.took)
     //response.aggregations.foreach(println)
     getMainDomainInfo2(response)
@@ -267,7 +269,7 @@ object CommonService extends AbstractService {
         boolQuery().must(rangeQuery(RANK_FIELD).gt(from - 1).lt(MAX_SIZE_RETURN), termQuery(DAY_FIELD, day))
       } sortBy {
         fieldSort(RANK_FIELD)
-      } limit MAX_SIZE_RETURN).await
+      } limit MAX_SIZE_RETURN).await(Duration(30, SECONDS))
     getMainDomainInfo(response)
   }
 

@@ -46,10 +46,10 @@
         <!-- page content -->
     <div class="right_col" role="main">
         <div class="row">
-            <div class="col-lg-3 col-sm-3 col-md-3 col-xs-12" id="mapBras">
+            <div class="col-lg-5 col-sm-5 col-md-5 col-xs-12" id="mapBras">
                 <div class="x_panel">
                     <div style="border-bottom: 2px solid #E6E9ED;">
-                        <a onclick="reloadData()" class="btn btn-success a-btn-slide-text" style="font-size: 10px">
+                        <a onclick="reloadData()" data-toggle="tooltip" title="Data bras by country is loaded in a day ago" class="btn btn-success a-btn-slide-text" style="font-size: 10px">
                             <i class="fa fa-refresh" aria-hidden="true" style="margin-right: 5px;"></i>
                             <span><strong>Load</strong></span>
                         </a>
@@ -57,72 +57,58 @@
                     <div id="mapVn" style="height: 520px;"></div>
                 </div>
             </div>
-            <div class="col-lg-9 col-sm-9 col-md-9 col-xs-12" id="grapBras" style="display: none">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-
-                    <div class="x_panel">
-                        <div style="border-bottom: 2px solid #E6E9ED;">
-                            <a data-toggle="toggle" style="cursor: pointer" data-target="grapBras"><i class="fa fa-chevron-left" aria-hidden="true" style="margin-right: 5px;color: #C5C7CB"></i><span style="font-size: 16px;font-weight: 400" id="lbBras"></span></a>
-                        </div>
-                        <div id="bras" style="height: 530px"></div>
+            <div class="col-lg-7 col-sm-7 col-md-7 col-xs-12" id="grapBras" style="display: none">
+                <div class="x_panel">
+                    <div style="border-bottom: 2px solid #E6E9ED;height: 35px">
+                        <a data-toggle="toggle" style="cursor: pointer" data-target="grapBras"><i class="fa fa-chevron-left" aria-hidden="true" style="margin-right: 5px;color: #C5C7CB"></i>
+                            <span style="font-size: 16px;font-weight: 600">List bras outlier: </span> <span class="titProvin" id="lbBras"></span>
+                        </a>
+                        <i class="fa fa-info-circle" style="font-size: 17px" title="Data bras is loaded in a day ago."></i>
                     </div>
+                    <div id="bras" style="height: 520px"></div>
                 </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                    <div class="x_panel">
-                        <table class="data table table-bordered" id="tbBras">
-                            <thead>
-                                <tr>
-                                    <th style="width: 30%"></th>
-                                    <th>Kibana</th>
-                                    <th>Opsview</th>
-                                </tr>
-                                <tr>
-                                    <th>Bras_id</th>
-                                    <th>
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-8 col-xs-8 bdR">Error Name</div>
-                                            <div class="col-lg-6 col-md-6 col-xs-6">Error Level</div>
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <div class="row">
-                                            <div class="col-lg-8 col-md-8 col-xs-8 bdR">Service Name</div>
-                                            <div class="col-lg-4 col-md-4 col-xs-4">Service Status</div>
-                                        </div>
-                                </tr>
-                            </thead>
-                            <tbody>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-xs-12" id="divBras" style="display: none">
+                <div class="x_panel">
+                    <table class="data table table-bordered" id="tbBras">
+                        <thead>
+                            <tr style="color: white;background: rgba(52,73,94,.94)">
+                                <th id="thFirst" style="width: 30%">Bras Id <i class="fa fa-info-circle" style="font-size: 17px" title="Data bras is loaded in 30 minutes ago."></i></th>
+                                <th>Kibana</th>
+                                <th>Opsview</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-xs-6 bdR">Error Name</div>
+                                        <div class="col-lg-6 col-md-6 col-xs-6">Error Level</div>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-xs-6 bdR">Service Name</div>
+                                        <div class="col-lg-6 col-md-6 col-xs-6">Service Status</div>
+                                    </div>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                            </tbody>
-                        </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-7 col-sm-7 col-md-7 col-xs-12" id="heat-mapChart" style="display: none">
+                <div class="x_panel tile">
+                    <div class="x_title">
+                        <h2 id="titLineCard" style="margin-right: 5px;font-weight: 600"></h2> <i class="fa fa-info-circle" style="font-size: 17px" title="Data card is loaded between 1 minutes before and 1 minutes later than the current time bras"></i>
+                        <div class="clearfix"></div>
                     </div>
-                    <div id="heat-mapChart" class="row">
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="x_panel tile">
-                                <div class="x_title">
-                                    <h2 id="titLineCard"></h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <div id="heat_map" style="height:320px;"></div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="x_content">
+                        <div id="heat_map" style="height:350px;"></div>
                     </div>
                 </div>
             </div>
@@ -131,7 +117,7 @@
         <div style="display: none" id="line-chart">
             <div class="x_panel tile">
                 <div class="x_title">
-                    <h2> Detail information</h2>
+                    <h2 style="margin-right: 5px;font-weight: 600"> Detail information</h2> <i class="fa fa-info-circle" style="font-size: 17px" title="Data is loaded between 30 minutes before and 30 minutes later than the current time bras"></i>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -143,21 +129,22 @@
         <div class="row" id="hostBras" style="display: none">
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
                 <div class="x_panel">
-                    <div style="border-bottom: 2px solid #E6E9ED">
-                        <span style="font-size: 16px;font-weight: 400" id="lbHost"></span>
+                    <div style="height: 35px;border-bottom: 2px solid #E6E9ED">
+                        <span style="font-size: 16px;font-weight: 600" id="lbHost"></span> <i class="fa fa-info-circle" style="font-size: 17px" title="Data hosts of bras is loaded in 30 minutes ago."></i>
                     </div>
                     <div id="host" style="height: 300px"></div>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
-                <div class="x_panel">
+                <div class="x_panel" style="max-height: 450px;overflow-y: auto">
                     <table class="data table no-margin border" id="tbHost" >
                         <thead>
-                            <tr>
+                            <tr style="color: white;background: rgba(52,73,94,.94);">
                                 <th style="width: 30%">Host</th>
                                 <th>Module</th>
                                 <th>Cpe</th>
                                 <th>Lostip</th>
+                                <th>Total error</th>
                                 @*<th>Lost Signal</th>
                                 <th>User Down</th>
                                 <th>Inf Down</th>*@
@@ -227,8 +214,9 @@
                     var dtaLineCard = data.linecard;
                     var dtaCard = data.card;
                     var dtaPort = data.host;
-
-                    var nodeBras = new vis.DataSet(getNodeBras(dtaPort,dtaCard,dtaLineCard,dtaBras,name))
+                    var dtaLogoff = data.arsLog;
+                    var dtaSigin = data.arsSig;
+                    var nodeBras = new vis.DataSet(getNodeBras(dtaSigin,dtaLogoff,dtaPort,dtaCard,dtaLineCard,dtaBras,name))
                     // create an array with edges to represent the network
                     /*var edgeBras = new vis.DataSet([
                         {from: 1, to: 6},
@@ -264,11 +252,25 @@
                                 waitMe();
                                 setTimeout(function () {
                                     hideWaitme();
-                                    $('#hostBras').hide();
+                                    /*$('#hostBras').hide();
+                                    $('#line-chart').hide();
+                                    $('#heat-mapChart').hide();*/
+
                                     $('#line-chart').hide();
                                     $('#heat-mapChart').hide();
+                                    $('#line-bras').text("");
+                                    $('#heat_map').text("");
+                                    $('#hostBras').hide();
+                                    $('#host').text("");
+                                    $('#tbHost tbody').text("");
+
+                                    $('#divBras').removeClass('col-lg-5').removeClass('col-md-5').removeClass('col-sm-5');
+                                    $('#divBras .x_panel').removeClass('scrolAuto');
                                     $('#tbBras tbody').find('tr').show();
                                     $('#tbBras tbody').find('tr').removeAttr('style', 'color:#1ABB9C');
+                                    //$('.autoTooltip').removeClass('wordBreak');
+                                    //$('.autoTooltip').removeAttr("title");
+                                    $('#thFirst').attr('style','width:30%');
                                 }, 1000);
                             }
                             else {
@@ -281,7 +283,11 @@
                                     },
                                     success: function (dtBras) {
                                         if(dtBras != "error") {
+                                            //$('.autoTooltip').addClass('wordBreak');
+                                            $('#thFirst').attr('style','width:10%');
                                             var dtHost = dtBras.host;
+                                            $('#divBras').addClass('col-lg-5').addClass('col-md-5').addClass('col-sm-5');
+                                            $('#divBras .x_panel').addClass('scrolAuto');
                                             $('#heat-mapChart').show();
                                             drawHeatMapChart(dtBras);
                                             $('#line-chart').show();
@@ -290,6 +296,10 @@
                                             $('#tbBras tbody').find('tr').hide();
                                             $('#' + id).show();
                                             $('#' + id).attr('style', 'color:#1ABB9C');
+                                            /*$('#tbBras').find('.autoTooltip').each(function(){
+                                                var title = $(this).text();
+                                                $(this).attr('title',title);
+                                            });*/
                                             drawHostBras(groupGraphost(dtHost, 'host'), brasNode)
                                             var html = getTableHost(dtHost);
                                             if(html == "") html = "<tr><td colspan='4' style='font-size: 15px;color: #ddd;text-align: center'>No matching records found </td></tr>"
@@ -301,7 +311,7 @@
                                         }
                                     },
                                     complete: function () {
-                                        hideWaitme()
+                                        hideWaitme();
                                     },
                                 });
                             }
@@ -335,11 +345,13 @@
                 function drawHeatMapChart(dta){
                     var sigLog = dta.sigLog
                     var isLog = 0;
+                    var color = '#1ABB9C';
                     var titUser = " users log off"
                     if(sigLog[0][1] <= sigLog[0][2]){
                         $('#titLineCard').text("SignIn per card per line-cards");
                         titUser=" users signin";
                         isLog =1;
+                        color = '#d9534f';
                     }
                     else{
                         $('#titLineCard').text("Logoff per card per line-cards");
@@ -372,7 +384,7 @@
                         colorAxis: {
                             min: 0,
                             minColor: '#FFFFFF',
-                            maxColor: '#1ABB9C'
+                            maxColor: color
                         },
 
                         legend: {
@@ -461,13 +473,13 @@
                             type: 'column',
                             name: 'Sign In',
                             yAxis: 0,
-                            color: "#FF0000",
+                            color: "#d9534f",
                             data: signin
                         }, {
                             type: 'column',
                             name: 'Log Off',
                             yAxis: 0,
-                            color: "#9073da",
+                            color: "#1ABB9C",
                             data: logoff
                         }, {
                             type: 'spline',
@@ -540,7 +552,7 @@
 
                 // ----------------//
                 function drawHostBras(data,idBras){
-                    console.log(Object.keys(data).length)
+                    //console.log(Object.keys(data).length)
                     if(Object.keys(data).length == 0 )
                         $('#host').attr('style','height:150px');
                     else
@@ -635,24 +647,15 @@
                             verticalAlign: 'bottom'
                         }
                     },
+                    colorAxis: {
+                        min: 0,
+                        minColor: '#FFFFFF',
+                        maxColor: '#d9534f'
+                    },
                     plotOptions:{
                         column: {
                             colorByPoint: true
                         }
-                    },
-                    colorAxis: {
-
-                        dataClasses: [{
-                            from: 0,
-                            to: 100000,
-                            color: '#9B59B6',
-                            name: 'NOC'
-                        }/*, {
-                        from: 0,
-                        to: 100,
-                        color: '#E74C3C',
-                        name: 'INF'
-                    }*/]
                     },
                     legend: {
                         align: 'right',
@@ -670,7 +673,7 @@
                             ['KGG', 2],
                             ['QBH', 3],
                             ['SLA', -7]]*/,
-                        name: 'Number of bras',
+                        name: 'Number of bras outlier',
                         states: {
                             hover: {
                                 color: '#BADA55'
@@ -689,7 +692,13 @@
                         point: {
                             events: {
                                 click: function () {
+                                    $('#line-chart').hide();
+                                    $('#heat-mapChart').hide();
+                                    $('#line-bras').text("");
+                                    $('#heat_map').text("");
                                     $('#hostBras').hide();
+                                    $('#host').text("");
+                                    $('#tbHost tbody').text("");
                                     var name = this.name;
                                     var key = JSON.stringify(this.options);
                                     var code = key.substring(11,key.indexOf(',')-1);
@@ -721,27 +730,31 @@
                                         },
                                         success: function (data) {
                                             if(data != "error") {
-                                                $('#lbBras').text("List bras outlier: " + name);
+                                                $('#lbBras').text(name);
                                                 $('#grapBras').show();
+                                                $('#divBras').show();
+                                                $('#divBras').removeClass('col-lg-5').removeClass('col-md-5').removeClass('col-sm-5');
                                                 drawGraphBras(data, name);
                                                 var html = insertTbBras(data.mapBras);
                                                 $('#tbBras tbody').html('');
                                                 $('#tbBras tbody').append(html);
+                                                $('#tbBras').find('.autoTooltip').each(function(){
+                                                    var title = $(this).text();
+                                                    $(this).attr('title',title);
+                                                });
                                             }
                                         },
                                         complete: function () {
                                             $('#mapVn').waitMe("hide");
                                             $('#bras').waitMe("hide");
                                             $('#tbBras').waitMe("hide");
-                                            $('#line-chart').hide();
-                                            $('#heat-mapChart').hide();
                                         },
                                     });
                                 }
                             }
                         },
 
-                        name: 'Number Of Bras',
+                        name: 'Number Of Bras Outlier',
 
                         tooltip: {
 
@@ -770,6 +783,8 @@
                         html+= '<td rowspan="'+sizeHost+'">'+dt[0].host+'</td><td>'+dt[0].module+'</td>';
                     }
                     html+= '<td>'+dt[1].cpe+'</td><td>'+dt[1].lostip+'</td>';
+                    var totalErr = Number(dt[1].cpe)+Number(dt[1].lostip);
+                    html+= '<td>'+totalErr+'</td>';
                     html+= '<!--<td></td><td></td><td></td>--></tr>';
                 });
                 return html;
@@ -873,17 +888,22 @@
                 return jsonArr
             }
 
-            function getNodeBras(dtaPort,dtaCard,dtaLine,dtaBras,name){
+            function getNodeBras(dtaSigin,dtaLogoff,dtaPort,dtaCard,dtaLine,dtaBras,name){
                 var jsonArr = [];
                 jsonArr.push({
                     id: 0,
                     label: name,
-                    color: "#9B59B6"
+                    color: "#d9534f"
                 });
                 for (var i = 0; i < dtaBras.length; i++) {
+                    var sigin = dtaSigin[i][1];
+                    var logoff = dtaLogoff[i][1];
+                    var title = "Log Off: "+logoff+" users";
+                    if(Number(sigin)>Number(logoff))
+                        title = "Sign In: "+sigin+" users";
                     jsonArr.push({
                         id: dtaBras[i][0]+"/"+dtaBras[i][1],
-                        title: "Bras: "+dtaBras[i][0]+"<br>Time: "+dtaBras[i][1],
+                        title: "Bras: "+dtaBras[i][0]+"<br>Time: "+dtaBras[i][1]+"<br>"+title,
                         label:"Bras "+dtaBras[i][0].split("-")[0],
                         color: "#1ABB9C"
                     });
@@ -930,27 +950,27 @@
                     for(var j=0;j<Object.keys(Object.values(mapBras)[i]).length;j++) {
                         var leg = Object.keys(Object.values(mapBras)[i]).length;
                         var arrErr = Object.values(Object.values(mapBras)[i])[j];
-                        html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR">';
-                        if(arrErr[0] != null && arrErr[0].length > 12) {
-                            html += '<span style="line-height: 0px" data-toggle="tooltip" title="'+arrErr[0]+'">'+JSON.stringify(arrErr[0]).substring(1,9)+'...</span>';
+                        html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR autoTooltip">';
+                        if(arrErr[0] != null && arrErr[0].length > 40) {
+                            html += '<span style="line-height: 0px" data-toggle="tooltip" title="'+arrErr[0]+'">'+JSON.stringify(arrErr[0]).substring(1,40)+'...</span>';
                         } else {
                             html +=  arrErr[0]
                         }
 
-                        html += '</div> <div class="col-lg-6 col-md-6 col-xs-6">'+arrErr[1]+'</div></div>';
+                        html += '</div> <div class="col-lg-6 col-md-6 col-xs-6 autoTooltip">'+arrErr[1]+'</div></div>';
                         if(j < (Object.keys(Object.values(mapBras)[i]).length -1))
                             html += '<div class="lineDiv"></div>';
                     }
                     html += '</td><td>';
                     for(var j=0;j<Object.keys(Object.values(mapBras)[i]).length;j++) {
                         var arrErr = Object.values(Object.values(mapBras)[i])[j];
-                        html += '<div class="row"><div class="col-lg-8 col-md-8 col-xs-8 bdR">'
+                        html += '<div class="row"><div class="col-lg-6 col-md-6 col-xs-6 bdR autoTooltip">'
                         /*if(arrErr[2] != null && arrErr[2].length > 12) {
                           html += '<span style="line-height: 0px" data-toggle="tooltip" title="'+arrErr[2]+'">'+JSON.stringify(arrErr[2]).substring(1,9)+'...</span>';
                         } else {*/
                         html += arrErr[2]
                         //}
-                        html += '</div><div class="col-lg-4 col-md-4 col-xs-4">'+arrErr[3]+'</div></div>';
+                        html += '</div><div class="col-lg-6 col-md-6 col-xs-6 autoTooltip">'+arrErr[3]+'</div></div>';
                         if(j < (Object.keys(Object.values(mapBras)[i]).length -1))
                             html += '<div class="lineDiv"></div>';
                     }

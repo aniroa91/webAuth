@@ -9,6 +9,8 @@ import services.ElasticUtil
 import model.user.DashboardResponse
 import services.Bucket
 
+import scala.concurrent.duration.{Duration, SECONDS}
+
 object DashboardService extends AbstractService {
 
   private val TO = "2017-09-25"
@@ -18,7 +20,7 @@ object DashboardService extends AbstractService {
     val multiSearchResponse = client.execute(multi(
           term(TO),
           termHourly(TO)
-        )).await
+        )).await(Duration(30, SECONDS))
     //println(client.show(term(TO)))
     val responses = multiSearchResponse.responses
     //val appByCount = responses(0)

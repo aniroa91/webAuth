@@ -1,7 +1,6 @@
 package services.domain
 
 import org.elasticsearch.search.sort.SortOrder
-
 import com.sksamuel.elastic4s.http.ElasticDsl.MultiSearchHttpExecutable
 import com.sksamuel.elastic4s.http.ElasticDsl.RichFuture
 import com.sksamuel.elastic4s.http.ElasticDsl.RichString
@@ -13,17 +12,19 @@ import com.sksamuel.elastic4s.http.ElasticDsl.search
 import com.sksamuel.elastic4s.http.ElasticDsl.termQuery
 import com.sksamuel.elastic4s.http.ElasticDsl.termsAggregation
 import com.sksamuel.elastic4s.http.ElasticDsl._
-
 import model.MainDomainInfo
 import model.ProfileResponse
 import utils.SearchReponseUtil
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.ftel.bigdata.utils.HttpUtil
 import model.DomainLocation
+
 import scala.util.Try
 import model.Label
 import com.ftel.bigdata.utils.ESUtil
 import services.Configure
+
+import scala.concurrent.duration.{Duration, SECONDS}
 
 object ProfileService extends AbstractService {
 
@@ -50,7 +51,7 @@ object ProfileService extends AbstractService {
                   avgAgg("avg", "queries")
               ) size 240
           ) size 240
-        )).await
+        )).await(Duration(30, SECONDS))
 
     val time1 = System.currentTimeMillis()
     val secondResponse = multiSearchResponse.responses(0)
@@ -129,7 +130,7 @@ object ProfileService extends AbstractService {
   @deprecated
   private def indexLocationRemove(domain: String) {
     val time0 = System.currentTimeMillis()
-    val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await
+    val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-location/docs").await(Duration(30, SECONDS))
     if (!getResponse.exists) {
 //      val url = IP_API_URL + domain
 //      val content = HttpUtil.getContent(url, "172.30.45.220", 80)
@@ -155,7 +156,7 @@ object ProfileService extends AbstractService {
         search("dns-service-domain-*" / "domain") query { must(termQuery(SECOND_FIELD, domain)) } aggregations (
           cardinalityAgg(NUM_DOMAIN_FIELD, "domain")),
         search((ES_INDEX + "whois") / "whois") query { must(termQuery(DOMAIN_FIELD, domain)) }
-        )).await
+        )).await(Duration(30, SECONDS))
     val time1 = System.currentTimeMillis()
     val secondResponse = multiSearchResponse.responses(0)
     val answerResponse = multiSearchResponse.responses(1)
@@ -185,7 +186,7 @@ object ProfileService extends AbstractService {
       multi(
         search(s"dns-statslog-${day}" / "docs") query { must(termQuery(SECOND_FIELD, domain)) } aggregations (
             termsAggregation("hourly").field("hour").subagg(sumAgg("sum", "queries")) size 24// sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } 
-        ))).await
+        ))).await(Duration(30, SECONDS))
     val response = multiSearchResponse.responses(0)
     getHourly(response)
   }

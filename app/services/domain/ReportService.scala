@@ -1,7 +1,6 @@
 package services.domain
 
 import model.DashboardResponse
-
 import org.elasticsearch.search.sort.SortOrder
 import com.ftel.bigdata.utils.HttpUtil
 import com.sksamuel.elastic4s.ElasticsearchClientUri
@@ -11,12 +10,15 @@ import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import services.CacheService
 import com.ftel.bigdata.utils.DateTimeUtil
+
 import scala.util.Try
 import model.ReportResponse
 import model.MalwareInfo
 import model.Label
 import utils.Sort
 import model.DayHourly
+
+import scala.concurrent.duration.{Duration, SECONDS}
 
 //import com.ftel.bigdata.dns.parameters.Label
 
@@ -49,7 +51,7 @@ object ReportService extends AbstractService {
         search(s"dns-org-${day}" / "docs") sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC) size 10, // org
         search(s"dns-country-${day}" / "docs") sortBy (fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC) size 100, // countr
         search(s"dns-hourly-day-${day}" / "docs") size 24 // hourly
-        )).await
+        )).await(Duration(30, SECONDS))
     val time1 = System.currentTimeMillis()
     
     val currentResponse = multiSearchResponse.responses(0)
@@ -106,7 +108,7 @@ object ReportService extends AbstractService {
         search(s"dns-daily-${prev}" / "docs"),
         search(s"dns-statslog-2017-08-21" / "docs") query { must(termQuery(LABEL_FIELD, BLACK_VALUE)) } sortBy { fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC } limit 100
         //search(s"dns-stats-${day}" / "top") query { must(termQuery(LABEL_FIELD, BLACK_VALUE)) } sortBy { fieldSort(NUM_QUERY_FIELD) order SortOrder.DESC } limit 1000
-        )).await
+        )).await(Duration(30, SECONDS))
     val time1 = System.currentTimeMillis()
     
     val currentResponse = multiSearchResponse.responses(0)

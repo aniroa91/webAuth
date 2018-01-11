@@ -16,7 +16,7 @@ object BrasService {
     BrasesCard.listBrasOutlier
   }
 
-  def listBrasById(id: String): Future[Seq[(String,String,String,String,String)]] = {
+  def listBrasById(id: String): Future[Seq[(String,String,String,String,String,Int,Int)]] = {
     BrasesCard.listBrasById(id)
   }
 

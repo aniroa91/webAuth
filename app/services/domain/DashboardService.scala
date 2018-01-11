@@ -2,6 +2,8 @@ package services.domain
 
 import org.elasticsearch.search.sort.SortOrder
 
+import scala.concurrent.duration.{Duration, SECONDS}
+
 //import com.sksamuel.elastic4s.http.ElasticDsl.MultiSearchHttpExecutable
 //import com.sksamuel.elastic4s.http.ElasticDsl.RichFuture
 //import com.sksamuel.elastic4s.http.ElasticDsl.RichString
@@ -49,7 +51,7 @@ object DashboardService extends AbstractService {
       //          //termsAggregation("daily").field("day").subagg(sumAgg("sum", "queries")) size 30
       //        )
     //println(response.totalHits)
-    val response = client.execute(search(s"dns-daily-*" / "docs") size 1000).await
+    val response = client.execute(search(s"dns-daily-*" / "docs") size 1000).await(Duration(30, SECONDS))
     val daily = response.hits.hits.map(x => {
       val sourceAsMap = x.sourceAsMap
       val day = getValueAsString(sourceAsMap, "day")
@@ -115,7 +117,7 @@ object DashboardService extends AbstractService {
   def get1(day: String): DashboardResponse = {
     val report = ReportService.get(day)
 
-    val multiSearchResponse = client.execute(multi(search(s"dns-overview-*" / "overview") sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } limit 30)).await
+    val multiSearchResponse = client.execute(multi(search(s"dns-overview-*" / "overview") sortBy { fieldSort(DAY_FIELD) order SortOrder.DESC } limit 30)).await(Duration(30, SECONDS))
     val dailyResponse = multiSearchResponse.responses(0)
 
     println(dailyResponse.hits.hits)

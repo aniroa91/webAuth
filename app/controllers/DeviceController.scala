@@ -80,15 +80,19 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val tm = outlier._2.substring(0,outlier._2.indexOf(".")+3)
         val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
         val dateTime = DateTime.parse(tm, formatter)
-        val oldTime  = dateTime.minusMinutes(15).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+        val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
         val brasKey = Await.result(BrasService.opViewKibana(outlier._1,dateTime.toString,oldTime), Duration.Inf)
         mapBras += (outlier._1+"/"+outlier._2-> brasKey)
       }
       val arrLine = lstBras.map(x => (x._1, x._2) -> x._3).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
       val arrCard = lstBras.map(x => (x._1, x._2, x._3) -> x._4).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
       val arrHost = lstBras.map(x => (x._1, x._2, x._3,x._4) -> x._5).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
+      val arsSig = lstBras.map(x => (x._1, x._2) -> x._6).groupBy(x => x._1).mapValues(x => x.map(y => y._2).sum)
+      val arsLog = lstBras.map(x => (x._1, x._2) -> x._7).groupBy(x => x._1).mapValues(x => x.map(y => y._2).sum)
       val jsBras = Json.obj(
         "bras" -> arrOutlier,
+        "arsSig" ->arsSig,
+        "arsLog" ->arsLog,
         "linecard" -> arrLine,
         "card" -> arrCard,
         "host" -> arrHost,
