@@ -72,11 +72,18 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
   }
 
   def getBrasJson(id: String) = Action { implicit request =>
-    try{
+    //try{
       val lstBras = Await.result(BrasService.listBrasById(id), Duration.Inf)
       var mapBras = collection.mutable.Map[String, Seq[(String,String,String,String)]]()
       val arrOutlier = lstBras.map(x => (x._1->x._2)).toList.distinct
+      var mapSigLog = new Array[String](arrOutlier.length)
+      var num =0;
       for(outlier <- arrOutlier){
+        // get  map num of signin and logoff
+        val objBras = Await.result(BrasService.getNumLogSiginById(outlier._1,outlier._2), Duration.Inf)
+        mapSigLog(num)= objBras(0)._1.toString +"/" +objBras(0)._2.toString
+        num = num +1;
+        // get kibana and opview
         val tm = outlier._2.substring(0,outlier._2.indexOf(".")+3)
         val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
         val dateTime = DateTime.parse(tm, formatter)
@@ -87,22 +94,19 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val arrLine = lstBras.map(x => (x._1, x._2) -> x._3).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
       val arrCard = lstBras.map(x => (x._1, x._2, x._3) -> x._4).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
       val arrHost = lstBras.map(x => (x._1, x._2, x._3,x._4) -> x._5).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
-      val arsSig = lstBras.map(x => (x._1, x._2) -> x._6).groupBy(x => x._1).mapValues(x => x.map(y => y._2).sum)
-      val arsLog = lstBras.map(x => (x._1, x._2) -> x._7).groupBy(x => x._1).mapValues(x => x.map(y => y._2).sum)
       val jsBras = Json.obj(
         "bras" -> arrOutlier,
-        "arsSig" ->arsSig,
-        "arsLog" ->arsLog,
+        "logSig" ->mapSigLog,
         "linecard" -> arrLine,
         "card" -> arrCard,
         "host" -> arrHost,
         "mapBras" -> mapBras
       )
       Ok(Json.toJson(jsBras))
-    }
+    /*}
     catch{
       case e: Exception => Ok("error")
-    }
+    }*/
   }
 
 }

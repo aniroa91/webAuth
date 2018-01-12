@@ -202,162 +202,166 @@
     <script type="text/javascript">
             $(document).ready(function () {
                 // Build the chart line day of month vector
-                var category = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t => t.time.toString})));
-                var logoff = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t =>t.logoff})));
-                var signin = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t =>t.signin})));
-                var users = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t => t.active_user})));
-                //console.log(category)
-                Highcharts.chart('chart-bras', {
-                    chart: {
-                        zoomType: 'xy'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    xAxis: [{
-                        categories: category
-                    }],
-                    yAxis: [{ // Secondary yAxis
-                        gridLineWidth: 0,
+                @if(lstBrasChart != null){
+                    var category = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t => t.time.toString})));
+                    var logoff = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t =>t.logoff})));
+                    var signin = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t =>t.signin})));
+                    var users = @Html(Json.stringify(Json.toJson(lstBrasChart.map { t => t.active_user})));
+                    //console.log(category)
+                    Highcharts.chart('chart-bras', {
+                        chart: {
+                            zoomType: 'xy'
+                        },
                         title: {
-                            text: 'SignIn - LogOff Users',
-                            /*style: {
-                                color: "#1ABB9C"
-                            }*/
+                            text: ''
+                        },
+                        xAxis: [{
+                            categories: category
+                        }],
+                        yAxis: [{ // Secondary yAxis
+                            gridLineWidth: 0,
+                            title: {
+                                text: 'SignIn - LogOff Users',
+                                /*style: {
+                                    color: "#1ABB9C"
+                                }*/
+                            },
+                            labels: {
+                                format: '{value} users',
+                                /*style: {
+                                    color: "#1ABB9C"
+                                }*/
+                            }
+                        },
+                            { // Primary yAxis
+                                labels: {
+                                    format: '{value}',
+                                    style: {
+                                        color: "red"
+                                    }
+                                },
+                                title: {
+                                    text: 'Active users',
+                                    style: {
+                                        color: "red"
+                                    }
+                                },
+                                opposite: true
+
+                            }],
+                        tooltip: {
+                            shared: true
                         },
                         labels: {
-                            format: '{value} users',
-                            /*style: {
-                                color: "#1ABB9C"
-                            }*/
-                        }
-                    },
-                        { // Primary yAxis
-                            labels: {
-                                format: '{value}',
+                            items: [{
+                                html: '',
                                 style: {
-                                    color: "red"
+                                    left: '50px',
+                                    top: '18px',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
                                 }
-                            },
-                            title: {
-                                text: 'Active users',
-                                style: {
-                                    color: "red"
-                                }
-                            },
-                            opposite: true
+                            }]
+                        },
 
-                        }],
-                    tooltip: {
-                        shared: true
-                    },
-                    labels: {
-                        items: [{
-                            html: '',
-                            style: {
-                                left: '50px',
-                                top: '18px',
-                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                        series: [{
+                            type: 'column',
+                            name: 'Sign In',
+                            yAxis: 0,
+                            color: "#f0ad4e",
+                            data: signin
+                        }, {
+                            type: 'column',
+                            name: 'Log Off',
+                            yAxis: 0,
+                            color: "#9073da",
+                            data: logoff
+                        }, {
+                            type: 'spline',
+                            name: 'Actives user',
+                            yAxis: 1,
+                            data: users,
+                            color: "#FF0000",
+                            marker: {
+                                lineWidth: 2,
+                                lineColor: "white",
+                                fillColor: '#FF0000'
                             }
                         }]
-                    },
-
-                    series: [{
-                        type: 'column',
-                        name: 'Sign In',
-                        yAxis: 0,
-                        color: "#f0ad4e",
-                        data: signin
-                    }, {
-                        type: 'column',
-                        name: 'Log Off',
-                        yAxis: 0,
-                        color: "#9073da",
-                        data: logoff
-                    }, {
-                        type: 'spline',
-                        name: 'Actives user',
-                        yAxis: 1,
-                        data: users,
-                        color: "#FF0000",
-                        marker: {
-                            lineWidth: 2,
-                            lineColor: "white",
-                            fillColor: '#FF0000'
-                        }
-                    }]
-                });
-                // heat map line cards
-                var card = @Html(Json.stringify(Json.toJson(listCard.map { t => t._3})));
-                var linecard = @Html(Json.stringify(Json.toJson(listCard.map { t => t._2})));
-                var data = @Html(Json.stringify(Json.toJson(listCard)));
-                var numSignin = @Html(Json.stringify(Json.toJson(lstbrasTime(0).signin)));
-                var numLogoff = @Html(Json.stringify(Json.toJson(lstbrasTime(0).logoff)));
-                var titUser = " users log off"
-                var isLog = 0
-                if(Number(numSignin)>=Number(numLogoff)){
-                    titUser=" users signin";
-                    isLog = 1;
+                    });
                 }
-                var cardLabel = getCard(card,1)
-                var linecardLabel = getCard(linecard,0)
-                var dta = getData(data,isLog)
+                // heat map line cards
+                @if(listCard != null && lstbrasTime != null){
+                    var card = @Html(Json.stringify(Json.toJson(listCard.map { t => t._3})));
+                    var linecard = @Html(Json.stringify(Json.toJson(listCard.map { t => t._2})));
+                    var data = @Html(Json.stringify(Json.toJson(listCard)));
+                    var numSignin = @Html(Json.stringify(Json.toJson(lstbrasTime(0).signin)));
+                    var numLogoff = @Html(Json.stringify(Json.toJson(lstbrasTime(0).logoff)));
+                    var titUser = " users log off"
+                    var isLog = 0
+                    if (Number(numSignin) >= Number(numLogoff)) {
+                        titUser = " users signin";
+                        isLog = 1;
+                    }
+                    var cardLabel = getCard(card, 1)
+                    var linecardLabel = getCard(linecard, 0)
+                    var dta = getData(data, isLog)
 
-                Highcharts.chart('heat_map', {
+                    Highcharts.chart('heat_map', {
 
-                    chart: {
-                        type: 'heatmap',
-                        marginTop: 40,
-                        marginBottom: 80,
-                        plotBorderWidth: 1
-                    },
+                        chart: {
+                            type: 'heatmap',
+                            marginTop: 40,
+                            marginBottom: 80,
+                            plotBorderWidth: 1
+                        },
 
-                    title: {
-                        text: ''
-                    },
+                        title: {
+                            text: ''
+                        },
 
-                    xAxis: {
-                        categories: cardLabel
-                    },
+                        xAxis: {
+                            categories: cardLabel
+                        },
 
-                    yAxis: {
-                        categories: linecardLabel,
-                        title: null
-                    },
+                        yAxis: {
+                            categories: linecardLabel,
+                            title: null
+                        },
 
-                    colorAxis: {
-                        min: 0,
-                        minColor: '#FFFFFF',
-                        maxColor: '#1ABB9C'
-                    },
+                        colorAxis: {
+                            min: 0,
+                            minColor: '#FFFFFF',
+                            maxColor: '#1ABB9C'
+                        },
 
-                    legend: {
-                        align: 'right',
-                        layout: 'vertical',
-                        margin: 0,
-                        verticalAlign: 'top',
-                        y: 25,
-                        symbolHeight: 280
-                    },
+                        legend: {
+                            align: 'right',
+                            layout: 'vertical',
+                            margin: 0,
+                            verticalAlign: 'top',
+                            y: 25,
+                            symbolHeight: 280
+                        },
 
-                    tooltip: {
-                        formatter: function () {
-                            return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> has <br><b>' +
-                                    this.point.value + '</b> '+titUser+' <br><b>'+  this.series.yAxis.categories[this.point.y] + '</b>';
-                        }
-                    },
+                        tooltip: {
+                            formatter: function () {
+                                return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> has <br><b>' +
+                                        this.point.value + '</b> ' + titUser + ' <br><b>' + this.series.yAxis.categories[this.point.y] + '</b>';
+                            }
+                        },
 
-                    series: [{
-                        name: 'Logoff per card',
-                        borderWidth: 1,
-                        data: dta,
-                        dataLabels: {
-                            enabled: true,
-                            color: '#000000'
-                        }
-                    }]
+                        series: [{
+                            name: 'Logoff per card',
+                            borderWidth: 1,
+                            data: dta,
+                            dataLabels: {
+                                enabled: true,
+                                color: '#000000'
+                            }
+                        }]
 
-                });
+                    });
+                }
             });
             function getCard(arrCard,type){
                 var jsonArr = [];

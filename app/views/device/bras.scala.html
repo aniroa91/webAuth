@@ -67,38 +67,40 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @for(bras <- lstBras){
-                        <tr>
-                            <td><a href="/brasInfo?id=@bras._1&time=@bras._2&sigin=@bras._4&logoff=@bras._5&timeCurrent=@bras._2" style="color: #1ABB9C;" class="activeHref">@bras._1</a></td>
-                            <td>@bras._2</td>
-                            <td>@bras._4</td>
-                            <td>@bras._5</td>
-                            <td>@bras._3</td>
-                            <td>@bras._6</td>
-                            <td>@bras._7</td>
-                            <td>@bras._8</td>
-                            <td>@bras._9</td>
-                            <td>
-                                @if(bras._10.isEmpty || bras._10.get == "0"){
-                                    <span class="label label-danger lbOutlier" style="font-size: 13px">Outlier</span>
-                                }else{
-                                    <span class="label label-success lbOutlier" style="font-size: 13px">Outlier</span>
-                                }
-                            </td>
-                            <td style="padding-top: 5px">
-                                <a onclick="confirmOutlier(this)" id="@bras._1/@bras._2.replace(" ","=").replace(":","_").replace(":","_").replace(".","%")" class="btn btn-primary a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">
-                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                    <span><strong>Confirm</strong></span>
-                                </a>
-                            </td>
-                            <td style="padding-top: 5px">
-                                <a onclick="rejectOutlier(this)" id="@bras._1/@bras._2" class="btn btn-primary a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">
-                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                    <span><strong>Reject</strong></span>
-                                </a>
-                            </td>
-                        </tr>
-                    }
+                        @if(lstBras != null){
+                            @for(bras <- lstBras){
+                                <tr>
+                                    <td><a href="/brasInfo?id=@bras._1&time=@bras._2&sigin=@bras._4&logoff=@bras._5&timeCurrent=@bras._2" style="color: #1ABB9C;" class="activeHref">@bras._1</a></td>
+                                    <td>@bras._2</td>
+                                    <td>@bras._4</td>
+                                    <td>@bras._5</td>
+                                    <td>@bras._3</td>
+                                    <td>@bras._6</td>
+                                    <td>@bras._7</td>
+                                    <td>@bras._8</td>
+                                    <td>@bras._9</td>
+                                    <td>
+                                    @if(bras._10.isEmpty || bras._10.get == "0"){
+                                        <span class="label label-danger lbOutlier" style="font-size: 13px">Outlier</span>
+                                    }else{
+                                        <span class="label label-success lbOutlier" style="font-size: 13px">Outlier</span>
+                                    }
+                                    </td>
+                                    <td style="padding-top: 5px">
+                                        <a onclick="confirmOutlier(this)" id="@bras._1/@bras._2.replace(" ","=").replace(":","_").replace(":","_").replace(".","%")" class="btn btn-primary a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">
+                                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                            <span><strong>Confirm</strong></span>
+                                        </a>
+                                    </td>
+                                    <td style="padding-top: 5px">
+                                        <a onclick="rejectOutlier(this)" id="@bras._1/@bras._2" class="btn btn-primary a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">
+                                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                            <span><strong>Reject</strong></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
                     </tbody>
                 </table>
             </div>

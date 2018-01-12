@@ -93,6 +93,15 @@ object BrasesCard {
         .as[(String, String,String,String)])
   }
 
+  def getNumLogSiginById(id : String,time: String) : Future[Seq[(Int,Int)]] = {
+    dbConfig.db.run(
+      sql"""SELECT signin_total_count,logoff_total_count
+            FROM dwh_radius_bras_detail
+            WHERE bras_id=$id AND date_time=$time::TIMESTAMP
+         """
+        .as[(Int,Int)])
+  }
+
   def getCard(id: String,time: String,sigin: String,logoff: String): Future[Seq[(String,String,String,Int,Int)]] = {
     val strTime = time.substring(0,time.indexOf(".")+2)
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")

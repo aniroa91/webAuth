@@ -36,6 +36,10 @@ object BrasService {
     BrasesCard.opViewKibana(id,time,oldTime)
   }
 
+  def getNumLogSiginById(id : String,time: String): Future[Seq[(Int,Int)]] = {
+    BrasesCard.getNumLogSiginById(id,time)
+  }
+
   def getBrasTime(id : String,time: String) : Future[Seq[Bras]] = {
     BrasList.getTime(id,time)
   }

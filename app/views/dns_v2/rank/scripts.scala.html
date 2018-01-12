@@ -6,10 +6,6 @@
 
 <script type="text/javascript">
         $(document).ready(function () {
-            $('.topRank').select2({
-                minimumResultsForSearch: Infinity
-            });
-            $('.ui.selection.dropdown').dropdown();
             // event click time
             var lastWeek = @Html(Json.stringify(Json.toJson(response.last7Day.map(x => Array(x.rankFtel.toString,getImageTag(x.name),getLinkTag(x.name),formatNumber(x.queries),x.label)))));
             var lastMonth = @Html(Json.stringify(Json.toJson(response.last30Day.map(x => Array(x.rankFtel.toString,getImageTag(x.name),getLinkTag(x.name),formatNumber(x.queries),x.label)))));

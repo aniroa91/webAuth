@@ -106,6 +106,16 @@
         </div>
 
         @views.html.common.bottom("Rank",0)
-        @scripts(response)
+        <script type="text/javascript">
+              $(document).ready(function () {
+                    $('.topRank').select2({
+                        minimumResultsForSearch: Infinity
+                    });
+                    $('.ui.selection.dropdown').dropdown();
+              });
+        </script>
+        @if(response != null) {
+            @scripts(response)
+        }
     </body>
 </html>
