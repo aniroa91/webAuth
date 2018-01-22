@@ -72,7 +72,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
   }
 
   def getBrasJson(id: String) = Action { implicit request =>
-    //try{
+    try{
       val lstBras = Await.result(BrasService.listBrasById(id), Duration.Inf)
       var mapBras = collection.mutable.Map[String, Seq[(String,String,String,String)]]()
       val arrOutlier = lstBras.map(x => (x._1->x._2)).toList.distinct
@@ -103,10 +103,10 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         "mapBras" -> mapBras
       )
       Ok(Json.toJson(jsBras))
-    /*}
+    }
     catch{
       case e: Exception => Ok("error")
-    }*/
+    }
   }
 
 }

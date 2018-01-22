@@ -264,9 +264,9 @@
                                     $('#hostBras').hide();
                                     $('#host').text("");
                                     $('#tbHost tbody').text("");
-
                                     $('#divBras').removeClass('col-lg-5').removeClass('col-md-5').removeClass('col-sm-5');
-                                    $('#divBras .x_panel').removeClass('scrolAuto');
+                                    $('#divBras .x_panel').removeClass('xsScroll');
+                                    $('#divBras .x_panel').addClass('lgScroll');
                                     $('#tbBras tbody').find('tr').show();
                                     $('#tbBras tbody').find('tr').removeAttr('style', 'color:#1ABB9C');
                                     //$('.autoTooltip').removeClass('wordBreak');
@@ -288,7 +288,8 @@
                                             $('#thFirst').attr('style','width:10%');
                                             var dtHost = dtBras.host;
                                             $('#divBras').addClass('col-lg-5').addClass('col-md-5').addClass('col-sm-5');
-                                            $('#divBras .x_panel').addClass('scrolAuto');
+                                            $('#divBras .x_panel').addClass('xsScroll');
+                                            $('#divBras .x_panel').removeClass('lgScroll');
                                             $('#heat-mapChart').show();
                                             drawHeatMapChart(dtBras);
                                             $('#line-chart').show();
@@ -735,6 +736,7 @@
                                                     $('#lbBras').text(name);
                                                     $('#grapBras').show();
                                                     $('#divBras').show();
+                                                    $('#divBras .x_panel').addClass('lgScroll');
                                                     $('#divBras').removeClass('col-lg-5').removeClass('col-md-5').removeClass('col-sm-5');
                                                     drawGraphBras(data, name);
                                                     var html = insertTbBras(data.mapBras);
