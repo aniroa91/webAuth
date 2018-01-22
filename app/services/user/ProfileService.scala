@@ -174,8 +174,8 @@ object ProfileService extends AbstractService {
         sumAgg("sum", "value")) size SIZE_DEFAULT) size SIZE_DEFAULT
   }
 
-  private def getDurationDoW(contract: String): Array[(String, Array[Double])] = {
-     val response = client.execute(search(s"user-duration-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await(scala.concurrent.duration.Duration(30, SECONDS))
+  private def getDurationDoW(contract: String,month: String): Array[(String, Array[Double])] = {
+     val response = client.execute(search(s"user-duration-day-of-week-$month" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await(scala.concurrent.duration.Duration(30, SECONDS))
      val result= response.hits.hits.map(x => x.sourceAsMap)
        .map(x => getValueAsString(x, "wod") -> Array(
            getValueAsDouble(x, "Mon"),
@@ -188,8 +188,8 @@ object ProfileService extends AbstractService {
      result
   }
   
-  private def getDownloadDoW(contract: String): (Array[(String, Array[Double])], Array[(String, Array[Double])]) = {
-     val response = client.execute(search(s"user-downup-day-of-week-2017-09" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await(scala.concurrent.duration.Duration(30, SECONDS))
+  private def getDownloadDoW(contract: String, month: String): (Array[(String, Array[Double])], Array[(String, Array[Double])]) = {
+     val response = client.execute(search(s"user-downup-day-of-week-$month" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await(scala.concurrent.duration.Duration(30, SECONDS))
      val download= response.hits.hits.map(x => x.sourceAsMap)
        .map(x => getValueAsString(x, "wod") -> Array(
            getValueAsDouble(x, "Mon_Download"),
@@ -302,7 +302,7 @@ object ProfileService extends AbstractService {
       .toArray
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
-    val downupDow = getDownloadDoW(contract)
+    val downupDow = getDownloadDoW(contract,month)
     val downup = DownUp(downloadQuad, uploadQuad, downupDow._1, downupDow._2, formatArray(downloadDaily), formatArray(uploadDaily))
     
     val durationDailyRes = ESUtil.get(client, "user-duration-daily-"+month, "docs", contract)
@@ -331,7 +331,7 @@ object ProfileService extends AbstractService {
       .sortBy(x => x._1.toInt)
       //.take(28)
 
-    val durationDow = getDurationDoW(contract)
+    val durationDow = getDurationDoW(contract,month)
     val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
     val pon = client.execute(search(s"user-inf-pon-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
     val suyhoutSource = if (pon.totalHits <= 0) {
