@@ -50,11 +50,17 @@ object BrasesCard {
     val aDayLater = dt.minusMinutes(60*24);
     val aDayTime = aDayLater.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
-      sql"""SELECT distinct tbC.bras_id,tbB.date_time,tbC.line_ol,tbC.card_ol,tbC.port_ol,tbB.signin_total_count,tbB.logoff_total_count
-             FROM (SELECT bras_id,date_time,signin_total_count,logoff_total_count FROM dwh_radius_bras_detail WHERE date_time >= $aDayTime::TIMESTAMP and label = 'outlier' and bras_id  LIKE $id || '%') tbB join
-               (SELECT * FROM bras_count_by_port WHERE bras_id LIKE  $id || '%' and time >= $aDayTime::TIMESTAMP) tbC
-             on tbB.bras_id=tbC.bras_id and  date_trunc('minute', tbC.time) between date_trunc('minute', tbB.date_time) - INTERVAL '3' MINUTE and date_trunc('minute', tbB.date_time)
-             ORDER BY tbC.bras_id desc,tbC.line_ol desc,tbC.port_ol desc,tbB.date_time desc
+      sql"""SELECT tbRs.bras_id,tbRs.date_time,tbRs.line_ol,tbRs.card_ol,tbRs.port_ol,tbRs.signin_total_count,tbRs.logoff_total_count
+                   FROM(
+                       SELECT distinct tbC.bras_id,tbB.date_time,tbB.date_time = MAX(tbB.date_time) OVER (PARTITION BY tbB.bras_id) as isMaxdate,tbC.line_ol,tbC.card_ol,tbC.port_ol,tbB.signin_total_count,tbB.logoff_total_count
+                        FROM (SELECT bras_id,date_time,signin_total_count,logoff_total_count FROM dwh_radius_bras_detail
+                              WHERE date_time >= $aDayTime::TIMESTAMP and label = 'outlier' and bras_id  LIKE $id || '%') tbB join
+                          (SELECT * FROM bras_count_by_port WHERE bras_id LIKE  $id || '%' and time >= $aDayTime::TIMESTAMP) tbC
+                        on tbB.bras_id=tbC.bras_id and  date_trunc('minute', tbC.time) between date_trunc('minute', tbB.date_time) - INTERVAL '3' MINUTE
+                             and date_trunc('minute', tbB.date_time)
+                        ORDER BY tbC.bras_id desc,tbC.line_ol desc,tbC.port_ol desc,tbB.date_time desc
+                       ) tbRs
+                   WHERE tbRs.isMaxdate = true
                   """
         .as[(String, String, String, String,String,Int,Int)])
   }
