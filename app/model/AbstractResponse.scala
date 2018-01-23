@@ -35,13 +35,13 @@ case class MainDomainInfo(
 }
 
 case class TotalInfo(
-    queries: Int,
-    domains: Int,
-    clients: Int,
-    malwares: Int,
-    success: Int,
-    failed: Int,
-    seconds: Int) {
+    queries: Long,
+    domains: Long,
+    clients: Long,
+    malwares: Long,
+    success: Long,
+    failed: Long,
+    seconds: Long) {
   def clone(numOfClients: Int) = TotalInfo(queries, domains, numOfClients, malwares, success, failed, seconds)
   def this() = this(0,0,0,0,0,0,0)
   def plus(that: TotalInfo) = TotalInfo(
