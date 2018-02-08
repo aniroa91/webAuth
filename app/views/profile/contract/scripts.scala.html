@@ -18,38 +18,39 @@
               $("#@p._1").click(function(e) {
                   $("#tbSegPaytv").find('.hight-light').removeClass('hight-light');
                  $(this).parent().parent().addClass('hight-light');
-                // chart hourly vector
-                var hourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => x.key))));
-                var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => formatNumHour(x.value)))));
-                var hourInMonth = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourlyInMonths.map(x => x.value))));
+                 @if(response.paytv.vectors.get(p._1).get.hourly != null && response.paytv.vectors.get(p._1).get.hourlyInMonths != null){
+                  // chart hourly vector
+                  var hourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => x.key))));
+                  var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourly.map(x => formatNumHour(x.value)))));
+                  var hourInMonth = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.hourlyInMonths.map(x => x.value))));
                   Highcharts.chart('line-hourVector', {
-                    chart: {
-                        type: 'column'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    subtitle: {
-                        text: ''
-                    },
-                    plotOptions: {
-                        column: {
-                            colorByPoint: true
-                        }
-                    },
-                    colors: [
-                        '#1ABB9C','#9B59B6'
-                    ],
-                    xAxis: {
-                        categories: hourly
-                    },
-                    yAxis: [{ // Primary yAxis
-                        title: {
-                            text: 'Duration (hours)',
-                            style: {
-                                color: "#1ABB9C"
-                            }
-                        }
+                      chart: {
+                          type: 'column'
+                      },
+                      title: {
+                          text: ''
+                      },
+                      subtitle: {
+                          text: ''
+                      },
+                      plotOptions: {
+                          column: {
+                              colorByPoint: true
+                          }
+                      },
+                      colors: [
+                          '#1ABB9C', '#9B59B6'
+                      ],
+                      xAxis: {
+                          categories: hourly
+                      },
+                      yAxis: [{ // Primary yAxis
+                          title: {
+                              text: 'Duration (hours)',
+                              style: {
+                                  color: "#1ABB9C"
+                              }
+                          }
                       }/*, { // Secondary yAxis
                         title: {
                             text: 'Values',
@@ -59,30 +60,32 @@
                         },
                         opposite: true
                      }*/],
-                    tooltip: {
-                        crosshairs: true,
-                        shared: true
-                    },
-                    plotOptions: {
-                        spline: {
-                            marker: {
-                                radius: 4,
-                                lineColor: '#666666',
-                                lineWidth: 1
-                            }
-                        }
-                    },
-                    series: [{
-                        type: 'spline',
-                        name: 'Hourly',
-                        data: values
-                    }/*,{
+                      tooltip: {
+                          crosshairs: true,
+                          shared: true
+                      },
+                      plotOptions: {
+                          spline: {
+                              marker: {
+                                  radius: 4,
+                                  lineColor: '#666666',
+                                  lineWidth: 1
+                              }
+                          }
+                      },
+                      series: [{
+                          type: 'spline',
+                          name: 'Hourly',
+                          data: values
+                      }/*,{
                         type: 'spline',
                         name: 'Hourly in month',
                         data: hourInMonth,
                         yAxis:1
                     }*/]
-                });
+                  });
+                  }
+                  @if(response.paytv.vectors.get(p._1).get.app != null){
                   // Build the chart pie app vector
                   var appVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.app.map(x => x.key -> x.value))));
                   Highcharts.chart('pie-appVector', {
@@ -120,6 +123,8 @@
                           data: appVectors
                       }]
                   });
+                  }
+                  @if(response.paytv.vectors.get(p._1).get.dayOfWeek != null){
                   // Build the chart line daily vector
                   var daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.dayOfWeek.map(x => x.key))));
                   values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.dayOfWeek.map(x => formatNumHour(x.value)))));
@@ -162,6 +167,8 @@
 
                       }]
                   });
+                  }
+                  @if(response.paytv.vectors.get(p._1).get.iptv != null){
                   // Build the chart pie iptv vector
                   var iptvVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.iptv.filter(x => x.value > 0).map(x => x.key -> x.value))));
                   Highcharts.chart('pie-iptvVector', {
@@ -176,14 +183,14 @@
                       },
                       plotOptions: {
                           pie: {
-                             /* colors: [
-                                  '#9B59B6',
-                                  '#1ABB9C',
-                                  '#3498DB',
-                                  '#9CC2CB',
-                                  '#E74C3C',
-                                  '#73879C'
-                              ],*/
+                              /* colors: [
+                                   '#9B59B6',
+                                   '#1ABB9C',
+                                   '#3498DB',
+                                   '#9CC2CB',
+                                   '#E74C3C',
+                                   '#73879C'
+                               ],*/
                               allowPointSelect: true,
                               cursor: 'pointer',
                               dataLabels: {
@@ -199,6 +206,7 @@
                           data: iptvVectors
                       }]
                   });
+                  }
                   // Build the chart pie vod vector
                   @if(response.paytv.vectors.get(p._1).get.vod != null){
                       var vodVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.vod.filter(x => x.value > 0).map(x => x.key -> x.value))));
@@ -316,53 +324,54 @@
                           }]
                       });
                   }
+                  @if(response.paytv.vectors.get(p._1).get.appHourly2 != null){
                   // Build the chart line app-daily vector
                   var appHour2 = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.appHourly2)));
-            Highcharts.chart('line-appHourVector', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                colors: [
-                    '#9B59B6',
-                    '#1ABB9C',
-                    '#000066',
-                    '#3498DB',
-                    '#9CC2CB',
-                    '#E74C3C',
-                    '#73879C',
-                    '#ff9600'
-                ],
-                xAxis: {
-                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23"],
-                    title: {
-                        text: ''
-                    },
-                },
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                series: /*[
+                  Highcharts.chart('line-appHourVector', {
+                      chart: {
+                          type: 'column'
+                      },
+                      title: {
+                          text: ''
+                      },
+                      subtitle: {
+                          text: ''
+                      },
+                      plotOptions: {
+                          column: {
+                              colorByPoint: true
+                          }
+                      },
+                      colors: [
+                          '#9B59B6',
+                          '#1ABB9C',
+                          '#000066',
+                          '#3498DB',
+                          '#9CC2CB',
+                          '#E74C3C',
+                          '#73879C',
+                          '#ff9600'
+                      ],
+                      xAxis: {
+                          categories: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "23"],
+                          title: {
+                              text: ''
+                          },
+                      },
+                      tooltip: {
+                          crosshairs: true,
+                          shared: true
+                      },
+                      plotOptions: {
+                          spline: {
+                              marker: {
+                                  radius: 4,
+                                  lineColor: '#666666',
+                                  lineWidth: 1
+                              }
+                          }
+                      },
+                      series: /*[
                     {
                         type: 'spline',
                         name: 'IPTV',
@@ -379,10 +388,11 @@
                         },
                         data: vodHourly
                     }]*/
-                getJsonAppVector(appHour2)
-            });
-
-            // Build the chart line app-daily vector
+                              getJsonAppVector(appHour2)
+                  });
+                  }
+                  @if(response.paytv.vectors.get(p._1).get.appDayOfWeek2 != null){
+                  // Build the chart line app-daily vector
                   var appDaily2 = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.appDayOfWeek2)));
                   Highcharts.chart('line-appDayVector', {
                       chart: {
@@ -410,22 +420,22 @@
                           '#ff9600'
                       ],
                       xAxis: {
-                          categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+                          categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
                       },
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                series:/* [
+                      tooltip: {
+                          crosshairs: true,
+                          shared: true
+                      },
+                      plotOptions: {
+                          spline: {
+                              marker: {
+                                  radius: 4,
+                                  lineColor: '#666666',
+                                  lineWidth: 1
+                              }
+                          }
+                      },
+                      series: /* [
                     {
                         type: 'spline',
                         name: 'IPTV',
@@ -442,10 +452,10 @@
                         },
                         data: vodDayOfWeek
                     }]*/
-                      getJsonAppVector(appDaily2)
-            });
-
-
+                              getJsonAppVector(appDaily2)
+                  });
+                  }
+                  @if(response.paytv.vectors.get(p._1).get.daily != null){
                   // Build the chart line day of month vector
                   daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => x._1))));
                   values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(p._1).get.daily.map(x => formatNumHour(x._2)))));
@@ -489,12 +499,14 @@
                           data: values
                       }]
                   });
+                  }
 
               });
             }
            /* END CLICK PAYTV ID */
 
             /* START CHART FOR PAYTV*/
+            @if(response.paytv.vectors.get(idPayTv).get.app != null){
             // Build the chart pie app vector
             var appVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.app.map(x => x.key -> x.value))));
             Highcharts.chart('pie-appVector', {
@@ -532,8 +544,8 @@
                     data: appVectors
                 }]
             });
-
-
+            }
+            @if(response.paytv.vectors.get(idPayTv).get.hourly != null && response.paytv.vectors.get(idPayTv).get.hourlyInMonths != null){
             // Build the chart line hourly vector
             var hourly = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.hourly.map(x => x.key))));
             var values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.hourly.map(x => formatNumHour(x.value)))));
@@ -554,7 +566,7 @@
                     }
                 },
                 colors: [
-                    '#1ABB9C','#9B59B6'
+                    '#1ABB9C', '#9B59B6'
                 ],
                 xAxis: {
                     categories: hourly
@@ -599,9 +611,9 @@
                     yAxis: 1
                 }*/]
             });
-
+            }
+            @if(response.paytv.vectors.get(idPayTv).get.appHourly2 != null){
             // Build the chart line app-daily vector
-
             var appHour2 = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.appHourly2)));
             Highcharts.chart('line-appHourVector', {
                 chart: {
@@ -629,7 +641,7 @@
                     '#ff9600'
                 ],
                 xAxis: {
-                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23"]
+                    categories: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "23"]
                 },
                 tooltip: {
                     crosshairs: true,
@@ -646,7 +658,8 @@
                 },
                 series: getJsonAppVector(appHour2)
             });
-
+            }
+            @if(response.paytv.vectors.get(idPayTv).get.appDayOfWeek2 != null){
             // Build the chart line app-daily vector
             var appDaily2 = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.appDayOfWeek2)));
             Highcharts.chart('line-appDayVector', {
@@ -675,7 +688,7 @@
                     '#ff9600'
                 ],
                 xAxis: {
-                    categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+                    categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
                 },
                 tooltip: {
                     crosshairs: true,
@@ -707,9 +720,10 @@
                         },
                         data: vodDayOfWeek
                     }]*/
-                getJsonAppVector(appDaily2)
+                        getJsonAppVector(appDaily2)
             });
-
+            }
+            @if(response.paytv.vectors.get(idPayTv).get.iptv != null){
             // Build the chart line iptv vector
             var iptvVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.iptv.filter(x => x.value > 0).map(x => x.key -> x.value))));
             Highcharts.chart('pie-iptvVector', {
@@ -747,6 +761,7 @@
                     data: iptvVectors
                 }]
             });
+            }
             // Build the chart pie vod vector
             @if(response.paytv.vectors.get(idPayTv).get.vod != null){
                 var vodVectors = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.vod.filter(x => x.value > 0).map(x => x.key -> x.value))));
@@ -864,10 +879,10 @@
                     }]
                 });
             }
-
+            @if(response.paytv.vectors.get(idPayTv).get.dayOfWeek != null){
             // Build the chart line daily vector
             var daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.dayOfWeek.map(x => x.key))));
-                values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.dayOfWeek.map(x => formatNumHour(x.value)))));
+            values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.dayOfWeek.map(x => formatNumHour(x.value)))));
             Highcharts.chart('col-dayVector', {
                 chart: {
                     type: 'column'
@@ -908,7 +923,8 @@
 
                 }]
             });
-
+            }
+            @if(response.paytv.vectors.get(idPayTv).get.daily != null){
             // Build the chart line day of month vector
             daily = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => x._1))));
             values = @Html(Json.stringify(Json.toJson(response.paytv.vectors.get(idPayTv).get.daily.map(x => formatNumHour(x._2)))));
@@ -952,10 +968,12 @@
                 }]
             });
             }
+            }
             /* END CHART FOR PAYTV*/
 
             /* START CHART FOR INTERNET*/
 
+            @if(response.internet.duration.hourly != null){
             // Build the chart line hourly vector
             hourly = @Html(Json.stringify(Json.toJson(response.internet.duration.hourly.map(x => x._1))));
             values = @Html(Json.stringify(Json.toJson(response.internet.duration.hourly.map(x => formatNumHour(x._2)))));
@@ -981,10 +999,10 @@
                     categories: hourly
 
                 }, yAxis: {
-                  title: {
-                    text: "Time (hours)"
-                  }
-                  
+                    title: {
+                        text: "Time (hours)"
+                    }
+
                 },
                 tooltip: {
                     crosshairs: true,
@@ -1009,7 +1027,8 @@
 
                 }]
             });
-
+            }
+            @if(response.internet.downUp.upQuad != null && response.internet.downUp.downQuad != null){
             // Build the chart line hourly vector
             Highcharts.chart('int-line-hourVector', {
                 chart: {
@@ -1027,17 +1046,17 @@
                     }
                 },
                 colors: [
-                    '#9B59B6','#1ABB9C'
+                    '#9B59B6', '#1ABB9C'
                 ],
                 xAxis: {
-                    categories: ["7h-13h","13h-19h","19h-1h","1h-7h"]
+                    categories: ["7h-13h", "13h-19h", "19h-1h", "1h-7h"]
 
                 },
                 yAxis: {
-                  title: {
-                    text: "Size (GB)"
-                  }
-                  
+                    title: {
+                        text: "Size (GB)"
+                    }
+
                 },
                 tooltip: {
                     crosshairs: true,
@@ -1053,363 +1072,375 @@
                     }
                 },
                 series: [
-                {
-                    type: 'spline',
-                    name: 'Upload',
-                    // change down and up 11/10
-                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upQuad.map(x => BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
-                },{
-                type: 'spline',
-                        name: 'Download',
-                        data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
-                }]
-            });
-            // Build the chart line hourly vector
-            var valueDown = @Html(Json.stringify(Json.toJson(response.internet.downUp.downDayOfWeek.map(x => x._2).toList.transpose.map(_.sum))));
-            var valueUp = @Html(Json.stringify(Json.toJson(response.internet.downUp.upDayOfWeek.map(x => x._2).toList.transpose.map(_.sum))));
-            Highcharts.chart('int-col-dayVector', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                colors: [
-                    '#1ABB9C','#9B59B6'
-                ],
-                xAxis: {
-                    categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-                },
-                yAxis: {
-                  title: {
-                    text: "Size (GB)"
-                  }
-                  
-                },
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                series: [{
-                    type: 'spline',
-                    name: 'Download',
-                    data: valueDown
-                   },
                     {
                         type: 'spline',
                         name: 'Upload',
-                        data: valueUp
+                        // change down and up 11/10
+                        data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upQuad.map(x => BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
+                    }, {
+                        type: 'spline',
+                        name: 'Download',
+                        data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downQuad.map(x => BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
                     }]
             });
+            }
+            // Build the chart line hourly vector
+            @if(response.internet.downUp.downDayOfWeek != null && response.internet.downUp.upDayOfWeek != null){
+                var valueDown = @Html(Json.stringify(Json.toJson(response.internet.downUp.downDayOfWeek.map(x => x._2).toList.transpose.map(_.sum))));
+                var valueUp = @Html(Json.stringify(Json.toJson(response.internet.downUp.upDayOfWeek.map(x => x._2).toList.transpose.map(_.sum))));
+                Highcharts.chart('int-col-dayVector', {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    plotOptions: {
+                        column: {
+                            colorByPoint: true
+                        }
+                    },
+                    colors: [
+                        '#1ABB9C', '#9B59B6'
+                    ],
+                    xAxis: {
+                        categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                    },
+                    yAxis: {
+                        title: {
+                            text: "Size (GB)"
+                        }
+
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 4,
+                                lineColor: '#666666',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: [{
+                        type: 'spline',
+                        name: 'Download',
+                        data: valueDown
+                    },
+                        {
+                            type: 'spline',
+                            name: 'Upload',
+                            data: valueUp
+                        }]
+                });
+            }
            // Build the chart line hourly vector
-            values = @Html(Json.stringify(Json.toJson(response.internet.duration.dayOfWeek.map(x => x._2).toList.transpose.map(_.sum).map(x => formatNumHour(x)))));
-            Highcharts.chart('int-pie-durDayVector', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                 yAxis: {
-                  title: {
-                    text: "Time (hours)"
-                  }
-                  
-                },
-                colors: [
-                    '#9B59B6',
-                    '#1ABB9C',
-                    '#3498DB',
-                    '#9CC2CB',
-                ],
-                xAxis: {
-                    categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-
-                },
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                series: [{
-                    type: 'spline',
-                    name: 'Duration',
-                    marker: {
-                        symbol: 'diamond'
-                    },
-                    data: values
-                }]
-                //getJsonAppVector(values)
-            });
-            // Build the chart line day of month vector
-            Highcharts.chart('int-col-dayofMonth', {
-                chart: {
-                    zoomType: 'xy'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                xAxis: [{
-                    categories: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => x._1)))),
-                    crosshair: true,
-                    title: {
-                        text: 'Daily',
-                    }
-                }],
-                yAxis: [{ // Primary yAxis
-                    labels: {
-                        format: '{value} MB',
-                        style: {
-                            color: "#1ABB9C"
-                        }
+            @if(response.internet.duration.dayOfWeek != null){
+                values = @Html(Json.stringify(Json.toJson(response.internet.duration.dayOfWeek.map(x => x._2).toList.transpose.map(_.sum).map(x => formatNumHour(x)))));
+                Highcharts.chart('int-pie-durDayVector', {
+                    chart: {
+                        type: 'column'
                     },
                     title: {
-                        text: 'Size (MB)',
-                        style: {
-                            color: "#1ABB9C"
-                        }
-                    }
-                }, { // Secondary yAxis
-                    title: {
-                        text: 'Duration (hours)',
-                        style: {
-                            color: "#9B59B6  MB"
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    plotOptions: {
+                        column: {
+                            colorByPoint: true
                         }
                     },
-                    labels: {
-                        format: '{value}',
-                        style: {
-                            color: "#9B59B6"
+                    yAxis: {
+                        title: {
+                            text: "Time (hours)"
+                        }
+
+                    },
+                    colors: [
+                        '#9B59B6',
+                        '#1ABB9C',
+                        '#3498DB',
+                        '#9CC2CB',
+                    ],
+                    xAxis: {
+                        categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 4,
+                                lineColor: '#666666',
+                                lineWidth: 1
+                            }
                         }
                     },
-                    opposite: true
-                }],
-                tooltip: {
-                    shared: true
-                },
-
-                series: [
-                {
-                    type: 'column',
-                    name: 'Duration',
-                    yAxis: 1,
-                    data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => BigDecimal(x._2 / 3600).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
-                }, {
-                    name: 'Upload',
-                    type: 'spline',
-                    color: "#9B59B6",
-                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upDaily.map(x => BigDecimal(x._2 * 1024).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
-
-                }, {
-                    name: 'Download',
-                    type: 'spline',
-                    color: "#1ABB9C",
-                    data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => BigDecimal(x._2 * 1024).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
-                }]
-            });
-
-            // chart line suy vector
-            values = @Html(Json.stringify(Json.toJson(response.internet.suyhout.map(x => if (x._2.toBoolean) 1 else -1))))
-            Highcharts.chart('line-suyVector', {
-                chart: {
-                    type: 'column',
-                    events: {
-                        load: function () {
-                             $.each(this.series[0].data, function(i, point) {
-                                if(point.y>0)
-                                   point.graphic.attr({ fill: '#1ABB9C' });
-                                else
-                                    point.graphic.attr({ fill: '#FF0000' });
-                            });
-                        }
-                    }
-                },
-                legend: {
-                    enabled: false
-                },
-                title: {
-                    text: ''
-                },
-                xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(response.internet.suyhout.map(x => x._1))))
-                },
-                yAxis: {
-                    min: -1,
-                    title: {
-                        text: 'Value'
-                    }
-                },
-                tooltip: {
-                    headerFormat: '<span style="font-size:10px">Date: {point.key}</span><table>',
-                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-                    footerFormat: '</table>',
-                    shared: true,
-                    useHTML: true
-                },
-                plotOptions:{
-                    column:{
-                        pointPadding: 0.2,
-                        borderWidth: 0,
-                        point: {
-                            events:  {
-                                mouseOut: function(){
-                                    console.log('mouseout');
-                                    var chart = $('#line-suyVector').highcharts();
-                                    $.each(chart.series[0].data, function(i, point) {
-                                        if(point.y>0)
-                                            point.graphic.attr({ fill: '#1ABB9C' });
-                                        else
-                                            point.graphic.attr({ fill: '#FF0000' });
-                                    });
-                                },
-                                mouseOver: function(){
-                                    console.log('mouseover');
-                                    var chart = $('#line-suyVector').highcharts();
-                                    $.each(chart.series[0].data, function(i, point) {
-                                        if(point.y>0)
-                                            point.graphic.attr({ fill: '#1ABB9C' });
-                                        else
-                                            point.graphic.attr({ fill: '#FF0000' });
-                                    });
-                                },
-                            },
-                        },
-                        states:{hover:{enabled:false}},
-                    },
-                },
-                series: [{
-                    name: 'Value',
-                    data: values
-                }]
-            });
-                // chart line error vector
-
-            Highcharts.chart('line-errVector', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                colors: [
-                    '#3498DB','#fbc28d'
-                ],
-                xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(response.internet.errorDisconnect.map(x => x._1))))
-                },
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                series: [
-                    {
+                    series: [{
                         type: 'spline',
-                        name: 'Lofi',
-                        marker: {
-                            symbol: 'square'
-                        },
-                        data: @Html(Json.stringify(Json.toJson(response.internet.errorDisconnect.map(x => x._2))))
-
-                    },{
-                        type: 'spline',
-                        name: 'Sf',
+                        name: 'Duration',
                         marker: {
                             symbol: 'diamond'
                         },
-                        data: @Html(Json.stringify(Json.toJson(response.internet.errorModule.map(x => x._2))))
+                        data: values
                     }]
-            });
+                    //getJsonAppVector(values)
+                });
+            }
+            @if(response.internet.downUp.downDaily != null){
+                // Build the chart line day of month vector
+                Highcharts.chart('int-col-dayofMonth', {
+                    chart: {
+                        zoomType: 'xy'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    xAxis: [{
+                        categories: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => x._1)))),
+                        crosshair: true,
+                        title: {
+                            text: 'Daily',
+                        }
+                    }],
+                    yAxis: [{ // Primary yAxis
+                        labels: {
+                            format: '{value} MB',
+                            style: {
+                                color: "#1ABB9C"
+                            }
+                        },
+                        title: {
+                            text: 'Size (MB)',
+                            style: {
+                                color: "#1ABB9C"
+                            }
+                        }
+                    }, { // Secondary yAxis
+                        title: {
+                            text: 'Duration (hours)',
+                            style: {
+                                color: "#9B59B6  MB"
+                            }
+                        },
+                        labels: {
+                            format: '{value}',
+                            style: {
+                                color: "#9B59B6"
+                            }
+                        },
+                        opposite: true
+                    }],
+                    tooltip: {
+                        shared: true
+                    },
+
+                    series: [
+                        {
+                            type: 'column',
+                            name: 'Duration',
+                            yAxis: 1,
+                            data: @Html(Json.stringify(Json.toJson(response.internet.duration.daily.map(x => BigDecimal(x._2 / 3600).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
+                        }, {
+                            name: 'Upload',
+                            type: 'spline',
+                            color: "#9B59B6",
+                            data: @Html(Json.stringify(Json.toJson(response.internet.downUp.upDaily.map(x => BigDecimal(x._2 * 1024).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
+
+                        }, {
+                            name: 'Download',
+                            type: 'spline',
+                            color: "#1ABB9C",
+                            data: @Html(Json.stringify(Json.toJson(response.internet.downUp.downDaily.map(x => BigDecimal(x._2 * 1024).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble))))
+                        }]
+                });
+            }
+            @if(response.internet.suyhout != null){
+                // chart line suy vector
+                values = @Html(Json.stringify(Json.toJson(response.internet.suyhout.map(x => if (x._2.toBoolean) 1 else -1))))
+                Highcharts.chart('line-suyVector', {
+                    chart: {
+                        type: 'column',
+                        events: {
+                            load: function () {
+                                 $.each(this.series[0].data, function(i, point) {
+                                    if(point.y>0)
+                                       point.graphic.attr({ fill: '#1ABB9C' });
+                                    else
+                                        point.graphic.attr({ fill: '#FF0000' });
+                                });
+                            }
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.internet.suyhout.map(x => x._1))))
+                    },
+                    yAxis: {
+                        min: -1,
+                        title: {
+                            text: 'Value'
+                        }
+                    },
+                    tooltip: {
+                        headerFormat: '<span style="font-size:10px">Date: {point.key}</span><table>',
+                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                        footerFormat: '</table>',
+                        shared: true,
+                        useHTML: true
+                    },
+                    plotOptions:{
+                        column:{
+                            pointPadding: 0.2,
+                            borderWidth: 0,
+                            point: {
+                                events:  {
+                                    mouseOut: function(){
+                                        console.log('mouseout');
+                                        var chart = $('#line-suyVector').highcharts();
+                                        $.each(chart.series[0].data, function(i, point) {
+                                            if(point.y>0)
+                                                point.graphic.attr({ fill: '#1ABB9C' });
+                                            else
+                                                point.graphic.attr({ fill: '#FF0000' });
+                                        });
+                                    },
+                                    mouseOver: function(){
+                                        console.log('mouseover');
+                                        var chart = $('#line-suyVector').highcharts();
+                                        $.each(chart.series[0].data, function(i, point) {
+                                            if(point.y>0)
+                                                point.graphic.attr({ fill: '#1ABB9C' });
+                                            else
+                                                point.graphic.attr({ fill: '#FF0000' });
+                                        });
+                                    },
+                                },
+                            },
+                            states:{hover:{enabled:false}},
+                        },
+                    },
+                    series: [{
+                        name: 'Value',
+                        data: values
+                    }]
+                });
+            }
+                // chart line error vector
+            @if(response.internet.errorDisconnect != null){
+                Highcharts.chart('line-errVector', {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    plotOptions: {
+                        column: {
+                            colorByPoint: true
+                        }
+                    },
+                    colors: [
+                        '#3498DB', '#fbc28d'
+                    ],
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.internet.errorDisconnect.map(x => x._1))))
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 4,
+                                lineColor: '#666666',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            type: 'spline',
+                            name: 'Lofi',
+                            marker: {
+                                symbol: 'square'
+                            },
+                            data: @Html(Json.stringify(Json.toJson(response.internet.errorDisconnect.map(x => x._2))))
+
+                        }, {
+                            type: 'spline',
+                            name: 'Sf',
+                            marker: {
+                                symbol: 'diamond'
+                            },
+                            data: @Html(Json.stringify(Json.toJson(response.internet.errorModule.map(x => x._2))))
+                        }]
+                });
+            }
+            @if(response.internet.device.deviceTypes != null){
             // Build the chart pie device types
             var deviceTypes = @Html(Json.stringify(Json.toJson(response.internet.device.deviceTypes)))
-            Highcharts.chart('pie-deviceType', {
-                chart: {
-                    type: 'pie'
-                },
-                title: {
-                    text: ''
-                },
-                tooltip: {
-                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                },
-                plotOptions: {
-                    pie: {
-                        colors: [
-                            '#1ABB9C',
-                            '#9B59B6',
-                            '#3498DB',
-                            '#E74C3C',
-                            '#9CC2CB',
-                            '#73879C'
-                        ],
-                        allowPointSelect: true,
-                        cursor: 'pointer',
-                        dataLabels: {
-                            enabled: true
+                    Highcharts.chart('pie-deviceType', {
+                        chart: {
+                            type: 'pie'
                         },
-                        showInLegend: true
-                    }
-                },
-                series: [{
-                    name: 'Percent',
-                    innerSize: '40%',
-                    colorByPoint: true,
-                    data: deviceTypes
-                }]
-            });
+                        title: {
+                            text: ''
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        plotOptions: {
+                            pie: {
+                                colors: [
+                                    '#1ABB9C',
+                                    '#9B59B6',
+                                    '#3498DB',
+                                    '#E74C3C',
+                                    '#9CC2CB',
+                                    '#73879C'
+                                ],
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: true
+                                },
+                                showInLegend: true
+                            }
+                        },
+                        series: [{
+                            name: 'Percent',
+                            innerSize: '40%',
+                            colorByPoint: true,
+                            data: deviceTypes
+                        }]
+                    });
+            }
+            @if(response.internet.device.venders != null){
             // Build the chart pie device types
             var venders = @Html(Json.stringify(Json.toJson(response.internet.device.venders)))
                     Highcharts.chart('pie-venderType', {
@@ -1447,81 +1478,83 @@
                             data: venders
                         }]
                     });
-
-            // Build the chart line device
-           values =  @Html(Json.stringify(Json.toJson(response.internet.device.deviceChars.map(x => x._2))));
-           var name = @Html(Json.stringify(Json.toJson(response.internet.device.deviceChars.map(x => x._1.split(",")(0)))));
-            Highcharts.chart('line-device', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    column: {
-                        colorByPoint: true
-                    }
-                },
-                colors: [
-                    '#9B59B6',
-                    '#1ABB9C',
-                    '#000066',
-                    '#3498DB',
-                    '#9CC2CB',
-                    '#E74C3C',
-                    '#73879C',
-                    '#ff9600',
-                    '#b6a278',
-                    '#ffd6e1'
-                ],
-                width:'100%',
-                xAxis: {
-                    categories: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","21","22","23","24","25","26","27","28","29"]
-                },
-                yAxis: {
-                    title: {
-                        text: ""
-                    }
-
-                },
-                tooltip: {
-                    crosshairs: true,
-                    shared: true
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            radius: 4,
-                            lineColor: '#666666',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                series: /*[
-                    {
-                        type: 'spline',
-                        name: 'W1',
-                        data: [12,20,2,31]
-                    },{
-                        type: 'spline',
-                        name: 'W2',
-                        data: [42,10,22,61]
+            }
+            @if(response.internet.device.deviceChars != null){
+                // Build the chart line device
+                values =  @Html(Json.stringify(Json.toJson(response.internet.device.deviceChars.map(x => x._2))));
+                var name = @Html(Json.stringify(Json.toJson(response.internet.device.deviceChars.map(x => x._1.split(",")(0)))));
+                Highcharts.chart('line-device', {
+                    chart: {
+                        type: 'column'
                     },
-                    {
-                        type: 'spline',
-                        name: 'W3',
-                        data: [4,50,22,41]
-                    },{
-                        type: 'spline',
-                        name: 'W4',
-                        data: [52,32,68,11]
-                    }]*/
-                        getJsonDeviceVector(values,name)
-            });
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    plotOptions: {
+                        column: {
+                            colorByPoint: true
+                        }
+                    },
+                    colors: [
+                        '#9B59B6',
+                        '#1ABB9C',
+                        '#000066',
+                        '#3498DB',
+                        '#9CC2CB',
+                        '#E74C3C',
+                        '#73879C',
+                        '#ff9600',
+                        '#b6a278',
+                        '#ffd6e1'
+                    ],
+                    width: '100%',
+                    xAxis: {
+                        categories: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "23", "24", "25", "26", "27", "28", "29"]
+                    },
+                    yAxis: {
+                        title: {
+                            text: ""
+                        }
+
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 4,
+                                lineColor: '#666666',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: /*[
+                        {
+                            type: 'spline',
+                            name: 'W1',
+                            data: [12,20,2,31]
+                        },{
+                            type: 'spline',
+                            name: 'W2',
+                            data: [42,10,22,61]
+                        },
+                        {
+                            type: 'spline',
+                            name: 'W3',
+                            data: [4,50,22,41]
+                        },{
+                            type: 'spline',
+                            name: 'W4',
+                            data: [52,32,68,11]
+                        }]*/
+                            getJsonDeviceVector(values, name)
+                });
+            }
             /* END CHART FOR INTERNET*/
         });
 
