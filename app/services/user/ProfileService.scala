@@ -175,40 +175,52 @@ object ProfileService extends AbstractService {
   }
 
   private def getDurationDoW(contract: String,month: String): Array[(String, Array[Double])] = {
-     val response = client.execute(search(s"user-duration-day-of-week-$month" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await(scala.concurrent.duration.Duration(30, SECONDS))
-     val result= response.hits.hits.map(x => x.sourceAsMap)
-       .map(x => getValueAsString(x, "wod") -> Array(
-           getValueAsDouble(x, "Mon"),
-           getValueAsDouble(x, "Tue"),
-           getValueAsDouble(x, "Wed"),
-           getValueAsDouble(x, "Thu"),
-           getValueAsDouble(x, "Fri"),
-           getValueAsDouble(x, "Sat"),
-           getValueAsDouble(x, "Sun")))
-     result
+    try {
+      val response = client.execute(search(s"user-duration-day-of-week-$month" / "docs") query {
+        must(termQuery("Contract.keyword", contract))
+      }).await(scala.concurrent.duration.Duration(30, SECONDS))
+      val result = response.hits.hits.map(x => x.sourceAsMap)
+        .map(x => getValueAsString(x, "wod") -> Array(
+          getValueAsDouble(x, "Mon"),
+          getValueAsDouble(x, "Tue"),
+          getValueAsDouble(x, "Wed"),
+          getValueAsDouble(x, "Thu"),
+          getValueAsDouble(x, "Fri"),
+          getValueAsDouble(x, "Sat"),
+          getValueAsDouble(x, "Sun")))
+      result
+    } catch {
+      case e: Exception => {null}
+    }
   }
   
   private def getDownloadDoW(contract: String, month: String): (Array[(String, Array[Double])], Array[(String, Array[Double])]) = {
-     val response = client.execute(search(s"user-downup-day-of-week-$month" / "docs") query { must(termQuery("Contract.keyword", contract)) }).await(scala.concurrent.duration.Duration(30, SECONDS))
-     val download= response.hits.hits.map(x => x.sourceAsMap)
-       .map(x => getValueAsString(x, "wod") -> Array(
-           getValueAsDouble(x, "Mon_Download"),
-           getValueAsDouble(x, "Tue_Download"),
-           getValueAsDouble(x, "Wed_Download"),
-           getValueAsDouble(x, "Thu_Download"),
-           getValueAsDouble(x, "Fri_Download"),
-           getValueAsDouble(x, "Sat_Download"),
-           getValueAsDouble(x, "Sun_Download")))
-     val upload= response.hits.hits.map(x => x.sourceAsMap)
-       .map(x => getValueAsString(x, "wod") -> Array(
-           getValueAsDouble(x, "Mon_Upload"),
-           getValueAsDouble(x, "Tue_Upload"),
-           getValueAsDouble(x, "Wed_Upload"),
-           getValueAsDouble(x, "Thu_Upload"),
-           getValueAsDouble(x, "Fri_Upload"),
-           getValueAsDouble(x, "Sat_Upload"),
-           getValueAsDouble(x, "Sun_Upload")))
-     (download, upload)
+    try {
+      val response = client.execute(search(s"user-downup-day-of-week-$month" / "docs") query {
+        must(termQuery("Contract.keyword", contract))
+      }).await(scala.concurrent.duration.Duration(30, SECONDS))
+      val download = response.hits.hits.map(x => x.sourceAsMap)
+        .map(x => getValueAsString(x, "wod") -> Array(
+          getValueAsDouble(x, "Mon_Download"),
+          getValueAsDouble(x, "Tue_Download"),
+          getValueAsDouble(x, "Wed_Download"),
+          getValueAsDouble(x, "Thu_Download"),
+          getValueAsDouble(x, "Fri_Download"),
+          getValueAsDouble(x, "Sat_Download"),
+          getValueAsDouble(x, "Sun_Download")))
+      val upload = response.hits.hits.map(x => x.sourceAsMap)
+        .map(x => getValueAsString(x, "wod") -> Array(
+          getValueAsDouble(x, "Mon_Upload"),
+          getValueAsDouble(x, "Tue_Upload"),
+          getValueAsDouble(x, "Wed_Upload"),
+          getValueAsDouble(x, "Thu_Upload"),
+          getValueAsDouble(x, "Fri_Upload"),
+          getValueAsDouble(x, "Sat_Upload"),
+          getValueAsDouble(x, "Sun_Upload")))
+      (download, upload)
+    } catch {
+      case e: Exception => {(null,null)}
+    }
   }
   
   def get(contract: String,month: String): ProfileResponse = {
@@ -303,7 +315,8 @@ object ProfileService extends AbstractService {
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
     val downupDow = getDownloadDoW(contract,month)
-    val downup = DownUp(downloadQuad, uploadQuad, downupDow._1, downupDow._2, formatArray(downloadDaily), formatArray(uploadDaily))
+    println(s"res $downupDow")
+    val downup = if(downupDow == null) DownUp(downloadQuad, uploadQuad, null,null, formatArray(downloadDaily), formatArray(uploadDaily)) else DownUp(downloadQuad, uploadQuad, downupDow._1, downupDow._2, formatArray(downloadDaily), formatArray(uploadDaily))
     
     val durationDailyRes = ESUtil.get(client, "user-duration-daily-"+month, "docs", contract)
     val durationDailySource = durationDailyRes.source
