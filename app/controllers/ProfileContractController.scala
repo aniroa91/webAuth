@@ -46,12 +46,16 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
           strMonth = lastMonth.toString(DateTimeFormat.forPattern("yyyy-MM"))
         }
         val response = ProfileService.get(domain,strMonth)
+        println(response)
         Ok(views.html.profile.contract.index(form, response, domain+"&day="+strMonth,username,strMonth))
       } else {
         Ok(views.html.profile.contract.index(form, null, null,username,month))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.contract.index(form, null, domain+"&day="+strMonth,username,strMonth))
+      case e: Exception => {
+        e.printStackTrace()
+        Ok(views.html.profile.contract.index(form, null, domain+"&day="+strMonth,username,strMonth))
+        }
     }
   }
 }
