@@ -1091,6 +1091,10 @@
         <link href="../assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+        <link href="../assets/vendors/datatables.net-fixedColumn/css/fixedColumn.bootstrap.min.css" rel="stylesheet">
+        <!-- bootstrap-daterangepicker -->
+        <link href="/assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
         <link href="../assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
@@ -1149,6 +1153,77 @@
                 }
                 .activeHref{
                     cursor: pointer;font-weight: 600;
+                }
+                .titLb{
+                    position: relative;
+                    margin: 0 0 0 10px;
+                    z-index: 5;
+                    padding: 0;
+                    font-size: 24px;
+                }
+                .boxCss{
+                    text-align: center;
+                    color: white;
+                }
+                .card-header{
+                    color: #fff;
+                    background-color: #4980b5;
+                    border-bottom: 1px solid rgba(111,111,111,.13);
+                    padding: .75rem 0.15rem;
+                    text-align: center;
+                    font-size: 18px;
+                }
+                .timeline .tags{
+                    top:5px;
+                }
+                .timeline .block{
+                    padding: 6px 15px;
+                    border-left: 1px solid #e8e8e8;
+                }
+                ul.bar_tabs>li.active{
+                    font-weight: 700;
+                }
+                .excerpt{
+                    font-size: 18px;
+                }
+                .hight-light{    color: #26B99A;font-weight: 600;}
+                .ui-autocomplete {
+                    position: absolute;
+                    z-index: 1000;
+                    cursor: pointer;
+                    max-height: 200px;
+                    overflow: auto;
+                    left:1440px;
+                    padding: 0;
+                    margin-top: 2px;
+                    list-style: none;
+                    background-color: #ffffff;
+                    border: 1px solid #ccc;
+                    -webkit-border-radius: 5px;
+                    -moz-border-radius: 5px;
+                    border-radius: 5px;
+                    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                }
+                .ui-autocomplete > li {
+                    padding: 3px 20px;
+                }
+                .ui-autocomplete > li.ui-state-focus {
+                    background-color: #26B99A;
+                    color: white;
+                }
+                .noData-title {
+                    margin-bottom: 13px;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                    font-size: 40px;
+                    color: #f60;
+                    font-size: 2.5rem;
+                }
+                .dropdown-menu li{
+                    width:auto;
                 }
         </style>
     }

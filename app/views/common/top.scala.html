@@ -134,12 +134,16 @@
                                     <li><a href="/device"><i class="fa fa-home"></i> Dashboard </a>
                                     </li>
                                     @if(item == "BrasDetail") {
-                                        <li class="current-page"><a href="/bras"><i class="fa fa-credit-card-alt"></i> Bras Outlier </a>
+                                        <li class="current-page"><a href="/searchBras?date=@day"><i class="fa fa-search"></i>
+                                            Search </a>
                                         </li>
                                     }else {
-                                        <li><a href="/bras"><i class="fa fa-credit-card-alt"></i> Bras Outlier </a>
+                                        <li><a href="/searchBras?date=@day"><i class="fa fa-search"></i>
+                                            Search </a>
                                         </li>
                                     }
+                                    <li><a href="/bras"><i class="fa fa-credit-card-alt"></i> Bras Outlier </a>
+                                    </li>
 
                                 </ul>
                               }
