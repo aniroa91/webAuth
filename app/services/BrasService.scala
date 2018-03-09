@@ -1,9 +1,57 @@
 package service
 
-import model.device.{Bras, BrasList,BrasesCard}
+import model.device.{Bras, BrasList,BrasesCard,BrasDAO}
 import scala.concurrent.Future
 
 object BrasService {
+
+  // for page Search Bras
+  def getSigLogResponse(bras: String,nowDay: String):Future[Seq[(Int,Int)]] = {
+    BrasDAO.getSigLogResponse(bras,nowDay)
+  }
+
+  def getNoOutlierResponse(bras: String,nowDay: String):Future[Seq[(Int)]] = {
+    BrasDAO.getNoOutlierResponse(bras,nowDay)
+  }
+
+  def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
+    BrasDAO.getOpviewBytimeResponse(bras,nowDay,hourly)
+  }
+
+  def getKibanaBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
+    BrasDAO.getKibanaBytimeResponse(bras,nowDay,hourly)
+  }
+
+  def getSigLogBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int,Int)]] = {
+    BrasDAO.getSigLogBytimeResponse(bras,nowDay,hourly)
+  }
+
+  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
+    BrasDAO.getInfErrorBytimeResponse(bras,nowDay,hourly)
+  }
+
+  def getInfhostResponse(bras: String,nowDay: String):Future[Seq[(String,Int,Int)]] = {
+    BrasDAO.getInfhostResponse(bras,nowDay)
+  }
+
+  def getInfModuleResponse(bras: String,nowDay: String):Future[Seq[(String,String,Int,Int,Int)]] = {
+    BrasDAO.getInfModuleResponse(bras,nowDay)
+  }
+
+  def getOpsviewServiceSttResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
+    BrasDAO.getOpsviewServiceSttResponse(bras,nowDay)
+  }
+
+  def getOpServByStatusResponse(bras: String,nowDay: String):Future[Seq[(String,String,Int)]] = {
+    BrasDAO.getOpServByStatusResponse(bras,nowDay)
+  }
+
+  def getLinecardhostResponse(bras: String,nowDay: String):Future[Seq[(String,Int,Int)]] = {
+    BrasDAO.getLinecardhostResponse(bras,nowDay)
+  }
+
+  // end page Search Bras
+
   def listTop100Bras: Future[Seq[(String,String,String,String,String, String, String, String,String,Option[String])]] = {
     BrasList.top100
   }

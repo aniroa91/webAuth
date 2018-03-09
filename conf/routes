@@ -37,6 +37,7 @@ GET      /dns                     controllers.DashboardController.index
 GET      /demo                     controllers.DemoController.index
 GET      /msg                     controllers.DemoController.message
 GET      /device                   controllers.DeviceController.index
+GET      /searchBras                   controllers.DeviceController.search
 GET      /bras                     controllers.BrasController.index
 GET      /brasInfo                 controllers.BrasDetailController.index
 GET      /msg2                    controllers.DemoController.message2
@@ -53,6 +54,9 @@ GET     /analytic                 controllers.AnalyticController.index
 #GET     /ace/tables                 controllers.ACEController.tables
 GET     /paytv                    controllers.PaytvClientController.index
 GET     /profile                  controllers.ProfileContractController.index(day: String ?= "")
+
+### INTERNET PROFILE
+GET     /internet/history             controllers.InternetHistoryController.index
 
 ### ADD MORE FEATURE FOR SERVICE INTERNAL
 GET     /search/compare             controllers.CompareController.index(domains: String ?= "")

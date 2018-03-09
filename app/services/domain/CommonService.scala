@@ -1,9 +1,11 @@
 package services.domain
 
+import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 
+import com.ftel.bigdata.utils.DateTimeUtil
 import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, Days}
 
 import scala.collection.mutable
 
@@ -40,7 +42,7 @@ import java.time.format.DateTimeFormatter
 object CommonService extends AbstractService {
 
   val SIZE_DEFAULT = 20
-
+  val RANK_HOURLY = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"
   /**
    * Service for Get Information about day
    */
@@ -54,12 +56,34 @@ object CommonService extends AbstractService {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(1).toString(DateTimeUtil.YMD)
   }
+
+  def getNextDay(day: String): String = {
+    val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
+    prev.plusDays(1).toString(DateTimeUtil.YMD)
+  }
+
+  def getCurrentDay(): String = {
+    val date = new DateTime()
+    date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
+  }
   
   def getPreviousDay(day: String, num: Int): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(num).toString(DateTimeUtil.YMD)
   }
-  
+
+  def getRangeDay(day: String): String = {
+    var from = day.split("/")(0)
+    val to = day.split("/")(1)
+    val prev = DateTimeUtil.create(from, DateTimeUtil.YMD)
+    val next = DateTimeUtil.create(to, DateTimeUtil.YMD)
+    val numDays = Days.daysBetween(prev, next).getDays()
+    for (f<- 1 to numDays) {
+      from += ","+prev.plusDays(f).toString(DateTimeUtil.YMD)
+    }
+    return from
+  }
+
   def isDayValid(day: String): Boolean = {
     Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
   }
@@ -303,6 +327,11 @@ object CommonService extends AbstractService {
     formatter.format(number)
     
     //BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+
+  def formatPattern(number: Int): String ={
+    val frnum = new DecimalFormat("###,###.###");
+    frnum.format(number);
   }
   
   def percent(number: Long, prev: Long): Double = {
