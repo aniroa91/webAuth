@@ -55,6 +55,9 @@ GET     /analytic                 controllers.AnalyticController.index
 GET     /paytv                    controllers.PaytvClientController.index
 GET     /profile                  controllers.ProfileContractController.index(day: String ?= "")
 
+### INTERNET PROFILE
+GET     /internet/history             controllers.InternetHistoryController.index
+
 ### ADD MORE FEATURE FOR SERVICE INTERNAL
 GET     /search/compare             controllers.CompareController.index(domains: String ?= "")
 GET     /search/subdomain           controllers.SubdomainController.index(domain: String ?= "")

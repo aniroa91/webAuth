@@ -15,7 +15,7 @@
                                             <i class="fa fa-globe"></i> DNS
                                         }
                                         @if(id == 1) {
-                                            @if(item == "Paytv" || item == "Contract"){
+                                            @if(item == "Paytv" || item == "Contract" || item == "History"){
                                                 <i class="fa fa-user"></i> Profile
                                             }else{
                                                 <i class="fa fa-laptop"></i> Demo
@@ -108,7 +108,7 @@
                                       </li>
                                   </ul>
                               }else if(id == 1){
-                                  @if(item == "Paytv" || item == "Contract"){
+                                  @if(item == "Paytv" || item == "Contract" || item =="History"){
                                       <ul class="nav side-menu">
                                           <li><a href="/paytv"><i class="fa fa-home"></i> Dashboard </a>
                                           </li>
@@ -119,6 +119,13 @@
                                               <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
                                               </li>
                                           }
+                                          <li><a><i class="fa fa-internet-explorer"></i> Internet </a>
+                                              <ul class="nav child_menu">
+                                                  <li><a href="#">Real time</a></li>
+                                                  <li><a href="/internet/history">History</a></li>
+                                                  <li><a href="/internet/compare">Compare</a></li>
+                                              </ul>
+                                          </li>
                                       </ul>
                                   }else{
                                       <ul class="nav side-menu">
