@@ -72,3 +72,6 @@ GET     /dev/dns/malware/virus      dns.controllers.MalwareController.virus
 GET     /dev/dns/report             dns.controllers.ReportController.index(day: String ?= "")
 #GET     /dev/dns/compare            dns.controllers.CompareDomainController.index
 
+
+### Profile 
+GET     /dev/profile/dashboard          profile.controllers.DashboardController.index
