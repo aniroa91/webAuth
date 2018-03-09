@@ -1,0 +1,11 @@
+@(form: Form[InternetContract], route: Call,contract: String)
+
+@helper.form(action = route,'id -> "ctSearch") {
+    <div class="input-group">
+        <input type="hidden" name="date" id="date">
+        <input type="text" class="form-control autocomplete" value="@contract" required id="ct" name="ct" placeholder="Search ...">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="submit" style="background-color: #3db9dc;color:#fff">Go</button>
+        </span>
+    </div>
+}

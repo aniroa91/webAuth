@@ -1,4 +1,4 @@
-@(form: Form[SearchContract],email: String)
+@(form: Form[InternetContract],email: String,contract: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -27,8 +27,7 @@
                     <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                 </div>
                 <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
-
-                @views.html.profile.contract.frmSearch(form, routes.InternetHistoryController.index)
+                @views.html.profile.internet.frmSearchInternet(form, routes.InternetHistoryController.index,contract)
 
                 </div>
             </nav>
@@ -72,200 +71,364 @@
 
         </div>
     </div>
-        <!-- /top navigation -->
+    <!-- /top navigation -->
         <!-- page content -->
     <div class="right_col" role="main">
-        <div class="row top_tiles">
-            <div class="col-md-3 col-sm-3 col-xs-3">
-                <div class="widget widget-info-2">
-                        <!-- Widget title -->
-                    <div class="widget-content padd">
-                        <p>123</p>
-                        <p><span>Contracts</span></p>
-                        <span>Numbers contracts today</span>
+        @if(contract != null){
+            <div class="row top_tiles">
+                <div class="col-md-3 col-sm-3 col-xs-3">
+                    <div class="widget widget-info-2">
+                            <!-- Widget title -->
+                        <div class="widget-content padd">
+                            <p>123</p>
+                            <p><span>Down/Up</span></p>
+                            <span>Number down/up today</span>
+                        </div>
+                    </div>
+                    <div class="widget widget-info-2 wi2-red">
+                            <!-- Widget title -->
+                        <div class="widget-content padd">
+                            <p>44,110</p>
+                            <p><span>Session Active</span></p>
+                            <span>Numbers session active today</span>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 30px">
+                        <div class="progress-bar progress-bar-success" role="progressbar" style="width:40%;line-height: 30px">
+                            40%
+                        </div>
+                        <div class="progress-bar progress-bar-warning" role="progressbar" style="width:30%;line-height: 30px">
+                            30%
+                        </div>
+                        <div class="progress-bar progress-bar-danger" role="progressbar" style="width:30%;line-height: 30px">
+                            30%
+                        </div>
                     </div>
                 </div>
-                <div class="widget widget-info-2 wi2-red">
-                        <!-- Widget title -->
-                    <div class="widget-content padd">
-                        <p>44,110</p>
-                        <p><span>Sessions</span></p>
-                        <span>Number sessions today</span>
-                    </div>
-                </div>
-
-                <div class="progress" style="height: 30px">
-                    <div class="progress-bar progress-bar-success" role="progressbar" style="width:40%;line-height: 30px">
-                        40%
-                    </div>
-                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width:30%;line-height: 30px">
-                        30%
-                    </div>
-                    <div class="progress-bar progress-bar-danger" role="progressbar" style="width:30%;line-height: 30px">
-                        30%
+                <div class="col-md-9 col-sm-9 col-xs-9">
+                    <div class="x_panel tile fixed_height_350">
+                        <div class="x_content">
+                            <div id="line-hourly" style="height: 315px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-9 col-sm-9 col-xs-9">
-                <div class="x_panel tile fixed_height_350">
-                    <div class="x_content">
-                        <div id="line-hourly" style="height: 220px;"></div>
-                        <div class="row">
-                            <div class="col-xs-4 bdR">
-                                <div class="widget widget-graph-info">
-                                    <div class="widget-content">
-                                        Total Session<span style="color: #f1b53d;">1,540</span>
+            <div class="row">
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile fixed_height_320">
+                        <div class="titbox">
+                            <h2> Top 10 Session ID</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="padding: 10px 17px">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Username</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Mark</td>
+                                        <td>Otto</td>
+                                        <td>do</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Jacob</td>
+                                        <td>Thornton</td>
+                                        <td>fat</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Larry</td>
+                                        <td>the Bird</td>
+                                        <td>twitter</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile fixed_height_320">
+                        <div class="titbox">
+                            <h2> Top 10 Down Up</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="padding: 10px 17px">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Username</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Mark</td>
+                                        <td>Otto</td>
+                                        <td>do</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Jacob</td>
+                                        <td>Thornton</td>
+                                        <td>fat</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Larry</td>
+                                        <td>the Bird</td>
+                                        <td>twitter</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile fixed_height_320">
+                        <div class="titbox">
+                            <h2> Top 10 Ip & Mac Adress</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="padding: 10px 17px">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Username</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Mark</td>
+                                        <td>Otto</td>
+                                        <td>do</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Jacob</td>
+                                        <td>Thornton</td>
+                                        <td>fat</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Larry</td>
+                                        <td>the Bird</td>
+                                        <td>twitter</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        } else {
+            <div class="row top_tiles">
+                <div class="col-md-3 col-sm-3 col-xs-3">
+                    <div class="widget widget-info-2">
+                            <!-- Widget title -->
+                        <div class="widget-content padd">
+                            <p>123</p>
+                            <p><span>Contracts</span></p>
+                            <span>Numbers contracts today</span>
+                        </div>
+                    </div>
+                    <div class="widget widget-info-2 wi2-red">
+                            <!-- Widget title -->
+                        <div class="widget-content padd">
+                            <p>44,110</p>
+                            <p><span>Sessions</span></p>
+                            <span>Number sessions today</span>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 30px">
+                        <div class="progress-bar progress-bar-success" role="progressbar" style="width: 40%;
+                            line-height: 30px">
+                            40%
+                        </div>
+                        <div class="progress-bar progress-bar-warning" role="progressbar" style="width: 30%;
+                            line-height: 30px">
+                            30%
+                        </div>
+                        <div class="progress-bar progress-bar-danger" role="progressbar" style="width: 30%;
+                            line-height: 30px">
+                            30%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">
+                    <div class="x_panel tile fixed_height_350">
+                        <div class="x_content">
+                            <div id="line-hourly" style="height: 220px;"></div>
+                            <div class="row">
+                                <div class="col-xs-4 bdR">
+                                    <div class="widget widget-graph-info">
+                                        <div class="widget-content">
+                                            Total Session<span style="color: #f1b53d;">1,540</span>
                                             <span id="sparkline1"></span>
+                                        </div>
+                                        <div class="clearfix"></div>
                                     </div>
-                                    <div class="clearfix"></div>
                                 </div>
-                            </div>
-                            <div class="col-xs-4 bdR">
-                                <div class="widget widget-graph-info wgi-red">
-                                    <div class="widget-content">
-                                        Total Down<span style="color: #585f7e;">20,001</span>
+                                <div class="col-xs-4 bdR">
+                                    <div class="widget widget-graph-info wgi-red">
+                                        <div class="widget-content">
+                                            Total Down<span style="color: #585f7e;">20,001</span>
                                             <span id="sparkline2"></span>
+                                        </div>
+                                        <div class="clearfix"></div>
                                     </div>
-                                    <div class="clearfix"></div>
                                 </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <div class="widget widget-graph-info">
-                                    <div class="widget-content">
-                                        Total Up<span style="color: #9B59B6">1,203</span>
+                                <div class="col-xs-4">
+                                    <div class="widget widget-graph-info">
+                                        <div class="widget-content">
+                                            Total Up<span style="color: #9B59B6">1,203</span>
                                             <span id="sparkline3"></span>
+                                        </div>
+                                        <div class="clearfix"></div>
                                     </div>
-                                    <div class="clearfix"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4 col-sm-4 col-xs-12">
-                <div class="x_panel tile fixed_height_320">
-                    <div class="titbox">
-                        <h2> Top 10 Contract</h2>
-                        <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile fixed_height_320">
+                        <div class="titbox">
+                            <h2> Top 10 Contract</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="padding: 10px 17px">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Username</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Mark</td>
+                                        <td>Otto</td>
+                                        <td>do</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Jacob</td>
+                                        <td>Thornton</td>
+                                        <td>fat</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Larry</td>
+                                        <td>the Bird</td>
+                                        <td>twitter</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="x_content" style="padding: 10px 17px">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Username</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>do</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Jacob</td>
-                                    <td>Thornton</td>
-                                    <td>fat</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Larry</td>
-                                    <td>the Bird</td>
-                                    <td>twitter</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile fixed_height_320">
+                        <div class="titbox">
+                            <h2> Top 10 Province</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="padding: 10px 17px">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Username</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Mark</td>
+                                        <td>Otto</td>
+                                        <td>do</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Jacob</td>
+                                        <td>Thornton</td>
+                                        <td>fat</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Larry</td>
+                                        <td>the Bird</td>
+                                        <td>twitter</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile fixed_height_320">
+                        <div class="titbox">
+                            <h2> Top 10 Region</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="padding: 10px 17px">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Username</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Mark</td>
+                                        <td>Otto</td>
+                                        <td>do</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Jacob</td>
+                                        <td>Thornton</td>
+                                        <td>fat</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Larry</td>
+                                        <td>the Bird</td>
+                                        <td>twitter</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-4 col-xs-12">
-                <div class="x_panel tile fixed_height_320">
-                    <div class="titbox">
-                        <h2> Top 10 Province</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content" style="padding: 10px 17px">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Username</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>do</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Jacob</td>
-                                    <td>Thornton</td>
-                                    <td>fat</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Larry</td>
-                                    <td>the Bird</td>
-                                    <td>twitter</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 col-sm-4 col-xs-12">
-                <div class="x_panel tile fixed_height_320">
-                    <div class="titbox">
-                        <h2> Top 10 Region</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content" style="padding: 10px 17px">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Username</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>do</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Jacob</td>
-                                    <td>Thornton</td>
-                                    <td>fat</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Larry</td>
-                                    <td>the Bird</td>
-                                    <td>twitter</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        }
        <!-- <div class="row"><h2 class="noData-title">Sorry, This page is under construction, please come back later...</h2></div> -->
     </div>
         <!-- /page content -->
