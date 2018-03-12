@@ -48,7 +48,7 @@
                     </div>
 
                     <div class="input-group date" id="weeklyDatePicker" style="display: none;width: 200px">
-                        <input type="text" class="form-control" value="" readonly="true" style="background-color: white" placeholder="Choose week...">
+                        <input type="text" class="form-control" readonly="true" style="background-color: white" placeholder="Choose week...">
                         <span class="input-group-addon" style="background-color: #3db9dc"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
                         </span>
                     </div>
@@ -61,7 +61,7 @@
 
                 </li>
                 <li class="form-group" style="margin-top: 13px;right: 10px">
-                    <select class="form-control" onchange="setDatePicker(this)" style="width: 200px;margin-right: 15px">
+                    <select class="form-control" onchange="setDatePicker(this)" id="cbbWeek" style="width: 200px;margin-right: 15px">
                         <option value="1">Day</option>
                         <option value="2">Week</option>
                         <option value="3">Month</option>
@@ -77,14 +77,40 @@
         @if(1 == 1){
             <div class="row">
                 <div class="col-md-12">
-                    <div class="x_panel disInline">
+                    <div class="x_panel disInline" id="dayDiv">
                         <div class="compare-btn">
-                            <label class="btn btn-success" style="margin-left: 10px;" onclick="showModalCp()">
-                                <i class="fa  fa-calendar">&nbsp;&nbsp;</i><span style="color: white">Add time</span>
+                            <label class="btn btn-success" id="datePicker" style="margin-left: 10px;">
+                                <i class="fa fa-calendar">&nbsp;&nbsp;</i><span style="color: white">Add day</span>
                             </label>
                         </div>
-                        <div style="padding:5px 0px 0px 20px">
-                            <span class="lbText">&nbsp;2018-07 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span>
+                        <div id="lbDay" class="disInline">
+                            <div class="pdCp">
+                                <span class="lbText">&nbsp;2018-02-01 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x_panel disInline" id="weekDiv" style="display: none">
+                        <div class="compare-btn">
+                            <label class="btn btn-success " id="weekPicker" style="margin-left: 10px;">
+                                <i class="fa fa-calendar">&nbsp;&nbsp;</i><span style="color: white">Add week</span>
+                            </label>
+                        </div>
+                        <div id="lbWeek" class="disInline">
+                            <div class="pdCp">
+                                <span class="lbText">&nbsp;2018-09-01 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x_panel disInline" id="monthDiv" style="display: none">
+                        <div class="compare-btn">
+                            <label class="btn btn-success timepicker" id="monthPicker" style="margin-left: 10px;">
+                                <i class="fa fa-calendar">&nbsp;&nbsp;</i><span style="color: white">Add month</span>
+                            </label>
+                        </div>
+                        <div id="lbMonth" class="disInline">
+                            <div class="pdCp">
+                                <span class="lbText">&nbsp;2018-07 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -151,7 +177,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-xs-12">
+                <div class="col lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="titbox">
                         <div class="count" style="font-size: 30px"> Region </div>
                     </div>
@@ -159,16 +185,14 @@
                         <div id="col-region" style="height:250px;"></div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
+                <div class="col lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="x_panel tile" style="padding: 0px">
                         <div class="titbox">
                             <span> Province</span>
                             <div class="clearfix"></div>
                         </div>
-                        <div class="x_content" style="padding: 10px 17px">
-                            <table class="table table-striped">
+                        <div class="x_content" style="padding: 10px 17px;height: 260px">
+                            <table class="table table-striped" id="tbProvince">
                                 <thead>
                                     <tr>
                                         <th>Time</th>
