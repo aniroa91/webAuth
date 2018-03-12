@@ -84,11 +84,21 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val opServByStt = Await.result(BrasService.getOpServByStatusResponse(brasId,day), Duration.Inf)
         val servName = opServByStt.map(x=> x._1).distinct
         val servStatus = opServByStt.map(x=> x._2).distinct
-        // LINE CARD, CARD, PORT
+        // LINECARD, CARD, PORT
         val linecardhost = Await.result(BrasService.getLinecardhostResponse(brasId,day), Duration.Inf)
+        // KIBANA Severity
+        val kibanaSeverity = Await.result(BrasService.getErrorSeverityResponse(brasId,day), Duration.Inf)
+        // KIBANA Error type
+        val kibanaErrorType = Await.result(BrasService.getErrorTypeResponse(brasId,day), Duration.Inf)
+        // KIBANA Facility
+        val kibanaFacility = Await.result(BrasService.getFacilityResponse(brasId,day), Duration.Inf)
+        // KIBANA DDos
+        val kibanaDdos = Await.result(BrasService.getDdosResponse(brasId,day), Duration.Inf)
+        // KIBANA Severity value
+        val severityValue = Await.result(BrasService.getSeveValueResponse(brasId,day), Duration.Inf)
 
         Ok(views.html.device.search(form,username,BrasResponse(BrasInfor(noOutlier,siginLogoff),KibanaOpviewByTime(kibanaBytime,opviewBytime),SigLogByTime(siginBytime,logoffBytime),
-          infErrorBytime,infHostBytime,infModuleBytime,opServiceName,ServiceNameStatus(servName,servStatus,opServByStt),linecardhost), day,brasId))
+          infErrorBytime,infHostBytime,infModuleBytime,opServiceName,ServiceNameStatus(servName,servStatus,opServByStt),linecardhost,KibanaOverview(kibanaSeverity,kibanaErrorType,kibanaFacility,kibanaDdos,severityValue)), day,brasId))
       }
       else
         Ok(views.html.device.search(form,username,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null))

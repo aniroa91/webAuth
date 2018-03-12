@@ -50,6 +50,26 @@ object BrasService {
     BrasDAO.getLinecardhostResponse(bras,nowDay)
   }
 
+  def getErrorSeverityResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
+    BrasDAO.getErrorSeverityResponse(bras,nowDay)
+  }
+
+  def getErrorTypeResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
+    BrasDAO.getErrorTypeResponse(bras,nowDay)
+  }
+
+  def getFacilityResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
+    BrasDAO.getFacilityResponse(bras,nowDay)
+  }
+
+  def getDdosResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
+    BrasDAO.getDdosResponse(bras,nowDay)
+  }
+
+  def getSeveValueResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
+    BrasDAO.getSeveValueResponse(bras,nowDay)
+  }
+
   // end page Search Bras
 
   def listTop100Bras: Future[Seq[(String,String,String,String,String, String, String, String,String,Option[String])]] = {

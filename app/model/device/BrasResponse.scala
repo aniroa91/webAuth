@@ -4,6 +4,7 @@ case class BrasInfor(
                     noOutlier: Seq[(Int)],
                     siginLogoff: Seq[(Int,Int)]
                     )
+
 case class KibanaOpviewByTime(
                        countK: Array[Int],
                        countOp: Array[Int]
@@ -20,6 +21,14 @@ case class ServiceNameStatus(
                          arrService: Seq[(String,String,Int)]
                        )
 
+case class KibanaOverview(
+                              arrSeverity: Seq[(String,Int)],
+                              arrErrorType: Seq[(String,Int)],
+                              arrFacility: Seq[(String,Int)],
+                              arrDdos: Seq[(String,Int)],
+                              arrSevValue: Seq[(String,Int)]
+                            )
+
 case class BrasResponse(
                             currentsInfo: BrasInfor,
                             kibanaOpviewBytime: KibanaOpviewByTime,
@@ -29,5 +38,6 @@ case class BrasResponse(
                             infModuleBytime: Seq[(String,String,Int,Int,Int)],
                             opServiceStt: Seq[(String,Int)],
                             servNameStt: ServiceNameStatus,
-                            linecardhost: Seq[(String,Int,Int)]
+                            linecardhost: Seq[(String,Int,Int)],
+                            kibanaOverview: KibanaOverview
                        )
