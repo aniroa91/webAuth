@@ -1424,12 +1424,15 @@
         <!-- Font Awesome -->
     <link href="../assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
         <!-- bootstrap-daterangepicker -->
-    <link href="../assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
     <link href="/assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
         <!-- Custom Theme Style -->
     <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
     <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
     <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
+    <link href="../assets/custom/css/jquerysctipttop.css" rel="stylesheet">
+    <link href="../assets/custom/css/monthPicker.css" rel="stylesheet">
+
+    <link href="../assets/custom/css/jquery-ui.css" rel="stylesheet">
     <style type="text/css">
             .top_nav .navbar-right {
                 width: auto;
@@ -1610,6 +1613,9 @@
             .iconDomain{
                 font-size: 18px;color: green;margin-right: 15px
             }
+            .ui-button span{
+                line-height: 20px;
+            }
     </style>
 }
 @if(item == "CompareDate"){
@@ -1617,12 +1623,15 @@
         <!-- Font Awesome -->
     <link href="../assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
         <!-- bootstrap-daterangepicker -->
-    <link href="../assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
     <link href="/assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
         <!-- Custom Theme Style -->
     <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
     <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
     <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
+    <link href="../assets/custom/css/jquerysctipttop.css" rel="stylesheet">
+    <link href="../assets/custom/css/monthPicker.css" rel="stylesheet">
+
+    <link href="../assets/custom/css/jquery-ui.css" rel="stylesheet">
     <style type="text/css">
             .top_nav .navbar-right {
                 width: auto;
@@ -1708,6 +1717,11 @@
                 background-color: #26B99A;
                 color: white;
             }
+            .ui-autocomplete .ui-state-active {
+                background-color: #26B99A!important;
+                color: white!important;
+                border: 1px solid transparent!important;
+            }
             .ui-helper-hidden-accessible {
                 display: none;
             }
@@ -1736,9 +1750,9 @@
                 color: #fff;
                 background: #3db9dc;
             }
-            .nav>li>a{
+            /*.nav>li>a{
                 font-size: 16px;
-            }
+            }*/
             .disabledTab {
                 pointer-events: none;
             }
@@ -1761,6 +1775,24 @@
             }
             .pdCp{
                 padding:5px 0px 0px 20px;
+            }
+            /*#MonthPicker_Button_monthPicker{
+                display: none;
+            }*/
+            .ui-button span{
+                line-height: 20px;
+            }
+            .btnGroup,#weekPicker_weekpicker{
+                width: 80px;
+                font-size: 14px;
+                padding: 6px 0px;
+                background: #26B99A;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+            }
+            .iconGroup{
+                border: none;background: #26B99A;color: #fff;
             }
     </style>
 }

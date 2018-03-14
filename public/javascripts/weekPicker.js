@@ -1,104 +1,150 @@
-var globalTriggeringElement;
-var globalAdditionalFunction = function() { null; };
+;( function( $, window, document, undefined ) {
 
-var getDateFromISOWeek = function(ywString, separator) {
-    try {
-        //console.log(ywString);
-        var ywArray = ywString.split(separator);
-        var y = ywArray[0];
-        var w = ywArray[1];
-        var simple = new Date(y, 0, 1 + (w - 1) * 7);
-        var dow = simple.getDay();
-        var ISOweekStart = simple;
-        if (dow <= 4)
-            ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-        else
-            ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-        return ISOweekStart;
-    } catch (err) {
-        console.error("Cannot convert Week into date");
-        return new Date();
+    "use strict";
+
+    // keep a list of weekpicker objects by datepicker input id
+    var instances = [];
+
+    var pluginName = "WeekPicker",
+        defaults = {
+            firstDay: 1,
+            dateFormat: "dd/mm/yy",
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            showWeek: true,
+
+            // supported keywords:
+            //  w  = week number, eg. 3
+            //  ww = zero-padded week number, e.g. 03
+            //  o  = short (week) year number, e.g. 18
+            //  oo = long (week) year number, e.g. 2018
+            weekFormat: "w/oo"
+        };
+
+    function WeekPicker ( element, options ) {
+        this.datePickerInput = $( element );
+        this.datePickerId = getDatePickerId( this.datePickerInput );
+
+        this.settings = $.extend( {
+            beforeShow: this.beforeShow,
+            onClose: this.onClose,
+            onSelect: this.onSelect
+        }, defaults, options );
+
+        this.init();
+
+        instances[ this.datePickerId ] = this;
+        return this;
     }
-};
 
-var showWeekCalendar = function(triggeringElement, additionalFunction) {
-    globalTriggeringElement = triggeringElement;
-    globalAdditionalFunction = additionalFunction;
-    var prevItem = $(triggeringElement).prev();
-    var weekValue = prevItem.val();
-    prevItem.datepicker("option", "defaultDate", getDateFromISOWeek(weekValue, '-'));
-    prevItem.val(weekValue);
-    prevItem.datepicker("show");
-};
+    $.extend( WeekPicker.prototype, {
+        init: function() {
+            this.weekPickerInput = createWeekPickerInput( this.datePickerInput );
 
-var setWeekCalendar = function(settingElement) {
-    var startDate;
-    var endDate;
-    var selectCurrentWeek = function() {
-        window.setTimeout(function() {
-            var activeElement = $("#ui-datepicker-div .ui-state-active");
-            var tdElement = activeElement.parent();
-            var trElement = tdElement.parent();
+            // initialize the date picker input, but hide it,
+            // so only the week picker version remains visible
+            this.datePickerInput.datepicker( this.settings );
+            this.datePickerInput.hide();
 
-            trElement.find("a").addClass("ui-state-active")
+            this.weekPickerInput.focus( function() {
 
-        }, 1);
-    };
+                // briefly focus the datepicker before hiding it to make the selection window open
+                this.datePickerInput.show().focus().hide();
+            }.bind( this ) );
 
-    $(settingElement).datepicker({
-        showOtherMonths: true,
-        selectOtherMonths: true,
-        showWeek: true,
-        firstDay: 1,
-        onSelect: function(dateText, inst) {
-            var datepickerValue = $(this).datepicker('getDate');
-            var dateObj = new Date(datepickerValue.getFullYear(), datepickerValue.getMonth(), datepickerValue.getDate());
-            var weekNum = $.datepicker.iso8601Week(dateObj);
-            if (weekNum < 10) {
-                weekNum = "0" + weekNum;
-            }
-            var ywString = datepickerValue.getFullYear() + '-' + weekNum;
-            $(this).val(ywString);
-            $(this).prev().html(ywString);
-            startDate = new Date(datepickerValue.getFullYear(), datepickerValue.getMonth(), datepickerValue.getDate() - datepickerValue.getDay());
-            endDate = new Date(datepickerValue.getFullYear(), datepickerValue.getMonth(), datepickerValue.getDate() - datepickerValue.getDay() + 6);
-            selectCurrentWeek();
-            $(this).data('datepicker').inline = true;
-            globalAdditionalFunction(globalTriggeringElement);
-        },
-        onClose: function() {
-            $(this).data('datepicker').inline = false;
+            $( "body" ).on( "mousemove", ".ui-weekpicker .ui-datepicker-calendar tr",
+                function() { $( this ).find( "td a" ).addClass( "ui-state-hover" ); }
+            ).on( "mouseleave", ".ui-weekpicker .ui-datepicker-calendar tr",
+                function() { $( this ).find( "td a" ).removeClass( "ui-state-hover" ); }
+            );
         },
         beforeShow: function() {
-            selectCurrentWeek();
+            $( this ).datepicker( "widget" ).addClass( "ui-weekpicker" );
         },
-        beforeShowDay: function(datepickerValue) {
-            var cssClass = '';
-            if (datepickerValue >= startDate && datepickerValue <= endDate)
-                cssClass = 'ui-datepicker-current-day';
-            selectCurrentWeek();
-            return [true, cssClass];
+        onClose: function() {
+            $( this ).datepicker( "widget" ).removeClass( "ui-weekpicker" );
         },
-        onChangeMonthYear: function(year, month, inst) {
-            selectCurrentWeek();
+        onSelect: function( dateText, dpInstance ) {
+            var instance = getWeekPickerByInstanceId( dpInstance.id );
+
+            var datepickerValue = $( this ).datepicker( "getDate" );
+            var year = datepickerValue.getFullYear();
+            var month = datepickerValue.getMonth();
+
+            var dateObj = new Date( year, month, datepickerValue.getDate() );
+            var week = $.datepicker.iso8601Week( dateObj );
+
+            if ( week > 50 && month === 0 ) {
+                year--;
+            }
+
+            // build the field value based on week format
+            var text = instance.settings.weekFormat;
+            text = text.replace( /ww/g, leftPad( week, 2 ) );
+            text = text.replace( /w/g, week );
+            text = text.replace( /oo/g, year );
+            text = text.replace( /o/g, year % 100 );
+
+            instance.weekPickerInput.val( text );
+            // submit form search compare week HoangNH44
+            $('#date').val(text);
+            $('#tpTime').val("W");
+            $("#ctSearch").submit();
         }
-    }).datepicker('widget').addClass('ui-weekpicker');
+    } );
 
-    $('body').on('mousemove', '.ui-weekpicker .ui-datepicker-calendar tr', function() { $(this).find('td a').addClass('ui-state-hover'); });
-    $('body').on('mouseleave', '.ui-weekpicker .ui-datepicker-calendar tr', function() { $(this).find('td a').removeClass('ui-state-hover'); });
+    $.fn.weekpicker = function( options ) {
+        return this.each( function() {
+            if ( !$.data( this, "plugin_" + pluginName ) ) {
+                $.data( this, "plugin_" +
+                    pluginName, new WeekPicker( this, options ) );
+            }
+        } );
+    };
 
-    // function for doing something more
+    var getDatePickerId = function( datePickerInput ) {
+        var datePickerId = datePickerInput.attr( "id" );
 
-};
+        if ( datePickerId === undefined ) {
+            var generateUniqueId = function( prefix ) {
+                var id;
 
-var convertToWeekPicker = function(targetElement) {
-    if (targetElement.prop("tagName") == "INPUT" && (targetElement.attr("type") == "text" || targetElement.attr("type") == "hidden")) {
-        var week = targetElement.val();
-        $('<span class="displayDate" style="display:none">' + week + '</span>').insertBefore(targetElement);
-        $('<i class="fa fa-calendar showCalendar" aria-hidden="true" style="cursor:pointer;margin-left: 10px;margin-top: 3px;" onclick="javascript:showWeekCalendar(this)"></i>').insertAfter(targetElement);
-        setWeekCalendar(targetElement);
-    } else {
-        targetElement.replaceWith("<span>ERROR: please control js console</span>");
-        console.error("convertToWeekPicker() - ERROR: The target element is not compatible with this conversion, try to use an <input type=\"text\" /> or an <input type=\"hidden\" />");
-    }
-};
+                do {
+                    id = prefix + Math.floor( ( 1 + Math.random() ) * 0x100000000 )
+                        .toString( 16 ).substring( 1 );
+                } while ( $( "#" + id ).length );
+
+                return id;
+            };
+
+            datePickerId = generateUniqueId( "datepicker_" );
+            datePickerInput.attr( "id", datePickerId );
+        }
+
+        return datePickerId;
+    };
+
+    var createWeekPickerInput = function( datePickerInput ) {
+        var datePickerId = datePickerInput.attr( "id" );
+        var weekPickerId = datePickerId + "_weekpicker";
+        var weekPickerInput = $( "<input type=\"text\" placeholder='Choose week...' class=\"form-control\" id=\"" + weekPickerId +
+            "\" data-datepicker-id=\"" + datePickerId + "\"></div>" );
+
+        datePickerInput.after( weekPickerInput );
+        datePickerInput.data( "weekpicker-id", weekPickerId );
+
+        return weekPickerInput;
+    };
+
+    var getWeekPickerByInstanceId = function( instId ) {
+        return instances[ instId ];
+    };
+
+    var leftPad = function( input, length, padString ) {
+        padString = padString || "0";
+        input = input + "";
+        return input.length >= length ?
+            input :
+            new Array( length - input.length + 1 ).join( padString ) + input;
+    };
+} )( jQuery, window, document );

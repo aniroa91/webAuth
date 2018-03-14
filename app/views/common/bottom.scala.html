@@ -268,12 +268,19 @@
                 $('#sparkline1').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
                 $('#sparkline2').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
                 $('#sparkline3').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
+
                 $('#monthDate').datepicker({
                     autoclose: true,
                     minViewMode: 1,
                     endDate: '+0d',
                     format: 'yyyy-mm'
                 }).on('changeDate', function(selected){
+                    var startDate = new Date(selected.date.valueOf());
+                    var yr = startDate.getFullYear();
+                    var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
+                    var newDate = yr + '-' + month;
+                    $('#date').val(newDate);
+                    $("#ctSearch").submit();
                 });
 
                 $('#weeklyDatePicker').datepicker({
@@ -357,9 +364,12 @@
 
     <script type="text/javascript" src="../assets/vendors/moment/moment.js"></script>
         <!--  Datepicker -->
-    <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript" src="../assets/vendors/daterangepicker/daterangepicker.js"></script>
     <script type="text/javascript" src="../assets/javascripts/weekPicker.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/jquery.maskedinput.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/monthPicker.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/jquery-ui.min.js"></script>
+
 
     <script type="text/javascript">
             $(document).ready(function () {
@@ -375,20 +385,37 @@
                         $("#ctSearch").submit();
                     }
                 });
-                $('#monthDate').datepicker({
-                    autoclose: true,
-                    minViewMode: 1,
-                    endDate: '+0d',
-                    format: 'yyyy-mm'
-                }).on('changeDate', function(selected){
+                /*MONTH PICKER*/
+                $('#monthPicker').MonthPicker({
+                    Button: false,
+                    OnAfterChooseMonth: function() {
+                        var range = $(this).val();
+                        $('#date').val(range);
+                        $('#tpTime').val("M");
+                        $("#ctSearch").submit();
+                    }
                 });
-
-                $('#weeklyDatePicker').datepicker({
-                    autoclose: true,
-                    endDate: '+0d',
-                    format: 'yyyy-mm-dd'
-                }).on('changeDate', function(selected){
+                /*END MONTH PICKER*/
+                /* WEEK DATEPICKER */
+                $( "#week-datepicker" ).weekpicker({
+                    // set start day of the week
+                    firstDay: 1,
+                    // custom date format
+                    dateFormat: "dd/m/yy",
+                    // shows other months
+                    showOtherMonths: true,
+                    // allows to select other months
+                    selectOtherMonths: true,
+                    // shows the current week number
+                    showWeek: true,
+                    // supported keywords:
+                    //  w  = week number, eg. 3
+                    //  ww = zero-padded week number, e.g. 03
+                    //  o  = short (week) year number, e.g. 18
+                    //  oo = long (week) year number, e.g. 2018
+                    weekFormat: "w/oo"
                 });
+                /* END WEEK PICKER*/
 
                 var start = moment();
                 var end = moment();
@@ -420,6 +447,7 @@
                 $('#rangeTime').on('apply.daterangepicker', function(ev, picker) {
                     var range = picker.startDate.format('YYYY-MM-DD')+"/"+picker.endDate.format('YYYY-MM-DD');
                     $('#date').val(range);
+                    $('#tpTime').val("D");
                     $("#ctSearch").submit();
                 });
             });
@@ -429,6 +457,12 @@
                     $('#monthDate').hide();
                     $('#weeklyDatePicker').hide();
                     $('#rangeTime').show();
+                    $('#dayDiv').show();
+                    $('#weekDiv').hide();
+                    $('#monthDiv').hide();
+                    $('#monthPicker').hide();
+                    $('#ipMonth').hide();
+                    $('#MonthPicker_Button_monthPicker').hide();
                     // active tab
                     $("#tbHour").removeClass('disabledTab').removeClass('disabled').addClass('active');
                     $("#tbWeek").addClass('disabledTab').addClass('disabled').removeClass('active');
@@ -442,6 +476,12 @@
                     $('#monthDate').hide();
                     $('#rangeTime').hide();
                     $('#weeklyDatePicker').show();
+                    $('#weekDiv').show();
+                    $('#monthDiv').hide();
+                    $('#dayDiv').hide();
+                    $('#monthPicker').hide();
+                    $('#MonthPicker_Button_monthPicker').hide();
+                    $('#ipMonth').hide();
                     // active tab
                     $("#tbHour").removeClass('disabledTab').removeClass('disabled').removeClass("active");
                     $("#tbWeek").removeClass('disabledTab').removeClass('disabled').addClass('active');
@@ -452,9 +492,17 @@
                     $('#month').removeClass("active");
                 }
                 if($(element).val()== 3){
+
                     $('#rangeTime').hide();
                     $('#weeklyDatePicker').hide();
-                    $('#monthDate').show();
+                    $('#monthPicker').show();
+                    $('#MonthPicker_Button_monthPicker').show();
+                    // show month picker
+                    $('#monthDiv').show();
+                    $('#weekDiv').hide();
+                    $('#dayDiv').hide();
+                    $('#ipMonth').show();
+
                     // active tab
                     $("#tbHour").removeClass('disabledTab').removeClass('disabled').removeClass("active");
                     $("#tbWeek").removeClass('disabledTab').removeClass('disabled').removeClass("active");
@@ -568,9 +616,11 @@
     <script src="../assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
     <script type="text/javascript" src="../assets/vendors/moment/moment.js"></script>
         <!--  Datepicker -->
-    <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript" src="../assets/vendors/daterangepicker/daterangepicker.js"></script>
     <script type="text/javascript" src="../assets/javascripts/weekPicker.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/jquery.maskedinput.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/monthPicker.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/jquery-ui.min.js"></script>
 
     <script type="text/javascript">
             $(document).ready(function () {
@@ -594,41 +644,86 @@
                         $("#ctSearch").submit();
                     }
                 });
-
-                $('#monthDate').datepicker({
-                    autoclose: true,
-                    minViewMode: 1,
-                    endDate: '+0d',
-                    format: 'yyyy-mm'
-                }).on('changeDate', function(selected){
+                /*MONTH PICKER*/
+                $('#monthPicker').MonthPicker({
+                    Button: false,
+                    OnAfterChooseMonth: function() {
+                        var range = $(this).val();
+                        $('#date').val(range);
+                        $('#tpTime').val("M");
+                        $("#ctSearch").submit();
+                    }
                 });
-
-                $('#datePicker').datepicker({
-                    autoclose: true,
-                    endDate: '+0d',
-                    format: 'yyyy-mm-dd'
-                }).on('changeDate', function(selected){
-                    var startDate = new Date(selected.date.valueOf());
-                    var yr = startDate.getFullYear();
-                    var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
-                    var day = startDate.getDate() < 9 ? ('0' + Number(startDate.getDate())) : (Number(startDate.getDate()));
-                    var newDate = yr + '-' + month+'-'+day;
-                    var html = '<div class="pdCp"><span class="lbText">&nbsp;'+newDate+' <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span></div>';
-                    $('#lbDay').append(html);
+                $('#monthDate').MonthPicker({
+                    Button: false,
+                    OnAfterChooseMonth: function() {
+                        var newDate = $(this).val();
+                        /*var html = '<div class="pdCp"><span class="lbText">&nbsp;'+newDate+' <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span></div>';
+                        $('#lbMonth').append(html);*/
+                        $('#date').val(newDate);
+                        $('#tpTime').val("M");
+                        $("#ctSearch").submit();
+                    }
                 });
-
-                $('#weeklyDatePicker').datepicker({
-                    autoclose: true,
+                /*END MONTH PICKER*/
+                /* WEEK DATEPICKER */
+                $( "#week-datepicker" ).weekpicker({
+                    // set start day of the week
+                    firstDay: 1,
+                    // custom date format
+                    dateFormat: "dd/m/yy",
+                    // shows other months
+                    showOtherMonths: true,
+                    // allows to select other months
+                    selectOtherMonths: true,
+                    // shows the current week number
                     showWeek: true,
-                    endDate: '+0d',
-                    format: 'yyyy-mm-dd'
-                }).on('changeDate', function(selected){
+                    // supported keywords:
+                    //  w  = week number, eg. 3
+                    //  ww = zero-padded week number, e.g. 03
+                    //  o  = short (week) year number, e.g. 18
+                    //  oo = long (week) year number, e.g. 2018
+                    weekFormat: "w/oo"
                 });
-
+                $( "#weekPicker" ).weekpicker({
+                    // set start day of the week
+                    firstDay: 1,
+                    // custom date format
+                    dateFormat: "dd/m/yy",
+                    // shows other months
+                    showOtherMonths: true,
+                    // allows to select other months
+                    selectOtherMonths: true,
+                    // shows the current week number
+                    showWeek: true,
+                    // supported keywords:
+                    //  w  = week number, eg. 3
+                    //  ww = zero-padded week number, e.g. 03
+                    //  o  = short (week) year number, e.g. 18
+                    //  oo = long (week) year number, e.g. 2018
+                    weekFormat: "w/oo"
+                });
+                /* END WEEK PICKER*/
+                /* DAY RANGE PICKER*/
                 var start = moment();
                 var end = moment();
 
-                if($('#date').val() != "") {
+                // day picker when click compare
+                $('#datePicker').daterangepicker({
+                            singleDatePicker: true,
+                            showDropdowns: true,
+                            maxDate:end
+                });
+                $('#datePicker').on('apply.daterangepicker', function(ev, picker) {
+                    var newDate = picker.startDate.format('YYYY-MM-DD');
+                    var html = '<div class="pdCp"><span class="lbText">&nbsp;'+newDate+' <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span></div>';
+                    $('#lbDay').append(html);
+                    $('#date').val(newDate);
+                    $('#tpTime').val("D");
+                    $("#ctSearch").submit();
+                });
+                // range date picker
+                if($('#tpTime').val() == "D" && $('#date').val() != "") {
                     var fromDate = $('#date').val().split('/')[0];
                     var toDate = $('#date').val().split('/')[1];
                     start = moment(fromDate);
@@ -655,8 +750,10 @@
                 $('#rangeTime').on('apply.daterangepicker', function(ev, picker) {
                     var range = picker.startDate.format('YYYY-MM-DD')+"/"+picker.endDate.format('YYYY-MM-DD');
                     $('#date').val(range);
+                    $('#tpTime').val("D");
                     $("#ctSearch").submit();
                 });
+                /* END DAY RANGE PICKER*/
             });
 
             function setDatePicker(element){
@@ -667,6 +764,9 @@
                     $('#dayDiv').show();
                     $('#weekDiv').hide();
                     $('#monthDiv').hide();
+                    $('#monthPicker').hide();
+                    $('#ipMonth').hide();
+                    $('#monthDate').hide();
                 }
                 if($(element).val()== 2){
                     $('#monthDate').hide();
@@ -675,40 +775,22 @@
                     $('#weekDiv').show();
                     $('#monthDiv').hide();
                     $('#dayDiv').hide();
-                    $('#weekPicker').datepicker({
-                        autoclose: true,
-                        endDate: '+0d',
-                        format: 'yyyy-mm-dd'
-                    }).on('changeDate', function(selected){
-                        var startDate = new Date(selected.date.valueOf());
-                        var yr = startDate.getFullYear();
-                        var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
-                        var day = startDate.getDate() < 9 ? ('0' + Number(startDate.getDate())) : (Number(startDate.getDate()));
-                        var newDate = yr + '-' + month+'-'+day;
-                        var html = '<div class="pdCp"><span class="lbText">&nbsp;'+newDate+' <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span></div>';
-                        $('#lbWeek').append(html);
-                    });
+                    $('#monthPicker').hide();
+                    $('#monthDate').hide();
+                    $('#ipMonth').hide();
+                    $('#weekPicker_weekpicker').removeAttr('placeholder');
+                    $('#weekPicker_weekpicker').val("Add week")
                 }
                 if($(element).val()== 3){
                     $('#rangeTime').hide();
                     $('#weeklyDatePicker').hide();
+                    $('#monthPicker').show();
                     $('#monthDate').show();
                     // show month picker
                     $('#monthDiv').show();
                     $('#weekDiv').hide();
                     $('#dayDiv').hide();
-                    $('#monthPicker').datepicker({
-                        autoclose: true,
-                        minViewMode: 1,
-                        endDate: '+0d'
-                    }).on('changeDate', function(selected){
-                        var startDate = new Date(selected.date.valueOf());
-                        var yr = startDate.getFullYear();
-                        var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
-                        var newDate = yr + '-' + month;
-                        var html = '<div class="pdCp"><span class="lbText">&nbsp;'+newDate+' <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span></div>';
-                        $('#lbMonth').append(html);
-                    });
+                    $('#ipMonth').show();
                 }
             }
             function refreshDomain(element){

@@ -27,7 +27,7 @@
                     <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                 </div>
                 <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
-                @views.html.profile.internet.frmSearchInternet(form, routes.InternetHistoryController.compareContract,contract)
+                @views.html.profile.internet.frmSearchInternet(form, routes.InternetHistoryController.compareContract,contract,null,null)
 
                 </div>
             </nav>
@@ -48,14 +48,16 @@
                     </div>
 
                     <div class="input-group date" id="weeklyDatePicker" style="display: none;width: 200px">
-                        <input type="text" class="form-control" value="" readonly="true" style="background-color: white" placeholder="Choose week...">
-                        <span class="input-group-addon" style="background-color: #3db9dc!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                        <input type="text" id="week-datepicker" class="form-control" readonly="true" style="background-color: white" placeholder="Choose week...">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
                         </span>
                     </div>
 
-                    <div class="input-group date" id="monthDate" style="display: none;width: 200px">
-                        <input type="text" class="form-control" value="" readonly="true" placeholder="Choose month..." style="background-color: white" >
-                        <span class="input-group-addon" style="background-color: #3db9dc!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                    <div class="input-group date" id="ipMonth" style="display: none;width: 200px">
+                        <input type="text" id="monthPicker" class="form-control" value="" readonly="true" placeholder="Choose month..." style="display: none;background-color: white" >
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
                         </span>
                     </div>
 

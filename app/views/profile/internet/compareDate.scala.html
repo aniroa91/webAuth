@@ -1,4 +1,4 @@
-@(form: Form[InternetContract],email: String,contract: String)
+@(form: Form[InternetContract],email: String,contract: String,day: String,tpTime: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -27,7 +27,7 @@
                     <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                 </div>
                 <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
-                @views.html.profile.internet.frmSearchInternet(form, routes.InternetHistoryController.compareDate,contract)
+                @views.html.profile.internet.frmSearchInternet(form, routes.InternetHistoryController.compareDate,contract,day,tpTime)
 
                 </div>
             </nav>
@@ -48,17 +48,17 @@
                     </div>
 
                     <div class="input-group date" id="weeklyDatePicker" style="display: none;width: 200px">
-                        <input type="text" class="form-control" readonly="true" style="background-color: white" placeholder="Choose week...">
-                        <span class="input-group-addon" style="background-color: #3db9dc!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                        <input type="text" id="week-datepicker" class="form-control" readonly="true" style="background-color: white" placeholder="Choose week...">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
                         </span>
                     </div>
-
-                    <div class="input-group date" id="monthDate" style="display: none;width: 200px">
-                        <input type="text" class="form-control" value="" readonly="true" placeholder="Choose month..." style="background-color: white" >
-                        <span class="input-group-addon" style="background-color: #3db9dc!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                    <div class="input-group date" id="ipMonth" style="display: none;width: 200px">
+                      <input type="text" id="monthPicker" class="form-control" value="" readonly="true" placeholder="Choose month..." style="display: none;background-color: white" >
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
                         </span>
                     </div>
-
                 </li>
                 <li class="form-group" style="margin-top: 13px;right: 10px">
                     <select class="form-control" onchange="setDatePicker(this)" id="cbbWeek" style="width: 200px;margin-right: 15px">
@@ -84,33 +84,28 @@
                             </label>
                         </div>
                         <div id="lbDay" class="disInline">
-                            <div class="pdCp">
-                                <span class="lbText">&nbsp;2018-02-01 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span>
-                            </div>
                         </div>
                     </div>
                     <div class="x_panel disInline" id="weekDiv" style="display: none">
-                        <div class="compare-btn">
-                            <label class="btn btn-success " id="weekPicker" style="margin-left: 10px;">
-                                <i class="fa fa-calendar">&nbsp;&nbsp;</i><span style="color: white">Add week</span>
-                            </label>
+                        <div class="input-group date" style="width: 100px">
+                            <span class="input-group-addon iconGroup">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                            <input type="text" id="weekPicker" value="Add week" class="btnGroup" readonly="true">
                         </div>
+
                         <div id="lbWeek" class="disInline">
-                            <div class="pdCp">
-                                <span class="lbText">&nbsp;2018-09-01 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span>
-                            </div>
                         </div>
                     </div>
                     <div class="x_panel disInline" id="monthDiv" style="display: none">
-                        <div class="compare-btn">
-                            <label class="btn btn-success timepicker" id="monthPicker" style="margin-left: 10px;">
-                                <i class="fa fa-calendar">&nbsp;&nbsp;</i><span style="color: white">Add month</span>
-                            </label>
+                        <div class="input-group date" style="width: 100px">
+                            <span class="input-group-addon iconGroup">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                            <input type="text" id="monthDate" value="Add month" class="btnGroup" readonly="true">
                         </div>
+
                         <div id="lbMonth" class="disInline">
-                            <div class="pdCp">
-                                <span class="lbText">&nbsp;2018-07 <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span>
-                            </div>
                         </div>
                     </div>
                 </div>
