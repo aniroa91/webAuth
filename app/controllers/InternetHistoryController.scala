@@ -62,12 +62,14 @@ class InternetHistoryController @Inject()(cc: ControllerComponents) extends Abst
     try {
       if (!formValidationResult.hasErrors) {
         val ct = formValidationResult.get.ct.trim()
-        Ok(views.html.profile.internet.compareContract(form, username,ct))
+        val day = formValidationResult.get.date.trim()
+        val tptime = formValidationResult.get.tpTime.trim()
+        Ok(views.html.profile.internet.compareContract(form, username,ct,day,tptime))
       } else {
-        Ok(views.html.profile.internet.compareContract(form, username,null))
+        Ok(views.html.profile.internet.compareContract(form, username,null,null,null))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.internet.compareContract(form, username,null))
+      case e: Exception => Ok(views.html.profile.internet.compareContract(form, username,null,null,null))
     }
   }
 

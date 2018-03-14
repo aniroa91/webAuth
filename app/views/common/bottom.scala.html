@@ -373,6 +373,17 @@
 
     <script type="text/javascript">
             $(document).ready(function () {
+                // active datepicker and tab content
+                if($('#tpTime').val()== "W"){
+                    activePicker("week");
+                    activeTab("week");
+                    $('#cbbTime').val(2);
+                }
+                if($('#tpTime').val()== "M"){
+                    activePicker("month");
+                    activeTab("month");
+                    $('#cbbTime').val(3);
+                }
                 // autocomplete
                 var listContracts = [
                     "HUFD08955","BDFD02717","DAD048115","DAFD10840","TNFD01957","SLFD00293","LSFD03412","HNH236126","BDD005873","NTFD08246","DNFD21880","DNFD21875","NTFD09091","VLFD01954","SGH209147","HMFD01095","NTFD08147","QTFD00164","LAFD02695","VPFD02046","NTFD08490","BTFD05630","CTD025308","HPFD14341","SGH210510","CTD025308","HNH212346","NBFD02615","SGH210160","QNFD09571","HDFD05936","LSFD03397","HYFD03518","SGH212667","SGH212667","NTFD08534","HTFD00614","LDFD03872","TQFD02416","TNFD01968","HPFD14355","SGH212894","QNFD07990","AGFD05107","SGH212055","SGH212679","TNFD01906","SGH212907","AGFD05055","SGH212654","BDFD06200","BDFD06200","DLFD03323","SGH212169","HNH048249","PTFD01356","DAFD11035","HUFD01005","HPD003862","HPFD14159","HMFD01099","SGH212435","LDFD03853","DAFD11055","NDFD02190","BDD006186","BTFD05475","PTFD01342","BTFD05475","HTFD00623","NDFD01953","HPFD14176","BNFD08634","DNFD37665","BPFD02810","SGH095989","SGH247446","GLFD03947","SGH212852","BDFD06170","HTFD00624","TNFD01952","AGFD04570","QNFD08800","HNH212288","SGH213072","NDFD01928","SGH211382","TNFD01905","NDFD01940","NDFD01929","LSFD03442","SGH211994","HYFD03539","HUFD08758","NDFD02196","GLFD02554","SGH212837","SGH212100","NDFD01951","LSFD03441","VTD026363","AGD018793","NTFD09035","NDFD02205","SGH212403","BDFD06219","SGH213065","SGH212882","QAFD01870","SGH079714","HYFD03475","LSFD03399","HPFD14403","HYFD03475","LDD019743","HPFD14365","DNFD21878","DAD020539","LDD019743","SGH211634","HNH002849","LDFD03897","DNFD21878","HNH212638","GLFD02567","LDFD03882","BDFD05859","SGH212143","BDFD06244","SGH212143","NAFD01028","HNH355436","HNH355151","DND007172","BDD004626","BDD000027","DND003213","BDD006543","SGH018289","BDD005828","CTFD12224","BDD003339","HDD030000","SGD228370","QNFD20988","BDD006410","BDD001071","SGH232074","HDD000066","STD003161","DAFD14440","BGFD10224","SGH223919","HDD007807","HNH253179","DND075401","BGFD08935","HDD023109","DND035949","DNFD37040","HNH251578","DNFD11355","HND440892","SGH264080","SGH293974","DND064819","DNFD12802","HDFD02824","SGH081959","NTFD04756","HDFD03490","SGH081577","DAD054747","HPFD08783","QNFD08897","BIFD02357","VTFD06989","CTFD07354","LAD004040","SGH083516","DNFD17454","QNFD06927","DNFD05895","SGH082650","SGH082847","DND049657","DNFD17454","SGH082121","HPFD08552","SGH081934","SGH082131","QND036965","DAFD05955","DAFD05955","BDD064055","HPFD08851","HDFD03555","DLFD02209","SGH084411","QND036965","HPFD08766","HPFD08852","BDD055418","HDFD03566","HDFD03563","SGH082123","HDFD05560","HDFD03562","QNFD03156","HPFD08781","BDD006141","SGH096025","HDD027833","CTFD07441","SGH082141","QTFD05313","SGH083260","TIFD03157","HDFD03570","DAFD23977","BDD005859","DTFD04226","BDD005004","HNH354433","SGH211993","HPFD14413","HPFD14296","HYFD06107","HPFD14242","SGD241237","SGH080337","NBFD04938","HPFD29978","HNH078989","HNH078989","SGH018225","CTFD07406","VTFD08149","SGH200832","NTFD04752","SGH251848","THFD00735","NTFD16250","SGH081567","DLFD02213","DAD017635","HPFD29847","DNFD16408","SGH083132","HBFD02145","HPFD08597","SGH249375","DLFD02212","NTFD04741","BDFD46717","HPFD29862","DAFD21305","QND056190","NTFD04744","SGH083958","HPFD29921","HPFD17796","BDFD70124","NTFD04771","SGH084438","CMFD01712","HYFD06215","SGD523452","HPFD29688","SGH094006","BGFD08883","QNFD06943","HPD020218","LDFD02663","DND084510","DAFD14609","SGH083948","SGD711642","SGH083274","NTD009689","HPFD08778","HPFD29688","HNH354747","HDFD05542","DNFD18945","HPFD29657","HDFD05542","HPD062608","HYFD06217","SGH083953","SGD797354","NTFD04745","HPFD29920","DND084514","HDFD03551","HNH355969","SGH096041","DND057621","LDFD02665","DAD054761","DAD002137","DNFD18905","HPFD08564","TGFD01944","SGH003263","HYFD06188","DAD005828","HNH354632","SGH082855","SGH081415","SGH083968","HNH355728","DND004461","STFD00740","SGH212743","HYFD03514","TNFD01949","BDD006179","VTD000404","SGH211685","SGH211664","NDFD02191","SGH209998","BDD003074","SGH210429","BGFD02555","HPFD09346","NTFD09036","STFD01260","NTD021714","HPFD14367","BGFD02585","HPFD14493","NTFD08504","HMFD01096","NTFD09043","HPD003468","DND003924","NTFD09016","NTFD09131","HDD000537","DND004643","SGH213362","QNFD07977","SGH211757","NTFD08511","SGD084312","LDFD03771","NTFD09028","VTFD09914","VPFD02209","SGH212158","HYFD03475","SGH212067","SGH213192","SGH213128","NTFD08100","SGH212158","SGH212119","BDFD51645","DAFD11145","QNFD09572","SGH212364","BTFD05675","SGH212019","BDFD06207","SGH211150","SGH003596","SGH213139","BDFD52806","SGH213257","BDFD06274","SGH211452","BGFD07816","SGH213298","VTD042108","SGH211558","SGH213498","QNFD09538","QAFD01821","LAFD02855","DAFD11139","QNFD09538","BTFD05585","LCFD03084","VTFD07347","QIFD01300","SGH054448","SGH096889","SGD238938","HDFD10365","DNFD43810","BDD006756","SGH313426","DAD006070","DAD040745","SGH092905","HPFD20039","HNH248717","SGD193994"
@@ -385,9 +396,12 @@
                         $("#ctSearch").submit();
                     }
                 });
+                var start = moment();
+                var end = moment();
                 /*MONTH PICKER*/
                 $('#monthPicker').MonthPicker({
                     Button: false,
+                    MaxMonth: 0,
                     OnAfterChooseMonth: function() {
                         var range = $(this).val();
                         $('#date').val(range);
@@ -417,10 +431,7 @@
                 });
                 /* END WEEK PICKER*/
 
-                var start = moment();
-                var end = moment();
-
-                if($('#date').val() != "") {
+                if($('#date').val() != "" && $('#tpTime').val()=="D") {
                     var fromDate = $('#date').val().split('/')[0];
                     var toDate = $('#date').val().split('/')[1];
                     start = moment(fromDate);
@@ -452,17 +463,8 @@
                 });
             });
 
-            function setDatePicker(element){
-                if($(element).val()== 1){
-                    $('#monthDate').hide();
-                    $('#weeklyDatePicker').hide();
-                    $('#rangeTime').show();
-                    $('#dayDiv').show();
-                    $('#weekDiv').hide();
-                    $('#monthDiv').hide();
-                    $('#monthPicker').hide();
-                    $('#ipMonth').hide();
-                    $('#MonthPicker_Button_monthPicker').hide();
+            function activeTab(time){
+                if(time == "day"){
                     // active tab
                     $("#tbHour").removeClass('disabledTab').removeClass('disabled').addClass('active');
                     $("#tbWeek").addClass('disabledTab').addClass('disabled').removeClass('active');
@@ -472,16 +474,7 @@
                     $('#week').removeClass("active");
                     $('#month').removeClass("active");
                 }
-                if($(element).val()== 2){
-                    $('#monthDate').hide();
-                    $('#rangeTime').hide();
-                    $('#weeklyDatePicker').show();
-                    $('#weekDiv').show();
-                    $('#monthDiv').hide();
-                    $('#dayDiv').hide();
-                    $('#monthPicker').hide();
-                    $('#MonthPicker_Button_monthPicker').hide();
-                    $('#ipMonth').hide();
+                if(time == "week"){
                     // active tab
                     $("#tbHour").removeClass('disabledTab').removeClass('disabled').removeClass("active");
                     $("#tbWeek").removeClass('disabledTab').removeClass('disabled').addClass('active');
@@ -491,8 +484,41 @@
                     $('#week').addClass("active");
                     $('#month').removeClass("active");
                 }
-                if($(element).val()== 3){
-
+                if(time == "month"){
+                    // active tab
+                    $("#tbHour").removeClass('disabledTab').removeClass('disabled').removeClass("active");
+                    $("#tbWeek").removeClass('disabledTab').removeClass('disabled').removeClass("active");
+                    $("#tbMonth").removeClass('disabledTab').removeClass('disabled').addClass('active');
+                    //active content
+                    $('#hour').removeClass("active");
+                    $('#week').removeClass("active");
+                    $('#month').addClass("active");
+                }
+            }
+            function activePicker(time){
+                if(time == "day"){
+                    $('#monthDate').hide();
+                    $('#weeklyDatePicker').hide();
+                    $('#rangeTime').show();
+                    $('#dayDiv').show();
+                    $('#weekDiv').hide();
+                    $('#monthDiv').hide();
+                    $('#monthPicker').hide();
+                    $('#ipMonth').hide();
+                    $('#MonthPicker_Button_monthPicker').hide();
+                }
+                if(time == "week"){
+                    $('#monthDate').hide();
+                    $('#rangeTime').hide();
+                    $('#weeklyDatePicker').show();
+                    $('#weekDiv').show();
+                    $('#monthDiv').hide();
+                    $('#dayDiv').hide();
+                    $('#monthPicker').hide();
+                    $('#MonthPicker_Button_monthPicker').hide();
+                    $('#ipMonth').hide();
+                }
+                if(time == "month"){
                     $('#rangeTime').hide();
                     $('#weeklyDatePicker').hide();
                     $('#monthPicker').show();
@@ -502,15 +528,21 @@
                     $('#weekDiv').hide();
                     $('#dayDiv').hide();
                     $('#ipMonth').show();
+                }
+            }
 
-                    // active tab
-                    $("#tbHour").removeClass('disabledTab').removeClass('disabled').removeClass("active");
-                    $("#tbWeek").removeClass('disabledTab').removeClass('disabled').removeClass("active");
-                    $("#tbMonth").removeClass('disabledTab').removeClass('disabled').addClass('active');
-                    //active content
-                    $('#hour').removeClass("active");
-                    $('#week').removeClass("active");
-                    $('#month').addClass("active");
+            function setDatePicker(element){
+                if($(element).val()== 1){
+                    activePicker("day");
+                    activeTab("day");
+                }
+                if($(element).val()== 2){
+                    activePicker("week");
+                    activeTab("week");
+                }
+                if($(element).val()== 3){
+                    activePicker("month");
+                    activeTab("month");
                 }
             }
 
@@ -554,7 +586,7 @@
             }
 
             function showModalCp() {
-                var url = window.location.href;
+                /*var url = window.location.href;
                 var vlDomain = "";
                 if(url.indexOf('=')>=0){
                     vlDomain = url.substring(url.indexOf('=')+1);
@@ -570,7 +602,7 @@
                             $('#dm'+i).attr('disabled','true');
                         }
                     }
-                }
+                }*/
                 $('#fr-compare').modal('show');
             }
 
@@ -647,6 +679,7 @@
                 /*MONTH PICKER*/
                 $('#monthPicker').MonthPicker({
                     Button: false,
+                    MaxMonth: 0,
                     OnAfterChooseMonth: function() {
                         var range = $(this).val();
                         $('#date').val(range);
@@ -656,6 +689,7 @@
                 });
                 $('#monthDate').MonthPicker({
                     Button: false,
+                    MaxMonth: 0,
                     OnAfterChooseMonth: function() {
                         var newDate = $(this).val();
                         /*var html = '<div class="pdCp"><span class="lbText">&nbsp;'+newDate+' <i class="fa fa-times iconRemove" aria-hidden="true" onclick="refreshContract()"></i></span></div>';
