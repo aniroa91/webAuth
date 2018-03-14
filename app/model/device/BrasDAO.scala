@@ -163,4 +163,59 @@ object BrasDAO {
                   """
         .as[(String,Int,Int)])
   }
+
+  def getErrorSeverityResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select severity, count(error_name) from dwh_kibana
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by severity
+                  """
+        .as[(String,Int)])
+  }
+
+  def getErrorTypeResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select error_type, count(error_name) from dwh_kibana
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by error_type
+                  """
+        .as[(String,Int)])
+  }
+
+  def getFacilityResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select facility, count(error_name) from dwh_kibana
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by facility
+                  """
+        .as[(String,Int)])
+  }
+
+  def getDdosResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select error_name, sum(value) from dwh_kibana
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and error_type='ddos'
+            group by error_name
+                  """
+        .as[(String,Int)])
+  }
+
+  def getSeveValueResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select severity, sum(value) from dwh_kibana
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by severity
+                  """
+        .as[(String,Int)])
+  }
 }

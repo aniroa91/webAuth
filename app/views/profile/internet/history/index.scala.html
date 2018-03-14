@@ -1,4 +1,4 @@
-@(form: Form[SearchContract], email: String, response: _root_.profile.controllers.internet.InternetReponse)
+@(form: Form[SearchContract], email: String, response: _root_.profile.services.internet.response.History, date: String, _type: String)
 
 @import _root_.profile.services.internet.Common.humanReadableByteCount
 @import play.api.libs.json.Json
@@ -80,23 +80,24 @@
     <div class="right_col" role="main">
         <div class="row top_tiles">
             <div class="col-md-3 col-sm-3 col-xs-3">
-                <div class="widget widget-info-2">
+                <div class="widget widget-info-2 wi2-red">
                         <!-- Widget title -->
                     <div class="widget-content padd">
                         <p>@formatNumber(response.numberOfContract)</p>
                         <p><span>Contracts</span></p>
-                        <span>Numbers contracts today</span>
+                        <span>@date</span>
                     </div>
                 </div>
-                <div class="widget widget-info-2 wi2-red">
+                <div class="widget widget-info-2">
                         <!-- Widget title -->
                     <div class="widget-content padd">
                         <p>@formatNumber(response.numberOfSession)</p>
                         <p><span>Sessions</span></p>
-                        <span>Number sessions today</span>
+                        <span>@date</span>
                     </div>
                 </div>
 
+                <!--
                 <div class="progress" style="height: 30px">
                     @for(i <- response.status) {
                         @if(i._1 == "ACTALIVE") {
@@ -113,7 +114,9 @@
                     
                     
                 </div>
+                -->
             </div>
+
             <div class="col-md-9 col-sm-9 col-xs-9">
                 <div class="x_panel tile fixed_height_350">
                     <div class="x_content">
@@ -122,7 +125,7 @@
                             <div class="col-xs-4 bdR">
                                 <div class="widget widget-graph-info">
                                     <div class="widget-content">
-                                        <p style="color: #f1b53d;">Session</p><span style="color: #f1b53d;">@formatNumber(response.sessionHourly.map(x => x._2).sum)</span>
+                                        <p style="color: #f1b53d;">Session</p><span style="color: #f1b53d;">@formatNumber(response.hourly.session.map(x => x._2).sum)</span>
                                             <span id="sparkline1"></span>
                                     </div>
                                     <div class="clearfix"></div>
@@ -131,7 +134,7 @@
                             <div class="col-xs-4 bdR">
                                 <div class="widget widget-graph-info wgi-red">
                                     <div class="widget-content">
-                                        <p style="color: #585f7e;">Download</p><span style="color: #585f7e;">@humanReadableByteCount(response.downloadHourly.map(x => x._2).sum)</span>
+                                        <p style="color: #3498DB;">Download</p><span style="color: #3498DB;">@humanReadableByteCount(response.hourly.download.map(x => x._2).sum)</span>
                                             <span id="sparkline2"></span>
                                     </div>
                                     <div class="clearfix"></div>
@@ -140,7 +143,7 @@
                             <div class="col-xs-4">
                                 <div class="widget widget-graph-info">
                                     <div class="widget-content">
-                                        <p style="color: #9B59B6;">Upload</p><span style="color: #9B59B6">@humanReadableByteCount(response.uploadHourly.map(x => x._2).sum)</span>
+                                        <p style="color: #1ABB9C;">Upload</p><span style="color: #1ABB9C">@humanReadableByteCount(response.hourly.upload.map(x => x._2).sum)</span>
                                             <span id="sparkline3"></span>
                                     </div>
                                     <div class="clearfix"></div>
@@ -150,6 +153,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
         <div class="row">
             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -169,12 +173,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for(i <- 0 until response.topContract.size) {
+                                @for(i <- 0 until response.contracts.size) {
                                     <tr>
                                         <th scope="row">@(i+1)</th>
-                                        <td>@response.topContract(i)._1.toUpperCase()</td>
-                                        <td>@humanReadableByteCount(response.topContract(i)._2)</td>
-                                        <td>@humanReadableByteCount(response.topContract(i)._3)</td>
+                                        <td>@response.contracts(i)._1.toUpperCase()</td>
+                                        <td>@humanReadableByteCount(response.contracts(i)._4)</td>
+                                        <td>@humanReadableByteCount(response.contracts(i)._5)</td>
                                     </tr>
                                 }
                             </tbody>
@@ -183,6 +187,17 @@
                 </div>
             </div>
             <div class="col-md-8 col-sm-8 col-xs-12">
+                <div class="row">
+                    <div class="x_panel tile fixed_height_300">
+                        <div class="titbox">
+                            <h2> Top 10 Region</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="padding: 10px 17px">
+                            <div id="col-region" style="height:240px;"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="x_panel tile fixed_height_340">
                         <div class="titbox">
@@ -198,18 +213,18 @@
                                         <th>Number Of Contract</th>
                                         <th>Download</th>
                                         <th>Upload</th>
-                                        <th>Duration</th>
+                                        <th>Session</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for(i <- 0 until response.topProvince.size) {
+                                    @for(i <- 0 until response.provinces.size) {
                                         <tr>
                                             <th scope="row">@(i+1)</th>
-                                            <td>@response.topProvince(i)._1</td>
-                                            <td>@formatNumber(response.topProvince(i)._2)</td>
-                                            <td>@humanReadableByteCount(response.topProvince(i)._3)</td>
-                                            <td>@humanReadableByteCount(response.topProvince(i)._4)</td>
-                                            <td>@humanReadableByteCount(response.topProvince(i)._5)</td>
+                                            <td>@response.provinces(i)._1</td>
+                                            <td>@formatNumber(response.provinces(i)._2)</td>
+                                            <td>@humanReadableByteCount(response.provinces(i)._4)</td>
+                                            <td>@humanReadableByteCount(response.provinces(i)._5)</td>
+                                            <td>@formatNumber(response.provinces(i)._3)</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -217,40 +232,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="x_panel tile fixed_height_340">
-                        <div class="titbox">
-                            <h2> Top 10 Region</h2>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content" style="padding: 10px 17px">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Province</th>
-                                        <th>Number Of Contract</th>
-                                        <th>Download</th>
-                                        <th>Upload</th>
-                                        <th>Duration</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for(i <- 0 until response.topRegion.size) {
-                                        <tr>
-                                            <th scope="row">@(i+1)</th>
-                                            <td>@response.topRegion(i)._1</td>
-                                            <td>@formatNumber(response.topRegion(i)._2)</td>
-                                            <td>@humanReadableByteCount(response.topRegion(i)._3)</td>
-                                            <td>@humanReadableByteCount(response.topRegion(i)._4)</td>
-                                            <td>@humanReadableByteCount(response.topRegion(i)._5)</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
             
         </div>
@@ -283,9 +265,10 @@
 
                 
                 @if(response != null) {
-                    //var hourly = @Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._1))));
-                //var values = @Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._2))));
-                var data = @Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._1 -> x._2))));
+                    //var hourly = @@Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._1))));
+                //var values = @@Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._2))));
+                @if(_type=="day") {
+                var data = @Html(Json.stringify(Json.toJson(response.hourly.contract.map(x => x._1 -> x._2))));
                 // line hourly
                 Highcharts.chart('line-hourly', {
                     chart: {
@@ -312,7 +295,7 @@
                     },
                     yAxis: {
                         title: {
-                            text: "Query"
+                            text: "Number Of Constract"
                         }
 
                     },
@@ -335,6 +318,201 @@
                         data: data
                     }]
                 });
+
+            } else if (_type=="week") {
+                var cate = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => x._1))));
+                var data = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => x._2))));
+                // line hourly
+                Highcharts.chart('line-hourly', {
+                    chart: {
+                        type: 'column'
+                        //zoomType: 'x'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    plotOptions: {
+                        column: {
+                            //colorByPoint: true
+                        }
+                    },
+                    colors: [
+                        'rgba(255, 102, 86, 1)'
+                    ],
+                    xAxis: {
+                        categories: cate
+                        //type: 'datetime'
+                    },
+                    yAxis: {
+                        title: {
+                            text: "Number Of Constract"
+                        }
+
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 10,
+                                //lineColor: '#666666',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: [{
+                        type: 'spline',
+                        name: 'Day Of Week',
+                        data: data
+                    }]
+                });
+            } else {
+                // var cate = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => x._1))));
+                var data = @Html(Json.stringify(Json.toJson(response.daily.contract.map(x => x._1 -> x._2))));
+                var download = @Html(Json.stringify(Json.toJson(response.daily.download.map(x => x._1 -> x._2))));
+                var upload = @Html(Json.stringify(Json.toJson(response.daily.upload.map(x => x._1 -> x._2))));
+                // line hourly
+                Highcharts.chart('line-hourly', {
+                    chart: {
+                        //type: 'column'
+                        zoomType: 'x'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    plotOptions: {
+                        column: {
+                            //colorByPoint: true
+                        }
+                    },
+                    colors: [
+                        //'rgba(255, 102, 86, 1)'
+                        '#3498DB',
+                        '#1ABB9C',
+                        '#9B59B6',
+                        '#9CC2CB',
+                        '#E74C3C',
+                        '#73879C'
+                    ],
+                    xAxis: {
+                        //categories: cate
+                        type: 'datetime'
+                    },
+                    yAxis: {
+                        title: {
+                            text: "Number Of Constract"
+                        }
+
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 0.1,
+                                //lineColor: '#666666',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: [{
+                        type: 'spline',
+                        name: 'Download',
+                        data: data
+                    }]
+                });
+            }
+
+
+                var regions = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._1).sorted)));
+                var contracts = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._2))));
+                var download = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._3))));
+                var upload = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._4))));
+                var duration = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._5))));
+
+                Highcharts.chart('col-region', {
+
+                    chart: {
+                        type: 'column'
+                    },
+
+                    title: {
+                        text: ''
+                    },
+
+                    xAxis: {
+                        categories: regions
+                    },
+
+                    yAxis: {
+                        allowDecimals: false,
+                        min: 0,
+                        title: {
+                            text: 'Number of traffic'
+                        }
+                    },
+                    colors: [
+                        '#3498DB',
+                        '#1ABB9C',
+                        '#9B59B6',
+                        '#9CC2CB',
+                        '#E74C3C',
+                        '#73879C'
+                    ],
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.x + '</b><br/>' +
+                                    this.series.name + ': ' + this.y + '<br/>'
+                        }
+                    },
+
+                    series: [{
+                       name: 'Contract',
+                       data: contracts
+                   }, {
+                       name: 'Download',
+                       data: download
+                   }, {
+                       name: 'Upload',
+                       data: upload
+                   }, {
+                       name: 'Duration',
+                       data: duration
+                   }]
+                });
+
+                function getJsonSeries(arr,tpChart) {
+                    var jsonArr = [];
+                    if(tpChart =="col") {
+                        for (var i = 0; i < arr.length; i++) {
+                            jsonArr.push({
+                                name: arr[i][0],
+                                data: arr[i][1]
+                            });
+                        }
+                    }
+                    else if (tpChart=="line"){
+                        for (var i = 0; i < arr.length; i++) {
+                            jsonArr.push({
+                                type: "spline",
+                                name: arr[i][0],
+                                data: arr[i][1]
+                            });
+                        }
+                    }
+                    return jsonArr
+                }
+
                 }
             });
             /*
@@ -395,18 +573,44 @@
         });
 */
             @if(response != null) {
-            var session = @Html(Json.stringify(Json.toJson(response.sessionHourly.map(x => x._2))));
-            var download = @Html(Json.stringify(Json.toJson(response.downloadHourly.map(x => x._2))));
-            var upload = @Html(Json.stringify(Json.toJson(response.uploadHourly.map(x => x._2))));
-            //var myvalues = [1011,8,5,7,4,11,22,14,4,1];
+                @if(_type == "day") {
+                    var session = @Html(Json.stringify(Json.toJson(response.hourly.session.map(x => x._2))));
+                    var download = @Html(Json.stringify(Json.toJson(response.hourly.download.map(x => x._2))));
+                    var upload = @Html(Json.stringify(Json.toJson(response.hourly.upload.map(x => x._2))));
+                    //var myvalues = [1011,8,5,7,4,11,22,14,4,1];
 
-            /* The second argument gives options such as chart type */
-            $('#sparkline1').sparkline(session, {type: 'bar', barColor: '#f1b53d'} );
+                    /* The second argument gives options such as chart type */
+                    $('#sparkline1').sparkline(session, {type: 'bar', barColor: '#f1b53d'} );
 
-            $('#sparkline2').sparkline(download, {type: 'bar', barColor: '#585f7e'} );
+                    $('#sparkline2').sparkline(download, {type: 'bar', barColor: '#3498DB'} );
 
-            $('#sparkline3').sparkline(upload, {type: 'bar', barColor: '#9B59B6'} );
-        }
+                    $('#sparkline3').sparkline(upload, {type: 'bar', barColor: '#1ABB9C'} );
+                } else if(_type == "week") {
+                    var session = @Html(Json.stringify(Json.toJson(response.dayOfWeek.session.map(x => x._2))));
+                    var download = @Html(Json.stringify(Json.toJson(response.dayOfWeek.download.map(x => x._2))));
+                    var upload = @Html(Json.stringify(Json.toJson(response.dayOfWeek.upload.map(x => x._2))));
+                    //var myvalues = [1011,8,5,7,4,11,22,14,4,1];
+
+                    /* The second argument gives options such as chart type */
+                    $('#sparkline1').sparkline(session, {type: 'bar', barColor: '#f1b53d'} );
+
+                    $('#sparkline2').sparkline(download, {type: 'bar', barColor: '#3498DB'} );
+
+                    $('#sparkline3').sparkline(upload, {type: 'bar', barColor: '#1ABB9C'} );
+                } else {
+                    var session = @Html(Json.stringify(Json.toJson(response.daily.session.map(x => x._2))));
+                    var download = @Html(Json.stringify(Json.toJson(response.daily.download.map(x => x._2))));
+                    var upload = @Html(Json.stringify(Json.toJson(response.daily.upload.map(x => x._2))));
+                    //var myvalues = [1011,8,5,7,4,11,22,14,4,1];
+
+                    /* The second argument gives options such as chart type */
+                    $('#sparkline1').sparkline(session, {type: 'bar', barColor: '#f1b53d'} );
+
+                    $('#sparkline2').sparkline(download, {type: 'bar', barColor: '#3498DB'} );
+
+                    $('#sparkline3').sparkline(upload, {type: 'bar', barColor: '#1ABB9C'} );
+                }
+            }
 
     </script>
 

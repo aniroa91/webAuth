@@ -233,54 +233,20 @@
                                                         </div>
                                                     </div>
                                                 </li>
-                                                <li>
-                                                    <div class="block">
-                                                        <div class="tags">
-                                                            <a href="" class="tag">
-                                                                <span>Alert</span>
-                                                            </a>
+                                                @for(i <- 0 until response.kibanaOverview.arrSevValue.length) {
+                                                    <li>
+                                                        <div class="block">
+                                                            <div class="tags">
+                                                                <a href="" class="tag">
+                                                                    <span>@response.kibanaOverview.arrSevValue(i)._1</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="block_content">
+                                                                <p class="excerpt">@response.kibanaOverview.arrSevValue(i)._2</p>
+                                                            </div>
                                                         </div>
-                                                        <div class="block_content">
-                                                            <p class="excerpt">334</p>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="block">
-                                                        <div class="tags">
-                                                            <a href="" class="tag">
-                                                                <span>Infor</span>
-                                                            </a>
-                                                        </div>
-                                                        <div class="block_content">
-                                                            <p class="excerpt"> 33 </p>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="block">
-                                                        <div class="tags">
-                                                            <a href="" class="tag">
-                                                                <span>Notice</span>
-                                                            </a>
-                                                        </div>
-                                                        <div class="block_content">
-                                                            <p class="excerpt"> 56333</p>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="block">
-                                                        <div class="tags">
-                                                            <a href="" class="tag">
-                                                                <span>Warining</span>
-                                                            </a>
-                                                        </div>
-                                                        <div class="block_content">
-                                                            <p class="excerpt"> 2244 </p>
-                                                        </div>
-                                                    </div>
-                                                </li>
+                                                    </li>
+                                                }
                                                 <li>
                                                     <div class="block">
                                                         <div class="tags">
@@ -288,7 +254,7 @@
                                                                 font-weight: 600">Total</span>
                                                         </div>
                                                         <div class="block_content">
-                                                            <p class="excerpt" style="font-weight: 600"> 2244 </p>
+                                                            <p class="excerpt" style="font-weight: 600"> @formatPattern(response.kibanaOverview.arrSevValue.map(x=>x._2).sum) </p>
                                                         </div>
                                                     </div>
                                                 </li>
@@ -825,14 +791,14 @@
                     },
                     plotOptions: {
                         pie: {
-                            colors: [
+                            /*colors: [
                                 'rgba(255,99,132,1)',
                                 'rgba(54, 162, 235, 1)',
                                 'rgba(255, 206, 86, 1)',
                                 'rgba(75, 192, 192, 1)',
                                 'rgba(153, 102, 255, 1)',
                                 'rgba(255, 159, 64, 1)'
-                            ],
+                            ],*/
                             allowPointSelect: true,
                             cursor: 'pointer',
                             dataLabels: {
@@ -842,10 +808,11 @@
                         }
                     },
                     series: [{
-                        name: 'Percent',
+                        name: 'Percent error',
                         innerSize: '40%',
                         colorByPoint: true,
-                        data: [["warning", 12], ["alert", 25], ["infor", 53], ["notice", 15], ["error", 44]]
+                        data: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrSeverity)))
+                        /*[["warning", 12], ["alert", 25], ["infor", 53], ["notice", 15], ["error", 44]]*/
                     }]
                 });
                 // nerror by facility
@@ -861,14 +828,14 @@
                     },
                     plotOptions: {
                         pie: {
-                            colors: [
+                           /* colors: [
                                 'rgba(255,99,132,1)',
                                 'rgba(54, 162, 235, 1)',
                                 'rgba(255, 206, 86, 1)',
                                 'rgba(75, 192, 192, 1)',
                                 'rgba(153, 102, 255, 1)',
                                 'rgba(255, 159, 64, 1)'
-                            ],
+                            ],*/
                             allowPointSelect: true,
                             cursor: 'pointer',
                             dataLabels: {
@@ -881,7 +848,8 @@
                         name: 'Percent',
                         innerSize: '40%',
                         colorByPoint: true,
-                        data: [["KERN", 53], ["PFE", 25], ["USER", 53], ["AUTHOR", 15], ["DAEMON", 44]]
+                        data: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrFacility)))
+                        /*[["KERN", 53], ["PFE", 25], ["USER", 53], ["AUTHOR", 15], ["DAEMON", 44]]*/
                     }]
                 });
                 // bar chart type error
@@ -912,7 +880,7 @@
                     },
                     series: [{
                         name: 'Nerror',
-                        data: [5, 3, 4, 7]
+                        data: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrErrorType.map(x=> x._2))))
                     }]
                 });
                 // col chart ntime by ddos
@@ -924,7 +892,7 @@
                         text: ''
                     },
                     xAxis: {
-                        categories: ['None', 'DDos', 'Mac move', 'Temperature']
+                        categories: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrDdos.map(x=> x._1))))
                     },
                     yAxis: {
                         min: 0,
@@ -938,12 +906,12 @@
                     plotOptions: {
                         series: {
                             stacking: 'normal',
-                            color: 'rgba(54, 162, 235, 1)'
+                            color: '#f60'
                         }
                     },
                     series: [{
                         name: 'Ntime',
-                        data: [5, 3, 4, 7]
+                        data: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrDdos.map(x=> x._2))))
                     }]
                 });
                 /* END KIBANA JS */

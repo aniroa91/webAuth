@@ -53,7 +53,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="x_panel disInline">
-                                <div class="compare-btn">
+                                <div class="compareDate-btn">
                                     <label class="btn btn-success" style="margin-left: 10px;"  onclick="showModalCp()">
                                         <i class="fa fa-bar-chart">&nbsp;&nbsp;</i><span style="color: white">Compare</span>
                                     </label>
@@ -550,8 +550,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="x_panel disInline">
-                            <div class="compare-btn">
-                                <label class="btn btn-success" style="margin-left: 10px;" data-toggle="modal" data-target="#fr-compare">
+                            <div class="compareDate-btn">
+                                <label class="btn btn-success" style="margin-left: 10px;" data-toggle="modal" data-target="#fr-compareDate">
                                     <i class="fa fa-bar-chart">&nbsp;&nbsp;</i><span style="color: white">Compare</span>
                                 </label>
                             </div>
@@ -566,11 +566,11 @@
 
 }
         <!-- Modal -->
-    <div class="modal fade" id="fr-compare" tabindex="-1" role="dialog" data-keyboard="false"  data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="fr-compareDate" tabindex="-1" role="dialog" data-keyboard="false"  data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document" style="width: 435px">
             <div class="modal-content">
                 <div class="modal-body" style="text-align: center;">
-                    <form id="frmDomain" class="form-vertical login-form" action="/dev/dns/compare" method="get">
+                    <form id="frmDomain" class="form-vertical login-form" action="/dev/dns/compareDate" method="get">
                         <input type="hidden" id="ipDomain">
                     </form>
                     <h3 style="margin-bottom: 25px">Add / Remove Competitors</h3>
@@ -580,35 +580,35 @@
                                 <input type="text" id="dm0" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
                                 <i class="fa fa-remove iCss" id="ic_0" onclick="removeDomain(this)"></i>
                             </div>
-                            <div id="lbCp_0" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                            <div id="lbCp_0" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compareDate</a></div>
                         </div>
                         <div class="divInputCp">
                             <div id="divIp_1" class="divIp hideCss">
                                 <input type="text" id="dm1" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
                                 <i class="fa fa-remove iCss" id="ic_1" onclick="removeDomain(this)"></i>
                             </div>
-                            <div id="lbCp_1" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                            <div id="lbCp_1" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compareDate</a></div>
                         </div>
                         <div class="divInputCp">
                             <div id="divIp_2" class="divIp hideCss">
                                 <input type="text" id="dm2" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
                                 <i class="fa fa-remove iCss" id="ic_2" onclick="removeDomain(this)"></i>
                             </div>
-                            <div id="lbCp_2" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                            <div id="lbCp_2" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compareDate</a></div>
                         </div>
                         <div class="divInputCp">
                             <div id="divIp_3" class="divIp hideCss">
                                 <input type="text" id="dm3" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
                                 <i class="fa fa-remove iCss" id="ic_3" onclick="removeDomain(this)"></i>
                             </div>
-                            <div id="lbCp_3" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                            <div id="lbCp_3" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compareDate</a></div>
                         </div>
                         <div class="divInputCp">
                             <div id="divIp_4" class="divIp hideCss">
                                 <input type="text" id="dm4" class="form-control autocomplete noBorder ipCss" onblur="blurValueDomain(this)">
                                 <i class="fa fa-remove iCss" id="ic_4" onclick="removeDomain(this)"></i>
                             </div>
-                            <div id="lbCp_4" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compare</a></div>
+                            <div id="lbCp_4" class="lbCp lbPd"><a class="tagA" onclick="showInputCp(this)"><i class="fa fa-plus" aria-hidden="true"></i> Add domain to compareDate</a></div>
                         </div>
                     </div>
                 </div>
@@ -1046,7 +1046,7 @@
                     $(this).parent().addClass('hideCss');
                     $(this).parent().parent().find('.lbCp').addClass('lbPd');
                     $(this).parent().parent().find('.lbCp a').removeClass('hideCss');
-                    $('#fr-compare').modal('hide');
+                    $('#fr-compareDate').modal('hide');
                 });
             }
 
@@ -1068,7 +1068,7 @@
                     vlDomain+=","+this.value;
                 });
 
-                location.href = "/search/compare?domains=" + vlDomain;
+                location.href = "/search/compareDate?domains=" + vlDomain;
             }
 
             function showModalCp() {
@@ -1089,7 +1089,7 @@
                         }
                     }
                 }
-                $('#fr-compare').modal('show');
+                $('#fr-compareDate').modal('show');
             }
 
             function submitCompare(){
@@ -1105,9 +1105,9 @@
                     count++;
                 });
                 if(checkNull == 0)
-                    location.href = "/search/compare";
+                    location.href = "/search/compareDate";
                 else
-                   location.href = "/search/compare?domains=" + vlDomain;
+                   location.href = "/search/compareDate?domains=" + vlDomain;
             }
 
             function alert_input()

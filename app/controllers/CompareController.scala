@@ -18,7 +18,7 @@ import com.ftel.bigdata.utils.DateTimeUtil
 class CompareController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured {
 
   def index(domains: String) =  Action {
-//    Ok(views.html.compare.index())
+//    Ok(views.html.compareDate.index())
 //    Ok(domains)
     val responses = domains.split(",").map(x => x -> CacheService.getDomain(x)._1).toMap.filter(x => x._2 != null)
     val now = DateTimeUtil.now

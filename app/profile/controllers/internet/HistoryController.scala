@@ -16,6 +16,8 @@ import views.html.ace.client
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import profile.services.internet.HistoryService
 import com.ftel.bigdata.utils.StringUtil
+import profile.services.internet.response.History
+import profile.services.internet.response.Hourly
 
 
 /**
@@ -40,12 +42,16 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
         val contract = formValidationResult.get.q.trim()
         if (StringUtil.isNullOrEmpty(contract)) {
           println(contract)
-          Ok(views.html.profile.internet.history.index(form, username, HistoryService.get(date)))
+          //Ok(views.html.profile.internet.history.index(form, username, HistoryService.get("day", date), date, "day"))
+          //Ok(views.html.profile.internet.history.index(form, username, HistoryService.get("week", "2018-02-08"), date, "week"))
+          Ok(views.html.profile.internet.history.index(form, username, HistoryService.getAll("month", "2018-02-01"), date, "month"))
         } else {
-          Ok(views.html.profile.internet.history.indexContract(form, username, HistoryService.get(date, contract.toLowerCase()), contract))
+          Ok(views.html.profile.internet.history.indexContract(form, username, HistoryService.getContract("day", date, contract.toLowerCase()), contract, "day"))
+          //Ok(views.html.profile.internet.history.indexContract(form, username, HistoryService.getContract("week", "2018-02-08", contract.toLowerCase()), contract, "week"))
+          //Ok(views.html.profile.internet.history.indexContract(form, username, HistoryService.getContract("month", "2018-02-01", contract.toLowerCase()), contract, "month"))
         }
       } else {
-        Ok(views.html.profile.internet.history.index(form, username, HistoryService.get(date)))
+        Ok(views.html.profile.internet.history.index(form, username, HistoryService.getAll("month", "2018-02-01"), "2018-02", "month"))
       }
 //    } catch {
 //      case e: Exception => Ok("Message: " + e.getMessage)
@@ -61,121 +67,96 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
   
   
   
-  private def getResponseTest(): InternetReponse = {
-    val numberOfContract = 2089675
-    val numberOfSession = 9581974
-    val contractHourly = Array(
-        0 -> 10L,
-        1 -> 40L,
-        2 -> 30L,
-        3 -> 80L,
-        4 -> 60L,
-        5 -> 90L,
-        6 -> 30L,
-        7 -> 80L,
-        8 -> 100L,
-        9 -> 120L,
-        10 -> 150L,
-        11 -> 400L,
-        12 -> 800L,
-        13 -> 500L,
-        14 -> 200L,
-        15 -> 100L,
-        16 -> 250L,
-        17 -> 360L,
-        18 -> 240L,
-        19 -> 800L,
-        20 -> 1120L,
-        21 -> 1200L,
-        22 -> 900L,
-        23 -> 200L).map(x => x._1.toLong -> x._2)
-        
-    val sessionHourly = contractHourly
-    val downloadHourly = contractHourly
-    val uploadHourly = contractHourly
-    val status = Array(
-        "ACTLIVE" -> 80,
-        "ACTLOFF" -> 20)
-    val topContract = Array(
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L),
-        ("bpfdl-150820-434", 100L, 20L))
-    val topProvince = Array(
-        ("A", 100L, 200L, 100L, 50L),
-        ("B", 100L, 200L, 100L, 50L),
-        ("C", 100L, 200L, 100L, 50L),
-        ("D", 100L, 200L, 100L, 50L),
-        ("E", 100L, 200L, 100L, 50L),
-        ("F", 100L, 200L, 100L, 50L),
-        ("G", 100L, 200L, 100L, 50L),
-        ("E", 100L, 200L, 100L, 50L),
-        ("F", 100L, 200L, 100L, 50L),
-        ("G", 100L, 200L, 100L, 50L))
-        
-    val topRegion = Array(
-        ("A", 100L, 200L, 100L, 50L),
-        ("B", 100L, 200L, 100L, 50L),
-        ("C", 100L, 200L, 100L, 50L),
-        ("D", 100L, 200L, 100L, 50L),
-        ("E", 100L, 200L, 100L, 50L),
-        ("F", 100L, 200L, 100L, 50L),
-        ("G", 100L, 200L, 100L, 50L))
-        
-    InternetReponse(
-        "contract",
-        numberOfContract,
-        numberOfSession,
-        contractHourly,
-        sessionHourly,
-        downloadHourly,
-        uploadHourly,
-        status,
-        topContract,
-        topProvince,
-        topRegion)
-  }
+//  private def getResponseTest(): History = {
+//    val numberOfContract = 2089675
+//    val numberOfSession = 9581974
+//    val contractHourly = Array(
+//        0 -> 10L,
+//        1 -> 40L,
+//        2 -> 30L,
+//        3 -> 80L,
+//        4 -> 60L,
+//        5 -> 90L,
+//        6 -> 30L,
+//        7 -> 80L,
+//        8 -> 100L,
+//        9 -> 120L,
+//        10 -> 150L,
+//        11 -> 400L,
+//        12 -> 800L,
+//        13 -> 500L,
+//        14 -> 200L,
+//        15 -> 100L,
+//        16 -> 250L,
+//        17 -> 360L,
+//        18 -> 240L,
+//        19 -> 800L,
+//        20 -> 1120L,
+//        21 -> 1200L,
+//        22 -> 900L,
+//        23 -> 200L).map(x => x._1.toLong -> x._2)
+//        
+//    val sessionHourly = contractHourly.map(x => x._1.toInt -> x._2)
+//    val downloadHourly = contractHourly.map(x => x._1.toInt -> x._2)
+//    val uploadHourly = contractHourly.map(x => x._1.toInt -> x._2)
+//    val status = Array(
+//        "ACTLIVE" -> 80,
+//        "ACTLOFF" -> 20)
+//    val topContract = Array(
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L),
+//        ("bpfdl-150820-434", 100L, 20L))
+//    val topProvince = Array(
+//        ("A", 100L, 200L, 100L, 50L),
+//        ("B", 100L, 200L, 100L, 50L),
+//        ("C", 100L, 200L, 100L, 50L),
+//        ("D", 100L, 200L, 100L, 50L),
+//        ("E", 100L, 200L, 100L, 50L),
+//        ("F", 100L, 200L, 100L, 50L),
+//        ("G", 100L, 200L, 100L, 50L),
+//        ("E", 100L, 200L, 100L, 50L),
+//        ("F", 100L, 200L, 100L, 50L),
+//        ("G", 100L, 200L, 100L, 50L))
+//        
+//    val topRegion = Array(
+//        ("A", 100L, 200L, 100L, 50L),
+//        ("B", 100L, 200L, 100L, 50L),
+//        ("C", 100L, 200L, 100L, 50L),
+//        ("D", 100L, 200L, 100L, 50L),
+//        ("E", 100L, 200L, 100L, 50L),
+//        ("F", 100L, 200L, 100L, 50L),
+//        ("G", 100L, 200L, 100L, 50L))
+//        
+//    History(
+//        "contract",
+//        numberOfContract,
+//        numberOfSession,
+//        null,
+//        null,
+//        null,
+//        status,
+//        topContract,
+//        topProvince,
+//        topRegion)
+//  }
 }
 
 
-case class InternetReponse(
-    _type: String,
-    numberOfContract: Long,
-    numberOfSession: Long,
-    contractHourly: Array[(Long, Long)],
-    sessionHourly: Array[(Long, Long)],
-    downloadHourly: Array[(Long, Long)],
-    uploadHourly: Array[(Long, Long)],
-    status: Array[(String, Int)],
-    topContract: Array[(String, Long, Long)],
-    topProvince: Array[(String, Long, Long, Long, Long)],
-    topRegion: Array[(String, Long, Long, Long, Long)])
-    
-case class InternetReponseContract(
-    _type: String,
-    numberOfDevice: Long,
-    numberOfSession: Long,
-    contractHourly: Array[(Long, Long)],
-    sessionHourly: Array[(Long, Long)],
-    downloadHourly: Array[(Long, Long)],
-    uploadHourly: Array[(Long, Long)],
-    status: Array[(String, Int)],
-    topSession: Array[(String, Long, Long, Long)],
-    logs: Array[(String, String, Long, Long, Long, String)],
-    macList: Array[(String, Long, Long)])
+
