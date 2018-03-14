@@ -1,6 +1,8 @@
-@(form: Form[SearchContract], email: String, response: _root_.profile.services.internet.response.History, date: String, _type: String)
+@(form: Form[InternetContract], email: String, response: _root_.profile.services.internet.response.History, date: String, _type: String)
 
 @import _root_.profile.services.internet.Common.humanReadableByteCount
+@import _root_.profile.services.internet.Common.getTimeFrom
+
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -30,7 +32,7 @@
                 </div>
                 <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
 
-                @views.html.profile.internet.history.frmSearch(form, _root_.profile.controllers.internet.routes.HistoryController.index(""), null)
+                @views.html.profile.internet.history.frmSearch(form, _root_.profile.controllers.internet.routes.HistoryController.index(""), null, null, null)
 
                 </div>
             </nav>
@@ -51,14 +53,16 @@
                     </div>
 
                     <div class="input-group date" id="weeklyDatePicker" style="display: none;width: 200px">
-                        <input type="text" class="form-control" value="" readonly="true" style="background-color: white" placeholder="Choose week...">
-                        <span class="input-group-addon" style="background-color: #3db9dc"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                        <input type="text" id="week-datepicker" class="form-control" readonly="true" style="background-color: white" placeholder="Choose week...">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
                         </span>
                     </div>
 
-                    <div class="input-group date" id="monthDate" style="display: none;width: 200px">
-                        <input type="text" class="form-control" value="" readonly="true" placeholder="Choose month..." style="background-color: white" >
-                        <span class="input-group-addon" style="background-color: #3db9dc"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                    <div class="input-group date" id="ipMonth" style="display: none;width: 200px">
+                        <input type="text" id="monthPicker" class="form-control" value="" readonly="true" placeholder="Choose month..." style="display: none;background-color: white" >
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
                         </span>
                     </div>
 
@@ -85,7 +89,7 @@
                     <div class="widget-content padd">
                         <p>@formatNumber(response.numberOfContract)</p>
                         <p><span>Contracts</span></p>
-                        <span>@date</span>
+                        <span>@getTimeFrom(_type, date)</span>
                     </div>
                 </div>
                 <div class="widget widget-info-2">
@@ -93,7 +97,7 @@
                     <div class="widget-content padd">
                         <p>@formatNumber(response.numberOfSession)</p>
                         <p><span>Sessions</span></p>
-                        <span>@date</span>
+                        <span>@getTimeFrom(_type, date)</span>
                     </div>
                 </div>
 
@@ -267,7 +271,7 @@
                 @if(response != null) {
                     //var hourly = @@Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._1))));
                 //var values = @@Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._2))));
-                @if(_type=="day") {
+                @if(_type=="D") {
                 var data = @Html(Json.stringify(Json.toJson(response.hourly.contract.map(x => x._1 -> x._2))));
                 // line hourly
                 Highcharts.chart('line-hourly', {
@@ -319,7 +323,7 @@
                     }]
                 });
 
-            } else if (_type=="week") {
+            } else if (_type=="W") {
                 var cate = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => x._1))));
                 var data = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => x._2))));
                 // line hourly
@@ -436,9 +440,9 @@
 
                 var regions = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._1).sorted)));
                 var contracts = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._2))));
-                var download = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._3))));
-                var upload = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._4))));
-                var duration = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._5))));
+                var download = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._4))));
+                var upload = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._5))));
+                var duration = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._6))));
 
                 Highcharts.chart('col-region', {
 
@@ -573,7 +577,7 @@
         });
 */
             @if(response != null) {
-                @if(_type == "day") {
+                @if(_type == "D") {
                     var session = @Html(Json.stringify(Json.toJson(response.hourly.session.map(x => x._2))));
                     var download = @Html(Json.stringify(Json.toJson(response.hourly.download.map(x => x._2))));
                     var upload = @Html(Json.stringify(Json.toJson(response.hourly.upload.map(x => x._2))));
@@ -585,7 +589,7 @@
                     $('#sparkline2').sparkline(download, {type: 'bar', barColor: '#3498DB'} );
 
                     $('#sparkline3').sparkline(upload, {type: 'bar', barColor: '#1ABB9C'} );
-                } else if(_type == "week") {
+                } else if(_type == "W") {
                     var session = @Html(Json.stringify(Json.toJson(response.dayOfWeek.session.map(x => x._2))));
                     var download = @Html(Json.stringify(Json.toJson(response.dayOfWeek.download.map(x => x._2))));
                     var upload = @Html(Json.stringify(Json.toJson(response.dayOfWeek.upload.map(x => x._2))));

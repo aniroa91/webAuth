@@ -1,10 +1,11 @@
-@(form: Form[SearchContract], route: Call, contract: String)
+@(form: Form[InternetContract], route: Call, contract: String, day: String,tpTime: String)
 
 
 @if(contract == "null") {
 	@helper.form(action = route,'id -> "ctSearch") {
     <div class="input-group">
-        <input type="hidden" name="date" id="date">
+        <input type="hidden" id="tpTime" name="tpTime" value="@tpTime">
+        <input type="hidden" name="date" value="@day" id="date">
         <input type="text" class="form-control autocomplete" required id="ct" name="ct" placeholder="Search ..." >
         <span class="input-group-btn">
             <button class="btn btn-default" type="submit" style="background-color: #3db9dc;color:#fff">Go</button>
@@ -14,7 +15,8 @@
 } else {
 	@helper.form(action = route,'id -> "ctSearch") {
     <div class="input-group">
-        <input type="hidden" name="date" id="date">
+        <input type="hidden" id="tpTime" name="tpTime" value="@tpTime">
+        <input type="hidden" name="date" value="@day" id="date">
         <input type="text" class="form-control autocomplete" required id="ct" name="ct" placeholder="Search ..." value="@contract">
         <span class="input-group-btn">
             <button class="btn btn-default" type="submit" style="background-color: #3db9dc;color:#fff">Go</button>
@@ -22,3 +24,4 @@
     </div>
 	}
 }
+

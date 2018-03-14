@@ -6,6 +6,7 @@ import org.joda.time.Days
 import org.joda.time.DateTimeConstants
 import services.Configure
 import com.sksamuel.elastic4s.http.ElasticDsl._
+import org.joda.time.DateTime
 
 object Common {
   
@@ -57,16 +58,31 @@ object Common {
     }
   }
   
-  def getRangeDateForWeek(day: String): String = {
-    DateTimeUtil.create(day, DateTimeUtil.YMD).withDayOfWeek(DateTimeConstants.MONDAY).toString(DateTimeUtil.YMD) + 
-    "/" +
-    DateTimeUtil.create(day, DateTimeUtil.YMD).withDayOfWeek(DateTimeConstants.SUNDAY).toString(DateTimeUtil.YMD)
+  def getTimeFrom(_type: String, date: String): String = {
+    _type match {
+      case "D" => s"Day: ${date.replace("/", " to ")}"
+      case "W" => "Week: " + Common.getRangeDateForWeek(date).replace("/", " to ")
+      case "M" => "Month: " + Common.getRangeDateForMonth(date).replace("/", " to ")
+    }
   }
   
-  def getRangeDateForMonth(day: String): String = {
-    DateTimeUtil.create(day, DateTimeUtil.YMD).dayOfMonth().withMinimumValue().toString(DateTimeUtil.YMD) + 
+  def getRangeDateForWeek(day: String): String = {
+//    DateTimeUtil.create(day, DateTimeUtil.YMD).withDayOfWeek(DateTimeConstants.MONDAY).toString(DateTimeUtil.YMD) + 
+//    "/" +
+//    DateTimeUtil.create(day, DateTimeUtil.YMD).withDayOfWeek(DateTimeConstants.SUNDAY).toString(DateTimeUtil.YMD)
+    val arr = day.split("/")
+    val datetime = new DateTime().withYear(arr(1).toInt).withWeekOfWeekyear(arr(0).toInt)
+    datetime.withDayOfWeek(DateTimeConstants.MONDAY).toString(DateTimeUtil.YMD) +
     "/" +
-    DateTimeUtil.create(day, DateTimeUtil.YMD).dayOfMonth().withMaximumValue().toString(DateTimeUtil.YMD)
+    datetime.withDayOfWeek(DateTimeConstants.SUNDAY).toString(DateTimeUtil.YMD)
+    //println(new DateTime().withYear(2018).withWeekOfWeekyear(9))
+    //null
+  }
+
+  def getRangeDateForMonth(day: String): String = {
+    DateTimeUtil.create(day, "MM/yyyy").dayOfMonth().withMinimumValue().toString(DateTimeUtil.YMD) + 
+    "/" +
+    DateTimeUtil.create(day, "MM/yyyy").dayOfMonth().withMaximumValue().toString(DateTimeUtil.YMD)
   }
   
   def reduceByKeyString(array: Array[(String, Long)]): Array[(String, Long)] = {
@@ -85,7 +101,8 @@ object Common {
   
   
   def main(args: Array[String]) {
-    println(humanReadableByteCount(1855425871872L , true))
-    println(humanReadableByteCount(9223372036854775807L , true))
+//    println(humanReadableByteCount(1855425871872L , true))
+//    println(humanReadableByteCount(9223372036854775807L , true))
+    println(getRangeDateForWeek(""))
   }
 }

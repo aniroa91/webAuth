@@ -37,7 +37,8 @@ object HistoryService {
     //println(getRangeDateForWeek("2018-03-10"))
     //getContract("week", "2018-02-09/2018-02-09", "hufd08955")
     
-    val res = getContract("week", "2018-02-08", "HUFD08955")
+    //val res = getContract("week", "2018-02-08", "HUFD08955")
+    val res = getAll("M", "02/2018")
     //val res = getContract("week", "2018-02-08", "HND636422")
     
     //res.
@@ -55,9 +56,9 @@ object HistoryService {
   
   def getContract(_type: String, date: String, contract: String): HistoryContract = {
     val esIndex = _type match {
-      case "day" => Common.getIndexString("radius-rawlog", date)
-      case "week" => Common.getIndexString("radius-rawlog", Common.getRangeDateForWeek(date))
-      case "month" => Common.getIndexString("radius-rawlog", Common.getRangeDateForMonth(date))
+      case "D" => Common.getIndexString("radius-rawlog", date)
+      case "W" => Common.getIndexString("radius-rawlog", Common.getRangeDateForWeek(date))
+      case "M" => Common.getIndexString("radius-rawlog", Common.getRangeDateForMonth(date))
     }
     if (StringUtil.isNullOrEmpty(esIndex)) {
       null
@@ -162,9 +163,9 @@ object HistoryService {
 
   private def get(_type: String, date: String, contract: String): History = {
     val esIndex = _type match {
-      case "day" => Common.getIndexString("radius-load", date)
-      case "week" => Common.getIndexString("radius-load", Common.getRangeDateForWeek(date))
-      case "month" => Common.getIndexString("radius-load", Common.getRangeDateForMonth(date))
+      case "D" => Common.getIndexString("radius-load", date)
+      case "W" => Common.getIndexString("radius-load", Common.getRangeDateForWeek(date))
+      case "M" => Common.getIndexString("radius-load", Common.getRangeDateForMonth(date))
     }
     if (StringUtil.isNullOrEmpty(esIndex)) {
       null
@@ -256,7 +257,7 @@ object HistoryService {
           })
           .toArray
     }
-    response.aggregations.foreach(println)
+    //response.aggregations.foreach(println)
     val hourly = getAggregations(response.aggregations.get("hourly"), true)
     val daily = getAggregations(response.aggregations.get("daily"), true)
     val provinces = getAggregations(response.aggregations.get("province"), true)
@@ -271,7 +272,7 @@ object HistoryService {
 
     val sessions = getAggregations(response.aggregations.get("sessions"), false)
       .sortBy(x => x._4)
-    sessions.foreach(println)
+    //sessions.foreach(println)
     val status = Array(
         "ACTLIVE" -> 80,
         "ACTLOFF" -> 20)

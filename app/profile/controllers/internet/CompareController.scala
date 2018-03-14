@@ -19,6 +19,7 @@ import com.ftel.bigdata.utils.StringUtil
 import profile.services.internet.response.History
 import profile.services.internet.response.Hourly
 import profile.services.internet.CompareService
+import controllers.InternetContract
 
 
 /**
@@ -32,20 +33,22 @@ class CompareController @Inject()(cc: ControllerComponents) extends AbstractCont
   val client = Configure.client
   val form = Form(
     mapping(
-      "ct" -> text)(SearchContract.apply)(SearchContract.unapply))
+      "tpTime" -> text,
+      "date" -> text,
+      "ct" -> text
+    )(InternetContract.apply)(InternetContract.unapply))
 
   def index =  withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
     try {
       if (!formValidationResult.hasErrors) {
-        val contract = formValidationResult.get.q.trim()
-        
-        Ok(views.html.profile.internet.compare.date.index(form, username, contract, CompareService.getDay(Array("2018-02-01", "2018-02-03"))))
+        val contract = formValidationResult.get.ct.trim()
+        Ok(views.html.profile.internet.compare.date.index(form, username, contract, null))
       } else {
-        Ok(views.html.profile.internet.compare.date.index(form, username, null, CompareService.getDay(Array("2018-02-01", "2018-02-03"))))
+        Ok(views.html.profile.internet.compare.date.index(form, username, null, null))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.internet.compare.date.index(form, username, null, CompareService.getDay(Array("2018-02-01", "2018-02-03"))))
+      case e: Exception => Ok(views.html.profile.internet.compare.date.index(form, username, null, null))
     }
   }
 }
