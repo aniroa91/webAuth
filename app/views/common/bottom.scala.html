@@ -225,28 +225,30 @@
 }
 @if(item == "History"){
         <!-- jQuery -->
-    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/vendors/jquery/dist/jquery.min.js"></script>
         <!-- Bootstrap -->
-    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
         <!-- bootstrap-progressbar -->
     <script src="/assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
         <!-- Custom Theme Scripts -->
-    <script src="../assets/custom/js/custom.min.js"></script>
+    <script src="/assets/custom/js/custom.min.js"></script>
         <!-- Hight chart -->
-    <script src="../assets/javascripts/highcharts.js"></script>
-    <script src="../assets/javascripts/exporting.js"></script>
+    <script src="/assets/javascripts/highcharts.js"></script>
+    <script src="/assets/javascripts/exporting.js"></script>
         <!-- Counter number -->
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
-    <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+    
+    <script src="/assets/javascripts/jquery.counterup.min.js"></script>
         <!-- Autocomplete -->
-    <script src="../assets/javascripts/jquery-ui.js"></script>
-    <script src="../assets/javascripts/jquery.sparkline.js"></script>
+    <script src="/assets/javascripts/jquery-ui.js"></script>
+    <script src="/assets/javascripts/jquery.sparkline.js"></script>
 
-    <script type="text/javascript" src="../assets/vendors/moment/moment.js"></script>
+    <script type="text/javascript" src="/assets/vendors/moment/moment.js"></script>
         <!--  Datepicker -->
-    <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
-    <script type="text/javascript" src="../assets/vendors/daterangepicker/daterangepicker.js"></script>
-    <script type="text/javascript" src="../assets/javascripts/weekPicker.js"></script>
+    <script type="text/javascript" src="/assets/vendors/daterangepicker/daterangepicker.js"></script>
+    <script type="text/javascript" src="/assets/javascripts/weekPicker.js"></script>
+    <script type="text/javascript" src="/assets/javascripts/jquery.maskedinput.min.js"></script>
+    <script type="text/javascript" src="/assets/javascripts/monthPicker.js"></script>
+    <script type="text/javascript" src="/assets/javascripts/jquery-ui.min.js"></script>
 
     <script type="text/javascript">
             $(document).ready(function () {
@@ -262,14 +264,16 @@
                         $("#ctSearch").submit();
                     }
                 });
-                var myvalues = [10,8,5,7,4,11,22,14,4,1];
 
-                /* The second argument gives options such as chart type */
-                $('#sparkline1').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
-                $('#sparkline2').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
-                $('#sparkline3').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
+                // var myvalues = [10,8,5,7,4,11,22,14,4,1];
 
-                $('#monthDate').datepicker({
+                // /* The second argument gives options such as chart type */
+                // $('#sparkline1').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
+                // $('#sparkline2').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
+                // $('#sparkline3').sparkline(myvalues, {type: 'bar', barColor: 'green'} );
+
+
+                /*$('#monthDate').datepicker({
                     autoclose: true,
                     minViewMode: 1,
                     endDate: '+0d',
@@ -288,12 +292,45 @@
                     endDate: '+0d',
                     format: 'yyyy-mm-dd'
                 }).on('changeDate', function(selected){
+                });*/
+
+                /*MONTH PICKER*/
+                $('#monthPicker').MonthPicker({
+                    Button: false,
+                    MaxMonth: 0,
+                    OnAfterChooseMonth: function() {
+                        var range = $(this).val();
+                        $('#date').val(range);
+                        $('#tpTime').val("M");
+                        $("#ctSearch").submit();
+                    }
                 });
+                /*END MONTH PICKER*/
+                /* WEEK DATEPICKER */
+                $( "#week-datepicker" ).weekpicker({
+                    // set start day of the week
+                    firstDay: 1,
+                    // custom date format
+                    dateFormat: "dd/m/yy",
+                    // shows other months
+                    showOtherMonths: true,
+                    // allows to select other months
+                    selectOtherMonths: true,
+                    // shows the current week number
+                    showWeek: true,
+                    // supported keywords:
+                    //  w  = week number, eg. 3
+                    //  ww = zero-padded week number, e.g. 03
+                    //  o  = short (week) year number, e.g. 18
+                    //  oo = long (week) year number, e.g. 2018
+                    weekFormat: "w/oo"
+                });
+                /* END WEEK PICKER*/
 
                 var start = moment();
                 var end = moment();
 
-                if($('#date').val() != "") {
+                if($('#date').val() != "" && $('#tpTime').val()=="D") {
                     var fromDate = $('#date').val().split('/')[0];
                     var toDate = $('#date').val().split('/')[1];
                     start = moment(fromDate);
@@ -320,25 +357,56 @@
                 $('#rangeTime').on('apply.daterangepicker', function(ev, picker) {
                     var range = picker.startDate.format('YYYY-MM-DD')+"/"+picker.endDate.format('YYYY-MM-DD');
                     $('#date').val(range);
+                    $('#tpTime').val('D');
                     $("#ctSearch").submit();
                 });
             });
 
-            function setDatePicker(element){
-                if($(element).val()== 1){
+            function activePicker(time){
+                if(time == "day"){
                     $('#monthDate').hide();
                     $('#weeklyDatePicker').hide();
                     $('#rangeTime').show();
+                    $('#dayDiv').show();
+                    $('#weekDiv').hide();
+                    $('#monthDiv').hide();
+                    $('#monthPicker').hide();
+                    $('#ipMonth').hide();
+                    $('#MonthPicker_Button_monthPicker').hide();
                 }
-                if($(element).val()== 2){
+                if(time == "week"){
                     $('#monthDate').hide();
                     $('#rangeTime').hide();
                     $('#weeklyDatePicker').show();
+                    $('#weekDiv').show();
+                    $('#monthDiv').hide();
+                    $('#dayDiv').hide();
+                    $('#monthPicker').hide();
+                    $('#MonthPicker_Button_monthPicker').hide();
+                    $('#ipMonth').hide();
                 }
-                if($(element).val()== 3){
+                if(time == "month"){
                     $('#rangeTime').hide();
                     $('#weeklyDatePicker').hide();
-                    $('#monthDate').show();
+                    $('#monthPicker').show();
+                    $('#MonthPicker_Button_monthPicker').show();
+                    // show month picker
+                    $('#monthDiv').show();
+                    $('#weekDiv').hide();
+                    $('#dayDiv').hide();
+                    $('#ipMonth').show();
+                }
+            }
+
+            function setDatePicker(element){
+                if($(element).val()== 1){
+                    activePicker("day");
+                }
+                if($(element).val()== 2){
+                   activePicker("week");
+                }
+                if($(element).val()== 3){
+                    activePicker("month");
 
                 }
             }

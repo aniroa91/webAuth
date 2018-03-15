@@ -25,37 +25,68 @@ class InternetHistoryController @Inject()(cc: ControllerComponents) extends Abst
       "ct" -> text
     )(InternetContract.apply)(InternetContract.unapply))
 
-  def index =  withAuth { username => implicit request =>
-    val formValidationResult = form.bindFromRequest
-    try {
-      if (!formValidationResult.hasErrors) {
-        val ct = formValidationResult.get.ct.trim()
-        val day = formValidationResult.get.date.trim()
-        Ok(views.html.profile.internet.history(form, username,ct,day))
-      } else {
-        Ok(views.html.profile.internet.history(form, username,null,null))
-      }
-    } catch {
-      case e: Exception => Ok(views.html.profile.internet.history(form, username,null,null))
-    }
+//<<<<<<< HEAD
+//  def index =  withAuth { username => implicit request =>
+//    val formValidationResult = form.bindFromRequest
+//    try {
+//      if (!formValidationResult.hasErrors) {
+//        val ct = formValidationResult.get.ct.trim()
+//        Ok(views.html.profile.internet.history(form, username,ct))
+//      } else {
+//        Ok(views.html.profile.internet.history(form, username,null))
+//      }
+//    } catch {
+//      case e: Exception => Ok(views.html.profile.internet.history(form, username,null))
+//    }
+//
+//  }
 
-  }
-
-  def compareDate =  withAuth { username => implicit request =>
-    val formValidationResult = form.bindFromRequest
-    try {
-      if (!formValidationResult.hasErrors) {
-        val ct = formValidationResult.get.ct.trim()
-        val day = formValidationResult.get.date.trim()
-        val tptime = formValidationResult.get.tpTime.trim()
-        Ok(views.html.profile.internet.compareDate(form, username,ct,day,tptime))
-      } else {
-        Ok(views.html.profile.internet.compareDate(form, username,null,null,null))
-      }
-    } catch {
-      case e: Exception => Ok(views.html.profile.internet.compareDate(form, username,null,null,null))
-    }
-  }
+//  def compareDate =  withAuth { username => implicit request =>
+//    val formValidationResult = form.bindFromRequest
+//    try {
+//      if (!formValidationResult.hasErrors) {
+//        val ct = formValidationResult.get.ct.trim()
+//        Ok(views.html.profile.internet.compareDate(form, username,ct))
+//      } else {
+//        Ok(views.html.profile.internet.compareDate(form, username,null))
+//      }
+//    } catch {
+//      case e: Exception => Ok(views.html.profile.internet.compareDate(form, username,null))
+//    }
+//  }
+//=======
+//  def index =  withAuth { username => implicit request =>
+//    val formValidationResult = form.bindFromRequest
+//    try {
+//      if (!formValidationResult.hasErrors) {
+//        val ct = formValidationResult.get.ct.trim()
+//        val day = formValidationResult.get.date.trim()
+//        Ok(views.html.profile.internet.history(form, username,ct,day))
+//      } else {
+//        Ok(views.html.profile.internet.history(form, username,null,null))
+//      }
+//    } catch {
+//      case e: Exception => Ok(views.html.profile.internet.history(form, username,null,null))
+//    }
+//
+//  }
+//
+//  def compareDate =  withAuth { username => implicit request =>
+//    val formValidationResult = form.bindFromRequest
+//    try {
+//      if (!formValidationResult.hasErrors) {
+//        val ct = formValidationResult.get.ct.trim()
+//        val day = formValidationResult.get.date.trim()
+//        val tptime = formValidationResult.get.tpTime.trim()
+//        Ok(views.html.profile.internet.compareDate(form, username,ct,day,tptime))
+//      } else {
+//        Ok(views.html.profile.internet.compareDate(form, username,null,null,null))
+//      }
+//    } catch {
+//      case e: Exception => Ok(views.html.profile.internet.compareDate(form, username,null,null,null))
+//    }
+//  }
+//>>>>>>> e3035daafbd226c519c0d34b5bdd3d934c46ba0e
 
   def compareContract =  withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest

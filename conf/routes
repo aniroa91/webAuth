@@ -56,9 +56,12 @@ GET     /paytv                    controllers.PaytvClientController.index
 GET     /profile                  controllers.ProfileContractController.index(day: String ?= "")
 
 ### INTERNET PROFILE
-GET     /internet/history             controllers.InternetHistoryController.index
-GET     /internet/compareCt             controllers.InternetHistoryController.compareContract
-GET     /internet/compareTime             controllers.InternetHistoryController.compareDate
+
+GET     /internet/history         profile.controllers.internet.HistoryController.index(date: String ?= "")
+#GET    /internet/history         controllers.InternetHistoryController.index
+GET     /internet/compareCt       controllers.InternetHistoryController.compareContract
+GET     /internet/compareTime     profile.controllers.internet.CompareController.index
+
 
 ### ADD MORE FEATURE FOR SERVICE INTERNAL
 GET     /search/compare             controllers.CompareController.index(domains: String ?= "")
@@ -78,3 +81,6 @@ GET     /dev/dns/malware/virus      dns.controllers.MalwareController.virus
 GET     /dev/dns/report             dns.controllers.ReportController.index(day: String ?= "")
 #GET     /dev/dns/compareDate            dns.controllers.CompareDomainController.index
 
+
+### Profile 
+GET     /dev/profile/dashboard          profile.controllers.DashboardController.index

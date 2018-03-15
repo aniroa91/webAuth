@@ -650,7 +650,7 @@ object ProfileService extends AbstractService {
     //val map3 = mergeArrayMap(array)
     //map3.foreach(println)
     //val response = ProfileService.get("HUFD08955","")
-    val response = ProfileService.get("SGH210510", "2017-10")
+    val response = ProfileService.get("HUFD08955", "2018-01")
     //val a = response.paytv.vectors.get("445814").get
 //    a.app.foreach(println)
 //    response.internet.errorDisconnect.foreach(println)
