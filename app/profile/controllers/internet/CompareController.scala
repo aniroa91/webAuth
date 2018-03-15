@@ -43,12 +43,14 @@ class CompareController @Inject()(cc: ControllerComponents) extends AbstractCont
     try {
       if (!formValidationResult.hasErrors) {
         val contract = formValidationResult.get.ct.trim()
-        Ok(views.html.profile.internet.compare.date.index(form, username, contract, null))
+        val date = formValidationResult.get.date.trim()
+        val tpTime = formValidationResult.get.tpTime.trim()
+        Ok(views.html.profile.internet.compare.date.index(form, username, contract,null, date,tpTime))
       } else {
-        Ok(views.html.profile.internet.compare.date.index(form, username, null, null))
+        Ok(views.html.profile.internet.compare.date.index(form, username, null, null,null,null))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.internet.compare.date.index(form, username, null, null))
+      case e: Exception => Ok(views.html.profile.internet.compare.date.index(form, username, null,null,null, null))
     }
   }
 }

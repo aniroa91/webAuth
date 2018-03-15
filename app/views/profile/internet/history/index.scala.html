@@ -32,7 +32,7 @@
                 </div>
                 <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
 
-                @views.html.profile.internet.history.frmSearch(form, _root_.profile.controllers.internet.routes.HistoryController.index(""), null, null, null)
+                @views.html.profile.internet.history.frmSearch(form, _root_.profile.controllers.internet.routes.HistoryController.index(""), null, date, _type)
 
                 </div>
             </nav>
@@ -68,7 +68,7 @@
 
                 </li>
                 <li class="form-group" style="margin-top: 13px;right: 10px">
-                    <select class="form-control" onchange="setDatePicker(this)" style="width: 200px;margin-right: 15px">
+                    <select class="form-control" id="cbbTime" onchange="setDatePicker(this)" style="width: 200px;margin-right: 15px">
                         <option value="1">Day</option>
                         <option value="2">Week</option>
                         <option value="3">Month</option>
