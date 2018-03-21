@@ -30,7 +30,7 @@ import controllers.InternetContract
 @Singleton
 class HistoryController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
-  
+
   val client = Configure.client
 //  val form = Form(
 //    mapping(
