@@ -1,12 +1,10 @@
 package profile.services.internet
 
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
-
 import com.ftel.bigdata.utils.DateTimeUtil
 import com.ftel.bigdata.utils.Parameters
 import com.ftel.bigdata.utils.StringUtil
 import com.sksamuel.elastic4s.http.ElasticDsl._
-
 import profile.services.internet.response.History
 import profile.services.internet.response.HistoryContractDay
 import services.Configure
@@ -15,6 +13,9 @@ import profile.services.internet.response.DayOfWeek
 import profile.services.internet.response.Daily
 import profile.services.internet.response.HistoryContract
 import org.joda.time.DateTimeZone
+import services.domain.CommonService
+import services.domain.CommonService.getAggregations
+
 
 object HistoryService {
   
@@ -172,6 +173,44 @@ object HistoryService {
     } else get(esIndex, contract)
   }
 
+   def getRealtime(day: String): History = {
+     val secondTime = CommonService.getpreviousMinutes(15)
+     println(secondTime)
+     val response = client.execute(
+       search(s"radius-streaming-$day" / "load")
+         query { must(rangeQuery("timestamp").gte(secondTime)) }
+         aggregations (
+           cardinalityAgg("numberOfcontract", "name"),
+           dateHistogramAggregation("minute")
+             .field("timestamp")
+
+             .interval(DateHistogramInterval.MINUTE)
+             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+             .subAggregations(
+               cardinalityAgg("contract", "name"),
+               sumAgg("download", "download"),
+               sumAgg("upload", "upload"),
+               sumAgg("duration", "sessionTime")
+             ),
+           termsAggregation("contract")
+             .field("name")
+             .subAggregations(
+               sumAgg("download", "download"),
+               sumAgg("upload", "upload"),
+               sumAgg("duration", "sessionTime")
+             ) size 50
+          )
+     ).await
+     val minutes = getAggregations(response.aggregations.get("minute"), true)
+     val contracts = getAggregations(response.aggregations.get("contract"), false)
+       .filter(x => x._1 != "??")
+       .sortBy(x => x._4)
+       .reverse.take(20)
+     val numberOfContract = response.aggregations.get("numberOfcontract").get.asInstanceOf[Map[String, Integer]].get("value").get.toLong
+     val numberOfSession = response.totalHits.toLong
+     History("realtime",numberOfContract,numberOfSession,new Hourly(minutes),null,null,null,contracts,null,null,null)
+  }
+
   private def get(esIndex: String, contract: String): History = {
     val req = search(esIndex / "docs") aggregations (
         cardinalityAgg("numberOfcontract", "name"),
@@ -241,22 +280,7 @@ object HistoryService {
     
     val numberOfContract = response.aggregations.get("numberOfcontract").get.asInstanceOf[Map[String, Integer]].get("value").get.toLong
     val numberOfSession = response.totalHits.toLong
-    
-    def getAggregations(aggr: Option[AnyRef], hasContract: Boolean): Array[(String, Long, Long, Long, Long, Long)] = {
-      aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
-          .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
-          .map(x => x.asInstanceOf[Map[String, AnyRef]])
-          .map(x => {
-            val key = x.getOrElse("key", "0L").toString
-            val count = x.getOrElse("doc_count", 0L).toString().toLong
-            val contract = if (hasContract) x.get("contract").get.asInstanceOf[Map[String, Integer]].get("value").get.toLong else 0L
-            val download = x.get("download").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
-            val upload = x.get("upload").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
-            val duration = x.get("duration").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
-            (key, contract, count, download, upload, duration)
-          })
-          .toArray
-    }
+
     //response.aggregations.foreach(println)
     val hourly = getAggregations(response.aggregations.get("hourly"), true)
     val daily = getAggregations(response.aggregations.get("daily"), true)

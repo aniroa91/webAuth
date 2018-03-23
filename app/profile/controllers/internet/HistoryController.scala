@@ -5,21 +5,23 @@ import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import javax.inject.Inject
 import javax.inject.Singleton
+
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
+import services.domain.CommonService
 //import controllers.SearchContract
 import controllers.Secured
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import services.Configure
 import views.html.ace.client
+import play.api.libs.json.Json
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import profile.services.internet.HistoryService
 import com.ftel.bigdata.utils.StringUtil
 import profile.services.internet.response.History
 import profile.services.internet.response.Hourly
 import controllers.InternetContract
-
 
 //case class InternetContract(tpTime: String,date: String,ct: String)
 
@@ -30,6 +32,7 @@ import controllers.InternetContract
 @Singleton
 class HistoryController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
+  val day = CommonService.getCurrentDay()
 
   val client = Configure.client
 //  val form = Form(
@@ -88,111 +91,30 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
         println("============")
         Ok(views.html.profile.internet.history.index(form, username, HistoryService.getAll("M", "02/2018"), "02/2018", "M"))
       }
-    
-    
-//    } catch {
-//      case e: Exception => Ok("Message: " + e.getMessage)
-//    }
+
   }
-  
-//  private def getResponse(): InternetReponse = {
-//    
-//    HistoryService.get(date)
-//    //HistoryService.get("bpfdl-150820-434")
-////    getResponseTest()
-//  }
-  
-  
-  
-//  private def getResponseTest(): History = {
-//    val numberOfContract = 2089675
-//    val numberOfSession = 9581974
-//    val contractHourly = Array(
-//        0 -> 10L,
-//        1 -> 40L,
-//        2 -> 30L,
-//        3 -> 80L,
-//        4 -> 60L,
-//        5 -> 90L,
-//        6 -> 30L,
-//        7 -> 80L,
-//        8 -> 100L,
-//        9 -> 120L,
-//        10 -> 150L,
-//        11 -> 400L,
-//        12 -> 800L,
-//        13 -> 500L,
-//        14 -> 200L,
-//        15 -> 100L,
-//        16 -> 250L,
-//        17 -> 360L,
-//        18 -> 240L,
-//        19 -> 800L,
-//        20 -> 1120L,
-//        21 -> 1200L,
-//        22 -> 900L,
-//        23 -> 200L).map(x => x._1.toLong -> x._2)
-//        
-//    val sessionHourly = contractHourly.map(x => x._1.toInt -> x._2)
-//    val downloadHourly = contractHourly.map(x => x._1.toInt -> x._2)
-//    val uploadHourly = contractHourly.map(x => x._1.toInt -> x._2)
-//    val status = Array(
-//        "ACTLIVE" -> 80,
-//        "ACTLOFF" -> 20)
-//    val topContract = Array(
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L),
-//        ("bpfdl-150820-434", 100L, 20L))
-//    val topProvince = Array(
-//        ("A", 100L, 200L, 100L, 50L),
-//        ("B", 100L, 200L, 100L, 50L),
-//        ("C", 100L, 200L, 100L, 50L),
-//        ("D", 100L, 200L, 100L, 50L),
-//        ("E", 100L, 200L, 100L, 50L),
-//        ("F", 100L, 200L, 100L, 50L),
-//        ("G", 100L, 200L, 100L, 50L),
-//        ("E", 100L, 200L, 100L, 50L),
-//        ("F", 100L, 200L, 100L, 50L),
-//        ("G", 100L, 200L, 100L, 50L))
-//        
-//    val topRegion = Array(
-//        ("A", 100L, 200L, 100L, 50L),
-//        ("B", 100L, 200L, 100L, 50L),
-//        ("C", 100L, 200L, 100L, 50L),
-//        ("D", 100L, 200L, 100L, 50L),
-//        ("E", 100L, 200L, 100L, 50L),
-//        ("F", 100L, 200L, 100L, 50L),
-//        ("G", 100L, 200L, 100L, 50L))
-//        
-//    History(
-//        "contract",
-//        numberOfContract,
-//        numberOfSession,
-//        null,
-//        null,
-//        null,
-//        status,
-//        topContract,
-//        topProvince,
-//        topRegion)
-//  }
+
+  def realtime() =  withAuth { username => implicit request =>
+    Ok(views.html.profile.internet.history.realtime(username, HistoryService.getAll("M", "02/2018"), HistoryService.getRealtime(day)))
+  }
+
+  def realtimeJson() =  withAuth { username => implicit request =>
+    val streaming = HistoryService.getRealtime(day)
+    val jsRealtime = Json.obj(
+      "numberOfContract" -> streaming.numberOfContract,
+      "numberOfSession" -> streaming.numberOfSession,
+      "minutes" -> streaming.hourly.contract.map(x=> x._1 -> x._2),
+      "session" -> streaming.hourly.session.map(x=> x._2),
+      "download" -> streaming.hourly.download.map(x=> x._2),
+      "upload" -> streaming.hourly.upload.map(x=> x._2),
+      "sumSession" -> streaming.hourly.session.map(x=> x._2).sum,
+      "sumDown" -> streaming.hourly.download.map(x=> x._2).sum,
+      "sumUp" -> streaming.hourly.upload.map(x=> x._2).sum,
+      "tbContract" -> streaming.contracts
+
+    )
+    Ok(Json.toJson(jsRealtime))
+  }
 }
 
 
