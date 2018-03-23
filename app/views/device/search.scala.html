@@ -45,7 +45,7 @@
                 <li class="form-group pull-right" style="margin-top: 13px;right: 10px">
 
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="form-group pull-right" style="margin-top: 13px;right: 10px">
+                        <li class="form-group pull-right" style="right: 10px">
                             <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
                                 <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
                                 <span></span> <b class="caret"></b>
@@ -483,7 +483,7 @@
                     startDate: start,
                     endDate: end,
                     maxDate: moment(),
-                    minDate: moment().subtract(90,'days'),
+                    minDate: moment().subtract(30,'days'),
                     ranges: {
                         'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                         'Last 7 Days': [moment().subtract(6, 'days'), moment()],

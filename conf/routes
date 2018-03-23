@@ -58,6 +58,9 @@ GET     /profile                  controllers.ProfileContractController.index(da
 ### INTERNET PROFILE
 
 GET     /internet/history         profile.controllers.internet.HistoryController.index(date: String ?= "")
+GET     /internet/realtime         profile.controllers.internet.HistoryController.realtime
+GET     /internet/realtime-json         profile.controllers.internet.HistoryController.realtimeJson
+
 #GET    /internet/history         controllers.InternetHistoryController.index
 GET     /internet/compareCt       controllers.InternetHistoryController.compareContract
 GET     /internet/compareTime     profile.controllers.internet.CompareController.index

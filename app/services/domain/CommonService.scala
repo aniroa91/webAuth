@@ -66,7 +66,28 @@ object CommonService extends AbstractService {
     val date = new DateTime()
     date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
   }
-  
+
+  def getpreviousMinutes(times: Int): String = {
+    val date = new DateTime()
+    date.minusMinutes(times).toString()
+  }
+
+  def getAggregations(aggr: Option[AnyRef], hasContract: Boolean): Array[(String, Long, Long, Long, Long, Long)] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val count = x.getOrElse("doc_count", 0L).toString().toLong
+        val contract = if (hasContract) x.get("contract").get.asInstanceOf[Map[String, Integer]].get("value").get.toLong else 0L
+        val download = x.get("download").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
+        val upload = x.get("upload").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
+        val duration = x.get("duration").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
+        (key, contract, count, download, upload, duration)
+      })
+      .toArray
+  }
+
   def getPreviousDay(day: String, num: Int): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(num).toString(DateTimeUtil.YMD)
@@ -330,6 +351,11 @@ object CommonService extends AbstractService {
   }
 
   def formatPattern(number: Int): String ={
+    val frnum = new DecimalFormat("###,###.###");
+    frnum.format(number);
+  }
+
+  def formatPatternDouble(number: Double): String ={
     val frnum = new DecimalFormat("###,###.###");
     frnum.format(number);
   }
