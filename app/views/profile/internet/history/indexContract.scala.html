@@ -3,6 +3,8 @@
 @import _root_.profile.services.internet.Common.humanReadableByteCount
 @import _root_.profile.services.internet.Common.bytesToGigabytes
 @import _root_.profile.services.internet.Common.getTimeFrom
+@import _root_.profile.services.internet.Common.getDayOfWeek
+
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -168,7 +170,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Contract</th>
+                                    <th>SessionID</th>
                                     <th>Download</th>
                                     <th>Upload</th>
                                 </tr>
@@ -292,7 +294,61 @@
                 //var hourly = @@Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._1))));
                 //var values = @@Html(Json.stringify(Json.toJson(response.contractHourly.map(x => x._2))));
                 @if(_type == "D") {
-                    var data = @Html(Json.stringify(Json.toJson(response.hourly.contract.map(x => x._1 -> x._2))));
+                    // var data = @Html(Json.stringify(Json.toJson(response.hourly.contract.map(x => x._1 -> x._2))));
+                    // // line hourly
+                    // Highcharts.chart('line-hourly', {
+                    //     chart: {
+                    //         //type: 'column'
+                    //         zoomType: 'x'
+                    //     },
+                    //     title: {
+                    //         text: ''
+                    //     },
+                    //     subtitle: {
+                    //         text: ''
+                    //     },
+                    //     plotOptions: {
+                    //         column: {
+                    //             colorByPoint: true
+                    //         }
+                    //     },
+                    //     colors: [
+                    //         'rgba(255, 102, 86, 1)'
+                    //     ],
+                    //     xAxis: {
+                    //         //categories: hourly
+                    //         type: 'datetime'
+                    //     },
+                    //     yAxis: {
+                    //         title: {
+                    //             text: "Time Of ACTALIVE/ACTLOGOF"
+                    //         }
+
+                    //     },
+                    //     tooltip: {
+                    //         crosshairs: true,
+                    //         shared: true
+                    //     },
+                    //     plotOptions: {
+                    //         spline: {
+                    //             marker: {
+                    //                 radius: 4,
+                    //                 lineColor: '#666666',
+                    //                 lineWidth: 1
+                    //             }
+                    //         }
+                    //     },
+                    //     series: [{
+                    //         type: 'column',
+                    //         name: 'Time',
+                    //         data: data
+                    //     }]
+                    // });
+
+                    var download = @Html(Json.stringify(Json.toJson(response.daily.download.map(x => x._1 -> bytesToGigabytes(x._2) ))));
+                    var upload = @Html(Json.stringify(Json.toJson(response.daily.upload.map(x => x._1 -> bytesToGigabytes(x._2) ))));
+                    var duration = @Html(Json.stringify(Json.toJson(response.daily.duration)));
+
                     // line hourly
                     Highcharts.chart('line-hourly', {
                         chart: {
@@ -300,7 +356,7 @@
                             zoomType: 'x'
                         },
                         title: {
-                            text: ''
+                            text: 'Daily Total Download/Upload'
                         },
                         subtitle: {
                             text: ''
@@ -311,15 +367,20 @@
                             }
                         },
                         colors: [
-                            'rgba(255, 102, 86, 1)'
+                        '#3498DB',
+                        '#1ABB9C',
+                        '#9B59B6',
+                        '#9CC2CB',
+                        '#E74C3C',
+                        '#73879C'
                         ],
                         xAxis: {
-                            //categories: hourly
+                            //categories: cate
                             type: 'datetime'
                         },
                         yAxis: {
                             title: {
-                                text: "Time Of ACTALIVE/ACTLOGOF"
+                                text: "Size (GB)"
                             }
 
                         },
@@ -336,14 +397,20 @@
                                 }
                             }
                         },
-                        series: [{
+                        series: [
+                        {
                             type: 'column',
-                            name: 'Time',
-                            data: data
+                            name: 'download',
+                            data: download
+                        },{
+                            type: 'column',
+                            name: 'upload',
+                            data: upload
                         }]
                     });
+
                 } else if(_type == "W") {
-                    var cate = @Html(Json.stringify(Json.toJson(response.dayOfWeek.download.map(x => x._1))));
+                    var cate = @Html(Json.stringify(Json.toJson(response.dayOfWeek.download.map(x => getDayOfWeek(x._1)))));
 
                     var download = @Html(Json.stringify(Json.toJson(response.dayOfWeek.download.map(x =>bytesToGigabytes(x._2)))));
                     var upload = @Html(Json.stringify(Json.toJson(response.dayOfWeek.upload.map(x => bytesToGigabytes(x._2)))));
@@ -356,7 +423,7 @@
                             //zoomType: 'x'
                         },
                         title: {
-                            text: ''
+                            text: 'Weekly Total Download/Upload'
                         },
                         subtitle: {
                             text: ''
@@ -380,7 +447,7 @@
                         },
                         yAxis: {
                             title: {
-                                text: "Time Of ACTALIVE/ACTLOGOF"
+                                text: "Size (GB)"
                             }
 
                         },
@@ -411,8 +478,8 @@
                 } else {
                     //var cate = @Html(Json.stringify(Json.toJson(response.daily.download.map(x => x._1))));
 
-                    var download = @Html(Json.stringify(Json.toJson(response.daily.download)));
-                    var upload = @Html(Json.stringify(Json.toJson(response.daily.upload)));
+                    var download = @Html(Json.stringify(Json.toJson(response.daily.download.map(x => x._1 -> bytesToGigabytes(x._2) ))));
+                    var upload = @Html(Json.stringify(Json.toJson(response.daily.upload.map(x => x._1 -> bytesToGigabytes(x._2) ))));
                     var duration = @Html(Json.stringify(Json.toJson(response.daily.duration)));
 
                     // line hourly
@@ -422,7 +489,7 @@
                             zoomType: 'x'
                         },
                         title: {
-                            text: ''
+                            text: 'Monthly Total Download/Upload'
                         },
                         subtitle: {
                             text: ''
@@ -446,7 +513,7 @@
                         },
                         yAxis: {
                             title: {
-                                text: "Time Of ACTALIVE/ACTLOGOF"
+                                text: "Size (GB)"
                             }
 
                         },

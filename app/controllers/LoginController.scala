@@ -24,13 +24,17 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
   )
 
   def check(username: String, password: String) = {
-    (username == "btgd@ftel" && password == "da@171020")
+    (username == "btgd@ftel" && password == "da@171020") || (username == "demo" && password == "demo")
+    
   }
 
   def index = Action { implicit request =>
     val ssId = request.session.get("username").toString
     if(ssId != "None") {
-      Redirect(routes.DashboardController.index)
+      //Redirect(routes.DashboardController.index)
+      //Redirect(_root_.profile.controllers.internet.HistoryController.index)
+      Redirect(_root_.profile.controllers.internet.routes.HistoryController.index(""))
+      //Ok(views.html.login.index(loginForm))
     }
     else
        Ok(views.html.login.index(loginForm))

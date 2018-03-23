@@ -78,7 +78,7 @@ object HistoryService {
     //println(esIndex)
     //println(client.show(req))
     val response = client.execute(req).await
-    response.hits.hits.foreach(println)
+    //response.hits.hits.foreach(println)
     val loadLogs = response.hits.hits
       .map(x => x.sourceAsMap)
       .map(x => {
@@ -147,7 +147,7 @@ object HistoryService {
       .map(x => x._1 -> x._2.map(y => y._2).sum.toInt)
       .toArray
       
-    history.dayOfWeek.download.foreach(println)
+    //history.dayOfWeek.download.foreach(println)
     
     HistoryContract(
         numberOfMessage,
@@ -230,7 +230,7 @@ object HistoryService {
     val response = if (contract == null) {
       client.execute(req).await 
     } else {
-      println(client.show(req.query(boolQuery().must(termQuery("contract", contract)))))
+      //println(client.show(req.query(boolQuery().must(termQuery("contract", contract)))))
       client.execute(
           req.query(boolQuery().must(termQuery("contract", contract)))
               

@@ -28,7 +28,7 @@ import controllers.InternetContract
   * application's home page.
   */
 @Singleton
-class HistoryController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
+class HistoryController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured {
 
   
   val client = Configure.client
@@ -43,7 +43,7 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
       "ct" -> text
     )(InternetContract.apply)(InternetContract.unapply))
     
-  def index(date: String) =  withAuth { username => implicit request =>
+  def index(date: String) = withAuth { username => implicit request =>
     //println("DATE: " + date)
     
 //    try {
@@ -62,17 +62,22 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
           //Ok(views.html.profile.internet.history.index(form, username, HistoryService.get("day", date), date, "day"))
           //Ok(views.html.profile.internet.history.index(form, username, HistoryService.get("week", "2018-02-08"), date, "week"))
 //          Ok(views.html.profile.internet.history.index(form, username, HistoryService.getAll("month", "2018-02-01"), date, "month"))
+          
+          if (StringUtil.isNullOrEmpty(_type) && StringUtil.isNullOrEmpty(time)) {
+            Ok(views.html.profile.internet.history.index(form, username, HistoryService.getAll("M", "02/2018"), "02/2018", "M"))
+          } else {
           Ok(views.html.profile.internet.history.index(form,
               username,
               HistoryService.getAll(_type, time),
               time,
               _type))
+          }
         } else {
           if (StringUtil.isNullOrEmpty(_type) && StringUtil.isNullOrEmpty(time)) {
             Ok(views.html.profile.internet.history.indexContract(form,
               username, HistoryService.getContract("M", "02/2018", contract.toLowerCase()),
               contract,
-              time,
+              "02/2018",
               "M"))
           } else {
           Ok(views.html.profile.internet.history.indexContract(form,

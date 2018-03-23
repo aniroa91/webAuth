@@ -1,7 +1,10 @@
 @(form: Form[InternetContract], email: String, response: _root_.profile.services.internet.response.History, date: String, _type: String)
 
 @import _root_.profile.services.internet.Common.humanReadableByteCount
+@import _root_.profile.services.internet.Common.bytesToTerabytes
+@import _root_.profile.services.internet.Common.secondsToDay
 @import _root_.profile.services.internet.Common.getTimeFrom
+@import _root_.profile.services.internet.Common.getDayOfWeek
 
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatNumber
@@ -163,7 +166,7 @@
             <div class="col-md-4 col-sm-4 col-xs-12">
                 <div class="x_panel tile fixed_height_640">
                     <div class="titbox">
-                        <h2> Top 10 Contract</h2>
+                        <h2> Top 20 Contract</h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content" style="padding: 10px 17px">
@@ -194,7 +197,7 @@
                 <div class="row">
                     <div class="x_panel tile fixed_height_300">
                         <div class="titbox">
-                            <h2> Top 10 Region</h2>
+                            <h2> Region Overview</h2>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="padding: 10px 17px">
@@ -205,7 +208,7 @@
                 <div class="row">
                     <div class="x_panel tile fixed_height_340">
                         <div class="titbox">
-                            <h2> Top 10 Province</h2>
+                            <h2> Top 10 Provinces</h2>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="padding: 10px 17px">
@@ -280,7 +283,7 @@
                         zoomType: 'x'
                     },
                     title: {
-                        text: ''
+                        text: 'Hourly Unique Contract'
                     },
                     subtitle: {
                         text: ''
@@ -299,7 +302,7 @@
                     },
                     yAxis: {
                         title: {
-                            text: "Number Of Constract"
+                            text: "Size"
                         }
 
                     },
@@ -318,13 +321,13 @@
                     },
                     series: [{
                         type: 'spline',
-                        name: 'Hourly',
+                        name: 'Number Of Contract',
                         data: data
                     }]
                 });
 
             } else if (_type=="W") {
-                var cate = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => x._1))));
+                var cate = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => getDayOfWeek(x._1)))));
                 var data = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => x._2))));
                 // line hourly
                 Highcharts.chart('line-hourly', {
@@ -333,7 +336,7 @@
                         //zoomType: 'x'
                     },
                     title: {
-                        text: ''
+                        text: 'Weekly Unique Contract'
                     },
                     subtitle: {
                         text: ''
@@ -352,7 +355,7 @@
                     },
                     yAxis: {
                         title: {
-                            text: "Number Of Constract"
+                            text: "Size"
                         }
 
                     },
@@ -371,7 +374,7 @@
                     },
                     series: [{
                         type: 'spline',
-                        name: 'Day Of Week',
+                        name: 'Number Of Contract',
                         data: data
                     }]
                 });
@@ -387,7 +390,7 @@
                         zoomType: 'x'
                     },
                     title: {
-                        text: ''
+                        text: 'Monthly Unique Contract'
                     },
                     subtitle: {
                         text: ''
@@ -398,13 +401,13 @@
                         }
                     },
                     colors: [
-                        //'rgba(255, 102, 86, 1)'
-                        '#3498DB',
-                        '#1ABB9C',
-                        '#9B59B6',
-                        '#9CC2CB',
-                        '#E74C3C',
-                        '#73879C'
+                        'rgba(255, 102, 86, 1)'
+                        // '#3498DB',
+                        // '#1ABB9C',
+                        // '#9B59B6',
+                        // '#9CC2CB',
+                        // '#E74C3C',
+                        // '#73879C'
                     ],
                     xAxis: {
                         //categories: cate
@@ -412,7 +415,7 @@
                     },
                     yAxis: {
                         title: {
-                            text: "Number Of Constract"
+                            text: "Size"
                         }
 
                     },
@@ -431,7 +434,7 @@
                     },
                     series: [{
                         type: 'spline',
-                        name: 'Download',
+                        name: 'Number Of Constract',
                         data: data
                     }]
                 });
@@ -440,9 +443,9 @@
 
                 var regions = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._1).sorted)));
                 var contracts = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._2))));
-                var download = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._4))));
-                var upload = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._5))));
-                var duration = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._6))));
+                var download = @Html(Json.stringify(Json.toJson(response.regions.map(x => bytesToTerabytes(x._4)))));
+                var upload = @Html(Json.stringify(Json.toJson(response.regions.map(x => bytesToTerabytes(x._5)))));
+                var duration = @Html(Json.stringify(Json.toJson(response.regions.map(x => secondsToDay(x._6)))));
 
                 Highcharts.chart('col-region', {
 
@@ -462,7 +465,7 @@
                         allowDecimals: false,
                         min: 0,
                         title: {
-                            text: 'Number of traffic'
+                            text: 'Down/Up (TB) - Duration (days) - Contract (number)'
                         }
                     },
                     colors: [

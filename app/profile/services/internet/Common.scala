@@ -47,6 +47,10 @@ object Common {
     BigDecimal(number).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
   
+  def secondsToDay(milliseconds: Long): Double = {
+    BigDecimal(milliseconds / 1000 / Math.pow(60, 2) / 24).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+  
   def getIndexString(indexParttern: String, date: String): String = {
     if (StringUtil.isNullOrEmpty(date)) {
       s"${indexParttern}-2018-02-01"
@@ -98,11 +102,25 @@ object Common {
          .toArray
          .sortBy(x => x._1)
   }
-  
+
+  def getDayOfWeek(number: Int): String = {
+    number match {
+      case DateTimeConstants.MONDAY    => "MON"
+      case DateTimeConstants.TUESDAY   => "TUE"
+      case DateTimeConstants.WEDNESDAY => "WED"
+      case DateTimeConstants.THURSDAY  => "THU"
+      case DateTimeConstants.FRIDAY    => "FRI"
+      case DateTimeConstants.SATURDAY  => "SAT"
+      case DateTimeConstants.SUNDAY    => "SUN"
+    }
+  }
   
   def main(args: Array[String]) {
 //    println(humanReadableByteCount(1855425871872L , true))
 //    println(humanReadableByteCount(9223372036854775807L , true))
-    println(getRangeDateForWeek(""))
+//    println(getRangeDateForWeek(""))
+    println(getDayOfWeek(DateTimeConstants.SUNDAY))
+    println(DateTimeConstants.SATURDAY)
+    println(DateTimeConstants.MONDAY)
   }
 }
