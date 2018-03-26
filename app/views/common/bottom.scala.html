@@ -433,9 +433,6 @@
             <!-- Hight chart -->
         <script src="/assets/javascripts/highcharts.js"></script>
         <script src="/assets/javascripts/exporting.js"></script>
-            <!-- Counter number -->
-        <script src="../assets/javascripts/waypoints.min.js"></script>
-        <script src="../assets/javascripts/jquery.counterup.min.js"></script>
             <!-- Autocomplete -->
         <script src="/assets/javascripts/jquery-ui.js"></script>
         <script src="/assets/javascripts/jquery.sparkline.js"></script>
@@ -447,16 +444,25 @@
         <script type="text/javascript" src="/assets/javascripts/jquery.maskedinput.min.js"></script>
         <script type="text/javascript" src="/assets/javascripts/monthPicker.js"></script>
         <script type="text/javascript" src="/assets/javascripts/jquery-ui.min.js"></script>
-
+        <!-- Datatable -->
+      @*  <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="../assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="../assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="../assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+        <script src="../assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+        <script src="../assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="../assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+        <script src="../assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
         <script type="text/javascript">
                 $(document).ready(function () {
-                    // auto count number
-                    $('.counter').counterUp({
-                        delay: 10,
-                        time: 1000
-                    });
+                    $('#tbProvince').dataTable( {
+                        colReorder: {
+                            realtime: true
+                        }
+                    } );
                 });
-        </script>
+        </script>*@
     }
 @if(item == "CompareCt"){
         <!-- jQuery -->
