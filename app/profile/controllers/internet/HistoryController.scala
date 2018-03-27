@@ -115,10 +115,14 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
       "download" -> streaming.hourly.download.map(x=> x._2),
       "upload" -> streaming.hourly.upload.map(x=> x._2),
       "sumSession" -> streaming.hourly.session.map(x=> x._2).sum,
-      "sumDown" -> Common.bytesToTerabytes(streaming.hourly.download.map(x=> x._2).sum),
+      "sumDown" -> streaming.hourly.download.map(x=> x._2).sum,
       "sumUp" -> streaming.hourly.upload.map(x=> x._2).sum,
-      "tbContract" -> streaming.contracts
-
+      "tbContract" -> streaming.contracts,
+      "tbProvince" -> streaming.provinces,
+      "jsContract" -> streaming.regions.map(x => x._2),
+      "jsDownload" -> streaming.regions.map(x => x._4),
+      "jsUpload" -> streaming.regions.map(x => x._5),
+      "jsDuration" -> streaming.regions.map(x => x._6)
     )
     Ok(Json.toJson(jsRealtime))
   }

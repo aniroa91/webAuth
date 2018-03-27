@@ -23,7 +23,7 @@
         <title>Dashboard Admin </title>
 
             <!-- Bootstrap -->
-        @views.html.common.css("History",1)
+        @views.html.common.css("Realtime",1)
     </head>
     @views.html.common.top("History",1,"")
         <!-- top navigation -->
@@ -52,6 +52,10 @@
         <!-- page content -->
     @if(response != null) {
     <div class="right_col" role="main">
+        <input type="hidden" id="idCt" value="@streaming.numberOfContract">
+        <input type="hidden" id="idSession" value="@streaming.numberOfSession">
+        <input type="hidden" id="idDown" value="@streaming.hourly.download.map(x => x._2).sum">
+        <input type="hidden" id="idUp" value="@streaming.hourly.upload.map(x => x._2).sum">
         <div class="row top_tiles">
             <div class="col-md-3 col-sm-3 col-xs-3">
                 <div class="widget widget-info-2 wi2-red">
@@ -159,7 +163,7 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="padding: 10px 17px">
-                            <table class="table table-striped">
+                            <table class="table table-striped" id="tbProvince">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -171,14 +175,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for(i <- 0 until response.provinces.size) {
+                                    @for(i <- 0 until streaming.provinces.size) {
                                         <tr>
                                             <th scope="row">@(i+1)</th>
-                                            <td>@response.provinces(i)._1</td>
-                                            <td>@formatNumber(response.provinces(i)._2)</td>
-                                            <td>@humanReadableByteCount(response.provinces(i)._4)</td>
-                                            <td>@humanReadableByteCount(response.provinces(i)._5)</td>
-                                            <td>@formatNumber(response.provinces(i)._3)</td>
+                                            <td>@streaming.provinces(i)._1</td>
+                                            <td>@formatNumber(streaming.provinces(i)._2)</td>
+                                            <td>@humanReadableByteCount(streaming.provinces(i)._4)</td>
+                                            <td>@humanReadableByteCount(streaming.provinces(i)._5)</td>
+                                            <td>@formatNumber(streaming.provinces(i)._3)</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -210,13 +214,11 @@
     @views.html.common.bottom("Realtime",0)
     <script>
             $(document).ready(function () {
-
                 Highcharts.setOptions({
                     time: {
                         timezoneOffset: -7 * 60
                     }
                 });
-
 
                 @if(response != null) {
                 // var cate = @Html(Json.stringify(Json.toJson(response.dayOfWeek.contract.map(x => x._1))));
@@ -287,11 +289,11 @@
                     }]
                 });
 
-                var regions = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._1).sorted)));
-                var contracts = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._2))));
-                var download = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._4))));
-                var upload = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._5))));
-                var duration = @Html(Json.stringify(Json.toJson(response.regions.map(x => x._6))));
+                var regions = @Html(Json.stringify(Json.toJson(streaming.regions.map(x => x._1).sorted)));
+                var contracts = @Html(Json.stringify(Json.toJson(streaming.regions.map(x => x._2))));
+                var download = @Html(Json.stringify(Json.toJson(streaming.regions.map(x => x._4))));
+                var upload = @Html(Json.stringify(Json.toJson(streaming.regions.map(x => x._5))));
+                var duration = @Html(Json.stringify(Json.toJson(streaming.regions.map(x => x._6))));
 
                 Highcharts.chart('col-region', {
 
@@ -325,7 +327,7 @@
                     tooltip: {
                         formatter: function () {
                             return '<b>' + this.x + '</b><br/>' +
-                                    this.series.name + ': ' + this.y + '<br/>'
+                                    this.series.name + ': ' + formatNumber(this.y) + '<br/>'
                         }
                     },
 
@@ -401,32 +403,31 @@
                         url: "/internet/realtime-json",
                         cache: false,
                         success: function (dta) {
-                            // set chart
+                            var oldSession = Number($('#idSession').val());
+                            var oldDown = Number($('#idDown').val());
+                            var oldUp = Number($('#idUp').val());
+                            var oldCt = Number($('#idCt').val())
+                            // set line minutes chart
                             var arrMinutes = dta.minutes
-                            /*var x = (new Date()).getTime(), // current time
-                                    y = Math.floor(Math.random() * 20000000);
-                            if(x != series.data[series.data.length -1].x && y != series.data[series.data.length -1].y)*/
-                            if (series.data[series.data.length - 1].x == arrMinutes[arrMinutes.length - 1][0])
-                            {
-                                console.log(series.data[series.data.length - 1].y + "-" + arrMinutes[arrMinutes.length - 1][1])
-                                series.data[series.data.length - 1].update({
-                                    x:arrMinutes[arrMinutes.length - 1][0],
-                                    y:arrMinutes[arrMinutes.length - 1][1]
-                                }); 
-                                //.y.update(arrMinutes[arrMinutes.length - 1][1])
-                            } else {
-                                series.data[series.data.length - 1].update({
-                                    x:arrMinutes[arrMinutes.length - 2][0],
-                                    y:arrMinutes[arrMinutes.length - 2][1]
-                                }); 
 
-                                //series.data[series.data.length - 1].y = arrMinutes[arrMinutes.length - 2][1]
-                                series.addPoint([arrMinutes[arrMinutes.length - 1][0], arrMinutes[arrMinutes.length - 1][1]], true, true);
+                            if(arrMinutes[arrMinutes.length -1][0] == series.data[series.data.length -1].x){
+                                series.data[series.data.length- 1].update(arrMinutes[arrMinutes.length -1][1]);
                             }
-                            // for(var i=0;i<arrMinutes.length;i++) {
-                            //     series.addPoint([arrMinutes[i][0], arrMinutes[i][1]], true, true);
-                            // }
-                            //series = arrMinutes
+                            else{
+                                series.addPoint([arrMinutes[arrMinutes.length -1][0], arrMinutes[arrMinutes.length -1][1]], true, true);
+                            }
+                            // set column regions
+                            var chartColRegion = $('#col-region').highcharts();
+                            chartColRegion.series[0].setData(dta.jsContract );
+                            chartColRegion.series[1].setData(dta.jsDownload);
+                            chartColRegion.series[2].setData(dta.jsUpload);
+                            chartColRegion.series[3].setData(dta.jsDuration);
+                            // set value hidden
+                            $('#idSession').val(dta.sumSession);
+                            $('#idDown').val(dta.sumDown);
+                            $('#idUp').val(dta.sumUp);
+                            $('#idCt').val(dta.numberOfContract);
+
                             // set number text
                             $('#numCt').text(formatNumber(dta.numberOfContract));
                             $('#numSession').text(formatNumber(dta.numberOfSession));
@@ -435,32 +436,81 @@
                             $('#session').text(formatNumber(dta.sumSession));
                             $('#download').text(formatNumber(dta.sumDown));
                             $('#upload').text(formatNumber(dta.sumUp));
-                            // auto count number
-                            $('.counter').counterUp({
-                                delay: 10,
-                                time: 1000
-                            });
-                            
-                            $('#sparkline1').sparkline(dta.session, {type: 'bar', barColor: '#3498DB'} );
+
+                            animateValue("session", oldSession, dta.sumSession, 1000);
+                            animateValue("download",oldDown, dta.sumDown, 1000);
+                            animateValue("upload", oldUp, dta.sumUp, 1000);
+                            animateValue("numCt",oldCt, dta.numberOfContract, 1000);
+                            animateValue("numSession", oldSession, dta.numberOfSession, 1000);
+                            $('#sparkline1').sparkline(dta.session, {type: 'bar', barColor: '#3498DB',    tooltipFormat: "{{value:val}}"
+                            } );
+
 
                             $('#sparkline2').sparkline(dta.download, {type: 'bar', barColor: '#f1b53d'} );
 
                             $('#sparkline3').sparkline(dta.upload, {type: 'bar', barColor: '#1ABB9C'} );
                             // table top contract
                             $('#tbContract tbody').html("");
-                            var html = "";
+                            var htmlContract = "";
                             for(var i=0 ;i< dta.tbContract.length;i++) {
-                                html += "<tr>";
-                                html += "<th scope=\"row\">"+(i+1)+"</th>"
-                                html += "<td>"+dta.tbContract[i][0]+"</td>"
-                                html += "<td>"+formatNumber(dta.tbContract[i][4])+"</td>"
-                                html += "<td>"+formatNumber(dta.tbContract[i][5])+"</td>"
-                                html += "</tr>"
+                                htmlContract += "<tr>";
+                                htmlContract += "<th scope=\"row\">"+(i+1)+"</th>"
+                                htmlContract += "<td>"+dta.tbContract[i][0]+"</td>"
+                                htmlContract += "<td>"+formatNumber(dta.tbContract[i][4])+"</td>"
+                                htmlContract += "<td>"+formatNumber(dta.tbContract[i][5])+"</td>"
+                                htmlContract += "</tr>"
                             }
-                            $('#tbContract tbody').append(html);
+                            $('#tbContract tbody').append(htmlContract);
+                            //table top province
+                            $('#tbProvince tbody').html("");
+                            var htmlProvince = "";
+                            for(var i=0 ;i< dta.tbProvince.length;i++) {
+                                htmlProvince += "<tr>";
+                                htmlProvince += "<th scope=\"row\">"+(i+1)+"</th>"
+                                htmlProvince += "<td>"+formatNumber(dta.tbProvince[i][0])+"</td>"
+                                htmlProvince += "<td>"+formatNumber(dta.tbProvince[i][1])+"</td>"
+                                htmlProvince += "<td>"+formatNumber(dta.tbProvince[i][3])+"</td>"
+                                htmlProvince += "<td>"+formatNumber(dta.tbProvince[i][4])+"</td>"
+                                htmlProvince += "<td>"+formatNumber(dta.tbProvince[i][2])+"</td>"
+                                htmlProvince += "</tr>"
+                            }
+                            $('#tbProvince tbody').append(htmlProvince);
                         }
                     });
-                }, 5*1000);
+                }, 5000);
+            }
+
+            function animateValue(id, start, end, duration) {
+                // assumes integer values for start and end
+
+                var obj = document.getElementById(id);
+                var range = end - start;
+                // no timer shorter than 50ms (not really visible any way)
+                var minTimer = 50;
+                // calc step time to show all interediate values
+                var stepTime = Math.abs(Math.floor(duration / range));
+
+                // never go below minTimer
+                stepTime = Math.max(stepTime, minTimer);
+
+                // get current time and calculate desired end time
+                var startTime = new Date().getTime();
+                var endTime = startTime + duration;
+                var timer;
+
+                function run() {
+                    var now = new Date().getTime();
+                    var remaining = Math.max((endTime - now) / duration, 0);
+                    var value = Math.round(end - (remaining * range));
+                    obj.innerHTML = formatNumber(value);
+                    if (value == end) {
+                        clearInterval(timer);
+                    }
+
+                }
+
+                timer = setInterval(run, stepTime);
+                run();
             }
 
     </script>

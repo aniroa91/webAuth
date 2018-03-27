@@ -175,7 +175,7 @@ object HistoryService {
 
    def getRealtime(day: String): History = {
      val secondTime = CommonService.getpreviousMinutes(15)
-     println(secondTime)
+     //println(secondTime)
      val response = client.execute(
        search(s"radius-streaming-$day" / "load")
          query { must(rangeQuery("timestamp").gte(secondTime)) }
@@ -198,7 +198,23 @@ object HistoryService {
                sumAgg("download", "download"),
                sumAgg("upload", "upload"),
                sumAgg("duration", "sessionTime")
-             ) size 50
+             ) size 50,
+           termsAggregation("region")
+             .field("region")
+             .subAggregations(
+               sumAgg("download", "download"),
+               sumAgg("upload", "upload"),
+               sumAgg("duration", "sessionTime"),
+               cardinalityAgg("contract", "name")
+             ) size 20,
+           termsAggregation("province")
+             .field("province")
+             .subAggregations(
+               sumAgg("download", "download"),
+               sumAgg("upload", "upload"),
+               sumAgg("duration", "sessionTime"),
+               cardinalityAgg("contract", "name")
+             ) size 20
           )
      ).await
      val minutes = getAggregations(response.aggregations.get("minute"), true)
@@ -208,7 +224,13 @@ object HistoryService {
        .reverse.take(20)
      val numberOfContract = response.aggregations.get("numberOfcontract").get.asInstanceOf[Map[String, Integer]].get("value").get.toLong
      val numberOfSession = response.totalHits.toLong
-     History("realtime",numberOfContract,numberOfSession,new Hourly(minutes),null,null,null,contracts,null,null,null)
+     val regions = getAggregations(response.aggregations.get("region"), true)
+       .filter(x => Array("Vung 1", "Vung 2", "Vung 3", "Vung 4", "Vung 5", "Vung 6", "Vung 7").contains(x._1))
+     val provinces = getAggregations(response.aggregations.get("province"), true)
+       .filter(x => x._1 != "??")
+       .take(10)
+     //provinces.foreach(println)
+     History("realtime",numberOfContract,numberOfSession,new Hourly(minutes),null,null,null,contracts,provinces,regions,null)
   }
 
 val pointText = 60 * 2
