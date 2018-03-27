@@ -2,6 +2,7 @@
 
 @import _root_.profile.services.internet.Common.humanReadableByteCount
 @import _root_.profile.services.internet.Common.getTimeFrom
+@import _root_.profile.services.internet.Common.bytesToTerabytes
 
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatNumber
@@ -405,10 +406,27 @@
                             /*var x = (new Date()).getTime(), // current time
                                     y = Math.floor(Math.random() * 20000000);
                             if(x != series.data[series.data.length -1].x && y != series.data[series.data.length -1].y)*/
-                            for(var i=0;i<arrMinutes.length;i++) {
-                                series.addPoint([arrMinutes[i][0], arrMinutes[i][1]], true, true);
-                            }
+                            if (series.data[series.data.length - 1].x == arrMinutes[arrMinutes.length - 1][0])
+                            {
+                                console.log(series.data[series.data.length - 1].y + "-" + arrMinutes[arrMinutes.length - 1][1])
+                                series.data[series.data.length - 1].update({
+                                    x:arrMinutes[arrMinutes.length - 1][0],
+                                    y:arrMinutes[arrMinutes.length - 1][1]
+                                }); 
+                                //.y.update(arrMinutes[arrMinutes.length - 1][1])
+                            } else {
+                                series.data[series.data.length - 1].update({
+                                    x:arrMinutes[arrMinutes.length - 2][0],
+                                    y:arrMinutes[arrMinutes.length - 2][1]
+                                }); 
 
+                                //series.data[series.data.length - 1].y = arrMinutes[arrMinutes.length - 2][1]
+                                series.addPoint([arrMinutes[arrMinutes.length - 1][0], arrMinutes[arrMinutes.length - 1][1]], true, true);
+                            }
+                            // for(var i=0;i<arrMinutes.length;i++) {
+                            //     series.addPoint([arrMinutes[i][0], arrMinutes[i][1]], true, true);
+                            // }
+                            //series = arrMinutes
                             // set number text
                             $('#numCt').text(formatNumber(dta.numberOfContract));
                             $('#numSession').text(formatNumber(dta.numberOfSession));
@@ -422,6 +440,7 @@
                                 delay: 10,
                                 time: 1000
                             });
+                            
                             $('#sparkline1').sparkline(dta.session, {type: 'bar', barColor: '#3498DB'} );
 
                             $('#sparkline2').sparkline(dta.download, {type: 'bar', barColor: '#f1b53d'} );
@@ -441,7 +460,7 @@
                             $('#tbContract tbody').append(html);
                         }
                     });
-                }, 60*1000);
+                }, 5*1000);
             }
 
     </script>

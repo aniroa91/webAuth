@@ -65,6 +65,8 @@ GET     /internet/realtime-json         profile.controllers.internet.HistoryCont
 GET     /internet/compareCt       controllers.InternetHistoryController.compareContract
 GET     /internet/compareTime     profile.controllers.internet.CompareController.index
 
+GET     /internet/bras            profile.controllers.internet.BrasController.index
+GET     /internet/brasJson        profile.controllers.internet.BrasController.json
 
 ### ADD MORE FEATURE FOR SERVICE INTERNAL
 GET     /search/compare             controllers.CompareController.index(domains: String ?= "")

@@ -211,6 +211,103 @@ object HistoryService {
      History("realtime",numberOfContract,numberOfSession,new Hourly(minutes),null,null,null,contracts,null,null,null)
   }
 
+val pointText = 60 * 2
+def getBrasRealtime() = {
+     val secondTime = CommonService.getpreviousMinutes(pointText * 2)
+     val secondTime2 = CommonService.getpreviousMinutes(pointText)
+     //println(secondTime)
+     val response = client.execute(
+       search(s"monitor-radius-*" / "docs")
+         query { must(rangeQuery("date_time").gte(secondTime).lt(secondTime2)) }
+         aggregations (
+           dateHistogramAggregation("minute")
+             .field("date_time")
+             .interval(DateHistogramInterval.MINUTE)
+             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+             .subAggregations(
+               maxAgg("signin", "signIn"),
+               maxAgg("logoff", "logOff"),
+               avgAgg("au", "active_users"),
+               maxAgg("L_rate", "L_rate"),
+               maxAgg("S_rate", "S_rate")
+             )
+          )
+     ).await
+
+     
+    val result = response.aggregations.get("minute")
+      .getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        //val count = x.getOrElse("doc_count", 0L).toString().toLong
+        //val contract = if (hasContract) x.get("contract").get.asInstanceOf[Map[String, Integer]].get("value").get.toLong else 0L
+        //val download = x.get("download").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
+        //val upload = x.get("upload").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
+        val signin = x.get("signin").get.asInstanceOf[Map[String, Double]].get("value").get
+        val logoff = x.get("logoff").get.asInstanceOf[Map[String, Double]].get("value").get
+        val au = x.get("au").get.asInstanceOf[Map[String, Double]].get("value").get
+        val l = x.get("L_rate").get.asInstanceOf[Map[String, Double]].get("value").get
+        val s = x.get("S_rate").get.asInstanceOf[Map[String, Double]].get("value").get
+        //(key, signin / au, logoff/au)
+        (key, s, l)
+      }).toArray.map(x => x._1 -> x._3)
+  
+    //result.foreach(println)
+     //val minutes = getAggregations(response.aggregations.get("minute"), true)
+     //response.aggregations.get("minute").foreach(println)
+     result
+  }
+
+  def getBrasRealtime2(unit: Int) = {
+     val secondTime = CommonService.getpreviousMinutes(pointText + 4 - unit)
+     val secondTime2 = CommonService.getpreviousMinutes(pointText + 2 - unit)
+     println(secondTime)
+     val response = client.execute(
+       search(s"monitor-radius-*" / "docs")
+         query { must(rangeQuery("date_time").gte(secondTime).lt(secondTime2)) }
+         aggregations (
+           dateHistogramAggregation("minute")
+             .field("date_time")
+             .interval(DateHistogramInterval.MINUTE)
+             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+             .subAggregations(
+               maxAgg("signin", "signIn"),
+               maxAgg("logoff", "logOff"),
+               avgAgg("au", "active_users"),
+               maxAgg("L_rate", "L_rate"),
+               maxAgg("S_rate", "S_rate")
+             )
+          )
+     ).await
+
+     
+    val result = response.aggregations.get("minute")
+      .getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        //val count = x.getOrElse("doc_count", 0L).toString().toLong
+        //val contract = if (hasContract) x.get("contract").get.asInstanceOf[Map[String, Integer]].get("value").get.toLong else 0L
+        //val download = x.get("download").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
+        //val upload = x.get("upload").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
+        val signin = x.get("signin").get.asInstanceOf[Map[String, Double]].get("value").get
+        val logoff = x.get("logoff").get.asInstanceOf[Map[String, Double]].get("value").get
+        val au = x.get("au").get.asInstanceOf[Map[String, Double]].get("value").get
+        val l = x.get("L_rate").get.asInstanceOf[Map[String, Double]].get("value").get
+        val s = x.get("S_rate").get.asInstanceOf[Map[String, Double]].get("value").get
+        //(key, signin / au, logoff/au)
+        (key, s, l)
+      }).toArray.map(x => x._1 -> x._3)
+  
+    //result.foreach(println)
+     //val minutes = getAggregations(response.aggregations.get("minute"), true)
+     //response.aggregations.get("minute").foreach(println)
+     result
+  }
+
   private def get(esIndex: String, contract: String): History = {
     val req = search(esIndex / "docs") aggregations (
         cardinalityAgg("numberOfcontract", "name"),

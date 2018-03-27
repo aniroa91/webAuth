@@ -22,6 +22,7 @@ import com.ftel.bigdata.utils.StringUtil
 import profile.services.internet.response.History
 import profile.services.internet.response.Hourly
 import controllers.InternetContract
+import profile.services.internet.Common
 
 //case class InternetContract(tpTime: String,date: String,ct: String)
 
@@ -105,6 +106,7 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
 
   def realtimeJson() =  withAuth { username => implicit request =>
     val streaming = HistoryService.getRealtime(day)
+    streaming.hourly.contract.map(x=> x._1 -> x._2).foreach(println)
     val jsRealtime = Json.obj(
       "numberOfContract" -> streaming.numberOfContract,
       "numberOfSession" -> streaming.numberOfSession,
@@ -113,7 +115,7 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
       "download" -> streaming.hourly.download.map(x=> x._2),
       "upload" -> streaming.hourly.upload.map(x=> x._2),
       "sumSession" -> streaming.hourly.session.map(x=> x._2).sum,
-      "sumDown" -> streaming.hourly.download.map(x=> x._2).sum,
+      "sumDown" -> Common.bytesToTerabytes(streaming.hourly.download.map(x=> x._2).sum),
       "sumUp" -> streaming.hourly.upload.map(x=> x._2).sum,
       "tbContract" -> streaming.contracts
 
