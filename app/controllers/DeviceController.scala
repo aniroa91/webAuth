@@ -19,6 +19,8 @@ import scala.concurrent.duration.Duration
 import play.api.libs.json.Json
 import services.domain.CommonService
 import services.domain.CommonService.formatYYYYmmddHHmmss
+import scala.util.control.Breaks._
+
 
 
 /**
@@ -50,30 +52,82 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
 
   def search =  withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
-    //try {
+   // try {
       if (!formValidationResult.hasErrors) {
-        var day = formValidationResult.get.date.trim()
+        val time = formValidationResult.get.date.trim()
+        var day = ""
         val brasId = formValidationResult.get.bras.trim()
-        if (day == null || day == ""){
+        if (time == null || time == ""){
           day = CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay()
         }
+        else{ day =  time}
 
-        // OVERVIEW
-        val siginLogoff = Await.result(BrasService.getSigLogResponse(brasId,day), Duration.Inf)
-        val noOutlier = Await.result(BrasService.getNoOutlierResponse(brasId,day), Duration.Inf)
         val hourlyStr = CommonService.RANK_HOURLY
-        val opviewBytime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getOpviewBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._2)).map(x=> x._2.sum)
-        val kibanaBytime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getKibanaBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._2)).map(x=> x._2.sum)
+        var numOutlier = 0
+        var sigin = 0
+        var logoff = 0
+        val fromDay = day.split("/")(0)
+        var nextDay = CommonService.getNextDay(day.split("/")(1))
+        var linecardhost = new  Array[(String,String)](0)
+        var siginBytime = new Array[Int](0)
+        var logoffBytime = new Array[Int](0)
 
-        val siginBytime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getSigLogBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._2)).map(x=> x._2.sum)
-        val logoffBytime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getSigLogBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._3)).map(x=> x._2.sum)
+        /* GET ES CURRENT */
+        if(day.split("/")(1).equals(CommonService.getCurrentDay())){
+          nextDay = day.split("/")(1)
+          // number sigin and logoff
+          val sigLog = BrasService.getSigLogCurrent(brasId,CommonService.getCurrentDay())
+          sigin = sigLog._1
+          logoff = sigLog._2
+          // number outlier
+          numOutlier = BrasService.getNoOutlierCurrent(brasId,CommonService.getCurrentDay())
+          // line-card-port
+          val linecardCurrent = BrasService.getLinecardhostCurrent(brasId,CommonService.getCurrentDay())
+          linecardhost = linecardCurrent
+          // SIGNIN LOGOFF BY TIME
+          val rsLogsigBytime = BrasService.getSigLogBytimeCurrent(brasId,CommonService.getCurrentDay())
+          siginBytime = rsLogsigBytime.sumSig
+          logoffBytime = rsLogsigBytime.sumLog
+        }
+        val timeStart = System.currentTimeMillis()
+        /* GET HISTORY DATA */
+        if(!fromDay.equals(CommonService.getCurrentDay())) {
+          // number sigin and logoff
+          val siginLogoff = Await.result(BrasService.getSigLogResponse(brasId, fromDay, nextDay), Duration.Inf)
+          sigin = if (siginLogoff.length > 0) {
+            siginLogoff(0)._1 + sigin
+          } else sigin
+          logoff = if (siginLogoff.length > 0) {
+            siginLogoff(0)._2 + logoff
+          } else logoff
+          // number outlier
+          val noOutlier = Await.result(BrasService.getNoOutlierResponse(brasId, day), Duration.Inf)
+          numOutlier += noOutlier.sum.toInt
 
+          // LINECARD, CARD, PORT
+          val seqLinecard = Await.result(BrasService.getLinecardhostResponse(brasId,day), Duration.Inf)
+          val linecardhistory = seqLinecard.map(x=>x._1-> (x._2+"-"+x._3)).toArray
+          linecardhost = (linecardhost++linecardhistory).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toArray
+          // SIGNIN LOGOFF BY TIME
+          val rsSigtime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getSigLogBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._2)).map(x=> x._2.sum)
+          siginBytime = siginBytime.zipAll(rsSigtime,0,0).map { case (x, y) => x + y }
+          val rsLogtime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getSigLogBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._3)).map(x=> x._2.sum)
+          logoffBytime = logoffBytime.zipAll(rsLogtime,0,0).map { case (x, y) => x + y }
+        }
+        //val t1= System.currentTimeMillis()
+        // Nerror (kibana & opview) By Time
+        val arrOpsview = Await.result(BrasService.getOpviewBytimeResponse(brasId,day,0), Duration.Inf).toArray
+        val opviewBytime = (0 until 24).map(x => x -> getValueByKey(arrOpsview,x)).toArray
+        val arrKibana = Await.result(BrasService.getKibanaBytimeResponse(brasId,day,0), Duration.Inf).toArray
+        val kibanaBytime = (0 until 24).map(x => x -> getValueByKey(arrKibana,x)).toArray
+        //println("t1: "+(System.currentTimeMillis() - t1))
         // INF ERROR
-        val infErrorBytime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getInfErrorBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._2)).map(x=> x._1->x._2.sum)
+        val arrInferror = Await.result(BrasService.getInfErrorBytimeResponse(brasId,day,0), Duration.Inf).toArray
+        val infErrorBytime = (0 until 24).map(x => x -> getValueByKey(arrInferror,x)).toArray
         //val infErrorBytime = null
         // INF HOST
         val infHostBytime = Await.result(BrasService.getInfhostResponse(brasId,day), Duration.Inf).map(x=> x._1->(x._2->x._3))
-       // val infHostBytime = null
+        // val infHostBytime = null
         // INF MODULE
         val infModuleBytime = Await.result(BrasService.getInfModuleResponse(brasId,day), Duration.Inf)
         //val infModuleBytime = null
@@ -84,8 +138,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val opServByStt = Await.result(BrasService.getOpServByStatusResponse(brasId,day), Duration.Inf)
         val servName = opServByStt.map(x=> x._1).distinct
         val servStatus = opServByStt.map(x=> x._2).distinct
-        // LINECARD, CARD, PORT
-        val linecardhost = Await.result(BrasService.getLinecardhostResponse(brasId,day), Duration.Inf)
+
         // KIBANA Severity
         val kibanaSeverity = Await.result(BrasService.getErrorSeverityResponse(brasId,day), Duration.Inf)
         // KIBANA Error type
@@ -94,18 +147,29 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val kibanaFacility = Await.result(BrasService.getFacilityResponse(brasId,day), Duration.Inf)
         // KIBANA DDos
         val kibanaDdos = Await.result(BrasService.getDdosResponse(brasId,day), Duration.Inf)
+
         // KIBANA Severity value
         val severityValue = Await.result(BrasService.getSeveValueResponse(brasId,day), Duration.Inf)
-
-        Ok(views.html.device.search(form,username,BrasResponse(BrasInfor(noOutlier,siginLogoff),KibanaOpviewByTime(kibanaBytime,opviewBytime),SigLogByTime(siginBytime,logoffBytime),
+        println("timeAll: "+(System.currentTimeMillis() - timeStart))
+        Ok(views.html.device.search(form,username,BrasResponse(BrasInfor(numOutlier,(sigin,logoff)),KibanaOpviewByTime(kibanaBytime,opviewBytime),SigLogByTime(siginBytime,logoffBytime),
           infErrorBytime,infHostBytime,infModuleBytime,opServiceName,ServiceNameStatus(servName,servStatus,opServByStt),linecardhost,KibanaOverview(kibanaSeverity,kibanaErrorType,kibanaFacility,kibanaDdos,severityValue)), day,brasId))
       }
       else
         Ok(views.html.device.search(form,username,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null))
-    /*}
+   /* }
     catch{
       case e: Exception => Ok(views.html.device.search(form,username,null,CommonService.getCurrentDay(),null))
     }*/
+  }
+  def getValueByKey(arr: Array[(Int,Int)], key:Int):Int = {
+    var value = 0;
+    breakable{for(i <- 0 until arr.length){
+      if(arr(i)._1 == key) {
+        value = arr(i)._2
+        break
+      }
+    }}
+    return value;
   }
 
   def getHostJson(id: String) = Action { implicit request =>

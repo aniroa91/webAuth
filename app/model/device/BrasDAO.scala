@@ -7,39 +7,66 @@ import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.Future
 import slick.driver.JdbcProfile
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import slick.driver.PostgresDriver.api._
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import profile.services.internet.HistoryService.client
+import services.Configure
 import services.domain.CommonService
+import services.domain.CommonService.getAggregations
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
+import org.joda.time.DateTimeZone
+import com.ftel.bigdata.utils.DateTimeUtil
 
 object BrasDAO {
 
+  val client = Configure.client
+
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
-  def getSigLogResponse(bras: String,nowDay: String): Future[Seq[(Int,Int)]] = {
-    val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    val sumDay = CommonService.getRangeDay(nowDay).split(",").length
+  def getSigLogResponse(bras: String,fromDay: String,nextDay: String): Future[Seq[(Int,Int)]] = {
+    //val sumDay = CommonService.getRangeDay(nowDay).split(",").length
     dbConfig.db.run(
-      sql"""select sum(signin_total_count) / $sumDay,sum(logoff_total_count) / $sumDay
-            from bras_count
-            where bras_id=$bras and time >= $fromDay::TIMESTAMP and time < $nextDay::TIMESTAMP
+      sql"""select sum(signin),sum(logoff)
+            from dwh_conn_bras
+            where bras_id=$bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by bras_id
                   """
         .as[(Int,Int)])
   }
+  def getSigLogCurrent(bras: String, nowDay: String): (Int,Int) = {
+    val multiRs = client.execute(
+      multi(
+        search(s"radius-streaming-$nowDay" / "con")
+          query { must(termQuery("typeLog", "SignIn"),termQuery("nasName",bras.toLowerCase)) },
+        search(s"radius-streaming-$nowDay" / "con")
+          query { must(termQuery("typeLog", "LogOff"),termQuery("nasName",bras.toLowerCase)) }
+      )
+    ).await
+    val signin = multiRs.responses(0).totalHits.toInt
+    val logoff = multiRs.responses(0).totalHits.toInt
+    (signin,logoff)
+  }
 
   def getNoOutlierResponse(bras: String,nowDay: String): Future[Seq[(Int)]] = {
     val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    val sumDay = CommonService.getRangeDay(nowDay).split(",").length
+    val nextDay = nowDay.split("/")(1)
+   // val sumDay = CommonService.getRangeDay(nowDay).split(",").length
     dbConfig.db.run(
-      sql"""select count(*) / $sumDay
-            from dwh_radius_bras_detail
+      sql"""select count(*)
+            from dwh_conn_bras_detail
             where bras_id=$bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label = 'outlier'
             group by bras_id
                   """
         .as[(Int)])
+  }
+  def getNoOutlierCurrent(bras: String,nowDay: String) : Int = {
+    val response = client.execute(
+        search(s"monitor-radius-$nowDay" / "docs")
+          query { must(termQuery("bras_id", bras),termQuery("label","outlier")) }
+    ).await
+    response.totalHits.toInt
   }
 
   def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int): Future[Seq[(Int,Int)]] = {
@@ -50,7 +77,7 @@ object BrasDAO {
             from dwh_opsview
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by bras_id,extract(hour from  date_time)
-            having extract(hour from  date_time) = $hourly
+            order by hourly
                   """
         .as[(Int,Int)])
   }
@@ -63,7 +90,7 @@ object BrasDAO {
             from dwh_kibana
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by bras_id,extract(hour from  date_time)
-            having extract(hour from  date_time) = $hourly
+            order by hourly
                   """
         .as[(Int,Int)])
   }
@@ -72,13 +99,48 @@ object BrasDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select extract(hour from  time) as hourly, sum(signin_total_count),sum(logoff_total_count)
-            from bras_count
-            where bras_id= $bras and time >= $fromDay::TIMESTAMP and time < $nextDay::TIMESTAMP
-            group by bras_id,extract(hour from  time)
-            having extract(hour from  time) = $hourly
+      sql"""select extract(hour from  date_time) as hourly, sum(signin),sum(logoff)
+            from dwh_conn_bras
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by bras_id,extract(hour from  date_time)
+            having extract(hour from  date_time) = $hourly
                   """
         .as[(Int,Int,Int)])
+  }
+  def getSigLogBytimeCurrent(bras: String, nowDay: String): SigLogByTime = {
+    val mulRes = client.execute(
+      multi(
+        search(s"radius-streaming-$nowDay" / "con")
+          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn")) }
+          aggregations (
+            dateHistogramAggregation("hourly")
+            .field("timestamp")
+            .interval(DateHistogramInterval.HOUR)
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          ),
+        search(s"radius-streaming-$nowDay" / "con")
+          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff")) }
+          aggregations (
+          dateHistogramAggregation("hourly")
+            .field("timestamp")
+            .interval(DateHistogramInterval.HOUR)
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          )
+      )
+    ).await
+/*    println(client.show(
+      search(s"radius-streaming-$nowDay" / "con")
+        query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn")) }
+        aggregations (
+        dateHistogramAggregation("hourly")
+          .field("timestamp")
+          .interval(DateHistogramInterval.HOUR)
+          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+        )
+    ))*/
+    val arrSigin = CommonService.getAggregationsSiglog(mulRes.responses(0).aggregations.get("hourly"), true).map(x=>x._2.toInt)
+    val arrLogoff = CommonService.getAggregationsSiglog(mulRes.responses(1).aggregations.get("hourly"), true).map(x=>x._2.toInt)
+    SigLogByTime(arrSigin,arrLogoff)
   }
 
   def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly:Int): Future[Seq[(Int,Int)]] = {
@@ -89,7 +151,7 @@ object BrasDAO {
             from dwh_inf_host
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by bras_id,extract(hour from  date_time)
-            having extract(hour from  date_time) = $hourly
+            order by hourly
                   """
         .as[(Int,Int)])
   }
@@ -155,13 +217,62 @@ object BrasDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select line_ol || '-' || card_ol || '-' || port_ol as linecard_card_port,sum(signin_total_count_by_port) as signin,
-            sum(logoff_total_count_by_port) as logoff
-            from bras_count_by_port
-            where bras_id= $bras and time >= $fromDay::TIMESTAMP and time < $nextDay::TIMESTAMP
-            group by line_ol, card_ol, port_ol
+      sql"""select linecard || '_' || card || '_' || port as linecard_card_port,sum(signin) as signin,
+            sum(logoff) as logoff
+            from dwh_conn_port
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by linecard, card, port
                   """
         .as[(String,Int,Int)])
+  }
+  def getLinecardhostCurrent(bras: String,nowDay: String): Array[(String,String)] = {
+    val multiRs = client.execute(
+      multi(
+       search(s"radius-streaming-$nowDay" / "con")
+        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn")) }
+        aggregations (
+        termsAggregation("linecard")
+          .field("card.lineId")
+          .subAggregations(
+            termsAggregation("card")
+              .field("card.id")
+              .subAggregations(
+                termsAggregation("port")
+                  .field("card.port")
+              )
+          )
+        ),
+        search(s"radius-streaming-$nowDay" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff")) }
+          aggregations (
+          termsAggregation("linecard")
+            .field("card.lineId")
+            .subAggregations(
+              termsAggregation("card")
+                .field("card.id")
+                .subAggregations(
+                  termsAggregation("port")
+                    .field("card.port")
+                )
+            )
+          )
+      )
+    ).await
+
+    val mapSigin = CommonService.getMultiAggregations(multiRs.responses(0).aggregations.get("linecard"))
+    val mapLogoff = CommonService.getMultiAggregations(multiRs.responses(1).aggregations.get("linecard"))
+
+    val arrSigin =  mapSigin.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 + "_" + x._2._1) -> x._2._2)
+      .flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 + "_" + x._2._1) -> x._2._2)
+
+    val arrLogoff = mapLogoff.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 + "_" + x._2._1) -> x._2._2)
+      .flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 + "_" + x._2._1) -> x._2._2)
+
+    (arrSigin++arrLogoff).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("-")}.toArray
   }
 
   def getErrorSeverityResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {

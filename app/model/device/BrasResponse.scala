@@ -1,13 +1,13 @@
 package model.device
 
 case class BrasInfor(
-                    noOutlier: Seq[(Int)],
-                    siginLogoff: Seq[(Int,Int)]
+                    noOutlier: Int,
+                    siginLogoff:(Int,Int)
                     )
 
 case class KibanaOpviewByTime(
-                       countK: Array[Int],
-                       countOp: Array[Int]
+                       countK: Array[(Int,Int)],
+                       countOp: Array[(Int,Int)]
                        )
 
 case class SigLogByTime(
@@ -33,11 +33,11 @@ case class BrasResponse(
                             currentsInfo: BrasInfor,
                             kibanaOpviewBytime: KibanaOpviewByTime,
                             sigLogBytime: SigLogByTime,
-                            infErrorBytime: Array[(String,Int)],
+                            infErrorBytime: Array[(Int,Int)],
                             infHostBytime: Seq[(String,(Int,Int))],
                             infModuleBytime: Seq[(String,String,Int,Int,Int)],
                             opServiceStt: Seq[(String,Int)],
                             servNameStt: ServiceNameStatus,
-                            linecardhost: Seq[(String,Int,Int)],
+                            linecardhost: Array[(String,String)],
                             kibanaOverview: KibanaOverview
                        )

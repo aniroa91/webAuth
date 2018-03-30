@@ -1,17 +1,24 @@
 package service
 
-import model.device.{Bras, BrasList,BrasesCard,BrasDAO}
+import model.device._
+
 import scala.concurrent.Future
 
 object BrasService {
 
   // for page Search Bras
-  def getSigLogResponse(bras: String,nowDay: String):Future[Seq[(Int,Int)]] = {
-    BrasDAO.getSigLogResponse(bras,nowDay)
+  def getSigLogResponse(bras: String,fromDay: String,nextDay: String):Future[Seq[(Int,Int)]] = {
+    BrasDAO.getSigLogResponse(bras,fromDay,nextDay)
+  }
+  def getSigLogCurrent(bras: String,nowDay: String):(Int,Int) = {
+    BrasDAO.getSigLogCurrent(bras,nowDay)
   }
 
   def getNoOutlierResponse(bras: String,nowDay: String):Future[Seq[(Int)]] = {
     BrasDAO.getNoOutlierResponse(bras,nowDay)
+  }
+  def getNoOutlierCurrent(bras: String,nowDay: String): Int = {
+    BrasDAO.getNoOutlierCurrent(bras,nowDay)
   }
 
   def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
@@ -24,6 +31,9 @@ object BrasService {
 
   def getSigLogBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int,Int)]] = {
     BrasDAO.getSigLogBytimeResponse(bras,nowDay,hourly)
+  }
+  def getSigLogBytimeCurrent(bras: String,nowDay: String): SigLogByTime = {
+    BrasDAO.getSigLogBytimeCurrent(bras,nowDay)
   }
 
   def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
@@ -48,6 +58,9 @@ object BrasService {
 
   def getLinecardhostResponse(bras: String,nowDay: String):Future[Seq[(String,Int,Int)]] = {
     BrasDAO.getLinecardhostResponse(bras,nowDay)
+  }
+  def getLinecardhostCurrent(bras: String,nowDay: String): Array[(String,String)]= {
+    BrasDAO.getLinecardhostCurrent(bras,nowDay)
   }
 
   def getErrorSeverityResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {

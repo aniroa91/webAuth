@@ -88,6 +88,44 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def getAggregationsSiglog(aggr: Option[AnyRef], hasContract: Boolean): Array[(String, Long)] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val count = x.getOrElse("doc_count", 0L).toString().toLong
+        (key, count)
+      })
+      .toArray
+  }
+
+  def getMultiAggregations(aggr: Option[AnyRef]):  Array[(String, Array[(String, Array[(String, Long)])])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse("card",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+           .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+             .map(x => x.asInstanceOf[Map[String,AnyRef]])
+               .map(x => {
+                 val keyCard = x.getOrElse("key","0L").toString
+                 val map = x.getOrElse("port",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+                             .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+                               .map(x=> x.asInstanceOf[Map[String,AnyRef]])
+                                  .map(x=> {
+                                    val keyPort = x.getOrElse("key","0L").toString
+                                    val count = x.getOrElse("doc_count",0L).toString.toLong
+                                    (keyPort,count)
+                                  }).toArray
+                 (keyCard,map)
+               }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
   def getPreviousDay(day: String, num: Int): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(num).toString(DateTimeUtil.YMD)

@@ -66,33 +66,21 @@
                 <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="tile-stats" style="background-color: #64b0f2;
                         display: inherit">
-                        @if(response.currentsInfo.noOutlier != null){
-                            <div class="count ">@formatPattern(response.currentsInfo.noOutlier.sum)</div>
-                        } else {
-                            <div class="count ">0</div>
-                        }
+                        <div class="count ">@formatPattern(response.currentsInfo.noOutlier)</div>
                         <div class="titLb">No Outlier of Bras</div>
                     </div>
                 </div>
                 <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="tile-stats" style="background-color: #f1b53d;
                         display: inherit">
-                        @if(response.currentsInfo.siginLogoff.length >0){
-                            <div class="count ">@formatPattern(response.currentsInfo.siginLogoff(0)._1)</div>
-                        } else {
-                            <div class="count ">0</div>
-                        }
+                        <div class="count ">@formatPattern(response.currentsInfo.siginLogoff._1)</div>
                         <div class="titLb">Signin</div>
                     </div>
                 </div>
                 <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12" >
                     <div class="tile-stats" style="display: inherit;
                         background-color: #3db9dc">
-                        @if(response.currentsInfo.siginLogoff.length >0){
-                            <div class="count ">@formatPattern(response.currentsInfo.siginLogoff(0)._2)</div>
-                        } else {
-                            <div class="count ">0</div>
-                        }
+                        <div class="count ">@formatPattern(response.currentsInfo.siginLogoff._2)</div>
                         <div class="titLb">Logoff</div>
                     </div>
                 </div>
@@ -283,7 +271,7 @@
                                         Nerror by service and status
                                         <div class="clearfix"></div>
                                     </div>
-                                    <div class="x_content" style="height: 305px">
+                                    <div class="x_content" style="height: 305px;overflow: auto">
                                         <table class="data table table-bordered tbScroll" id="tbOpview" style="width: 100%">
                                             <thead>
                                                 <tr>
@@ -485,8 +473,8 @@
                     maxDate: moment(),
                     minDate: moment().subtract(30,'days'),
                     ranges: {
+                        'Today': [moment(), moment()],
                         'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                         'This Month': [moment().startOf('month'), moment().endOf('month')],
                         'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                     }
@@ -618,7 +606,7 @@
 
                         tooltip: {
                             useHTML: true,
-                            headerFormat: '<table>',
+                            headerFormat: '<table><th>Line-card-port: </th><td>{series.name}</td></tr>',
                             pointFormat:
                             '<tr><th>Signin:</th><td>{point.x}</td></tr>' +
                             '<tr><th>Logoff:</th><td>{point.y}</td></tr>',
@@ -1158,8 +1146,18 @@
                     '#ffff00'];
                 var jsonArr = [];
                 for(var i=0;i<dta.length;i++){
+                    var sigin=0,logoff=0;
+                    if(dta[i][1].indexOf("_")>=0){
+                        var arrLogSig = dta[i][1].split("_")
+                        sigin = Number(arrLogSig[0].split("-")[0])+Number(arrLogSig[1].split("-")[0])
+                        logoff = Number(arrLogSig[0].split("-")[1])+Number(arrLogSig[1].split("-")[1])
+                    }
+                    else{
+                        sigin = Number(dta[i][1].split("-")[0])
+                        logoff = Number(dta[i][1].split("-")[1])
+                    }
                     jsonArr.push({
-                       data: [{"x":dta[i][1],"y":dta[i][2]}],
+                       data: [{"x":sigin,"y":logoff}],
                        name: dta[i][0],
                        marker: {
                             fillColor: {
