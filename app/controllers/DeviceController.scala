@@ -114,19 +114,21 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
           val rsLogtime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getSigLogBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._3)).map(x=> x._2.sum)
           logoffBytime = logoffBytime.zipAll(rsLogtime,0,0).map { case (x, y) => x + y }
         }
-        //val t1= System.currentTimeMillis()
+       // val t1= System.currentTimeMillis()
         // Nerror (kibana & opview) By Time
         val arrOpsview = Await.result(BrasService.getOpviewBytimeResponse(brasId,day,0), Duration.Inf).toArray
         val opviewBytime = (0 until 24).map(x => x -> getValueByKey(arrOpsview,x)).toArray
         val arrKibana = Await.result(BrasService.getKibanaBytimeResponse(brasId,day,0), Duration.Inf).toArray
         val kibanaBytime = (0 until 24).map(x => x -> getValueByKey(arrKibana,x)).toArray
-        //println("t1: "+(System.currentTimeMillis() - t1))
+       // println("t1: "+(System.currentTimeMillis() - t1))
         // INF ERROR
+       // val t2= System.currentTimeMillis()
         val arrInferror = Await.result(BrasService.getInfErrorBytimeResponse(brasId,day,0), Duration.Inf).toArray
         val infErrorBytime = (0 until 24).map(x => x -> getValueByKey(arrInferror,x)).toArray
         //val infErrorBytime = null
         // INF HOST
         val infHostBytime = Await.result(BrasService.getInfhostResponse(brasId,day), Duration.Inf).map(x=> x._1->(x._2->x._3))
+        //println("t2: "+(System.currentTimeMillis() - t2))
         // val infHostBytime = null
         // INF MODULE
         val infModuleBytime = Await.result(BrasService.getInfModuleResponse(brasId,day), Duration.Inf)

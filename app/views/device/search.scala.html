@@ -542,6 +542,10 @@
                 // Tree map status
                 @if( response.opServiceStt != null){
                     Highcharts.chart('tree-map', {
+                        colorAxis: {
+                            minColor: '#FFFFFF',
+                            maxColor: Highcharts.getOptions().colors[8]
+                        },
                         series: [{
                             type: "treemap",
                             layoutAlgorithm: 'strip',
@@ -1108,7 +1112,8 @@
                 for (var i = 0; i < appHour.length; i++) {
                     jsonArr.push({
                         name: appHour[i][0],
-                        value: Number(appHour[i][1])
+                        value: Number(appHour[i][1]),
+                        colorValue: Number(appHour[i][1]),
                     });
                 }
                 return jsonArr
