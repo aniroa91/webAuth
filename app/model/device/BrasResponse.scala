@@ -10,6 +10,12 @@ case class KibanaOpviewByTime(
                        countOp: Array[(Int,Int)]
                        )
 
+case class SigLogByHost(
+                         arrCates: Array[String],
+                         sumSig: Array[Int],
+                         sumLog: Array[Int]
+                       )
+
 case class SigLogByTime(
                          sumSig: Array[Int],
                          sumLog: Array[Int]
@@ -39,5 +45,6 @@ case class BrasResponse(
                             opServiceStt: Seq[(String,Int)],
                             servNameStt: ServiceNameStatus,
                             linecardhost: Array[(String,String)],
-                            kibanaOverview: KibanaOverview
+                            kibanaOverview: KibanaOverview,
+                            siglogByhost: SigLogByHost
                        )

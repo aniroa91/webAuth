@@ -6,6 +6,9 @@ import scala.concurrent.Future
 
 object BrasService {
 
+  def getSigLogByHost(bras: String,day: String): SigLogByHost ={
+    BrasDAO.getSigLogByHost(bras,day)
+  }
   // for page Search Bras
   def getSigLogResponse(bras: String,fromDay: String,nextDay: String):Future[Seq[(Int,Int)]] = {
     BrasDAO.getSigLogResponse(bras,fromDay,nextDay)

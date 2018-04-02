@@ -8,6 +8,7 @@ import org.elasticsearch.search.sort.SortOrder
 import org.joda.time.{DateTime, Days}
 
 import scala.collection.mutable
+import scala.util.control.Breaks.{break, breakable}
 
 //import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.DateTimeUtil
@@ -46,6 +47,28 @@ object CommonService extends AbstractService {
   /**
    * Service for Get Information about day
    */
+
+  def getLongValueByKey(arr: Array[(String,Long)], key:String):Int = {
+    var value = 0;
+    breakable{for(i <- 0 until arr.length){
+      if(arr(i)._1 == key) {
+        value = arr(i)._2.toInt
+        break
+      }
+    }}
+    return value;
+  }
+  def getIntValueByKey(arr: Array[(Int,Int)], key:Int):Int = {
+    var value = 0;
+    breakable{for(i <- 0 until arr.length){
+      if(arr(i)._1 == key) {
+        value = arr(i)._2
+        break
+      }
+    }}
+    return value;
+  }
+
   def getLatestDay(): String = {
     val response = client.execute(
       search("dns-marker" / "docs") sortBy { fieldSort("day") order SortOrder.DESC } limit 1).await(Duration(30, SECONDS))
@@ -88,7 +111,7 @@ object CommonService extends AbstractService {
       .toArray
   }
 
-  def getAggregationsSiglog(aggr: Option[AnyRef], hasContract: Boolean): Array[(String, Long)] = {
+  def getAggregationsSiglog(aggr: Option[AnyRef]): Array[(String, Long)] = {
     aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
       .map(x => x.asInstanceOf[Map[String, AnyRef]])

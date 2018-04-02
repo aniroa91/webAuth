@@ -946,72 +946,74 @@
                             }]
                     });
                 }
-                // line Sigin and logoff by host
-                Highcharts.chart('line-host', {
-                    chart: {
-                        zoomType: 'xy'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    subtitle: {
-                        text: ''
-                    },
-                    xAxis: [{
-                        categories: ['HCM-01', 'DNG-01', 'HCM-02', 'BBC-04', 'NTN-02'],
-                        crosshair: true,
-                        title: {
-                            text: '',
-                        }
-                    }],
-                    yAxis: [{ // Primary yAxis
-                        labels: {
-                            format: '{value}',
-                            style: {
-                                color: "#1ABB9C"
-                            }
+                @if(response.siglogByhost != null){
+                    // line Sigin and logoff by host
+                    Highcharts.chart('line-host', {
+                        chart: {
+                            zoomType: 'xy'
                         },
                         title: {
-                            //text: 'Size (MB)',
-                            style: {
-                                color: "#1ABB9C"
-                            }
-                        }
-                    }, { // Secondary yAxis
-                        title: {
-                            //text: 'Duration (hours)',
-                            style: {
-                                color: "#9B59B6"
-                            }
+                            text: ''
                         },
-                        labels: {
-                            format: '{value}',
-                            style: {
-                                color: "#9B59B6"
-                            }
+                        subtitle: {
+                            text: ''
                         },
-                        opposite: true
-                    }],
-                    tooltip: {
-                        shared: true
-                    },
+                        xAxis: [{
+                            categories: @Html(Json.stringify(Json.toJson(response.siglogByhost.arrCates))),
+                            crosshair: true,
+                            title: {
+                                text: '',
+                            }
+                        }],
+                        yAxis: [{ // Primary yAxis
+                            labels: {
+                                format: '{value}',
+                                style: {
+                                    color: "#1ABB9C"
+                                }
+                            },
+                            title: {
+                                //text: 'Size (MB)',
+                                style: {
+                                    color: "#1ABB9C"
+                                }
+                            }
+                        }, { // Secondary yAxis
+                            title: {
+                                //text: 'Duration (hours)',
+                                style: {
+                                    color: "#9B59B6"
+                                }
+                            },
+                            labels: {
+                                format: '{value}',
+                                style: {
+                                    color: "#9B59B6"
+                                }
+                            },
+                            opposite: true
+                        }],
+                        tooltip: {
+                            shared: true
+                        },
 
-                    series: [
-                        {
-                            type: 'column',
-                            name: 'Sigin',
-                            yAxis: 0,
-                            color: "#1ABB9C",
-                            data: [21, 22, 11, 55, 77]
-                        }, {
-                            name: 'Logoff',
-                            type: 'spline',
-                            yAxis: 1,
-                            color: "#9B59B6",
-                            data: [111, 192, 45, 222, 44]
+                        series: [
+                            {
+                                type: 'column',
+                                name: 'Sigin',
+                                yAxis: 0,
+                                color: "#1ABB9C",
+                                data: @Html(Json.stringify(Json.toJson(response.siglogByhost.sumSig)))
+                            }, {
+                                name: 'Logoff',
+                                type: 'spline',
+                                yAxis: 1,
+                                color: "#9B59B6",
+                                data: @Html(Json.stringify(Json.toJson(response.siglogByhost.sumLog)))
 
-                        }]
-                });
+                            }]
+                    });
+                }
                 @if(response.infErrorBytime != null){
                     // heat map inf nerror
                     Highcharts.chart('heat_map', {

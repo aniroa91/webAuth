@@ -117,14 +117,14 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
        // val t1= System.currentTimeMillis()
         // Nerror (kibana & opview) By Time
         val arrOpsview = Await.result(BrasService.getOpviewBytimeResponse(brasId,day,0), Duration.Inf).toArray
-        val opviewBytime = (0 until 24).map(x => x -> getValueByKey(arrOpsview,x)).toArray
+        val opviewBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrOpsview,x)).toArray
         val arrKibana = Await.result(BrasService.getKibanaBytimeResponse(brasId,day,0), Duration.Inf).toArray
-        val kibanaBytime = (0 until 24).map(x => x -> getValueByKey(arrKibana,x)).toArray
+        val kibanaBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana,x)).toArray
        // println("t1: "+(System.currentTimeMillis() - t1))
         // INF ERROR
        // val t2= System.currentTimeMillis()
         val arrInferror = Await.result(BrasService.getInfErrorBytimeResponse(brasId,day,0), Duration.Inf).toArray
-        val infErrorBytime = (0 until 24).map(x => x -> getValueByKey(arrInferror,x)).toArray
+        val infErrorBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrInferror,x)).toArray
         //val infErrorBytime = null
         // INF HOST
         val infHostBytime = Await.result(BrasService.getInfhostResponse(brasId,day), Duration.Inf).map(x=> x._1->(x._2->x._3))
@@ -152,9 +152,11 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
 
         // KIBANA Severity value
         val severityValue = Await.result(BrasService.getSeveValueResponse(brasId,day), Duration.Inf)
+        // SIGNIN LOGOFF BY HOST
+        val siglogByhost =  BrasService.getSigLogByHost(brasId,day)
         println("timeAll: "+(System.currentTimeMillis() - timeStart))
         Ok(views.html.device.search(form,username,BrasResponse(BrasInfor(numOutlier,(sigin,logoff)),KibanaOpviewByTime(kibanaBytime,opviewBytime),SigLogByTime(siginBytime,logoffBytime),
-          infErrorBytime,infHostBytime,infModuleBytime,opServiceName,ServiceNameStatus(servName,servStatus,opServByStt),linecardhost,KibanaOverview(kibanaSeverity,kibanaErrorType,kibanaFacility,kibanaDdos,severityValue)), day,brasId))
+          infErrorBytime,infHostBytime,infModuleBytime,opServiceName,ServiceNameStatus(servName,servStatus,opServByStt),linecardhost,KibanaOverview(kibanaSeverity,kibanaErrorType,kibanaFacility,kibanaDdos,severityValue),siglogByhost), day,brasId))
       }
       else
         Ok(views.html.device.search(form,username,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null))
@@ -163,16 +165,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       case e: Exception => Ok(views.html.device.search(form,username,null,CommonService.getCurrentDay(),null))
     }*/
   }
-  def getValueByKey(arr: Array[(Int,Int)], key:Int):Int = {
-    var value = 0;
-    breakable{for(i <- 0 until arr.length){
-      if(arr(i)._1 == key) {
-        value = arr(i)._2
-        break
-      }
-    }}
-    return value;
-  }
+
 
   def getHostJson(id: String) = Action { implicit request =>
     try{

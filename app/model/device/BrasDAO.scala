@@ -138,8 +138,8 @@ object BrasDAO {
           .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
         )
     ))*/
-    val arrSigin = CommonService.getAggregationsSiglog(mulRes.responses(0).aggregations.get("hourly"), true).map(x=>x._2.toInt)
-    val arrLogoff = CommonService.getAggregationsSiglog(mulRes.responses(1).aggregations.get("hourly"), true).map(x=>x._2.toInt)
+    val arrSigin = CommonService.getAggregationsSiglog(mulRes.responses(0).aggregations.get("hourly")).map(x=>x._2.toInt)
+    val arrLogoff = CommonService.getAggregationsSiglog(mulRes.responses(1).aggregations.get("hourly")).map(x=>x._2.toInt)
     SigLogByTime(arrSigin,arrLogoff)
   }
 
@@ -329,4 +329,39 @@ object BrasDAO {
                   """
         .as[(String,Int)])
   }
+
+  def getSigLogByHost(bras: String,nowDay: String): SigLogByHost = {
+    val arrDay = CommonService.getRangeDay(nowDay).split(",")
+    var streamingIndex = s"radius-streaming-"+arrDay(0)
+    for(i <- 1 until arrDay.length) {
+      streamingIndex += s",radius-streaming-"+arrDay(i)
+    }
+    val multiRs = client.execute(
+      multi(
+        search(s"$streamingIndex" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn")) }
+          aggregations (
+          termsAggregation("olt")
+            .field("card.olt")
+          ),
+        search(s"$streamingIndex" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff")) }
+          aggregations (
+          termsAggregation("olt")
+            .field("card.olt")
+          )
+      )
+    ).await
+    if(multiRs.responses(0).hits != null && multiRs.responses(1) != null) {
+      val arrSigin = CommonService.getAggregationsSiglog(multiRs.responses(0).aggregations.get("olt"))
+      val arrLogoff = CommonService.getAggregationsSiglog(multiRs.responses(1).aggregations.get("olt"))
+      //val rs = (arrSigin++arrLogoff).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("-")}.filter(x=> x._1 != "").filter(x=> x._1 != "N/A").toArray
+      val cates = (arrSigin ++ arrLogoff).groupBy(_._1).filter(x => x._1 != "").filter(x => x._1 != "N/A").map(x => x._1).toArray
+      val sigByHost = cates.map(x => CommonService.getLongValueByKey(arrSigin, x))
+      val logByHost = cates.map(x => CommonService.getLongValueByKey(arrLogoff, x))
+      SigLogByHost(cates, sigByHost, logByHost)
+    }
+    else null
+  }
+
 }
