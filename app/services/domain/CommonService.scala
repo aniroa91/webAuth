@@ -149,6 +149,25 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def getSecondAggregations(aggr: Option[AnyRef]):  Array[(String, Array[(String, Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse("card",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val keyCard = x.getOrElse("key","0L").toString
+            val count = x.getOrElse("doc_count",0L).toString.toLong
+            (keyCard,count)
+          }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
   def getPreviousDay(day: String, num: Int): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(num).toString(DateTimeUtil.YMD)
@@ -450,6 +469,20 @@ object CommonService extends AbstractService {
     val formatter = DateTimeFormat.forPattern("yyyy-mm-dd")
     val dateTime = DateTime.parse(date, formatter)
     dateTime.toString(DateTimeFormat.forPattern("dd/mm/yyyy"))
+  }
+
+  def formatUTC(date: String): String = {
+    val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    val formatter = DateTimeFormat.forPattern(ES_5_DATETIME_FORMAT)
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+  }
+
+  def formatStringToUTC(date: String): String = {
+    val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.toString(DateTimeFormat.forPattern(ES_5_DATETIME_FORMAT))
   }
 
   def formatYYYYmmddHHmmss( date : String) : String = {

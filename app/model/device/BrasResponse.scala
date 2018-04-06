@@ -34,6 +34,12 @@ case class KibanaOverview(
                               arrDdos: Seq[(String,Int)],
                               arrSevValue: Seq[(String,Int)]
                             )
+case class BrasOutlier(
+                      time: String,
+                      brasId: String,
+                      signin: Int,
+                      logOff: Int
+                      )
 
 case class BrasResponse(
                             currentsInfo: BrasInfor,

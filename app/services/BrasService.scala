@@ -1,10 +1,121 @@
 package service
 
 import model.device._
-
+import services.domain.{AbstractService, CommonService}
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import scala.concurrent.Future
+import org.elasticsearch.search.sort.SortOrder
+import services.domain.CommonService.formatUTC
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.joda.time.format.DateTimeFormat
 
-object BrasService {
+object BrasService extends AbstractService{
+
+  def getBrasOutlierCurrent(day: String):Array[BrasOutlier]  ={
+    val response = client.execute(
+      search(s"monitor-radius-$day" / "docs")
+        query { must(termQuery("label","outlier")) }
+        sortBy { fieldSort("date_time") order SortOrder.DESC } size 100
+    ).await
+    val brasOutlier = response.hits.hits.map(x => x.sourceAsMap)
+      .map(x => BrasOutlier(
+        getValueAsString(x, "date_time"),
+        getValueAsString(x, "bras_id"),
+        getValueAsInt(x,"signIn"),
+        getValueAsInt(x,"logOff")
+       )
+      )
+    brasOutlier.asInstanceOf[Array[BrasOutlier]]
+  }
+
+  def getBrasOutlierJson(day: String): Array[(String,String,Int,Int)] ={
+    val response = client.execute(
+      search(s"monitor-radius-$day" / "docs")
+        query { must(termQuery("label","outlier")) }
+        sortBy { fieldSort("date_time") order SortOrder.DESC } size 100
+    ).await
+    val brasOutlier = response.hits.hits.map(x => x.sourceAsMap)
+      .map(x =>
+        ( getValueAsString(x, "bras_id"),
+          formatUTC(getValueAsString(x, "date_time")),
+          getValueAsInt(x,"signIn"),
+        getValueAsInt(x,"logOff"))
+      )
+    brasOutlier
+  }
+
+  def getJsonBrasCard(bras: String,time: String) = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldHalfHour  = dateTime.minusHours(14).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val afterHalfHour  = dateTime.plusHours(4).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val multiRs = client.execute(
+      multi(
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
+          aggregations (
+          termsAggregation("linecard")
+            .field("card.lineId")
+            .subAggregations(
+              termsAggregation("card")
+                .field("card.id")
+            )
+          ),
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) }
+          aggregations (
+          termsAggregation("linecard")
+            .field("card.lineId")
+            .subAggregations(
+              termsAggregation("card")
+                .field("card.id")
+            )
+          )
+      )
+    ).await
+/*     println(client.show(search(s"radius-streaming-*" / "con")
+      query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) }
+      aggregations (
+      termsAggregation("linecard")
+        .field("card.lineId")
+        .subAggregations(
+          termsAggregation("card")
+            .field("card.id") size 20
+        )
+      ) size 20 ))*/
+    val mapSigin = CommonService.getSecondAggregations(multiRs.responses(0).aggregations.get("linecard"))
+    val mapLogoff = CommonService.getSecondAggregations(multiRs.responses(1).aggregations.get("linecard"))
+    mapSigin.foreach(println)
+    println("===========")
+    mapSigin.foreach(println)
+    println("===========")
+    val arrSigin =  mapSigin.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 -> x._2._1) -> x._2._2)
+    val arrLogoff =  mapLogoff.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 -> x._2._1) -> x._2._2)
+    (arrSigin++arrLogoff).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("-")}.toArray
+  }
+
+  def getJsonESBrasChart(bras: String,time: String):Array[(String,Int,Int,Int)] = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val afterHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val response = client.execute(
+      search(s"monitor-radius-*" / "docs")
+        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
+        sortBy { fieldSort("date_time") order SortOrder.DESC }
+    ).await
+    val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
+      .map(x=>(
+        getValueAsString(x,"date_time"),
+        getValueAsInt(x,"logOff"),
+        getValueAsInt(x,"signIn"),
+        getValueAsInt(x,"active_users")
+      ))
+    jsonRs
+  }
 
   def getSigLogByHost(bras: String,day: String): SigLogByHost ={
     BrasDAO.getSigLogByHost(bras,day)

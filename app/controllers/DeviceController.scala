@@ -49,10 +49,27 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       case e: Exception => Ok(views.html.device.index(username,null))
     }
   }
-
+  def dashboard =  withAuth { username => implicit request =>
+    //try {
+      // get data for map chart
+      val mapNoc = Await.result(BrasService.listNocOutlier, Duration.Inf)
+      val mapBrasOutlier = BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay())
+      Ok(views.html.device.dashboard(username,mapNoc,mapBrasOutlier))
+   /* }
+    catch{
+      case e: Exception => Ok(views.html.device.dashboard(username,null,null))
+    }*/
+  }
+  def realtimeBras() =  withAuth { username => implicit request =>
+    val bras = BrasService.getBrasOutlierJson(CommonService.getCurrentDay()).toSeq
+    val jsBras = Json.obj(
+      "bras" -> bras
+    )
+    Ok(Json.toJson(jsBras))
+  }
   def search =  withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
-   // try {
+    try {
       if (!formValidationResult.hasErrors) {
         val time = formValidationResult.get.date.trim()
         var day = ""
@@ -160,15 +177,15 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       }
       else
         Ok(views.html.device.search(form,username,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null))
-   /* }
+    }
     catch{
       case e: Exception => Ok(views.html.device.search(form,username,null,CommonService.getCurrentDay(),null))
-    }*/
+    }
   }
 
 
   def getHostJson(id: String) = Action { implicit request =>
-    try{
+    //try{
       val rsHost = Await.result(BrasService.getHostBras(id), Duration.Inf)
       val re = rsHost.map(
         iter =>
@@ -183,26 +200,32 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       )
       val idBras = id.split('/')(0)
       val time = id.split('/')(1)
-      val brasChart = Await.result(BrasService.getJsonBrasChart(idBras,time),Duration.Inf)
+      val brasChart = BrasService.getJsonESBrasChart(idBras,time)
       val listCard = Await.result(BrasService.getBrasCard(idBras,time,"",""),Duration.Inf)
-      val sigLog = brasChart.map({ t => (t._1.substring(0,t._1.indexOf(".")+2),t._2,t._3)}).filter(t => t._1 == time.substring(0,time.indexOf(".")+2))
-      //System.out.println(s"x $sigLog")
+      val listCard1 = BrasService.getJsonBrasCard(idBras,time)
+      val sigLog = brasChart.map({ t => (t._1,t._2,t._3)}).filter(t => CommonService.formatUTC(t._1) == time)
+      // get table kibana and opview
+      val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+      val dateTime = DateTime.parse(time, formatter)
+      val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+      val brasOpKiba = Await.result(BrasService.opViewKibana(idBras,time,oldTime), Duration.Inf)
       val jsBras = Json.obj(
         "host" -> re,
         "sigLog" -> sigLog,
-        "time" -> brasChart.map({ t => t._1.toString}),
+        "time" -> brasChart.map({ t => CommonService.formatUTC(t._1.toString)}),
         "logoff" -> brasChart.map({ t =>t._2}),
         "signin" -> brasChart.map({ t => t._3}),
         "users" -> brasChart.map({ t => t._4}),
         "heatCard" -> listCard.map { t => t._3},
         "heatLinecard" -> listCard.map { t => t._2},
-        "dtaCard" -> listCard
+        "dtaCard" -> listCard,
+        "mapBras" -> brasOpKiba
       )
       Ok(Json.toJson(jsBras))
-    }
+    /*}
     catch{
       case e: Exception => Ok("error")
-    }
+    }*/
   }
 
   def getBrasJson(id: String) = Action { implicit request =>

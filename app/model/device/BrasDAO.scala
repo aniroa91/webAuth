@@ -18,6 +18,7 @@ import services.domain.CommonService.getAggregations
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
+import org.elasticsearch.search.sort.SortOrder
 
 object BrasDAO {
 
