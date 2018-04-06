@@ -201,9 +201,17 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val idBras = id.split('/')(0)
       val time = id.split('/')(1)
       val brasChart = BrasService.getJsonESBrasChart(idBras,time)
-      val listCard = Await.result(BrasService.getBrasCard(idBras,time,"",""),Duration.Inf)
-      val listCard1 = BrasService.getJsonBrasCard(idBras,time)
+      //val listCard = Await.result(BrasService.getBrasCard(idBras,time,"",""),Duration.Inf)
+
+      // get data heatmap chart
       val sigLog = brasChart.map({ t => (t._1,t._2,t._3)}).filter(t => CommonService.formatUTC(t._1) == time)
+      val numLog = sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._2
+      val numSig = sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._3
+      val _type = if(numLog>numSig) "LogOff" else "SignIn"
+      val listCard = BrasService.getJsonBrasCard(idBras,time,_type)
+      val heatCard = listCard.map(x=> x._1._2)
+      val heatLinecard = listCard.map(x=> x._1._1)
+
       // get table kibana and opview
       val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
       val dateTime = DateTime.parse(time, formatter)
@@ -216,8 +224,8 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         "logoff" -> brasChart.map({ t =>t._2}),
         "signin" -> brasChart.map({ t => t._3}),
         "users" -> brasChart.map({ t => t._4}),
-        "heatCard" -> listCard.map { t => t._3},
-        "heatLinecard" -> listCard.map { t => t._2},
+        "heatCard" -> heatCard,
+        "heatLinecard" -> heatLinecard,
         "dtaCard" -> listCard,
         "mapBras" -> brasOpKiba
       )

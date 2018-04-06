@@ -415,9 +415,9 @@
                 function getData(data,isCheck){
                     var jsonArr = [];
                     for (var i =0 ; i < data.length; i++) {
-                        var user = data[i][4];
-                        if(isCheck == 0) user = data[i][3]
-                        jsonArr.push([Number(data[i][2]),Number(data[i][1]),user]);
+                        var user = data[i][1]
+                        var arrLineCard = data[i][0]
+                        jsonArr.push([Number(arrLineCard[1]),Number(arrLineCard[0]),Number(user)]);
                     }
                     return jsonArr
                 }
@@ -452,10 +452,9 @@
                     var cardLabel = getCard(dta.heatCard,1)
                     var linecardLabel = getCard(dta.heatLinecard,0)
                     var dtCard = getData(dta.dtaCard,isLog)
-                    if(dtCard.size >0) {
+                    if(dtCard.length >0) {
                         $('#heat_map').attr('style','height:350px');
                         Highcharts.chart('heat_map', {
-
                             chart: {
                                 type: 'heatmap',
                                 marginTop: 40,

@@ -45,25 +45,14 @@ object BrasService extends AbstractService{
     brasOutlier
   }
 
-  def getJsonBrasCard(bras: String,time: String) = {
+  def getJsonBrasCard(bras: String,time: String,_type: String): Array[((String,String),Long)] = {
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
     val dateTime = DateTime.parse(time, formatter)
     val oldHalfHour  = dateTime.minusHours(14).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val afterHalfHour  = dateTime.plusHours(4).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
-    val multiRs = client.execute(
-      multi(
+    val response = client.execute(
         search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
-          aggregations (
-          termsAggregation("linecard")
-            .field("card.lineId")
-            .subAggregations(
-              termsAggregation("card")
-                .field("card.id")
-            )
-          ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) }
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -72,29 +61,20 @@ object BrasService extends AbstractService{
                 .field("card.id")
             )
           )
-      )
     ).await
-/*     println(client.show(search(s"radius-streaming-*" / "con")
-      query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) }
-      aggregations (
-      termsAggregation("linecard")
-        .field("card.lineId")
-        .subAggregations(
-          termsAggregation("card")
-            .field("card.id") size 20
-        )
-      ) size 20 ))*/
-    val mapSigin = CommonService.getSecondAggregations(multiRs.responses(0).aggregations.get("linecard"))
-    val mapLogoff = CommonService.getSecondAggregations(multiRs.responses(1).aggregations.get("linecard"))
-    mapSigin.foreach(println)
-    println("===========")
-    mapSigin.foreach(println)
-    println("===========")
-    val arrSigin =  mapSigin.flatMap(x => x._2.map(y => x._1 -> y))
-      .map(x => (x._1 -> x._2._1) -> x._2._2)
-    val arrLogoff =  mapLogoff.flatMap(x => x._2.map(y => x._1 -> y))
-      .map(x => (x._1 -> x._2._1) -> x._2._2)
-    (arrSigin++arrLogoff).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("-")}.toArray
+     /*println(client.show(search(s"radius-streaming-*" / "con")
+       query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
+       aggregations (
+       termsAggregation("linecard")
+         .field("card.lineId")
+         .subAggregations(
+           termsAggregation("card")
+             .field("card.id")
+         )
+       )))*/
+    val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"))
+    mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 -> x._2._1) -> x._2._2).filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")
   }
 
   def getJsonESBrasChart(bras: String,time: String):Array[(String,Int,Int,Int)] = {
