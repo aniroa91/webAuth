@@ -16,7 +16,7 @@ pipeline {
                 // Run the Docker tool to build the image
                 script {
                     docker.withTool('docker') {
-                        docker.build('my-app:latest', 'target/docker/stage')
+                         docker.build("${env.BUILD_NUMBER}", 'target/docker/stage')
                     }
                 }
 
