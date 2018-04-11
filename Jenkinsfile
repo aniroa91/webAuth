@@ -20,6 +20,9 @@ pipeline {
                     }
                 }
 
+            }
+            steps {
+
                 // Run the Docker push image to registry
                 script {
                     docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
