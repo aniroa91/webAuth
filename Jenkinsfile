@@ -26,16 +26,16 @@ pipeline {
 
             }
         }
-        #stage('Docker Push') {
-        #    steps {
-        #        script {
-        #            docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
-        #                docker.push("${env.BUILD_NUMBER}")
-        #                docker.push("latest")
-        #            }
-        #        }
-        #    }
-        #}
+        //stage('Docker Push') {
+        //    steps {
+        //        script {
+        //            docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
+        //                docker.push("${env.BUILD_NUMBER}")
+        //                docker.push("latest")
+        //            }
+        //        }
+        //    }
+        //}
         stage('Deploying'){
 
             steps {
