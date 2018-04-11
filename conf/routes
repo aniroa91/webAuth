@@ -41,7 +41,7 @@ GET      /bras                     controllers.BrasController.index
 GET      /brasInfo                 controllers.BrasDetailController.index
 GET      /msg2                    controllers.DemoController.message2
 GET      /msgHistory              controllers.DemoController.history
-GET      /device1                    controllers.DeviceController.index
+#GET      /device1                    controllers.DeviceController.index
 GET      /device                    controllers.DeviceController.dashboard
 GET     /device/realtime-bras         controllers.DeviceController.realtimeBras
 

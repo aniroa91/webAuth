@@ -12,7 +12,7 @@ import org.joda.time.format.DateTimeFormat
 
 object BrasService extends AbstractService{
 
-  def getBrasOutlierCurrent(day: String):Array[BrasOutlier]  ={
+  /*def getBrasOutlierCurrent(day: String):Array[BrasOutlier]  ={
     val response = client.execute(
       search(s"monitor-radius-$day" / "docs")
         query { must(termQuery("label","outlier")) }
@@ -27,9 +27,12 @@ object BrasService extends AbstractService{
        )
       )
     brasOutlier.asInstanceOf[Array[BrasOutlier]]
+  }*/
+  def getBrasOutlierCurrent(day: String): Future[Seq[(String,String,Int,Int,String)]]   ={
+    BrasDAO.getBrasOutlierCurrent(day)
   }
 
-  def getBrasOutlierJson(day: String): Array[(String,String,Int,Int)] ={
+  /*def getBrasOutlierJson(day: String): Array[(String,String,Int,Int)] ={
     val response = client.execute(
       search(s"monitor-radius-$day" / "docs")
         query { must(termQuery("label","outlier")) }
@@ -43,7 +46,7 @@ object BrasService extends AbstractService{
         getValueAsInt(x,"logOff"))
       )
     brasOutlier
-  }
+  }*/
 
   def getJsonBrasCard(bras: String,time: String,_type: String): Array[((String,String),Long)] = {
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")

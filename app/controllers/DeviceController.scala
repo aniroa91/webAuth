@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 import javax.inject.Singleton
-
+import play.api.mvc._
 import com.google.common.util.concurrent.AbstractService
 import model.device._
 import play.api.data.Form
@@ -39,7 +39,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
     )(BrasOutlier.apply)(BrasOutlier.unapply)
   )
 
-  def index =  withAuth { username => implicit request =>
+  /*def index =  withAuth { username => implicit request =>
     try {
       // get data for map chart
       val mapNoc = Await.result(BrasService.listNocOutlier, Duration.Inf)
@@ -48,25 +48,26 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
     catch{
       case e: Exception => Ok(views.html.device.index(username,null))
     }
-  }
+  }*/
+
   def dashboard =  withAuth { username => implicit request =>
-    //try {
-      // get data for map chart
-      val mapNoc = Await.result(BrasService.listNocOutlier, Duration.Inf)
-      val mapBrasOutlier = BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay())
-      Ok(views.html.device.dashboard(username,mapNoc,mapBrasOutlier))
-   /* }
+    try {
+      val mapBrasOutlier = Await.result(BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay()),Duration.Inf)
+      Ok(views.html.device.dashboard(username,mapBrasOutlier))
+    }
     catch{
-      case e: Exception => Ok(views.html.device.dashboard(username,null,null))
-    }*/
+      case e: Exception => Ok(views.html.device.dashboard(username,null))
+    }
   }
+
   def realtimeBras() =  withAuth { username => implicit request =>
-    val bras = BrasService.getBrasOutlierJson(CommonService.getCurrentDay()).toSeq
+    val bras = Await.result(BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay()),Duration.Inf)
     val jsBras = Json.obj(
       "bras" -> bras
     )
     Ok(Json.toJson(jsBras))
   }
+
   def search =  withAuth { username => implicit request =>
     val formValidationResult = form.bindFromRequest
     try {
@@ -166,7 +167,6 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val kibanaFacility = Await.result(BrasService.getFacilityResponse(brasId,day), Duration.Inf)
         // KIBANA DDos
         val kibanaDdos = Await.result(BrasService.getDdosResponse(brasId,day), Duration.Inf)
-
         // KIBANA Severity value
         val severityValue = Await.result(BrasService.getSeveValueResponse(brasId,day), Duration.Inf)
         // SIGNIN LOGOFF BY HOST
@@ -185,7 +185,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
 
 
   def getHostJson(id: String) = Action { implicit request =>
-    //try{
+    try{
       val rsHost = Await.result(BrasService.getHostBras(id), Duration.Inf)
       val re = rsHost.map(
         iter =>
@@ -230,10 +230,10 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         "mapBras" -> brasOpKiba
       )
       Ok(Json.toJson(jsBras))
-    /*}
+    }
     catch{
       case e: Exception => Ok("error")
-    }*/
+    }
   }
 
   def getBrasJson(id: String) = Action { implicit request =>

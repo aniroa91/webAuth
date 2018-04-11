@@ -26,6 +26,17 @@ object BrasDAO {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
+  def getBrasOutlierCurrent(nowDay: String): Future[Seq[(String,String,Int,Int,String)]] = {
+    //val sumDay = CommonService.getRangeDay(nowDay).split(",").length
+    dbConfig.db.run(
+      sql"""select date_time,bras_id,signin,logoff,verified
+            from dwh_conn_bras_detail
+            where date_time >= $nowDay::TIMESTAMP and label='outlier'
+            order by date_time desc
+                  """
+        .as[(String,String,Int,Int,String)])
+  }
+
   def getSigLogResponse(bras: String,fromDay: String,nextDay: String): Future[Seq[(Int,Int)]] = {
     //val sumDay = CommonService.getRangeDay(nowDay).split(",").length
     dbConfig.db.run(
@@ -221,7 +232,7 @@ object BrasDAO {
       sql"""select linecard || '_' || card || '_' || port as linecard_card_port,sum(signin) as signin,
             sum(logoff) as logoff
             from dwh_conn_port
-            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and linecard != '-1' and card != '-1' and port != '-1'
             group by linecard, card, port
                   """
         .as[(String,Int,Int)])
@@ -230,7 +241,7 @@ object BrasDAO {
     val multiRs = client.execute(
       multi(
        search(s"radius-streaming-$nowDay" / "con")
-        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn")) }
+        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1"))) }
         aggregations (
         termsAggregation("linecard")
           .field("card.lineId")
@@ -244,7 +255,7 @@ object BrasDAO {
           )
         ),
         search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff")) }
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")))}
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -313,9 +324,9 @@ object BrasDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select error_name, sum(value) from dwh_kibana
+      sql"""select description, sum(value) from dwh_kibana
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and error_type='ddos'
-            group by error_name
+            group by description
                   """
         .as[(String,Int)])
   }
@@ -324,7 +335,7 @@ object BrasDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select severity, sum(value) from dwh_kibana
+      sql"""select severity, count(*) from dwh_kibana
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by severity
                   """

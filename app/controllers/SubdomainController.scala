@@ -11,7 +11,7 @@ import dns.utils.DataSampleUtil
 import com.ftel.bigdata.utils.DomainUtil
 import services.domain.CommonService
 import com.ftel.bigdata.utils.StringUtil
-
+import play.api.mvc._
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
@@ -19,16 +19,30 @@ import com.ftel.bigdata.utils.StringUtil
 @Singleton
 class SubdomainController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured {
 
-  def index(domain: String) =  withAuth { username => implicit request =>
+  /* Authentication action*/
+  def Authenticated(f: AuthenticatedRequest => Result) = {
+    Action { request =>
+      val username = request.session.get("username").get.toString
+      username match {
+        case "btgd@ftel" =>
+          f(AuthenticatedRequest(username, request))
+        case none =>
+          Redirect(routes.LoginController.index).withNewSession.flashing(
+            "success" -> "You are now logged out."
+          )
+      }
+    }
+  }
+
+  def index(domain: String) =  Authenticated { implicit request =>
     if (StringUtil.isNullOrEmpty(domain)) {
-      Ok(views.html.dns_v2.search.subdomain(null, null, null, username))
+      Ok(views.html.dns_v2.search.subdomain(null, null, null,request.session.get("username").get.toString))
     } else {
       val second = DomainUtil.extract(domain).second
       val logo = CommonService.getLogo(second, false)
       val response = CacheService.getDomain(second)
-      Ok(views.html.dns_v2.search.subdomain(domain, response._1, logo, username))
+      Ok(views.html.dns_v2.search.subdomain(domain, response._1, logo, request.session.get("username").get.toString))
     }
-    
   }
 }
 

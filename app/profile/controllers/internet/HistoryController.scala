@@ -5,7 +5,8 @@ import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import javax.inject.Inject
 import javax.inject.Singleton
-
+import play.api.mvc._
+import controllers.AuthenticatedRequest
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 import services.domain.CommonService
@@ -45,8 +46,23 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
       "date" -> text,
       "ct" -> text
     )(InternetContract.apply)(InternetContract.unapply))
-    
-  def index(date: String) =  withAuth { username => implicit request =>
+
+  /* Authentication action*/
+  def Authenticated(f: AuthenticatedRequest => Result) = {
+    Action { request =>
+      val username = request.session.get("username").get.toString
+      username match {
+        case "btgd@ftel" =>
+          f(AuthenticatedRequest(username, request))
+        case none =>
+          Redirect("/").withNewSession.flashing(
+            "success" -> "You are now logged out."
+          )
+      }
+    }
+  }
+
+  def index(date: String) =  Authenticated { implicit request =>
     //println("DATE: " + date)
     
 //    try {
@@ -66,20 +82,20 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
           //Ok(views.html.profile.internet.history.index(form, username, HistoryService.get("week", "2018-02-08"), date, "week"))
 //          Ok(views.html.profile.internet.history.index(form, username, HistoryService.getAll("month", "2018-02-01"), date, "month"))
           Ok(views.html.profile.internet.history.index(form,
-              username,
+            request.session.get("username").get.toString,
               HistoryService.getAll(_type, time),
               time,
               _type))
         } else {
           if (StringUtil.isNullOrEmpty(_type) && StringUtil.isNullOrEmpty(time)) {
             Ok(views.html.profile.internet.history.indexContract(form,
-              username, HistoryService.getContract("M", "02/2018", contract.toLowerCase()),
+              request.session.get("username").get.toString, HistoryService.getContract("M", "02/2018", contract.toLowerCase()),
               contract,
               time,
               "M"))
           } else {
           Ok(views.html.profile.internet.history.indexContract(form,
-              username, HistoryService.getContract(_type, time, contract.toLowerCase()),
+            request.session.get("username").get.toString, HistoryService.getContract(_type, time, contract.toLowerCase()),
               contract,
               time,
               _type))
@@ -89,13 +105,13 @@ class HistoryController @Inject()(cc: ControllerComponents) extends AbstractCont
         }
       } else {
         println("============")
-        Ok(views.html.profile.internet.history.index(form, username, HistoryService.getAll("M", "02/2018"), "02/2018", "M"))
+        Ok(views.html.profile.internet.history.index(form, request.session.get("username").get.toString, HistoryService.getAll("M", "02/2018"), "02/2018", "M"))
       }
 
   }
 
-  def realtime() =  withAuth { username => implicit request =>
-    Ok(views.html.profile.internet.history.realtime(username, HistoryService.getAll("M", "02/2018"), HistoryService.getRealtime(day)))
+  def realtime() =  Authenticated { implicit request =>
+    Ok(views.html.profile.internet.history.realtime(request.session.get("username").get.toString, HistoryService.getAll("M", "02/2018"), HistoryService.getRealtime(day)))
   }
 
   def realtimeJson() =  withAuth { username => implicit request =>

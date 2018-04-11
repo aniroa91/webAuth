@@ -1,9 +1,10 @@
-@(email: String,listNoc: Seq[(String,String)],mapBrasOutlier: Array[model.device.BrasOutlier])
+@(email: String,mapBrasOutlier: Seq[(String,String,Int,Int,String)])
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatUTC
+@import services.domain.CommonService.formatYYYYmmddHHmmss
 
 <!DOCTYPE html>
 
@@ -47,18 +48,47 @@
         <!-- page content -->
     <div class="right_col" role="main" style="background-image: url('../assets/images/bras-bg.jpg')">
         <div class="row">
+            <div class="alert alert-success" id="success-alert" style="display: none">
+                <button type="button" class="close" data-dismiss="alert">x</button>
+                <strong>Success! </strong>
+                You have updated bras successfully.
+            </div>
+            <div class="alert alert-error" id="error-alert" style="display: none">
+                <button type="button" class="close" data-dismiss="alert">x</button>
+                <strong>Error! </strong>
+                System error, Please review operation.
+            </div>
+        </div>
+        <div class="row">
             <div class="col-xs-12" id="grapBras" style="margin-top: 15px">
                 <div class="timeline">
                     <div class="timeline__wrap">
                         <div class="timeline__items">
-                            @for(bras <- mapBrasOutlier) {
+                            @for(i <- 0 until mapBrasOutlier.length) {
                                 <div class="timeline__item">
                                     <div class="timeline__content">
-                                        <input type="hidden" class="brasText" value="@bras.brasId/@formatUTC(bras.time)">
-                                        <h2>Bras: @bras.brasId</h2>
-                                        <p>Time: @formatUTC(bras.time)</p>
-                                        <p>Signin: @bras.signin</p>
-                                        <p>Logoff: @bras.logOff</p>
+                                        <div class="timeline_box">
+                                            <input type="hidden" class="brasText" value="@mapBrasOutlier(i)._2/@mapBrasOutlier(i)._1">
+                                            <h2>Bras: @mapBrasOutlier(i)._2</h2>
+                                            <p>Time: @mapBrasOutlier(i)._1</p>
+                                            <p><span style="margin-right: 10px">Signin: @mapBrasOutlier(i)._3</span><span>Logoff: @mapBrasOutlier(i)._4</span></p>
+                                        </div>
+                                        @if(mapBrasOutlier(i)._5 != "0" && mapBrasOutlier(i)._5 != "1") {
+                                            <p class="disInline">
+                                                <span style="padding-top: 5px">
+                                                    <a onclick="confirmOutlier(this)" id="@mapBrasOutlier(i)._2/@mapBrasOutlier(i)._1" class="btn btn-success a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">
+                                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                                        <span><strong>Confirm</strong></span>
+                                                    </a>
+                                                </span>
+                                                <span style="padding-top: 5px">
+                                                    <a onclick="rejectOutlier(this)" id="@mapBrasOutlier(i)._2/@mapBrasOutlier(i)._1" class="btn btn-danger a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">
+                                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                                        <span><strong>Reject</strong></span>
+                                                    </a>
+                                                </span>
+                                            </p>
+                                        }
                                     </div>
                                 </div>
                             }
@@ -126,7 +156,7 @@
             </div>
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
                 <div id="tbHost" class="tbScroll">
-                    <table class="data table no-margin border"style="font-weight: 700">
+                    <table class="table no-margin border table-fixed"style="font-weight: 700">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 14px">
                                 <th style="width: 30%">Host</th>
@@ -148,7 +178,6 @@
         <br>
     </div>
         <!-- /page content -->
-
         <!-- footer content -->
     <footer>
         <div class="pull-right">
@@ -193,18 +222,29 @@
                         success: function (dta) {
                             var oldestBras = $('.timeline__items .brasText:eq(0)').val().split('/');
                             for(var i=0;i<dta.bras.length;i++) {
-                                if(dta.bras[i][0] == oldestBras[0] && dta.bras[i][1] == oldestBras[1]){
+                                if(dta.bras[i][1] == oldestBras[0] && dta.bras[i][0] == oldestBras[1]){
                                     var html = ''
+                                    var button = ''
                                     for(var j=i-1;j>=0;j--){
-                                        console.log(dta.bras[j])
+                                        console.log(dta.bras[j]);
+                                        if(dta.bras[j][4] != 0 && dta.bras[j][4] != 1){
+                                            button = '<p class="disInline">'+
+                                                    '<span style="padding-top: 5px">'+
+                                                    '<a onclick="confirmOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-success a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
+                                                    '<span class="glyphicon glyphicon-ok" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Confirm</strong></span></a></span>'+
+                                                    '<span style="padding-top: 5px">'+
+                                                    '<a onclick="rejectOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-danger a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
+                                                    '<span class="glyphicon glyphicon-remove" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Reject</strong></span></a></span>'+
+                                                    '</p>'
+                                        }
                                         html = '<div class="timeline__item">' +
                                                 '<div class="timeline__content">' +
-                                                '<input type="hidden" class="brasText" value="'+dta.bras[j][0]+'/'+dta.bras[j][1]+'">'+
-                                                '<h2>Bras: ' + dta.bras[j][0] + '</h2>' +
-                                                '<p>Time: ' + dta.bras[j][1] + '</p>' +
-                                                '<p>Signin: ' + dta.bras[j][2] + '</p>' +
-                                                '<p>Logoff: ' + dta.bras[j][3] + '</p>' +
-                                                '</div>' +
+                                                '<div class="timeline_box">'+
+                                                '<input type="hidden" class="brasText" value="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'">'+
+                                                '<h2>Bras: ' + dta.bras[j][1] + '</h2>' +
+                                                '<p>Time: ' + dta.bras[j][0] + '</p>' +
+                                                '<p><span style="margin-right: 10px;">Signin: ' + dta.bras[j][2] + '</span><span>Logoff: ' + dta.bras[j][3] + '</span></p>' +
+                                                '</div>' +button+'</div>' +
                                                 '</div>';
                                         $('.timeline__items').prepend(html);
                                     }
@@ -215,6 +255,7 @@
                                             verticalStartPosition: 'left',
                                             visibleItems: 8
                                         });
+                                        activeOnclick();
                                     }
                                     break;
                                 }
@@ -222,195 +263,15 @@
                         }
                     });
                 }, 5000);
-                $('.timeline__content').click(function(){
-                    $('.timeline__items .activeBox').each(function(){
-                        $(this).removeClass('activeBox');
-                    });
-                    $(this).addClass('activeBox');
-                    var brasId = $(this).find('.brasText').val();
-                    $.ajax({
-                        url: "/host-json?id=" + brasId,
-                        cache: false,
-                        beforeSend: function () {
-                            $('.activeBox').waitMe({
-                                effect: 'roundBounce',
-                                text: 'Please wait...',
-                                bg: 'rgba(255,255,255,0.7)',
-                                color: '#000',
-                                textPos: 'vertical'
-                            });
-                            waitMe();
-                        },
-                        success: function (dtBras) {
-                            if(dtBras != "Error"){
-                                $('#divBras').show();
-                                if(dtBras.mapBras.length >0) {
-                                    // table Bras
-                                    var html = insertTbBras(dtBras.mapBras);
-                                    $('#tbBras tbody').html('');
-                                    $('#tbBras tbody').append(html);
-                                    $('#tbBras').find('.autoTooltip').each(function () {
-                                        var title = $(this).text();
-                                        $(this).attr('title', title);
-                                    });
-                                }
-                                // draw chart heat map
-                                $('#heat-mapChart').show();
-                                if(dtBras.sigLog.length > 0)
-                                    drawHeatMapChart(dtBras);
-                                // draw chart line
-                                $('#line-chart').show();
-                                drawChart(dtBras);
-                                // draw graph host and table
-                                drawHostBras(groupGraphost(dtBras.host, 'host'), brasId)
-                                $('#lbHost').text("Hosts of " + brasId)
-                                var html = getTableHost(dtBras.host);
-                                if(html == "") {
-                                    $('#tbHost').attr('style','height: 108px;background: transparent');
-                                    html = "<tr><td colspan='5' class='notResult'>No matching records found </td></tr>"
-                                }
-                                else{
-                                    $('#tbHost').attr('style','height: 455px');
-                                }
-                                $('#tbHost tbody').html('');
-                                $('#tbHost tbody').append(html);
-                            }
-                            else{
-                                location.href = "/device";
-                            }
-                        },
-                        complete: function () {
-                            $('.activeBox').waitMe("hide");
-                            hideWaitme();
-                        },
-                    });
-                });
+
+                activeOnclick();
+
                 $('[data-toggle="tooltip"]').tooltip();
                 $("[data-toggle='toggle']").click(function() {
                     $('#mapBras').toggleClass("hideDiv");
                     $(this).children('.fa-chevron-left, .fa-chevron-right').toggleClass("fa-chevron-left fa-chevron-right");
                     $('#grapBras').toggleClass("leftDiv");
                 });
-
-                // Nodes BRAS
-                /*var nodeBras = new vis.DataSet([
-                    {id: 0, label: 'Root',color:'#9B59B6'},
-                    {id: 1, label: 'Bras1',color:'#1ABB9C'},
-                    {id: 2, label: 'Bras2',color:'#1ABB9C'},
-                    {id: 6, label: 'LineCard1'},
-                    {id: 3, label: 'Card1'},
-                    {id: 4, label: 'Card2'},
-                    {id: 5, label: 'LineCard2'}
-                ]);*/
-
-                function drawGraphBras(data,name){
-                    var dtaBras = data.bras;
-                    var dtaLineCard = data.linecard;
-                    var dtaCard = data.card;
-                    var dtaPort = data.host;
-                    var dtaLogoff = data.arsLog;
-                    var dtaSigin = data.arsSig;
-                    var dtaLogSig= data.logSig;
-                    var nodeBras = new vis.DataSet(getNodeBras(dtaLogSig,dtaPort,dtaCard,dtaLineCard,dtaBras,name))
-                    // create an array with edges to represent the network
-                    /*var edgeBras = new vis.DataSet([
-                        {from: 1, to: 6},
-                        {from: 1, to: 5},
-                        {from: 6, to: 3},
-                        {from: 6, to: 4},
-                        {from: 0, to: 2},
-                        {from: 0, to: 1},
-                    ]);*/
-                    //console.log(getEdgeBras(dtaCard,dtaLineCard,dtaBras))
-                    var edgeBras = new vis.DataSet(getEdgeBras(dtaPort,dtaCard,dtaLineCard,dtaBras))
-
-                    // Find contained in document
-                    var divBras = document.getElementById('bras');
-                    //Define data object and the options of the network
-                    var arrBras = {
-                        nodes: nodeBras,
-                        edges: edgeBras
-                    };
-                    var optionsBras = {
-                        autoResize: true,
-                        height: '100%',
-                        width: '100%'
-                    };
-                    //Define the network object to be rendered.
-                    var bras = new vis.Network(divBras, arrBras, optionsBras);
-                    //Simply declare an event with callback.
-                    bras.on("click", function (params) {
-                        //console.log(params['nodes']['0']);
-                        var brasNode = params['nodes']['0'];
-                        if(brasNode!= undefined && (brasNode == 0 || brasNode.split('/').length<=2)) {
-                            if(brasNode == 0){
-                                waitMe();
-                                setTimeout(function () {
-                                    hideWaitme();
-                                    $('#line-chart').hide();
-                                    $('#heat-mapChart').hide();
-                                    $('#line-bras').text("");
-                                    $('#heat_map').text("");
-                                    $('#hostBras').hide();
-                                    $('#host').text("");
-                                    $('#tbHost tbody').text("");
-                                    $('#divBras').removeClass('col-lg-5').removeClass('col-md-5').removeClass('col-sm-5');
-                                    $('#divBras .x_panel').removeClass('xsScroll');
-                                    $('#divBras .x_panel').addClass('lgScroll');
-                                    $('#tbBras tbody').find('tr').show();
-                                    $('#tbBras tbody').find('tr').removeAttr('style', 'color:#1ABB9C');
-                                    //$('.autoTooltip').removeClass('wordBreak');
-                                    //$('.autoTooltip').removeAttr("title");
-                                    $('#thFirst').attr('style','width:30%');
-                                }, 1000);
-                            }
-                            else {
-                                var id = brasNode.replace('/', '').replace(' ', '').replace('.', '').replace(/:/g, "");
-                                $.ajax({
-                                    url: "/host-json?id=" + brasNode,
-                                    cache: false,
-                                    beforeSend: function () {
-                                        waitMe();
-                                    },
-                                    success: function (dtBras) {
-                                        if(dtBras != "error") {
-                                            //$('.autoTooltip').addClass('wordBreak');
-                                            $('#thFirst').attr('style','width:10%');
-                                            var dtHost = dtBras.host;
-                                            $('#divBras').addClass('col-lg-5').addClass('col-md-5').addClass('col-sm-5');
-                                            $('#divBras .x_panel').addClass('xsScroll');
-                                            $('#divBras .x_panel').removeClass('lgScroll');
-                                            $('#heat-mapChart').show();
-                                            drawHeatMapChart(dtBras);
-                                            $('#line-chart').show();
-                                            drawChart(dtBras);
-                                            $('#lbHost').text("Hosts of " + brasNode)
-                                            $('#tbBras tbody').find('tr').hide();
-                                            $('#' + id).show();
-                                            $('#' + id).attr('style', 'color:#1ABB9C');
-                                            /*$('#tbBras').find('.autoTooltip').each(function(){
-                                                var title = $(this).text();
-                                                $(this).attr('title',title);
-                                            });*/
-                                            drawHostBras(groupGraphost(dtHost, 'host'), brasNode)
-                                            $('#lbHost').text("Hosts of " + brasNode)
-                                            var html = getTableHost(dtHost);
-                                            if(html == "") html = "<tr><td colspan='4' style='font-size: 15px;color: #ddd;text-align: center'>No matching records found </td></tr>"
-                                            $('#tbHost tbody').html('');
-                                            $('#tbHost tbody').append(html);
-                                        }
-                                        else{
-                                            location.href = "/device";
-                                        }
-                                    },
-                                    complete: function () {
-                                        hideWaitme();
-                                    },
-                                });
-                            }
-                        }
-                    });
-                }
 
                 function getData(data,isCheck){
                     var jsonArr = [];
@@ -591,6 +452,72 @@
                     });
                 }
 
+                function activeOnclick(){
+                    $('.timeline_box').click(function(){
+                        $('.timeline__items .activeBox').each(function(){
+                            $(this).removeClass('activeBox');
+                        });
+                        $(this).parent().addClass('activeBox');
+                        var brasId = $(this).find('.brasText').val();
+                        $.ajax({
+                            url: "/host-json?id=" + brasId,
+                            cache: false,
+                            beforeSend: function () {
+                                $('.activeBox').waitMe({
+                                    effect: 'roundBounce',
+                                    text: 'Please wait...',
+                                    bg: 'rgba(255,255,255,0.7)',
+                                    color: '#000',
+                                    textPos: 'vertical'
+                                });
+                                waitMe();
+                            },
+                            success: function (dtBras) {
+                                if(dtBras != "Error"){
+                                    $('#divBras').show();
+                                    if(dtBras.mapBras.length >0) {
+                                        // table Bras
+                                        var html = insertTbBras(dtBras.mapBras);
+                                        $('#tbBras tbody').html('');
+                                        $('#tbBras tbody').append(html);
+                                        $('#tbBras').find('.autoTooltip').each(function () {
+                                            var title = $(this).text();
+                                            $(this).attr('title', title);
+                                        });
+                                    }
+                                    // draw chart heat map
+                                    $('#heat-mapChart').show();
+                                    if(dtBras.sigLog.length > 0)
+                                        drawHeatMapChart(dtBras);
+                                    // draw chart line
+                                    $('#line-chart').show();
+                                    drawChart(dtBras);
+                                    // draw graph host and table
+                                    drawHostBras(groupGraphost(dtBras.host, 'host'), brasId)
+                                    $('#lbHost').text("Hosts of " + brasId)
+                                    var html = getTableHost(dtBras.host);
+                                    if(html == "") {
+                                        $('#tbHost').attr('style','height: 108px;background: transparent');
+                                        html = "<tr><td colspan='5' class='notResult'>No matching records found </td></tr>"
+                                    }
+                                    else{
+                                        $('#tbHost').attr('style','height: 455px');
+                                    }
+                                    $('#tbHost tbody').html('');
+                                    $('#tbHost tbody').append(html);
+                                }
+                                else{
+                                    location.href = "/device";
+                                }
+                            },
+                            complete: function () {
+                                $('.activeBox').waitMe("hide");
+                                hideWaitme();
+                            },
+                        });
+                    });
+                }
+
                 function hideWaitme() {
                     $('#tbBras').waitMe("hide");
                     $('#host').waitMe("hide");
@@ -718,6 +645,52 @@
                     });
                 }
             });
+
+            function rejectOutlier(element){
+                var strId = $(element).attr('id')
+                var id = strId.split("/")[0]
+                var time = strId.split("/")[1]
+                $.ajax({
+                    url: "/rejectLabel?id="+id+"&time="+time,
+                    success: function (data) {
+                        if(data!= "error") {
+                            $(element).attr('disabled', 'disabled');
+                            $(element).prop('onclick', null);
+                            $("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
+                                $("#success-alert").slideUp(500);
+                            });
+                        }
+                        else{
+                            $("#error-alert").fadeTo(2000, 500).slideUp(500, function(){
+                                $("#error-alert").slideUp(500);
+                            });
+                        }
+                    }
+                });
+            }
+
+            function confirmOutlier(element){
+                var strId = $(element).attr('id')
+                var id = strId.split("/")[0]
+                var time = strId.split("/")[1]
+                $.ajax({
+                    url: "/confirmLabel?id="+id+"&time="+time,
+                    success: function (data) {
+                        if(data!= "error"){
+                            $(element).attr('disabled','disabled');
+                            $(element).prop('onclick', null);
+                            $("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
+                                $("#success-alert").slideUp(500);
+                            });
+                        }
+                        else{
+                            $("#error-alert").fadeTo(2000, 500).slideUp(500, function(){
+                                $("#error-alert").slideUp(500);
+                            });
+                        }
+                    }
+                });
+            }
 
             function getTableHost(dta){
                 var html = "";
