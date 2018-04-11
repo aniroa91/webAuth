@@ -15,13 +15,13 @@ pipeline {
 
                 // Run the Docker tool to build the image
                 script {
-                        docker.withTool('docker') {
-                            def app = docker.build("${env.BUILD_NUMBER}", 'target/docker/stage')
-                            docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
-                                app.push("${env.BUILD_NUMBER}")
-                                app.push("latest")
-                            }
-                        }
+                    docker.withTool('docker') {
+                        def app = docker.build("${env.BUILD_NUMBER}", 'target/docker/stage')
+                    }
+                    docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
                 }
 
             }
