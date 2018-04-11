@@ -1,23 +1,20 @@
-node("master") {
-    def app
-    def commit_id
+pipeline {
+    agent any
 
-        stage('Clone repository'){
-            git url: "https://tienthangnt@bitbucket.org/ftelde/bigdata-play.git", credentialsId: '6f93d732-e3e0-4964-a5d6-aadd066fde2e'
-        
-            sh "git rev-parse HEAD > .git/commit-id"
-            commit_id = readFile('.git/commit-id').trim()
-            println commit_id
-        }
-
-
+    stages {
         stage('Build') {
+            steps {
+                echo "Compiling..."
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt compile"
+            }
         }
         stage('Unit Test') {
+            steps {
+                echo "Testing..."
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt coverage 'test-only * -- -F 4'"
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt coverageReport"
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt scalastyle || true"
+            }
         }
         stage('Docker Publish') {
                 // Generate Jenkinsfile and prepare the artifact files.
@@ -47,4 +44,5 @@ node("master") {
                 //sh "ssh root@10.0.1.201 'docker service update --image bigdata-registry.local:5043/${env.JOB_NAME}:${env.BUILD_NUMBER} ${env.JOB_NAME}'"
             } 
         }
+    }
 }
