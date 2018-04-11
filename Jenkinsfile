@@ -1,8 +1,6 @@
 pipeline {
     agent { node { label 'master' } }
 
-    def app
-
     stages {
         stage('Build') {
             steps {
@@ -17,23 +15,27 @@ pipeline {
 
                 // Run the Docker tool to build the image
                 script {
-                    docker.withTool('docker') {
-                        app = docker.build("${env.BUILD_NUMBER}", 'target/docker/stage')
+                    docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
+                        docker.withTool('docker') {
+                            def app = docker.build("${env.BUILD_NUMBER}", 'target/docker/stage')
+                                app.push("${env.BUILD_NUMBER}")
+                                app.push("latest")
+                        }
                     }
                 }
 
             }
         }
-        stage('Docker Push') {
-            steps {
-                script {
-                    docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
-                    }
-                }
-            }
-        }
+        #stage('Docker Push') {
+        #    steps {
+        #        script {
+        #            docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
+        #                docker.push("${env.BUILD_NUMBER}")
+        #                docker.push("latest")
+        #            }
+        #        }
+        #    }
+        #}
         stage('Deploying'){
 
             steps {
