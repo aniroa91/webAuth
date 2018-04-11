@@ -21,6 +21,8 @@ pipeline {
                 }
 
             }
+        }
+        stage('Docker Push') {
             steps {
 
                 // Run the Docker push image to registry
