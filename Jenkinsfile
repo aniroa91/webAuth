@@ -8,14 +8,6 @@ pipeline {
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt compile"
             }
         }
-        stage('Unit Test') {
-            steps {
-                echo "Testing..."
-                sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt coverage 'test-only * -- -F 4'"
-                sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt coverageReport"
-                sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt scalastyle || true"
-            }
-        }
         stage('Docker Publish') {
             steps {
                 // Generate Jenkinsfile and prepare the artifact files.
@@ -25,6 +17,14 @@ pipeline {
                 script {
                     docker.withTool('docker') {
                         docker.build('${env.JOB_NAME}', 'target/docker/stage')
+                    }
+                }
+
+                // Run the Docker push image to registry
+                script {
+                    docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
+                    docker.push("${env.BUILD_NUMBER}")
+                    docker.push("latest")
                     }
                 }
             }
