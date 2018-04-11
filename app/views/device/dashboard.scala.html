@@ -485,6 +485,9 @@
                                             $(this).attr('title', title);
                                         });
                                     }
+                                    else{
+                                        $('#tbBras tbody').html('<tr><td colspan="4" class="notResult">No matching records found</td></tr>');
+                                    }
                                     // draw chart heat map
                                     $('#heat-mapChart').show();
                                     if(dtBras.sigLog.length > 0)
