@@ -32,7 +32,7 @@ case class KibanaOverview(
                               arrErrorType: Seq[(String,Int)],
                               arrFacility: Seq[(String,Int)],
                               arrDdos: Seq[(String,Int)],
-                              arrSevValue: Seq[(String,Int)]
+                              arrSevValue: Seq[(String,String,Int)]
                             )
 case class BrasOutlier(
                       time: String,

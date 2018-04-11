@@ -331,15 +331,15 @@ object BrasDAO {
         .as[(String,Int)])
   }
 
-  def getSeveValueResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
+  def getSeveValueResponse(bras: String,nowDay: String): Future[Seq[(String,String,Int)]] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select severity, count(*) from dwh_kibana
-            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
-            group by severity
+      sql"""select severity,error_name, count(*) from dwh_kibana
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and severity is not null and error_name is not null
+            group by severity,error_name
                   """
-        .as[(String,Int)])
+        .as[(String,String,Int)])
   }
 
   def getSigLogByHost(bras: String,nowDay: String): SigLogByHost = {

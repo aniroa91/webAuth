@@ -176,7 +176,7 @@ object BrasService extends AbstractService{
     BrasDAO.getDdosResponse(bras,nowDay)
   }
 
-  def getSeveValueResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
+  def getSeveValueResponse(bras: String,nowDay: String):Future[Seq[(String,String,Int)]] = {
     BrasDAO.getSeveValueResponse(bras,nowDay)
   }
 

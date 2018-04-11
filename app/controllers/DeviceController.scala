@@ -217,6 +217,8 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val dateTime = DateTime.parse(time, formatter)
       val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
       val brasOpKiba = Await.result(BrasService.opViewKibana(idBras,time,oldTime), Duration.Inf)
+      println(s"fT: $time and tT: $oldTime vs bras: $idBras")
+      brasOpKiba.foreach(println)
       val jsBras = Json.obj(
         "host" -> re,
         "sigLog" -> sigLog,

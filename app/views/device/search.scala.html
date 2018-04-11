@@ -206,47 +206,25 @@
                                         <div class="clearfix"></div>
                                     </div>
                                     <div class="x_content">
-                                        <div style="display: inherit;">
-
-                                            <ul class="list-unstyled timeline" style="padding: 12px">
-                                                <li>
-                                                    <div class="block">
-                                                        <div class="tags">
-                                                            <span style="font-size: 18px;
-                                                                font-weight: 600">Sevirity</span>
-                                                        </div>
-                                                        <div class="block_content">
-                                                            <span style="font-size: 18px;
-                                                                font-weight: 600"> Nerror </span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                @for(i <- 0 until response.kibanaOverview.arrSevValue.length) {
-                                                    <li>
-                                                        <div class="block">
-                                                            <div class="tags">
-                                                                <a class="tag">
-                                                                    <span>@response.kibanaOverview.arrSevValue(i)._1</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="block_content">
-                                                                <p class="excerpt">@response.kibanaOverview.arrSevValue(i)._2</p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                }
-                                                <li>
-                                                    <div class="block">
-                                                        <div class="tags">
-                                                            <span style="font-size: 20px;
-                                                                font-weight: 600">Total</span>
-                                                        </div>
-                                                        <div class="block_content">
-                                                            <p class="excerpt" style="font-weight: 600"> @formatPattern(response.kibanaOverview.arrSevValue.map(x=>x._2).sum) </p>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            </ul>
+                                        <table class="data table table-bordered" style="margin-bottom: 0px">
+                                            <thead>
+                                                <th class="thTop" style="width: 17.5%">Severity</th>
+                                                <th class="thTop" style="width:63%;">Error_name</th>
+                                                <th class="thTop">Nerror</th>
+                                            </thead>
+                                        </table>
+                                        <div  style="height: 283px;overflow: auto">
+                                        <table class="data table table-bordered">
+                                            <tbody>
+                                            @for(i <- 0 until response.kibanaOverview.arrSevValue.length) {
+                                                <tr>
+                                                    <td style="width: 18%">@response.kibanaOverview.arrSevValue(i)._1</td>
+                                                    <td style="width: 65%">@response.kibanaOverview.arrSevValue(i)._2</td>
+                                                    <td>@response.kibanaOverview.arrSevValue(i)._3</td>
+                                                </tr>
+                                            }
+                                            </tbody>
+                                        </table>
                                         </div>
                                     </div>
                                 </div>
@@ -271,37 +249,36 @@
                                         Nerror by service and status
                                         <div class="clearfix"></div>
                                     </div>
-                                    <div class="x_content" style="height: 305px;overflow: auto">
-                                        <table class="data table table-bordered tbScroll" id="tbOpview" style="width: 100%">
+                                    <div class="x_content">
+                                        <div>
+                                        <table class="data table table-bordered" style="margin-bottom: 0px">
                                             <thead>
                                                 <tr>
-                                                    <th>Service name</th>
-                                                @for(i <- 0 until response.servNameStt.arrStatus.length) {
-                                                    <th>@response.servNameStt.arrStatus(i)</th>
-                                                }
-                                                    <th>Total</th>
+                                                    <th style="width: 50%" class="thTop">Service name</th>
+                                                    @for(i <- 0 until response.servNameStt.arrStatus.length) {
+                                                        <th style="width: @(40/response.servNameStt.arrStatus.length)%" class="thTop">@response.servNameStt.arrStatus(i)</th>
+                                                    }
+                                                    <th class="thTop">Total</th>
                                                 </tr>
                                             </thead>
-                                            <tfoot>
+                                        </table>
+                                        </div>
+                                        <div style="height: 226px;overflow: auto">
+                                            <table class="data table table-bordered tbScroll" id="tbOpview" style="margin-bottom: 0px">
+                                                <tbody >
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <table class="data table table-bordered" style="margin-bottom: 0px">
+                                            <thead>
                                                 <tr>
-                                                    <th>Total</th>
-                                                @for(i <- 0 until response.servNameStt.arrStatus.length) {
-                                                    <th id="col-@i"></th>
-                                                }
+                                                    <th style="width: 50%">Total</th>
+                                                    @for(i <- 0 until response.servNameStt.arrStatus.length) {
+                                                        <th style="width: @(40/response.servNameStt.arrStatus.length)%" id="col-@i"></th>
+                                                    }
                                                     <th id="ttColall"></th>
                                                 </tr>
-                                            </tfoot>
-                                            <tbody >
-
-                                                @*<tr>
-                                                    <td>BBC-01</td>
-                                                    <td>22</td>
-                                                    <td>22</td>
-                                                    <td>22</td>
-                                                    <td>66</td>
-                                                </tr>*@
-
-                                            </tbody>
+                                            </thead>
                                         </table>
                                     </div>
                                 </div>
@@ -371,8 +348,8 @@
                                                 <tbody >
                                                 @for(i <- 0 until response.infModuleBytime.length) {
                                                     <tr>
-                                                        <td>@response.infModuleBytime(i)._1</td>
-                                                        <td>@response.infModuleBytime(i)._2</td>
+                                                        <td class="textGroup">@response.infModuleBytime(i)._1</td>
+                                                        <td class="textGroup">@response.infModuleBytime(i)._2</td>
                                                         <td>@response.infModuleBytime(i)._3</td>
                                                         <td>@response.infModuleBytime(i)._4</td>
                                                         <th>@response.infModuleBytime(i)._5</th>
@@ -1081,7 +1058,7 @@
                     var jsonArr = [];
                     var ttRow = 0;
                     var arrKey = [];
-                    var tr = '<tr><td>'+dtaName[i]+'</td>';
+                    var tr = '<tr><td style="width: 50%">'+dtaName[i]+'</td>';
                     for( var j=0; j< dtaService.length;j++){
                         if(dtaService[j][0] == dtaName[i]){
                             for(var k=0; k< dtaStatus.length;k++){
@@ -1093,15 +1070,16 @@
                             }
                         }
                     }
+                    var wdTd = parseInt(40/Number(dtaStatus.length))
                     for(var ct=0; ct<dtaStatus.length;ct++){
                         if(arrKey.indexOf(ct)>=0){
                             for(var l=0;l<jsonArr.length;l++){
                                 if(jsonArr[l][0]== ct)
-                                    tr += '<td class="col-'+ct+'">'+jsonArr[l][1]+'</td>';
+                                    tr += '<td style="width: '+wdTd+'%" class="col-'+ct+'">'+jsonArr[l][1]+'</td>';
                             }
                         }
                         else{
-                            tr += '<td>0</td>';
+                            tr += '<td style="width: '+wdTd+'%">0</td>';
                         }
                     }
                     html += tr+'<th class="ttRow">'+ttRow+'</th></tr>';
