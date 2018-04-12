@@ -17,26 +17,13 @@ pipeline {
                 script {
                     docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f') {
 
-                        def app = docker.build("${env.BUILD_NUMBER}:${env.BUILD_ID}")
+                        def app = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
                         /* Push the container to the custom Registry */
                         customImage.push()
                     }
                 }
             }
         }
-
-
-/*        stage('Docker Push') {
-            steps {
-                script {
-                    docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
-                    }
-                }
-            }
-        }*/
-        
         stage('Deploying'){
 
             steps {
