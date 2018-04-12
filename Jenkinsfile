@@ -19,7 +19,7 @@ pipeline {
 
                         def app = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
                         /* Push the container to the custom Registry */
-                        customImage.push()
+                        app.push()
                     }
                 }
             }
