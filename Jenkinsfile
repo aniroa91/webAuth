@@ -1,4 +1,5 @@
 pipeline {
+
     agent { node { label 'master' } }
 
     stages {
@@ -13,29 +14,29 @@ pipeline {
                 // Generate Jenkinsfile and prepare the artifact files.
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt docker:stage"
 
-                // Run the Docker tool to build the image
                 script {
-                    docker.withTool('docker') {
-                        def app = docker.build("${env.BUILD_NUMBER}", 'target/docker/stage')
+                    docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f') {
+
+                        def app = docker.build("${env.BUILD_NUMBER}:${env.BUILD_ID}")
+                        /* Push the container to the custom Registry */
+                        customImage.push()
                     }
+                }
+            }
+        }
+
+
+/*        stage('Docker Push') {
+            steps {
+                script {
                     docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
                     }
                 }
-
             }
-        }
-        //stage('Docker Push') {
-        //    steps {
-        //        script {
-        //            docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f'){
-        //                docker.push("${env.BUILD_NUMBER}")
-        //                docker.push("latest")
-        //            }
-        //        }
-        //    }
-        //}
+        }*/
+        
         stage('Deploying'){
 
             steps {
