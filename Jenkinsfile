@@ -15,8 +15,7 @@ pipeline {
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt docker:stage"
 
                 script {
-                    docker.withRegistry('https://bigdata-registry.local:5043', 'ff494237-f391-4f89-957b-bb0bf680157f') {
-
+                    docker.withRegistry('https://bigdata-registry.local:5043', '010ed969-34b5-473b-bcd9-01a207e7e382') {
                         def app = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
                         /* Push the container to the custom Registry */
                         app.push()
