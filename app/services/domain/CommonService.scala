@@ -478,6 +478,18 @@ object CommonService extends AbstractService {
     dateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
   }
 
+  def formatMilisecondToDate(second: Long): Int = {
+   /* val date = DateTime(second,DateTimeUtil.TIMEZONE_HCM)
+    date.getHours()*/
+    1
+  }
+
+  def formatStringToMillisecond(date: String):Long = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.getMillis()
+  }
+
   def formatStringToUTC(date: String): String = {
     val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")

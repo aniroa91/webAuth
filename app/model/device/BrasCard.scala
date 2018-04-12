@@ -22,7 +22,7 @@ object BrasesCard {
     val dateTime = DateTime.parse(time, formatter)
     val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     dbConfig.db.run(
-      sql"""SELECT host,module,sum(cpe_error),sum(lostip_error) from dwh_inf_module
+      sql"""SELECT host,module,sum(sf_error),sum(lofi_error) from dwh_inf_module
             WHERE bras_id=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP
             GROUP BY host,module
                   """

@@ -19,10 +19,12 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInter
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
 import org.elasticsearch.search.sort.SortOrder
+import service.BrasService.client
 
 object BrasDAO {
 
   val client = Configure.client
+  val client_kibana = Configure.client_kibana
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
@@ -106,6 +108,31 @@ object BrasDAO {
                   """
         .as[(Int,Int)])
   }
+  def getKibanaBytimeES(bras: String,day: String) ={
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_kibana" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatStringToMillisecond(day.split("/")(0))).lt(CommonService.formatStringToMillisecond(CommonService.getNextDay(day.split("/")(1))))) }
+        aggregations(
+        dateHistogramAggregation("hourly")
+          .field("date_time")
+          .interval(DateHistogramInterval.HOUR)
+          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+        )
+    ).await
+    println(client_kibana.show(
+      search(s"infra_dwh_kibana" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatStringToMillisecond(day.split("/")(0))).lt(CommonService.formatStringToMillisecond(CommonService.getNextDay(day.split("/")(1))))) }
+        aggregations(
+        dateHistogramAggregation("hourly")
+          .field("date_time")
+          .interval(DateHistogramInterval.HOUR)
+          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+        )
+    ))
+    //println("========="+CommonService.formatMilisecondToDate("1523462400000".toLong))
+
+    CommonService.getAggregationsSiglog(rs.aggregations.get("hourly")).foreach(println)
+  }
 
   def getSigLogBytimeResponse(bras: String,nowDay: String,hourly:Int): Future[Seq[(Int,Int,Int)]] = {
     val fromDay = nowDay.split("/")(0)
@@ -159,7 +186,7 @@ object BrasDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select extract(hour from  date_time) as hourly, sum(cpe_error)+sum(lostip_error) as sumError
+      sql"""select extract(hour from  date_time) as hourly, sum(sf_error)+sum(lofi_error) as sumError
             from dwh_inf_host
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by bras_id,extract(hour from  date_time)
@@ -172,7 +199,7 @@ object BrasDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select host, sum(cpe_error) as cpe,sum(lostip_error) as lostip
+      sql"""select host, sum(sf_error) as cpe,sum(lofi_error) as lostip
             from dwh_inf_host
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by host
@@ -184,7 +211,7 @@ object BrasDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select host, module,sum(cpe_error) as cpe,sum(lostip_error) as lostip,sum(cpe_error)+sum(lostip_error) as sumAll
+      sql"""select host, module,sum(sf_error) as cpe,sum(lofi_error) as lostip,sum(sf_error)+sum(lofi_error) as sumAll
             from dwh_inf_module
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by host,module

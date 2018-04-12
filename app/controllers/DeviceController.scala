@@ -132,15 +132,18 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
           val rsLogtime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getSigLogBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._3)).map(x=> x._2.sum)
           logoffBytime = logoffBytime.zipAll(rsLogtime,0,0).map { case (x, y) => x + y }
         }
-       // val t1= System.currentTimeMillis()
+        //val t1= System.currentTimeMillis()
         // Nerror (kibana & opview) By Time
         val arrOpsview = Await.result(BrasService.getOpviewBytimeResponse(brasId,day,0), Duration.Inf).toArray
         val opviewBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrOpsview,x)).toArray
         val arrKibana = Await.result(BrasService.getKibanaBytimeResponse(brasId,day,0), Duration.Inf).toArray
+
+        //val xx = BrasService.getKibanaBytimeES(brasId,day)
+
         val kibanaBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana,x)).toArray
-       // println("t1: "+(System.currentTimeMillis() - t1))
+        //println("t1: "+(System.currentTimeMillis() - t1))
         // INF ERROR
-       // val t2= System.currentTimeMillis()
+        //val t2= System.currentTimeMillis()
         val arrInferror = Await.result(BrasService.getInfErrorBytimeResponse(brasId,day,0), Duration.Inf).toArray
         val infErrorBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrInferror,x)).toArray
         //val infErrorBytime = null
@@ -158,7 +161,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val opServByStt = Await.result(BrasService.getOpServByStatusResponse(brasId,day), Duration.Inf)
         val servName = opServByStt.map(x=> x._1).distinct
         val servStatus = opServByStt.map(x=> x._2).distinct
-
+        //val t4= System.currentTimeMillis()
         // KIBANA Severity
         val kibanaSeverity = Await.result(BrasService.getErrorSeverityResponse(brasId,day), Duration.Inf)
         // KIBANA Error type
@@ -171,6 +174,8 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val severityValue = Await.result(BrasService.getSeveValueResponse(brasId,day), Duration.Inf)
         // SIGNIN LOGOFF BY HOST
         val siglogByhost =  BrasService.getSigLogByHost(brasId,day)
+        //println("time4: "+(System.currentTimeMillis() - t4))
+
         println("timeAll: "+(System.currentTimeMillis() - timeStart))
         Ok(views.html.device.search(form,username,BrasResponse(BrasInfor(numOutlier,(sigin,logoff)),KibanaOpviewByTime(kibanaBytime,opviewBytime),SigLogByTime(siginBytime,logoffBytime),
           infErrorBytime,infHostBytime,infModuleBytime,opServiceName,ServiceNameStatus(servName,servStatus,opServByStt),linecardhost,KibanaOverview(kibanaSeverity,kibanaErrorType,kibanaFacility,kibanaDdos,severityValue),siglogByhost), day,brasId))
@@ -217,8 +222,6 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val dateTime = DateTime.parse(time, formatter)
       val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
       val brasOpKiba = Await.result(BrasService.opViewKibana(idBras,time,oldTime), Duration.Inf)
-      println(s"fT: $time and tT: $oldTime vs bras: $idBras")
-      brasOpKiba.foreach(println)
       val jsBras = Json.obj(
         "host" -> re,
         "sigLog" -> sigLog,
@@ -234,7 +237,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       Ok(Json.toJson(jsBras))
     }
     catch{
-      case e: Exception => Ok("error")
+      case e: Exception => Ok("Error")
     }
   }
 
@@ -243,7 +246,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val lstBras = Await.result(BrasService.listBrasById(id), Duration.Inf)
       var mapBras = collection.mutable.Map[String, Seq[(String,String,String,String)]]()
       val arrOutlier = lstBras.map(x => (x._1->x._2)).toList.distinct
-      var mapSigLog = new Array[String](arrOutlier.length)
+      val mapSigLog = new Array[String](arrOutlier.length)
       var num =0;
       for(outlier <- arrOutlier){
         // get  map num of signin and logoff

@@ -9,6 +9,9 @@ import services.domain.CommonService.formatUTC
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
+import org.joda.time.DateTimeZone
+import com.ftel.bigdata.utils.DateTimeUtil
 
 object BrasService extends AbstractService{
 
@@ -65,16 +68,6 @@ object BrasService extends AbstractService{
             )
           )
     ).await
-     /*println(client.show(search(s"radius-streaming-*" / "con")
-       query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
-       aggregations (
-       termsAggregation("linecard")
-         .field("card.lineId")
-         .subAggregations(
-           termsAggregation("card")
-             .field("card.id")
-         )
-       )))*/
     val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"))
     mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 -> x._2._1) -> x._2._2).filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")
@@ -124,6 +117,9 @@ object BrasService extends AbstractService{
 
   def getKibanaBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
     BrasDAO.getKibanaBytimeResponse(bras,nowDay,hourly)
+  }
+  def getKibanaBytimeES(bras: String,day: String): Unit ={
+    BrasDAO.getKibanaBytimeES(bras,day)
   }
 
   def getSigLogBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int,Int)]] = {
