@@ -6,6 +6,7 @@ COPY target/universal/bigdata-play-1.0-SNAPSHOT.zip /opt/bigdata-play-1.0-SNAPSH
 RUN unzip /opt/bigdata-play-1.0-SNAPSHOT.zip \
   && rm -f /opt/bigdata-play-1.0-SNAPSHOT.zip \
   && mv /opt/bigdata-play-1.0-SNAPSHOT /opt/bigdata-play
-RUN ls
+RUN ls /opt/bigdata-play
+RUN chmod +x /opt/bigdata-play/bin/bigdata-play
 CMD ["bin/bigdata-play","-Dconfig.file=conf/prod/application.conf"]
 
