@@ -1,4 +1,4 @@
-FROM bigdata-registry.local:5043/java
+FROM bigdata-registry.local:5043/java:latest
 
 RUN mkdir -p /opt/bigdata-play
 COPY ./dist /opt/bigdata-play
