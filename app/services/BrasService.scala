@@ -100,7 +100,7 @@ object BrasService extends AbstractService{
 
     val response = client.execute(
       search(s"monitor-radius-*" / "docs")
-        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour))) } size 100
+        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
         sortBy { fieldSort("date_time") order SortOrder.DESC }
     ).await
     val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)

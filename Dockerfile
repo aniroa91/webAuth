@@ -1,5 +1,7 @@
 FROM bigdata-registry.local:5043/java:latest
 
+
+ENV TZ=Asia/Ho_Chi_Minh
 #RUN mkdir -p /opt/bigdata-play
 WORKDIR /opt/
 COPY target/universal/bigdata-play-1.0-SNAPSHOT.zip /opt/bigdata-play-1.0-SNAPSHOT.zip
