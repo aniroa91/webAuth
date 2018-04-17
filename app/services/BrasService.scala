@@ -95,16 +95,14 @@ object BrasService extends AbstractService{
     val dateTime = DateTime.parse(time, formatter)
     val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val afterHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    println(s"oldHalfHour:$oldHalfHour")
+    println(s"oldTime:"+CommonService.formatStringToUTC(oldHalfHour))
+
     val response = client.execute(
       search(s"monitor-radius-*" / "docs")
-        query { must(termQuery("bras_id",bras),rangeQuery("date_time")) } size 100
+        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour))) } size 100
         sortBy { fieldSort("date_time") order SortOrder.DESC }
     ).await
-    println(client.show(
-      search(s"monitor-radius-*" / "docs")
-        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
-        sortBy { fieldSort("date_time") order SortOrder.DESC }
-    ))
     val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
       .map(x=>(
         getValueAsString(x,"date_time"),

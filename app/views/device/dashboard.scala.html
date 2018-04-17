@@ -165,8 +165,9 @@
                 </div>
             </div>
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
-                <div id="tbHost" class="tbScroll">
-                    <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700" id="tbHostModule">
+                <a id="btnCSV" class="btn btn-success"><i class="fa fa-download" style="margin-right: 2px"></i><span>CSV</span></a>
+                <div class="tbScroll">
+                    <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 14px">
                                 <th style="width: 30%">Host</th>
@@ -174,11 +175,10 @@
                                 <th>Cpe</th>
                                 <th>Lostip</th>
                                 <th>Total error</th>
-                                @*<th>Lost Signal</th>
-                                <th>User Down</th>
-                                <th>Inf Down</th>*@
                             </tr>
                         </thead>
+                    </table>
+                    <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700" id="tbHost">
                         <tbody style="color: #f5f10d;background: #190e0e">
                         </tbody>
                     </table>
@@ -225,7 +225,7 @@
     <script src="../assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
     <script src="../assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
     <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
-        <!-- HightChartMap -->
+    <script src="../assets/javascripts/tableToCsv.js"></script>
     <script src="../assets/javascripts/map.js"></script>
     <script src="../assets/javascripts/vn-all.js"></script>
     <script src="../assets/javascripts/waitMe.js"></script>
@@ -237,6 +237,10 @@
                     mode: 'horizontal',
                     verticalStartPosition: 'left',
                     visibleItems: 8
+                });
+
+                $("#btnCSV").click(function(){
+                    $("#tbHost").tableToCSV();
                 });
 
                 setInterval(function () {
@@ -499,18 +503,18 @@
                             success: function (dtBras) {
                                 if(dtBras != "Error"){
                                     $('#divBras').show();
+                                    // table Bras
+                                    var tbBras = $('#tbBras').DataTable( {
+                                        "scrollY":        "150px",
+                                        "scrollCollapse": true,
+                                        "paging":         false,
+                                        "info":     false,
+                                        "searching":     false,
+                                        "sort":     false,
+                                        destroy: true
+                                    });
+                                    tbBras.rows().remove().draw();
                                     if(dtBras.mapBras.length >0) {
-                                        // table Bras
-                                        var tbBras = $('#tbBras').DataTable( {
-                                            "scrollY":        "150px",
-                                            "scrollCollapse": true,
-                                            "paging":         false,
-                                            "info":     false,
-                                            "searching":     false,
-                                            "sort":     false,
-                                            destroy: true
-                                        });
-                                        tbBras.rows().remove().draw();
                                         for(var i=0;i< dtBras.mapBras.length;i++){
                                             tbBras.row.add( [
                                                 dtBras.mapBras[i][0],
@@ -539,7 +543,7 @@
                                             "sort":     false,
                                             destroy: true,
                                             buttons: [
-                                                'csv', 'excel', 'pdf'
+                                                'csv'
                                             ]
                                         });
                                         tbUser.rows().remove().draw();
@@ -549,6 +553,12 @@
                                                 dtBras.userLogoff[i][1],
                                                 dtBras.userLogoff[i][2]
                                             ] ).draw( false );
+                                        }
+                                        // custom button group export
+                                        if(!($('#tbUser i:eq(0)').hasClass('fa-download'))) {
+                                            $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
+                                            /*$('.buttons-excel').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
+                                            $('.buttons-pdf').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')*/
                                         }
                                     }
                                     else{
@@ -566,36 +576,21 @@
                                     $('#lbHost').text("Hosts of " + brasId)
                                     var html = getTableHost(dtBras.host);
                                     if(html == "") {
-                                        $('#tbHost').attr('style','height: 108px');
+                                        $('#tbHost').attr('style','height: 73px');
+                                        $('.tbScroll').attr('style','height: auto');
+                                        $('#btnCSV').hide();
                                         $('#tbHost tbody').attr('style','background: transparent');
                                         html = "<tr><td colspan='5' class='notResult'>No matching records found </td></tr>";
                                         $('#tbHost tbody').html('');
                                         $('#tbHost tbody').append(html);
                                     }
                                     else{
-                                        $('#tbHost').attr('style','height: 455px');
+                                        $('#btnCSV').show();
+                                        $('#tbHost').attr('style','max-height: 380px;overflow: auto');
+                                        $('.tbScroll').attr('style','height: 420px');
                                         $('#tbHost tbody').attr('style','color: #f5f10d;background: #190e0e');
                                         $('#tbHost tbody').html('');
                                         $('#tbHost tbody').append(html);
-                                        var tbHostModule = $('#tbHostModule').DataTable( {
-                                            dom: 'Bfrtip',
-                                            "scrollY":        "450px",
-                                            "scrollCollapse": true,
-                                            "paging":         false,
-                                            "info":     false,
-                                            "searching":     false,
-                                            "sort":     false,
-                                            destroy: true,
-                                            buttons: [
-                                                'csv', 'excel', 'pdf'
-                                            ]
-                                        });
-                                    }
-                                    // custom button group export
-                                    if(!($('#tbUser i:eq(0)').hasClass('fa-download')) && !($('#tbHost i:eq(0)').hasClass('fa-download'))) {
-                                        $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
-                                        $('.buttons-excel').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
-                                        $('.buttons-pdf').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
                                     }
                                 }
                                 else{
@@ -798,7 +793,7 @@
                 $.each(dta,function(i,dt){
                     html+= '<tr class="'+dt[0].host+'">';
                     if(nameTest == dt[0].host){
-                        html+= '<th>'+dt[0].module+'</th>';
+                        html+= '<td style="width:30%">'+dt[0].module+'</td>';
                     }
                     else{
                         nameTest=dt[0].host;
@@ -807,7 +802,7 @@
                         $.each(dta,function(i,dt){
                             if(testhost == dt[0].host) sizeHost++;
                         })
-                        html+= '<th rowspan="'+sizeHost+'">'+dt[0].host+'</th><td>'+dt[0].module+'</td>';
+                        html+= '<td style="width:30%" rowspan="'+sizeHost+'">'+dt[0].host+'</td><td>'+dt[0].module+'</td>';
                     }
                     html+= '<td>'+dt[1].cpe+'</td><td>'+dt[1].lostip+'</td>';
                     var totalErr = Number(dt[1].cpe)+Number(dt[1].lostip);
