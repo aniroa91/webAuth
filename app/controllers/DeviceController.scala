@@ -20,8 +20,7 @@ import play.api.libs.json.Json
 import services.domain.CommonService
 import services.domain.CommonService.formatYYYYmmddHHmmss
 import scala.util.control.Breaks._
-
-
+import play.api.Logger
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -32,6 +31,7 @@ case class BrasOutlier(bras: String,date: String)
 @Singleton
 class DeviceController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
+  val logger: Logger = Logger(this.getClass())
   val form = Form(
     mapping(
       "bras" -> text,
@@ -190,8 +190,9 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
 
 
   def getHostJson(id: String) = Action { implicit request =>
-    try{
+    //try{
       val rsHost = Await.result(BrasService.getHostBras(id), Duration.Inf)
+    logger.info("success 0")
       val re = rsHost.map(
         iter =>
           Json.obj(
@@ -206,8 +207,11 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val idBras = id.split('/')(0)
       val time = id.split('/')(1)
       val brasChart = BrasService.getJsonESBrasChart(idBras,time)
+    logger.info("success 1")
       //val listCard = Await.result(BrasService.getBrasCard(idBras,time,"",""),Duration.Inf)
-
+      // get logoff user
+      val userLogoff = BrasService.getUserLogOff(idBras,time)
+    logger.info("success 2")
       // get data heatmap chart
       val sigLog = brasChart.map({ t => (t._1,t._2,t._3)}).filter(t => CommonService.formatUTC(t._1) == time)
       val numLog = sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._2
@@ -216,12 +220,13 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val listCard = BrasService.getJsonBrasCard(idBras,time,_type)
       val heatCard = listCard.map(x=> x._1._2)
       val heatLinecard = listCard.map(x=> x._1._1)
-
+    logger.info("success 3")
       // get table kibana and opview
       val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
       val dateTime = DateTime.parse(time, formatter)
       val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
       val brasOpKiba = Await.result(BrasService.opViewKibana(idBras,time,oldTime), Duration.Inf)
+    logger.info("success 4")
       val jsBras = Json.obj(
         "host" -> re,
         "sigLog" -> sigLog,
@@ -232,13 +237,14 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         "heatCard" -> heatCard,
         "heatLinecard" -> heatLinecard,
         "dtaCard" -> listCard,
-        "mapBras" -> brasOpKiba
+        "mapBras" -> brasOpKiba,
+        "userLogoff" -> userLogoff
       )
       Ok(Json.toJson(jsBras))
-    }
+    /*}
     catch{
       case e: Exception => Ok("Error")
-    }
+    }*/
   }
 
   def getBrasJson(id: String) = Action { implicit request =>

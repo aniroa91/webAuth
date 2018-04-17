@@ -51,6 +51,23 @@ object BrasService extends AbstractService{
     brasOutlier
   }*/
 
+  def getUserLogOff(bras: String,time: String): Array[(String,String,String)] = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldHalfHour  = dateTime.minusMinutes(60).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val response = client.execute(
+      search(s"radius-streaming-*" / "con")
+        query { must(termQuery("nasName", bras.toLowerCase),not(termQuery("card.olt", "N/A")),not(termQuery("card.indexId", -1)),not(termQuery("card.ontId", -1)),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(time)))}
+    ).await
+    val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
+      .map(x=>(
+        getValueAsString(x,"name"),
+        formatUTC(getValueAsString(x,"timestamp")),
+        getValueAsString(x,"card.olt")+"_"+getValueAsInt(x,"cable.ontId").toString+"_"+getValueAsInt(x,"cable.indexId").toString
+      ))
+    jsonRs
+  }
+
   def getJsonBrasCard(bras: String,time: String,_type: String): Array[((String,String),Long)] = {
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
     val dateTime = DateTime.parse(time, formatter)

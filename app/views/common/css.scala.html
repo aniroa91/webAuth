@@ -929,6 +929,10 @@
     <link href="../assets/custom/css/vis.min.css" rel="stylesheet">
     <link href="../assets/custom/css/waitMe.css" rel="stylesheet">
     <link href="../assets/custom/css/timeline.min.css" rel="stylesheet">
+    <link href="../assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/vendors/datatables.net-buttons/css/buttons.dataTables.min.css" rel="stylesheet">
+
     <style type="text/css">
             .top_nav .navbar-right {
                 width: auto;
@@ -1001,7 +1005,7 @@
                 font-size: 16px;background: #d9534f;padding: 5px;color: white;
             }
             .xsScroll{
-                max-height: 430px;
+                max-height: 170px;
                 overflow-y: auto;
             }
             .lgScroll{
@@ -1042,7 +1046,8 @@
                 font-size: 15px;color:red ;font-weight: 700;background:ghostwhite;text-align: center
             }
             .tbScroll{
-                height: 455px;overflow-y: auto;background: #190e0e
+                height: 455px;
+                background-image: url(../assets/images/bras-bg.jpg);
             }
             .disInline{
                 width: 100%;
@@ -1055,7 +1060,29 @@
                 border-color: #d6e9c6;
                 color: #3c763d;
             }
-
+            .dataTables_wrapper{
+                margin-bottom: 10px;
+            }
+            .buttons-csv{
+                background: green;
+                margin-right: 5px!important;
+                border: 1px solid green;
+                color: #fff;
+            }
+            .buttons-excel{
+                background: #daa120;
+                margin-right: 5px!important;
+                border: 1px solid #daa120;
+                color: #fff;
+            }
+            .buttons-pdf{
+                background: #80bbbb;
+                border: 1px solid #80bbbb;
+                color: #fff;
+            }
+            .dt-buttons{
+                margin-bottom: 2px!important;
+            }
     </style>
 }
     @if(item == "Bras"){
