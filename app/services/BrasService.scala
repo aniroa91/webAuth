@@ -85,19 +85,6 @@ object BrasService extends AbstractService{
             )
           )
     ).await
-    println("====")
-    println(client.show(
-      search(s"radius-streaming-*" / "con")
-        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
-        aggregations (
-        termsAggregation("linecard")
-          .field("card.lineId")
-          .subAggregations(
-            termsAggregation("card")
-              .field("card.id")
-          )
-        )
-    ))
     val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"))
     mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 -> x._2._1) -> x._2._2).filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")
@@ -110,7 +97,7 @@ object BrasService extends AbstractService{
     val afterHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val response = client.execute(
       search(s"monitor-radius-*" / "docs")
-        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
+        query { must(termQuery("bras_id",bras),rangeQuery("date_time")) } size 100
         sortBy { fieldSort("date_time") order SortOrder.DESC }
     ).await
     println(client.show(
