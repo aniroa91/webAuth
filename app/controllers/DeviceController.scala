@@ -214,8 +214,8 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
     logger.info("success 2")
       // get data heatmap chart
       val sigLog = brasChart.map({ t => (t._1,t._2,t._3)}).filter(t => CommonService.formatUTC(t._1) == time)
-      val numLog = sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._2
-      val numSig = sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._3
+      val numLog = if(sigLog.asInstanceOf[Array[(String,Int,Int)]].length >0) sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._2 else 0
+      val numSig = if(sigLog.asInstanceOf[Array[(String,Int,Int)]].length > 0) sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._3 else 0
       val _type = if(numLog>numSig) "LogOff" else "SignIn"
       val listCard = BrasService.getJsonBrasCard(idBras,time,_type)
       val heatCard = listCard.map(x=> x._1._2)
