@@ -57,7 +57,7 @@ object BrasService extends AbstractService{
     val oldHalfHour  = dateTime.minusMinutes(60).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val response = client.execute(
       search(s"radius-streaming-*" / "con")
-        query { must(termQuery("nasName", bras.toLowerCase),not(termQuery("card.olt", "N/A")),not(termQuery("card.indexId", -1)),not(termQuery("card.ontId", -1)),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(time)))}
+        query { must(termQuery("nasName", bras.toLowerCase),not(termQuery("card.olt", "N/A")),not(termQuery("card.indexId", "-1")),not(termQuery("card.ontId", "-1")),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(time)))}
     ).await
     val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
       .map(x=>(
@@ -85,6 +85,19 @@ object BrasService extends AbstractService{
             )
           )
     ).await
+    println("====")
+    println(client.show(
+      search(s"radius-streaming-*" / "con")
+        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
+        aggregations (
+        termsAggregation("linecard")
+          .field("card.lineId")
+          .subAggregations(
+            termsAggregation("card")
+              .field("card.id")
+          )
+        )
+    ))
     val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"))
     mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 -> x._2._1) -> x._2._2).filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")
@@ -100,6 +113,11 @@ object BrasService extends AbstractService{
         query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
         sortBy { fieldSort("date_time") order SortOrder.DESC }
     ).await
+    println(client.show(
+      search(s"monitor-radius-*" / "docs")
+        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
+        sortBy { fieldSort("date_time") order SortOrder.DESC }
+    ))
     val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
       .map(x=>(
         getValueAsString(x,"date_time"),

@@ -213,7 +213,12 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val userLogoff = BrasService.getUserLogOff(idBras,time)
     logger.info("success 2")
       // get data heatmap chart
+    println("bras println----------")
+    brasChart.map({ t => (t._1,t._2,t._3)}).asInstanceOf[Array[(String,Int,Int)]].foreach(println)
+    println("------------------")
       val sigLog = brasChart.map({ t => (t._1,t._2,t._3)}).filter(t => CommonService.formatUTC(t._1) == time)
+    sigLog.asInstanceOf[Array[(String,Int,Int)]].foreach(println)
+    println("------------")
       val numLog = if(sigLog.asInstanceOf[Array[(String,Int,Int)]].length >0) sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._2 else 0
       val numSig = if(sigLog.asInstanceOf[Array[(String,Int,Int)]].length > 0) sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._3 else 0
       val _type = if(numLog>numSig) "LogOff" else "SignIn"
