@@ -72,8 +72,8 @@ object BrasService extends AbstractService{
   def getJsonBrasCard(bras: String,time: String,_type: String): Array[((String,String),Long)] = {
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
     val dateTime = DateTime.parse(time, formatter)
-    val oldHalfHour  = dateTime.minusHours(14).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
-    val afterHalfHour  = dateTime.plusHours(4).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val oldHalfHour  = dateTime.minusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val afterHalfHour  = dateTime.plusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val response = client.execute(
         search(s"radius-streaming-*" / "con")
           query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
