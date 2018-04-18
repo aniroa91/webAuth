@@ -18,6 +18,7 @@ import slick.jdbc.JdbcProfile
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import services.user.ProfileService
+import play.api.mvc._
 
 case class SearchContract(q: String)
 
@@ -33,11 +34,26 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
     mapping(
       "ct" -> text)(SearchContract.apply)(SearchContract.unapply))
 
-  def index(month: String) = withAuth { username => implicit request =>
+  /* Authentication action*/
+  def Authenticated(f: AuthenticatedRequest => Result) = {
+    Action { request =>
+      val username = request.session.get("username").get.toString
+      username match {
+        case "btgd@ftel" =>
+          f(AuthenticatedRequest(username, request))
+        case none =>
+          Redirect(routes.LoginController.index).withNewSession.flashing(
+            "success" -> "You are now logged out."
+          )
+      }
+    }
+  }
+
+  def index(month: String) = Authenticated { implicit request =>
     val formValidationResult = form.bindFromRequest
     var strMonth = month
     var domain = ""
-    try {
+    //try {
       if (!formValidationResult.hasErrors) {
         domain = formValidationResult.get.q.trim()
         if(month == null || month ==""){
@@ -46,17 +62,16 @@ class ProfileContractController @Inject() (protected val dbConfigProvider: Datab
           strMonth = lastMonth.toString(DateTimeFormat.forPattern("yyyy-MM"))
         }
         val response = ProfileService.get(domain,strMonth)
-        println(response)
-        Ok(views.html.profile.contract.index(form, response, domain+"&day="+strMonth,username,strMonth))
+        Ok(views.html.profile.contract.index(form, response, domain+"&day="+strMonth,request.session.get("username").get.toString,strMonth))
       } else {
-        Ok(views.html.profile.contract.index(form, null, null,username,month))
+        Ok(views.html.profile.contract.index(form, null, null,request.session.get("username").get.toString,month))
       }
-    } catch {
+    /*} catch {
       case e: Exception => {
         e.printStackTrace()
-        Ok(views.html.profile.contract.index(form, null, domain+"&day="+strMonth,username,strMonth))
+        Ok(views.html.profile.contract.index(form, null, domain+"&day="+strMonth,request.session.get("username").get.toString,strMonth))
         }
-    }
+    }*/
   }
 }
 

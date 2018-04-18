@@ -8,6 +8,7 @@ import javax.inject.Singleton
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 import services.CacheService
+import play.api.mvc._
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -25,82 +26,34 @@ class InternetHistoryController @Inject()(cc: ControllerComponents) extends Abst
       "ct" -> text
     )(InternetContract.apply)(InternetContract.unapply))
 
-//<<<<<<< HEAD
-//  def index =  withAuth { username => implicit request =>
-//    val formValidationResult = form.bindFromRequest
-//    try {
-//      if (!formValidationResult.hasErrors) {
-//        val ct = formValidationResult.get.ct.trim()
-//        Ok(views.html.profile.internet.history(form, username,ct))
-//      } else {
-//        Ok(views.html.profile.internet.history(form, username,null))
-//      }
-//    } catch {
-//      case e: Exception => Ok(views.html.profile.internet.history(form, username,null))
-//    }
-//
-//  }
+  /* Authentication action*/
+  def Authenticated(f: AuthenticatedRequest => Result) = {
+    Action { request =>
+      val username = request.session.get("username").get.toString
+      username match {
+        case "btgd@ftel" =>
+          f(AuthenticatedRequest(username, request))
+        case none =>
+          Redirect(routes.LoginController.index).withNewSession.flashing(
+            "success" -> "You are now logged out."
+          )
+      }
+    }
+  }
 
-//  def compareDate =  withAuth { username => implicit request =>
-//    val formValidationResult = form.bindFromRequest
-//    try {
-//      if (!formValidationResult.hasErrors) {
-//        val ct = formValidationResult.get.ct.trim()
-//        Ok(views.html.profile.internet.compareDate(form, username,ct))
-//      } else {
-//        Ok(views.html.profile.internet.compareDate(form, username,null))
-//      }
-//    } catch {
-//      case e: Exception => Ok(views.html.profile.internet.compareDate(form, username,null))
-//    }
-//  }
-//=======
-//  def index =  withAuth { username => implicit request =>
-//    val formValidationResult = form.bindFromRequest
-//    try {
-//      if (!formValidationResult.hasErrors) {
-//        val ct = formValidationResult.get.ct.trim()
-//        val day = formValidationResult.get.date.trim()
-//        Ok(views.html.profile.internet.history(form, username,ct,day))
-//      } else {
-//        Ok(views.html.profile.internet.history(form, username,null,null))
-//      }
-//    } catch {
-//      case e: Exception => Ok(views.html.profile.internet.history(form, username,null,null))
-//    }
-//
-//  }
-//
-//  def compareDate =  withAuth { username => implicit request =>
-//    val formValidationResult = form.bindFromRequest
-//    try {
-//      if (!formValidationResult.hasErrors) {
-//        val ct = formValidationResult.get.ct.trim()
-//        val day = formValidationResult.get.date.trim()
-//        val tptime = formValidationResult.get.tpTime.trim()
-//        Ok(views.html.profile.internet.compareDate(form, username,ct,day,tptime))
-//      } else {
-//        Ok(views.html.profile.internet.compareDate(form, username,null,null,null))
-//      }
-//    } catch {
-//      case e: Exception => Ok(views.html.profile.internet.compareDate(form, username,null,null,null))
-//    }
-//  }
-//>>>>>>> e3035daafbd226c519c0d34b5bdd3d934c46ba0e
-
-  def compareContract =  withAuth { username => implicit request =>
+  def compareContract =  Authenticated { implicit request =>
     val formValidationResult = form.bindFromRequest
     try {
       if (!formValidationResult.hasErrors) {
         val ct = formValidationResult.get.ct.trim()
         val day = formValidationResult.get.date.trim()
         val tptime = formValidationResult.get.tpTime.trim()
-        Ok(views.html.profile.internet.compareContract(form, username,ct,day,tptime))
+        Ok(views.html.profile.internet.compareContract(form, request.session.get("username").get.toString,ct,day,tptime))
       } else {
-        Ok(views.html.profile.internet.compareContract(form, username,null,null,null))
+        Ok(views.html.profile.internet.compareContract(form, request.session.get("username").get.toString,null,null,null))
       }
     } catch {
-      case e: Exception => Ok(views.html.profile.internet.compareContract(form, username,null,null,null))
+      case e: Exception => Ok(views.html.profile.internet.compareContract(form, request.session.get("username").get.toString,null,null,null))
     }
   }
 

@@ -8,6 +8,7 @@ import org.elasticsearch.search.sort.SortOrder
 import org.joda.time.{DateTime, Days}
 
 import scala.collection.mutable
+import scala.util.control.Breaks.{break, breakable}
 
 //import com.ftel.bigdata.dns.parameters.Label
 import com.ftel.bigdata.utils.DateTimeUtil
@@ -46,6 +47,28 @@ object CommonService extends AbstractService {
   /**
    * Service for Get Information about day
    */
+
+  def getLongValueByKey(arr: Array[(String,Long)], key:String):Int = {
+    var value = 0;
+    breakable{for(i <- 0 until arr.length){
+      if(arr(i)._1 == key) {
+        value = arr(i)._2.toInt
+        break
+      }
+    }}
+    return value;
+  }
+  def getIntValueByKey(arr: Array[(Int,Int)], key:Int):Int = {
+    var value = 0;
+    breakable{for(i <- 0 until arr.length){
+      if(arr(i)._1 == key) {
+        value = arr(i)._2
+        break
+      }
+    }}
+    return value;
+  }
+
   def getLatestDay(): String = {
     val response = client.execute(
       search("dns-marker" / "docs") sortBy { fieldSort("day") order SortOrder.DESC } limit 1).await(Duration(30, SECONDS))
@@ -84,6 +107,63 @@ object CommonService extends AbstractService {
         val upload = x.get("upload").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
         val duration = x.get("duration").get.asInstanceOf[Map[String, Double]].get("value").get.toLong
         (key, contract, count, download, upload, duration)
+      })
+      .toArray
+  }
+
+  def getAggregationsSiglog(aggr: Option[AnyRef]): Array[(String, Long)] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val count = x.getOrElse("doc_count", 0L).toString().toLong
+        (key, count)
+      })
+      .toArray
+  }
+
+  def getMultiAggregations(aggr: Option[AnyRef]):  Array[(String, Array[(String, Array[(String, Long)])])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse("card",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+           .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+             .map(x => x.asInstanceOf[Map[String,AnyRef]])
+               .map(x => {
+                 val keyCard = x.getOrElse("key","0L").toString
+                 val map = x.getOrElse("port",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+                             .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+                               .map(x=> x.asInstanceOf[Map[String,AnyRef]])
+                                  .map(x=> {
+                                    val keyPort = x.getOrElse("key","0L").toString
+                                    val count = x.getOrElse("doc_count",0L).toString.toLong
+                                    (keyPort,count)
+                                  }).toArray
+                 (keyCard,map)
+               }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
+  def getSecondAggregations(aggr: Option[AnyRef]):  Array[(String, Array[(String, Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse("card",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val keyCard = x.getOrElse("key","0L").toString
+            val count = x.getOrElse("doc_count",0L).toString.toLong
+            (keyCard,count)
+          }).toArray
+        (key, map)
       })
       .toArray
   }
@@ -389,6 +469,32 @@ object CommonService extends AbstractService {
     val formatter = DateTimeFormat.forPattern("yyyy-mm-dd")
     val dateTime = DateTime.parse(date, formatter)
     dateTime.toString(DateTimeFormat.forPattern("dd/mm/yyyy"))
+  }
+
+  def formatUTC(date: String): String = {
+    val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    val formatter = DateTimeFormat.forPattern(ES_5_DATETIME_FORMAT)
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+  }
+
+  def formatMilisecondToDate(second: Long): Int = {
+   /* val date = DateTime(second,DateTimeUtil.TIMEZONE_HCM)
+    date.getHours()*/
+    1
+  }
+
+  def formatStringToMillisecond(date: String):Long = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.getMillis()
+  }
+
+  def formatStringToUTC(date: String): String = {
+    val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.toString(DateTimeFormat.forPattern(ES_5_DATETIME_FORMAT))
   }
 
   def formatYYYYmmddHHmmss( date : String) : String = {

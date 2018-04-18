@@ -1,5 +1,6 @@
 package controllers
 
+import play.api.mvc._
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.mvc.AbstractController
@@ -16,8 +17,22 @@ import com.ftel.bigdata.utils.DateTimeUtil
   */
 @Singleton
 class CompareController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured {
+  /* Authentication action*/
+  def Authenticated(f: AuthenticatedRequest => Result) = {
+    Action { request =>
+      val username = request.session.get("username").get.toString
+      username match {
+        case "btgd@ftel" =>
+          f(AuthenticatedRequest(username, request))
+        case none =>
+          Redirect(routes.LoginController.index).withNewSession.flashing(
+            "success" -> "You are now logged out."
+          )
+      }
+    }
+  }
 
-  def index(domains: String) =  Action {
+  def index(domains: String) =  Authenticated { implicit request =>
 //    Ok(views.html.compareDate.index())
 //    Ok(domains)
     val responses = domains.split(",").map(x => x -> CacheService.getDomain(x)._1).toMap.filter(x => x._2 != null)
