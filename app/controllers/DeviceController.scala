@@ -209,14 +209,14 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
       val brasChart = BrasService.getJsonESBrasChart(idBras,time)
     //logger.info("success 1")
       //val listCard = Await.result(BrasService.getBrasCard(idBras,time,"",""),Duration.Inf)
-      // get logoff user
-      val userLogoff = BrasService.getUserLogOff(idBras,time)
-    //logger.info("success 2")
       // get data heatmap chart
       val sigLog = brasChart.map({ t => (t._1,t._2,t._3)}).filter(t => CommonService.formatUTC(t._1) == time)
       val numLog = if(sigLog.asInstanceOf[Array[(String,Int,Int)]].length >0) sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._2 else 0
       val numSig = if(sigLog.asInstanceOf[Array[(String,Int,Int)]].length > 0) sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._3 else 0
       val _type = if(numLog>numSig) "LogOff" else "SignIn"
+      // get logoff user
+      val userLogoff = BrasService.getUserLogOff(idBras,time,_type)
+      // get list card
       val listCard = BrasService.getJsonBrasCard(idBras,time,_type)
       val heatCard = listCard.map(x=> x._1._2)
       val heatLinecard = listCard.map(x=> x._1._1)

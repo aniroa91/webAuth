@@ -125,7 +125,7 @@
                                 <th>Host-Module-Index</th>
                             </tr>
                         </thead>
-                        <tbody style="color: red;background: #190e0e">
+                        <tbody>
                         </tbody>
                     </table>
 
@@ -554,6 +554,12 @@
                                                 dtBras.userLogoff[i][2]
                                             ] ).draw( false );
                                         }
+                                        var sigLog = dtBras.sigLog
+                                        var color = 'green';
+                                        if(sigLog[0][1] <= sigLog[0][2]){
+                                            color = 'red';
+                                        }
+                                        $('#tbUser tbody').attr('style','background: #190e0e;color:'+color)
                                         // custom button group export
                                         if(!($('#tbUser i:eq(0)').hasClass('fa-download'))) {
                                             $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
