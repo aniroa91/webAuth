@@ -86,7 +86,7 @@ object BrasesCard {
     //val strTime = time.substring(0,time.indexOf(".")+2)
     //val strOld = oldTime.substring(0,oldTime.indexOf(".")+2)
     dbConfig.db.run(
-      sql"""SELECT distinct tbK.error_name,tbK.severity,tbO.service_name,tbO.service_status
+      sql"""SELECT distinct case when tbK.error_name='' then tbK.facility else tbK.error_name end,tbK.severity,tbO.service_name,tbO.service_status
             FROM
                 (select * from public.dwh_kibana
                  where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
