@@ -178,10 +178,12 @@
                             </tr>
                         </thead>
                     </table>
-                    <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700" id="tbHost">
-                        <tbody style="color: #f5f10d;background: #190e0e">
-                        </tbody>
-                    </table>
+                    <div id="divHost">
+                        <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700" id="tbHost">
+                            <tbody style="color: #f5f10d;background: #190e0e">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -301,14 +303,28 @@
                     $('#grapBras').toggleClass("leftDiv");
                 });
 
-                function getData(data,isCheck){
+                function getData(data,isCheck,isKnow){
                     var jsonArr = [];
                     for (var i =0 ; i < data.length; i++) {
                         var user = data[i][1]
                         var arrLineCard = data[i][0]
-                        jsonArr.push([Number(arrLineCard[1]),Number(arrLineCard[0]),Number(user)]);
+                        var vlLine = Number(arrLineCard[1])
+                        var vlCard = Number(arrLineCard[0])
+                        if(isKnow == 1){
+                            vlLine += 1
+                            vlCard += 1
+                        }
+                        jsonArr.push([Number(vlLine),Number(vlCard),Number(user)]);
                     }
                     return jsonArr
+                }
+
+                function checkUnknowValue(data){
+                    var isKnown = 0
+                    var arrNum = data.map(Number)
+                    if(arrNum.includes(-1))
+                        isKnown = 1
+                    return isKnown
                 }
 
                 function getCard(arrCard,type){
@@ -318,7 +334,9 @@
                     else
                         var title = "Linecard"
                     var arrNum = arrCard.map(Number)
-                    for (var i = 0; i <= Math.max.apply(null, arrNum); i++) {
+                    var istart = 0
+                    if(arrNum.includes(-1)) istart = Math.min.apply(null, arrNum)
+                    for (var i = istart; i <= Math.max.apply(null, arrNum); i++) {
                         jsonArr.push( title+" "+i);
                     }
                     return jsonArr
@@ -327,20 +345,23 @@
                 function drawHeatMapChart(dta){
                     var sigLog = dta.sigLog
                     var isLog = 0;
-                    var color = '#1ABB9C';
+                    var color = '#d9534f';
                     var titUser = " users log off"
                     if(sigLog[0][1] <= sigLog[0][2]){
                         $('#titLineCard').text("SignIn per card per line-cards");
                         titUser=" users signin";
                         isLog =1;
-                        color = '#d9534f';
+                        color = '#1ABB9C';
                     }
                     else{
                         $('#titLineCard').text("Logoff per card per line-cards");
                     }
                     var cardLabel = getCard(dta.heatCard,1)
                     var linecardLabel = getCard(dta.heatLinecard,0)
-                    var dtCard = getData(dta.dtaCard,isLog)
+                    var isCheckKnow = 0
+                    if(checkUnknowValue(dta.heatCard) >0 || checkUnknowValue(dta.heatLinecard)>0)
+                        isCheckKnow = 1
+                    var dtCard = getData(dta.dtaCard,isLog,isCheckKnow)
                     if(dtCard.length >0) {
                         $('#heat_map').attr('style','height:385px');
                         Highcharts.chart('heat_map', {
@@ -555,9 +576,9 @@
                                             ] ).draw( false );
                                         }
                                         var sigLog = dtBras.sigLog
-                                        var color = 'green';
+                                        var color = 'red';
                                         if(sigLog[0][1] <= sigLog[0][2]){
-                                            color = 'red';
+                                            color = 'green';
                                         }
                                         $('#tbUser tbody').attr('style','background: #190e0e;color:'+color)
                                         // custom button group export
@@ -582,7 +603,7 @@
                                     $('#lbHost').text("Hosts of " + brasId)
                                     var html = getTableHost(dtBras.host);
                                     if(html == "") {
-                                        $('#tbHost').attr('style','height: 73px');
+                                        $('#divHost').attr('style','height: 73px');
                                         $('.tbScroll').attr('style','height: auto');
                                         $('#btnCSV').hide();
                                         $('#tbHost tbody').attr('style','background: transparent');
@@ -592,7 +613,7 @@
                                     }
                                     else{
                                         $('#btnCSV').show();
-                                        $('#tbHost').attr('style','max-height: 380px;overflow: auto');
+                                        $('#divHost').attr('style','max-height: 380px;overflow: auto');
                                         $('.tbScroll').attr('style','height: 420px');
                                         $('#tbHost tbody').attr('style','color: #f5f10d;background: #190e0e');
                                         $('#tbHost tbody').html('');

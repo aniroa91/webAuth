@@ -76,7 +76,7 @@ object BrasService extends AbstractService{
     val afterHalfHour  = dateTime.plusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val response = client.execute(
         search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour)))}
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(time)).lt(CommonService.formatStringToUTC(afterHalfHour)))}
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -86,9 +86,9 @@ object BrasService extends AbstractService{
             )
           )
     ).await
-    val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"))
+    val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"),"card")
     mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
-      .map(x => (x._1 -> x._2._1) -> x._2._2).filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")
+      .map(x => (x._1 -> x._2._1) -> x._2._2)/*.filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")*/
   }
 
   def getJsonESBrasChart(bras: String,time: String):Array[(String,Int,Int,Int)] = {
@@ -136,7 +136,7 @@ object BrasService extends AbstractService{
   def getKibanaBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
     BrasDAO.getKibanaBytimeResponse(bras,nowDay,hourly)
   }
-  def getKibanaBytimeES(bras: String,day: String): Unit ={
+  def getKibanaBytimeES(bras: String,day: String): Array[(Int,Int)] ={
     BrasDAO.getKibanaBytimeES(bras,day)
   }
 
@@ -177,21 +177,36 @@ object BrasService extends AbstractService{
   def getErrorSeverityResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
     BrasDAO.getErrorSeverityResponse(bras,nowDay)
   }
+  def getErrorSeverityES(bras: String,nowDay: String): Array[(String,Long)] = {
+    BrasDAO.getErrorSeverityES(bras,nowDay)
+  }
 
   def getErrorTypeResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
     BrasDAO.getErrorTypeResponse(bras,nowDay)
+  }
+  def getErrorTypeES(bras: String,nowDay: String): Array[(String,Long)] = {
+    BrasDAO.getErrorTypeES(bras,nowDay)
   }
 
   def getFacilityResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
     BrasDAO.getFacilityResponse(bras,nowDay)
   }
+  def getFacilityES(bras: String,nowDay: String): Array[(String,Long)] = {
+    BrasDAO.getFacilityES(bras,nowDay)
+  }
 
   def getDdosResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
     BrasDAO.getDdosResponse(bras,nowDay)
   }
+  def getDdosES(bras: String,nowDay: String): Array[(String,Long)] = {
+    BrasDAO.getDdosES(bras,nowDay)
+  }
 
   def getSeveValueResponse(bras: String,nowDay: String):Future[Seq[(String,String,Int)]] = {
     BrasDAO.getSeveValueResponse(bras,nowDay)
+  }
+  def getSeveValueES(bras: String,nowDay: String):  Array[((String,String),Long)] = {
+    BrasDAO.getSeveValueES(bras,nowDay)
   }
 
   // end page Search Bras

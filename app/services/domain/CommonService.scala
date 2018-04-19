@@ -149,13 +149,13 @@ object CommonService extends AbstractService {
       .toArray
   }
 
-  def getSecondAggregations(aggr: Option[AnyRef]):  Array[(String, Array[(String, Long)])] = {
+  def getSecondAggregations(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long)])] = {
     aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
       .map(x => x.asInstanceOf[Map[String, AnyRef]])
       .map(x => {
         val key = x.getOrElse("key", "0L").toString
-        val map = x.getOrElse("card",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
           .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
           .map(x => x.asInstanceOf[Map[String,AnyRef]])
           .map(x => {
@@ -490,6 +490,13 @@ object CommonService extends AbstractService {
     dateTime.getMillis()
   }
 
+  def formatYYmmddToUTC(date: String): String = {
+    val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.toString(DateTimeFormat.forPattern(ES_5_DATETIME_FORMAT))
+  }
+
   def formatStringToUTC(date: String): String = {
     val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
@@ -509,6 +516,10 @@ object CommonService extends AbstractService {
     val hours = (minutes / 60)
     val days = (hours / 24)
     s"${days}d ${hours%24}h ${minutes%60}m ${seconds.toInt%60}s"
+  }
+
+  def getHoursFromMiliseconds(miliseconds: Long): Int = {
+    new DateTime(miliseconds).getHourOfDay()
   }
   
   /**
