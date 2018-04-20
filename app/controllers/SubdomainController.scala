@@ -7,7 +7,6 @@ import play.api.mvc.ControllerComponents
 import services.CacheService
 import java.text.NumberFormat
 import com.ftel.bigdata.utils.NumberUtil
-import dns.utils.DataSampleUtil
 import com.ftel.bigdata.utils.DomainUtil
 import services.domain.CommonService
 import com.ftel.bigdata.utils.StringUtil

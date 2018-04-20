@@ -1,5 +1,7 @@
 package controllers
 
+import play.api.mvc._
+import controllers.Secured
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.mvc.AbstractController

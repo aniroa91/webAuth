@@ -10,7 +10,6 @@ import javax.inject.Singleton
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 
-
 @Singleton
 class LoginController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
@@ -35,7 +34,7 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
         case "btgd@ftel" =>
           Redirect(routes.DashboardController.index)
         case "noc" =>
-          Redirect(routes.DeviceController.dashboard)
+          Redirect("/device")
       }
     }
     else
@@ -50,7 +49,7 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
           case "btgd@ftel" =>
             Redirect(routes.DashboardController.index).withSession(Security.username -> user._1)
           case "noc" =>
-            Redirect(routes.DeviceController.dashboard).withSession(Security.username -> user._1)
+            Redirect("/device").withSession(Security.username -> user._1)
         }
       }
     )
