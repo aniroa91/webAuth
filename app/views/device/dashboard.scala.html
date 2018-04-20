@@ -99,7 +99,7 @@
         </div>
         <br>
         <div class="row" style="margin-top: 15px">
-            <div class="col-lg-5 col-sm-5 col-md-5 col-xs-12" id="divBras" style="display: none">
+            <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12" id="divBras" style="display: none">
                     <table class="data table table-bordered" id="tbBras" style="margin-bottom: 0px">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 14px">
@@ -107,9 +107,9 @@
                                 <th colspan="2">Opsview</th>
                             </tr>
                             <tr style="color: cornsilk">
-                                <th colspan="1">Error Name</th>
+                                <th colspan="1" style="width: 35%">Error Name</th>
                                 <th colspan="1">Severity</th>
-                                <th colspan="1">Service Name</th>
+                                <th colspan="1" style="width: 35%">Service Name</th>
                                 <th colspan="1">Service Status</th>
                             </tr>
                         </thead>
@@ -120,17 +120,17 @@
                     <table class="data table table-bordered" id="tbUser" style="margin-bottom: 0px">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 14px">
-                                <th>Name</th>
+                                <th style="width: 35%">Name</th>
                                 <th>Time</th>
                                 <th>Host-Module-Index</th>
                             </tr>
                         </thead>
-                        <tbody style="color: red;background: #190e0e">
+                        <tbody>
                         </tbody>
                     </table>
 
             </div>
-            <div class="col-lg-7 col-sm-7 col-md-7 col-xs-12" id="heat-mapChart" style="display: none">
+            <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12" id="heat-mapChart" style="display: none">
                 <div class="titleInline">
                     <h2 id="titLineCard" style="margin-right: 5px;font-weight: 600"></h2> <i class="fa fa-info-circle toolTipText" title="Data card is loaded between 1 minutes before and 1 minutes later than the current time bras"></i>
                     <div class="clearfix"></div>
@@ -178,10 +178,12 @@
                             </tr>
                         </thead>
                     </table>
-                    <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700" id="tbHost">
-                        <tbody style="color: #f5f10d;background: #190e0e">
-                        </tbody>
-                    </table>
+                    <div id="divHost">
+                        <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700" id="tbHost">
+                            <tbody style="color: #f5f10d;background: #190e0e">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -301,14 +303,28 @@
                     $('#grapBras').toggleClass("leftDiv");
                 });
 
-                function getData(data,isCheck){
+                function getData(data,isCheck,isKnow){
                     var jsonArr = [];
                     for (var i =0 ; i < data.length; i++) {
                         var user = data[i][1]
                         var arrLineCard = data[i][0]
-                        jsonArr.push([Number(arrLineCard[1]),Number(arrLineCard[0]),Number(user)]);
+                        var vlLine = Number(arrLineCard[1])
+                        var vlCard = Number(arrLineCard[0])
+                        if(isKnow == 1){
+                            vlLine += 1
+                            vlCard += 1
+                        }
+                        jsonArr.push([Number(vlLine),Number(vlCard),Number(user)]);
                     }
                     return jsonArr
+                }
+
+                function checkUnknowValue(data){
+                    var isKnown = 0
+                    var arrNum = data.map(Number)
+                    if(arrNum.includes(-1))
+                        isKnown = 1
+                    return isKnown
                 }
 
                 function getCard(arrCard,type){
@@ -318,7 +334,9 @@
                     else
                         var title = "Linecard"
                     var arrNum = arrCard.map(Number)
-                    for (var i = 0; i <= Math.max.apply(null, arrNum); i++) {
+                    var istart = 0
+                    if(arrNum.includes(-1)) istart = Math.min.apply(null, arrNum)
+                    for (var i = istart; i <= Math.max.apply(null, arrNum); i++) {
                         jsonArr.push( title+" "+i);
                     }
                     return jsonArr
@@ -327,20 +345,23 @@
                 function drawHeatMapChart(dta){
                     var sigLog = dta.sigLog
                     var isLog = 0;
-                    var color = '#1ABB9C';
+                    var color = '#d9534f';
                     var titUser = " users log off"
                     if(sigLog[0][1] <= sigLog[0][2]){
                         $('#titLineCard').text("SignIn per card per line-cards");
                         titUser=" users signin";
                         isLog =1;
-                        color = '#d9534f';
+                        color = '#1ABB9C';
                     }
                     else{
                         $('#titLineCard').text("Logoff per card per line-cards");
                     }
                     var cardLabel = getCard(dta.heatCard,1)
                     var linecardLabel = getCard(dta.heatLinecard,0)
-                    var dtCard = getData(dta.dtaCard,isLog)
+                    var isCheckKnow = 0
+                    if(checkUnknowValue(dta.heatCard) >0 || checkUnknowValue(dta.heatLinecard)>0)
+                        isCheckKnow = 1
+                    var dtCard = getData(dta.dtaCard,isLog,isCheckKnow)
                     if(dtCard.length >0) {
                         $('#heat_map').attr('style','height:385px');
                         Highcharts.chart('heat_map', {
@@ -554,6 +575,12 @@
                                                 dtBras.userLogoff[i][2]
                                             ] ).draw( false );
                                         }
+                                        var sigLog = dtBras.sigLog
+                                        var color = 'red';
+                                        if(sigLog[0][1] <= sigLog[0][2]){
+                                            color = 'green';
+                                        }
+                                        $('#tbUser tbody').attr('style','background: #190e0e;color:'+color)
                                         // custom button group export
                                         if(!($('#tbUser i:eq(0)').hasClass('fa-download'))) {
                                             $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
@@ -576,7 +603,7 @@
                                     $('#lbHost').text("Hosts of " + brasId)
                                     var html = getTableHost(dtBras.host);
                                     if(html == "") {
-                                        $('#tbHost').attr('style','height: 73px');
+                                        $('#divHost').attr('style','height: 73px');
                                         $('.tbScroll').attr('style','height: auto');
                                         $('#btnCSV').hide();
                                         $('#tbHost tbody').attr('style','background: transparent');
@@ -586,7 +613,7 @@
                                     }
                                     else{
                                         $('#btnCSV').show();
-                                        $('#tbHost').attr('style','max-height: 380px;overflow: auto');
+                                        $('#divHost').attr('style','max-height: 380px;overflow: auto');
                                         $('.tbScroll').attr('style','height: 420px');
                                         $('#tbHost tbody').attr('style','color: #f5f10d;background: #190e0e');
                                         $('#tbHost tbody').html('');

@@ -108,10 +108,10 @@ object BrasDAO {
                   """
         .as[(Int,Int)])
   }
-  def getKibanaBytimeES(bras: String,day: String) ={
+  def getKibanaBytimeES(bras: String,day: String): Array[(Int,Int)] ={
     val rs = client_kibana.execute(
-      search(s"infra_dwh_kibana" / "docs")
-        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatStringToMillisecond(day.split("/")(0))).lt(CommonService.formatStringToMillisecond(CommonService.getNextDay(day.split("/")(1))))) }
+      search(s"infra_dwh_kibana_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations(
         dateHistogramAggregation("hourly")
           .field("date_time")
@@ -119,19 +119,7 @@ object BrasDAO {
           .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
         )
     ).await
-    println(client_kibana.show(
-      search(s"infra_dwh_kibana" / "docs")
-        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatStringToMillisecond(day.split("/")(0))).lt(CommonService.formatStringToMillisecond(CommonService.getNextDay(day.split("/")(1))))) }
-        aggregations(
-        dateHistogramAggregation("hourly")
-          .field("date_time")
-          .interval(DateHistogramInterval.HOUR)
-          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
-        )
-    ))
-    //println("========="+CommonService.formatMilisecondToDate("1523462400000".toLong))
-
-    CommonService.getAggregationsSiglog(rs.aggregations.get("hourly")).foreach(println)
+    CommonService.getAggregationsSiglog(rs.aggregations.get("hourly")).map(x=> (CommonService.getHoursFromMiliseconds(x._1.toLong)->x._2.toInt))
   }
 
   def getSigLogBytimeResponse(bras: String,nowDay: String,hourly:Int): Future[Seq[(Int,Int,Int)]] = {
@@ -146,19 +134,19 @@ object BrasDAO {
                   """
         .as[(Int,Int,Int)])
   }
-  def getSigLogBytimeCurrent(bras: String, nowDay: String): SigLogByTime = {
+  def getSigLogBytimeCurrent(bras: String, day: String): SigLogByTime = {
     val mulRes = client.execute(
       multi(
-        search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn")) }
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
             dateHistogramAggregation("hourly")
             .field("timestamp")
             .interval(DateHistogramInterval.HOUR)
             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
           ),
-        search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff")) }
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           dateHistogramAggregation("hourly")
             .field("timestamp")
@@ -167,16 +155,6 @@ object BrasDAO {
           )
       )
     ).await
-/*    println(client.show(
-      search(s"radius-streaming-$nowDay" / "con")
-        query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn")) }
-        aggregations (
-        dateHistogramAggregation("hourly")
-          .field("timestamp")
-          .interval(DateHistogramInterval.HOUR)
-          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
-        )
-    ))*/
     val arrSigin = CommonService.getAggregationsSiglog(mulRes.responses(0).aggregations.get("hourly")).map(x=>x._2.toInt)
     val arrLogoff = CommonService.getAggregationsSiglog(mulRes.responses(1).aggregations.get("hourly")).map(x=>x._2.toInt)
     SigLogByTime(arrSigin,arrLogoff)
@@ -264,11 +242,11 @@ object BrasDAO {
                   """
         .as[(String,Int,Int)])
   }
-  def getLinecardhostCurrent(bras: String,nowDay: String): Array[(String,String)] = {
+  def getLinecardhostCurrent(bras: String,day: String): Array[(String,String)] = {
     val multiRs = client.execute(
       multi(
-       search(s"radius-streaming-$nowDay" / "con")
-        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1"))) }
+       search(s"radius-streaming-*" / "con")
+        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations (
         termsAggregation("linecard")
           .field("card.lineId")
@@ -281,8 +259,8 @@ object BrasDAO {
               )
           )
         ),
-        search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")))}
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -324,6 +302,18 @@ object BrasDAO {
                   """
         .as[(String,Int)])
   }
+  def getErrorSeverityES(bras: String,day: String): Array[(String,Long)] ={
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_kibana_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        aggregations(
+        termsAggregation("severity")
+          .field("severity.keyword")
+        )
+    ).await
+
+    CommonService.getAggregationsSiglog(rs.aggregations.get("severity"))
+  }
 
   def getErrorTypeResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
     val fromDay = nowDay.split("/")(0)
@@ -334,6 +324,18 @@ object BrasDAO {
             group by error_type
                   """
         .as[(String,Int)])
+  }
+  def getErrorTypeES(bras: String,day: String): Array[(String,Long)] ={
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_kibana_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        aggregations(
+        termsAggregation("error_type")
+          .field("error_type.keyword")
+        )
+    ).await
+
+    CommonService.getAggregationsSiglog(rs.aggregations.get("error_type"))
   }
 
   def getFacilityResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
@@ -346,6 +348,18 @@ object BrasDAO {
                   """
         .as[(String,Int)])
   }
+  def getFacilityES(bras: String,day: String): Array[(String,Long)] ={
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_kibana_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        aggregations(
+        termsAggregation("facility")
+          .field("facility.keyword")
+        )
+    ).await
+
+    CommonService.getAggregationsSiglog(rs.aggregations.get("facility"))
+  }
 
   def getDdosResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
     val fromDay = nowDay.split("/")(0)
@@ -356,6 +370,20 @@ object BrasDAO {
             group by description
                   """
         .as[(String,Int)])
+  }
+  def getDdosES(bras: String,day: String): Array[(String,Long)] ={
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_kibana_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),termQuery("error_type","ddos"),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        aggregations(
+        termsAggregation("description")
+          .field("description.keyword")
+          .subaggs(
+            sumAgg("sum","value")
+          )
+        )
+    ).await
+    CommonService.getTerm(rs, "description", "sum")
   }
 
   def getSeveValueResponse(bras: String,nowDay: String): Future[Seq[(String,String,Int)]] = {
@@ -368,6 +396,24 @@ object BrasDAO {
                   """
         .as[(String,String,Int)])
   }
+  def getSeveValueES(bras: String,day: String): Array[((String,String),Long)] ={
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_kibana_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),not(termQuery("error_name.keyword","")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        aggregations(
+        termsAggregation("severity")
+          .field("severity.keyword")
+          .subAggregations(
+            termsAggregation("error_name")
+              .field("error_name.keyword")
+          )
+        )
+    ).await
+    val mapSevErr = CommonService.getSecondAggregations(rs.aggregations.get("severity"),"error_name")
+
+    mapSevErr.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1, x._2._1) -> x._2._2)
+  }
 
   def getSigLogByHost(bras: String,nowDay: String): SigLogByHost = {
     val arrDay = CommonService.getRangeDay(nowDay).split(",")
@@ -377,21 +423,21 @@ object BrasDAO {
     }
     val multiRs = client.execute(
       multi(
-        search(s"$streamingIndex" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn")) }
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
           aggregations (
           termsAggregation("olt")
             .field("card.olt")
           ),
-        search(s"$streamingIndex" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff")) }
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
           aggregations (
           termsAggregation("olt")
             .field("card.olt")
           )
       )
     ).await
-    if(multiRs.responses(0).hits != null && multiRs.responses(1) != null) {
+    if(multiRs.responses(0).hits != null && multiRs.responses(1).hits != null) {
       val arrSigin = CommonService.getAggregationsSiglog(multiRs.responses(0).aggregations.get("olt"))
       val arrLogoff = CommonService.getAggregationsSiglog(multiRs.responses(1).aggregations.get("olt"))
       //val rs = (arrSigin++arrLogoff).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("-")}.filter(x=> x._1 != "").filter(x=> x._1 != "N/A").toArray

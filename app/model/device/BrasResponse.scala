@@ -28,11 +28,11 @@ case class ServiceNameStatus(
                        )
 
 case class KibanaOverview(
-                              arrSeverity: Seq[(String,Int)],
-                              arrErrorType: Seq[(String,Int)],
-                              arrFacility: Seq[(String,Int)],
-                              arrDdos: Seq[(String,Int)],
-                              arrSevValue: Seq[(String,String,Int)]
+                              arrSeverity: Array[(String,Long)],
+                              arrErrorType: Array[(String,Long)],
+                              arrFacility: Array[(String,Long)],
+                              arrDdos: Array[(String,Long)],
+                              arrSevValue:  Array[((String,String),Long)]
                             )
 case class BrasOutlier(
                       time: String,
