@@ -134,19 +134,19 @@ object BrasDAO {
                   """
         .as[(Int,Int,Int)])
   }
-  def getSigLogBytimeCurrent(bras: String, nowDay: String): SigLogByTime = {
+  def getSigLogBytimeCurrent(bras: String, day: String): SigLogByTime = {
     val mulRes = client.execute(
       multi(
-        search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn")) }
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
             dateHistogramAggregation("hourly")
             .field("timestamp")
             .interval(DateHistogramInterval.HOUR)
             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
           ),
-        search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff")) }
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           dateHistogramAggregation("hourly")
             .field("timestamp")
@@ -242,11 +242,11 @@ object BrasDAO {
                   """
         .as[(String,Int,Int)])
   }
-  def getLinecardhostCurrent(bras: String,nowDay: String): Array[(String,String)] = {
+  def getLinecardhostCurrent(bras: String,day: String): Array[(String,String)] = {
     val multiRs = client.execute(
       multi(
-       search(s"radius-streaming-$nowDay" / "con")
-        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1"))) }
+       search(s"radius-streaming-*" / "con")
+        query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations (
         termsAggregation("linecard")
           .field("card.lineId")
@@ -259,8 +259,8 @@ object BrasDAO {
               )
           )
         ),
-        search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")))}
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")

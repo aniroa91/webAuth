@@ -86,7 +86,6 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         var logoff = 0
         val fromDay = day.split("/")(0)
         var nextDay = CommonService.getNextDay(day.split("/")(1))
-        var linecardhost = new  Array[(String,String)](0)
         var siginBytime = new Array[Int](0)
         var logoffBytime = new Array[Int](0)
         val timeStart= System.currentTimeMillis()
@@ -99,13 +98,6 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
           logoff = sigLog._2
           // number outlier
           numOutlier = BrasService.getNoOutlierCurrent(brasId,CommonService.getCurrentDay())
-          // line-card-port
-          val linecardCurrent = BrasService.getLinecardhostCurrent(brasId,CommonService.getCurrentDay())
-          linecardhost = linecardCurrent
-          // SIGNIN LOGOFF BY TIME
-          val rsLogsigBytime = BrasService.getSigLogBytimeCurrent(brasId,CommonService.getCurrentDay())
-          siginBytime = rsLogsigBytime.sumSig
-          logoffBytime = rsLogsigBytime.sumLog
         }
         val t0 = System.currentTimeMillis()
         /* GET HISTORY DATA */
@@ -118,40 +110,56 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
           logoff = if (siginLogoff.length > 0) {
             siginLogoff(0)._2 + logoff
           } else logoff
-          println("t00: "+(System.currentTimeMillis() - t0))
+          logger.info("t00: "+(System.currentTimeMillis() - t0))
           val t01 = System.currentTimeMillis()
           // number outlier
           val noOutlier = Await.result(BrasService.getNoOutlierResponse(brasId, day), Duration.Inf)
           numOutlier += noOutlier.sum.toInt
-          println("t01: "+(System.currentTimeMillis() - t01))
-          val t02 = System.currentTimeMillis()
-          // LINECARD, CARD, PORT
+          logger.info("t01: "+(System.currentTimeMillis() - t01))
+         /* val t02 = System.currentTimeMillis()
+           LINECARD, CARD, PORT
           val seqLinecard = Await.result(BrasService.getLinecardhostResponse(brasId,day), Duration.Inf)
           val linecardhistory = seqLinecard.map(x=>x._1-> (x._2+"-"+x._3)).toArray
+          linecardhistory.foreach(println)
           linecardhost = (linecardhost++linecardhistory).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toArray
-          println("t02: "+(System.currentTimeMillis() - t02))
-          val t03 = System.currentTimeMillis()
+          println("t02: "+(System.currentTimeMillis() - t02))*/
 
+         /* val t03 = System.currentTimeMillis()
           // SIGNIN LOGOFF BY TIME
           val rsSigtime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getSigLogBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._2)).map(x=> x._2.sum)
+          println("====")
+          rsSigtime.foreach(println)
           siginBytime = siginBytime.zipAll(rsSigtime,0,0).map { case (x, y) => x + y }
+          println("====")
+          siginBytime.foreach(println)
           val rsLogtime = hourlyStr.split(",").map(x=> x-> Await.result(BrasService.getSigLogBytimeResponse(brasId,day,x.toInt), Duration.Inf).map(x=> x._3)).map(x=> x._2.sum)
           logoffBytime = logoffBytime.zipAll(rsLogtime,0,0).map { case (x, y) => x + y }
-          println("t03: "+(System.currentTimeMillis() - t03))
+          println("t03: "+(System.currentTimeMillis() - t03))*/
 
         }
+        // SIGNIN LOGOFF BY TIME
+        val t03 = System.currentTimeMillis()
+        val rsLogsigBytime = BrasService.getSigLogBytimeCurrent(brasId,day)
+        siginBytime = rsLogsigBytime.sumSig
+        siginBytime.foreach(println)
+        logoffBytime = rsLogsigBytime.sumLog
+        logger.info("tSigLogBytime: "+(System.currentTimeMillis() - t03))
+
+        val t02= System.currentTimeMillis()
+        // line-card-port
+        val linecardhost = BrasService.getLinecardhostCurrent(brasId,day)
+        logger.info("tLinecardhost: "+(System.currentTimeMillis() - t02))
 
         val t1 = System.currentTimeMillis()
         // Nerror (kibana & opview) By Time
         val arrOpsview = Await.result(BrasService.getOpviewBytimeResponse(brasId,day,0), Duration.Inf).toArray
-        println("t1: "+(System.currentTimeMillis() - t1))
-
         val opviewBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrOpsview,x)).toArray
+        logger.info("tOpsviewBytime: "+(System.currentTimeMillis() - t1))
         //val arrKibana = Await.result(BrasService.getKibanaBytimeResponse(brasId,day,0), Duration.Inf).toArray
         val t20= System.currentTimeMillis()
         val arrKibana = BrasService.getKibanaBytimeES(brasId,day)
         val kibanaBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana,x)).toArray
-        println("t2: "+(System.currentTimeMillis() - t20))
+        logger.info("tKibanaBytime: "+(System.currentTimeMillis() - t20))
         // INF ERROR
         val t3= System.currentTimeMillis()
         val arrInferror = Await.result(BrasService.getInfErrorBytimeResponse(brasId,day,0), Duration.Inf).toArray
@@ -159,12 +167,12 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         //val infErrorBytime = null
         // INF HOST
         val infHostBytime = Await.result(BrasService.getInfhostResponse(brasId,day), Duration.Inf).map(x=> x._1->(x._2->x._3))
-        println("t3: "+(System.currentTimeMillis() - t3))
+        logger.info("tInfHostBytime: "+(System.currentTimeMillis() - t3))
         // val infHostBytime = null
         val t4= System.currentTimeMillis()
         // INF MODULE
         val infModuleBytime = Await.result(BrasService.getInfModuleResponse(brasId,day), Duration.Inf)
-        println("t4: "+(System.currentTimeMillis() - t4))
+        logger.info("tInfModuleBytime: "+(System.currentTimeMillis() - t4))
         //val infModuleBytime = null
         val t5= System.currentTimeMillis()
         // OPVIEW TREE MAP
@@ -174,7 +182,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val opServByStt = Await.result(BrasService.getOpServByStatusResponse(brasId,day), Duration.Inf)
         val servName = opServByStt.map(x=> x._1).distinct
         val servStatus = opServByStt.map(x=> x._2).distinct
-        println("t5: "+(System.currentTimeMillis() - t5))
+        logger.info("tOpsviewTreeMap: "+(System.currentTimeMillis() - t5))
 
         //val t6= System.currentTimeMillis()
         //val kibanaSeverity = Await.result(BrasService.getErrorSeverityResponse(brasId,day), Duration.Inf)
@@ -183,32 +191,32 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         // KIBANA Severity
         val kibanaSeverity = BrasService.getErrorSeverityES(brasId,day)
 
-        println("t60: "+(System.currentTimeMillis() - t60))
+        logger.info("tKibanaSeverity: "+(System.currentTimeMillis() - t60))
         val t7 = System.currentTimeMillis()
         // KIBANA Error type
         //val kibanaErrorType = Await.result(BrasService.getErrorTypeResponse(brasId,day), Duration.Inf)
         val kibanaErrorType = BrasService.getErrorTypeES(brasId,day)
-        println("t7: "+(System.currentTimeMillis() - t7))
+        logger.info("tKibanaErrorType: "+(System.currentTimeMillis() - t7))
         // KIBANA Facility
         val t8 = System.currentTimeMillis()
         //val kibanaFacility = Await.result(BrasService.getFacilityResponse(brasId,day), Duration.Inf)
         val kibanaFacility = BrasService.getFacilityES(brasId,day)
-        println("t8: "+(System.currentTimeMillis() - t8))
+        logger.info("tKibanaFacility: "+(System.currentTimeMillis() - t8))
         // KIBANA DDos
         val t9 = System.currentTimeMillis()
        // val kibanaDdos = Await.result(BrasService.getDdosResponse(brasId,day), Duration.Inf)
         val kibanaDdos = BrasService.getDdosES(brasId,day)
-        println("t9: "+(System.currentTimeMillis() - t9))
+        logger.info("tKibanaDdos: "+(System.currentTimeMillis() - t9))
         // KIBANA Severity value
         val t10 = System.currentTimeMillis()
         //val severityValue = Await.result(BrasService.getSeveValueResponse(brasId,day), Duration.Inf)
         val severityValue = BrasService.getSeveValueES(brasId,day)
-        println("t10: "+(System.currentTimeMillis() - t10))
+        logger.info("tSeverityValue: "+(System.currentTimeMillis() - t10))
         // SIGNIN LOGOFF BY HOST
         val siglogByhost =  BrasService.getSigLogByHost(brasId,day)
-        println("t11: "+(System.currentTimeMillis() - t10))
+        logger.info("tSiglogByhost: "+(System.currentTimeMillis() - t10))
 
-        println("timeAll: "+(System.currentTimeMillis() - timeStart))
+        logger.info("timeAll: "+(System.currentTimeMillis() - timeStart))
         Ok(views.html.device.search(form,username,BrasResponse(BrasInfor(numOutlier,(sigin,logoff)),KibanaOpviewByTime(kibanaBytime,opviewBytime),SigLogByTime(siginBytime,logoffBytime),
           infErrorBytime,infHostBytime,infModuleBytime,opServiceName,ServiceNameStatus(servName,servStatus,opServByStt),linecardhost,KibanaOverview(kibanaSeverity,kibanaErrorType,kibanaFacility,kibanaDdos,severityValue),siglogByhost), day,brasId))
       }
