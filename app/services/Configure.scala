@@ -16,8 +16,11 @@ object Configure {
   val PROXY_HOST = ConfigFactory.load().getString("proxy.host")
   val PROXY_PORT = ConfigFactory.load().getString("proxy.port").toInt
   
-  val ES_HOST = ConfigFactory.load().getString("es.host")
-  val ES_PORT = ConfigFactory.load().getString("es.port").toInt
+  val ES_HOST = ConfigFactory.load().getString("es.dns.host")
+  val ES_PORT = ConfigFactory.load().getString("es.dns.port").toInt
+
+  val ES_KIBANA_HOST = ConfigFactory.load().getString("es.dwh.host")
+  val ES_KIBANA_PORT = ConfigFactory.load().getString("es.dwh.port").toInt
   
   val REDIS_HOST = ConfigFactory.load().getString("redis.whois.host")
   val REDIS_PORT = ConfigFactory.load().getString("redis.whois.port").toInt
@@ -31,18 +34,19 @@ object Configure {
   val REDIS_NEWMAC_HOST = ConfigFactory.load().getString("redis.newmac.host")
   val REDIS_NEWMAC_PORT = ConfigFactory.load().getString("redis.newmac.port").toInt
   
-  val KIBANA_HOST = ConfigFactory.load().getString("kibana.host")
+  /*val KIBANA_HOST = ConfigFactory.load().getString("kibana.host")
   val KIBANA_PORT = ConfigFactory.load().getString("kibana.port").toInt
-  val KIBANA = KIBANA_HOST + ":" + KIBANA_PORT
+  val KIBANA = KIBANA_HOST + ":" + KIBANA_PORT*/
   
   val LOGO_DEFAULT = "../assets/images/logo/domain.png"
   
   val redis = new RedisClient(REDIS_HOST, REDIS_PORT)
   val redisDga: RedisClient = new RedisClient(REDIS_DGA_HOST, REDIS_DGA_PORT)
   val client = HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
-  
+  val client_kibana = HttpClient(ElasticsearchClientUri(Configure.ES_KIBANA_HOST,Configure.ES_KIBANA_PORT))
+
   def main(args: Array[String]) {
-    println(KIBANA)
+    println("")
   }
   
   val CACHE_CONTRACT_FIRST = scala.collection.mutable.Map[String, String]()

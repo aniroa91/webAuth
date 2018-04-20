@@ -81,14 +81,14 @@ object BrasList {
   }
 
   def getJsonChart(id: String,time: String): Future[Seq[(String,Int, Int,Int)]] = {
-    val strTime = time.substring(0,time.indexOf(".")+2)
-    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    val dateTime = DateTime.parse(strTime, formatter)
-    val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-    val addHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    //val strTime = time.substring(0,time.indexOf(".")+2)
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldHalfHour  = dateTime.minusHours(24).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+//    val addHalfHour  = dateTime.minusHours(24).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     dbConfig.db.run(
-      sql"""SELECT date_time,logoff_total_count,signin_total_count,active_user FROM dwh_radius_bras_detail
-            WHERE bras_id =$id and date_time >=$oldHalfHour::TIMESTAMP and date_time <=$addHalfHour::TIMESTAMP
+      sql"""SELECT date_time,logoff,signin,active_users FROM dwh_conn_bras_detail
+            WHERE bras_id =$id and date_time >=$oldHalfHour::TIMESTAMP and date_time <=$time::TIMESTAMP
             ORDER BY date_time desc
                   """
         .as[(String, Int, Int,Int)])
@@ -97,7 +97,7 @@ object BrasList {
 
   def confirmLabel(id: String,time: String) = {
     dbConfig.db.run(
-      sqlu"""UPDATE dwh_radius_bras_detail SET verified =1
+      sqlu"""UPDATE dwh_conn_bras_detail SET verified =1
             where bras_id =$id and date_time>=$time::TIMESTAMP
                   """
     )
@@ -105,7 +105,7 @@ object BrasList {
 
   def rejectLabel(id: String,time: String) = {
     dbConfig.db.run(
-      sqlu"""UPDATE dwh_radius_bras_detail SET verified =0
+      sqlu"""UPDATE dwh_conn_bras_detail SET verified =0
             where bras_id =$id and date_time>=$time::TIMESTAMP
                   """
     )

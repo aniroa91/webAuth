@@ -928,6 +928,11 @@
     <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
     <link href="../assets/custom/css/vis.min.css" rel="stylesheet">
     <link href="../assets/custom/css/waitMe.css" rel="stylesheet">
+    <link href="../assets/custom/css/timeline.min.css" rel="stylesheet">
+    <link href="../assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/vendors/datatables.net-buttons/css/buttons.dataTables.min.css" rel="stylesheet">
+
     <style type="text/css">
             .top_nav .navbar-right {
                 width: auto;
@@ -1000,12 +1005,82 @@
                 font-size: 16px;background: #d9534f;padding: 5px;color: white;
             }
             .xsScroll{
-                height: 430px;
+                max-height: 170px;
                 overflow-y: auto;
             }
             .lgScroll{
                 max-height: 600px;
                 overflow-y: auto;
+            }
+            .timeline__content p{
+                font-size: 12px;
+            }
+            .activeBox{
+                border: 1px solid #daa120;
+                background: #daa120;
+                color: #fff;
+            }
+            .card-header{
+                color: #fff;
+                background-color: #4980b5;
+                border-bottom: 1px solid rgba(111,111,111,.13);
+                padding: 7px;
+                text-align: center;
+                font-size: 14px;
+            }
+            .titleInline{
+                color: #fff;
+                background: #4980b5;
+                text-align: center;
+                display: -webkit-inline-flex;
+                display: -ms-inline-flexbox;
+                display: inline-flex;
+                width: 100%;
+                font-size: 14px;
+                padding: 0px 20px;
+            }
+            .toolTipText{
+                margin-top: 6px;font-size: 17px
+            }
+            .notResult{
+                font-size: 15px;color:red ;font-weight: 700;background:ghostwhite;text-align: center
+            }
+            .tbScroll{
+                background-image: url(../assets/images/bras-bg.jpg);
+            }
+            .disInline{
+                width: 100%;
+                display: -webkit-inline-flex;
+                display: -ms-inline-flexbox;
+                display: inline-flex;
+            }
+            .alert-success {
+                background-color: #dff0d8;
+                border-color: #d6e9c6;
+                color: #3c763d;
+            }
+            .dataTables_wrapper{
+                margin-bottom: 10px;
+            }
+            .buttons-csv{
+                background: #daa120!important;
+                margin-right: 5px!important;
+                border: 1px solid #daa120;
+                color: #fff;
+            }
+            .buttons-excel{
+                background: #daa120;
+                margin-right: 5px!important;
+                border: 1px solid green;
+                color: #fff;
+            }
+            .buttons-pdf{
+                background: #80bbbb;
+                border: 1px solid #80bbbb;
+                color: #fff;
+            }
+            .dt-buttons{
+                margin-bottom: 2px!important;
             }
     </style>
 }
@@ -1224,6 +1299,14 @@
                 }
                 .daterangepicker li{
                     width:auto;
+                }
+                .textGroup{
+                    color: #546f9c;
+                    font-weight: 600;
+                }
+                .thTop{
+                    border-bottom-width:1px!important;
+                    border-top:1!important;
                 }
         </style>
     }

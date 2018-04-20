@@ -315,7 +315,6 @@ object ProfileService extends AbstractService {
       //.map(x => x._1 -> BigDecimal(x._2).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble)
       .sortBy(x => x._1)
     val downupDow = getDownloadDoW(contract,month)
-    println(s"res $downupDow")
     val downup = if(downupDow == null) DownUp(downloadQuad, uploadQuad, null,null, formatArray(downloadDaily), formatArray(uploadDaily)) else DownUp(downloadQuad, uploadQuad, downupDow._1, downupDow._2, formatArray(downloadDaily), formatArray(uploadDaily))
     
     val durationDailyRes = ESUtil.get(client, "user-duration-daily-"+month, "docs", contract)
@@ -346,33 +345,49 @@ object ProfileService extends AbstractService {
 
     val durationDow = getDurationDoW(contract,month)
     val duration = Duration(durationHourly, durationDow, formatArray(durationDaily))
-    val pon = client.execute(search(s"user-inf-pon-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
-    val suyhoutSource = if (pon.totalHits <= 0) {
-      client.execute(search(s"user-inf-adsl-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
+    val isExistPon = ESUtil.exist(client,s"user-inf-pon-${month}","docs",contract)
+    val pon = if(isExistPon) client.execute(search(s"user-inf-pon-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
+              else null
+    //println("pon:"+pon)
+    val suyhoutSource = if (pon == null) {
+      val isExistAdsl = ESUtil.exist(client,s"user-inf-adsl-${month}","docs",contract)
+      if(isExistAdsl) client.execute(search(s"user-inf-adsl-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
+      else null
     } else pon
 
-    val suyhout = suyhoutSource.hits.hits.map(x => x.sourceAsMap)
-      .map(x => (getValueAsLong(x, "date") / 1000) -> getValueAsString(x, "passed"))
-      .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
-      .sortBy(x => x._1)
+    val suyhout = if(suyhoutSource != null) {
+      suyhoutSource.hits.hits.map(x => x.sourceAsMap)
+        .map(x => (getValueAsLong(x, "date") / 1000) -> getValueAsString(x, "passed"))
+        .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
+        .sortBy(x => x._1)
+    } else new Array[(String, String)](0)
       //.toMap.toArray
     //println(client.show(search(s"user-inf-error-2017-09" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000))
-    val errorRes = client.execute(search(s"user-inf-error-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
-    val error = errorRes.hits.hits.map(x => {
+    val isExistError = ESUtil.exist(client,s"user-inf-error-${month}","docs",contract)
+    println(s"error: $isExistError")
+    val errorRes = if(isExistError) client.execute(search(s"user-inf-error-$month" / "docs") query { must(termQuery("contract.keyword", contract)) } limit 1000).await(scala.concurrent.duration.Duration(30, SECONDS))
+                   else null
+    val error = if(isExistError) {
+      errorRes.hits.hits.map(x => {
         //println(x.sourceAsMap)
         x.sourceAsMap
       })
-      .map(x => (getValueAsLong(x, "date") / 1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error"), getValueAsString(x, "n_error")))
-      .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
+        .map(x => (getValueAsLong(x, "date") / 1000) -> (getValueAsInt(x, "time"), getValueAsString(x, "error"), getValueAsString(x, "n_error")))
+        .map(x => DateTimeUtil.create(x._1).toString(DateTimeUtil.YMD) -> x._2)
+    } else new Array[(String, (Int, String, String))](0)
       //.toMap.toArray
-    val module = error.filter(x => x._2._2 == "module/cpe error")
-      .map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum)
-      .toArray
-      .sortBy(x => x._1)
-    val disconnet = error.filter(x => x._2._2 == "disconnect/lost IP")
-      .map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum)
-      .toArray
-      .sortBy(x => x._1)
+    val module = if(isExistError) {
+      error.filter(x => x._2._2 == "module/cpe error")
+        .map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum)
+        .toArray
+        .sortBy(x => x._1)
+    } else new Array[(String, Int)](0)
+    val disconnet = if(isExistError) {
+      error.filter(x => x._2._2 == "disconnect/lost IP")
+        .map(x => x._1 -> x._2._3.toInt).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._2).sum)
+        .toArray
+        .sortBy(x => x._1)
+    } else new Array[(String, Int)](0)
 
     val sessionRes = ESUtil.get(client, s"user-session-${month}", "docs", contract)
     val session: Session = if (sessionRes.exists) {

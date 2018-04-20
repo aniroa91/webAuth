@@ -1,17 +1,132 @@
 package service
 
-import model.device.{Bras, BrasList,BrasesCard,BrasDAO}
+import model.device._
+import services.domain.{AbstractService, CommonService}
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import scala.concurrent.Future
+import org.elasticsearch.search.sort.SortOrder
+import services.domain.CommonService.formatUTC
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.joda.time.format.DateTimeFormat
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
+import org.joda.time.DateTimeZone
+import com.ftel.bigdata.utils.DateTimeUtil
 
-object BrasService {
+object BrasService extends AbstractService{
 
+  /*def getBrasOutlierCurrent(day: String):Array[BrasOutlier]  ={
+    val response = client.execute(
+      search(s"monitor-radius-$day" / "docs")
+        query { must(termQuery("label","outlier")) }
+        sortBy { fieldSort("date_time") order SortOrder.DESC } size 100
+    ).await
+    val brasOutlier = response.hits.hits.map(x => x.sourceAsMap)
+      .map(x => BrasOutlier(
+        getValueAsString(x, "date_time"),
+        getValueAsString(x, "bras_id"),
+        getValueAsInt(x,"signIn"),
+        getValueAsInt(x,"logOff")
+       )
+      )
+    brasOutlier.asInstanceOf[Array[BrasOutlier]]
+  }*/
+  def getBrasOutlierCurrent(day: String): Future[Seq[(String,String,Int,Int,String)]]   ={
+    BrasDAO.getBrasOutlierCurrent(day)
+  }
+
+  /*def getBrasOutlierJson(day: String): Array[(String,String,Int,Int)] ={
+    val response = client.execute(
+      search(s"monitor-radius-$day" / "docs")
+        query { must(termQuery("label","outlier")) }
+        sortBy { fieldSort("date_time") order SortOrder.DESC } size 100
+    ).await
+    val brasOutlier = response.hits.hits.map(x => x.sourceAsMap)
+      .map(x =>
+        ( getValueAsString(x, "bras_id"),
+          formatUTC(getValueAsString(x, "date_time")),
+          getValueAsInt(x,"signIn"),
+        getValueAsInt(x,"logOff"))
+      )
+    brasOutlier
+  }*/
+
+  def getUserLogOff(bras: String,time: String,typeLog: String): Array[(String,String,String)] = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val nextMinute  = dateTime.plusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val response = client.execute(
+      search(s"radius-streaming-*" / "con")
+        query { must(termQuery("nasName", bras.toLowerCase),not(termQuery("card.olt", "")),not(termQuery("card.olt", "N/A")),not(termQuery("card.indexId", -1)),not(termQuery("card.ontId", -1)),termQuery("typeLog", typeLog),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(time)).lt(CommonService.formatStringToUTC(nextMinute)))} size 100
+        sortBy { fieldSort("timestamp") order SortOrder.DESC }
+    ).await
+    val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
+      .map(x=>(
+        getValueAsString(x,"name"),
+        formatUTC(getValueAsString(x,"timestamp")),
+        getValueAsString(x,"card.olt")+"_"+getValueAsInt(x,"cable.ontId").toString+"_"+getValueAsInt(x,"cable.indexId").toString
+      ))
+    jsonRs
+  }
+
+  def getJsonBrasCard(bras: String,time: String,_type: String): Array[((String,String),Long)] = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldHalfHour  = dateTime.minusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val afterHalfHour  = dateTime.plusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val response = client.execute(
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(time)).lt(CommonService.formatStringToUTC(afterHalfHour)))}
+          aggregations (
+          termsAggregation("linecard")
+            .field("card.lineId")
+            .subAggregations(
+              termsAggregation("card")
+                .field("card.id")
+            )
+          )
+    ).await
+    val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"),"card")
+    mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 -> x._2._1) -> x._2._2)/*.filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")*/
+  }
+
+  def getJsonESBrasChart(bras: String,time: String):Array[(String,Int,Int,Int)] = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val afterHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val response = client.execute(
+      search(s"monitor-radius-*" / "docs")
+        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
+        sortBy { fieldSort("date_time") order SortOrder.DESC }
+    ).await
+    val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
+      .map(x=>(
+        getValueAsString(x,"date_time"),
+        getValueAsInt(x,"logOff"),
+        getValueAsInt(x,"signIn"),
+        getValueAsInt(x,"active_users")
+      ))
+    jsonRs
+  }
+
+  def getSigLogByHost(bras: String,day: String): SigLogByHost ={
+    BrasDAO.getSigLogByHost(bras,day)
+  }
   // for page Search Bras
-  def getSigLogResponse(bras: String,nowDay: String):Future[Seq[(Int,Int)]] = {
-    BrasDAO.getSigLogResponse(bras,nowDay)
+  def getSigLogResponse(bras: String,fromDay: String,nextDay: String):Future[Seq[(Int,Int)]] = {
+    BrasDAO.getSigLogResponse(bras,fromDay,nextDay)
+  }
+  def getSigLogCurrent(bras: String,nowDay: String):(Int,Int) = {
+    BrasDAO.getSigLogCurrent(bras,nowDay)
   }
 
   def getNoOutlierResponse(bras: String,nowDay: String):Future[Seq[(Int)]] = {
     BrasDAO.getNoOutlierResponse(bras,nowDay)
+  }
+  def getNoOutlierCurrent(bras: String,nowDay: String): Int = {
+    BrasDAO.getNoOutlierCurrent(bras,nowDay)
   }
 
   def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
@@ -21,9 +136,15 @@ object BrasService {
   def getKibanaBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
     BrasDAO.getKibanaBytimeResponse(bras,nowDay,hourly)
   }
+  def getKibanaBytimeES(bras: String,day: String): Array[(Int,Int)] ={
+    BrasDAO.getKibanaBytimeES(bras,day)
+  }
 
   def getSigLogBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int,Int)]] = {
     BrasDAO.getSigLogBytimeResponse(bras,nowDay,hourly)
+  }
+  def getSigLogBytimeCurrent(bras: String,nowDay: String): SigLogByTime = {
+    BrasDAO.getSigLogBytimeCurrent(bras,nowDay)
   }
 
   def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
@@ -49,25 +170,43 @@ object BrasService {
   def getLinecardhostResponse(bras: String,nowDay: String):Future[Seq[(String,Int,Int)]] = {
     BrasDAO.getLinecardhostResponse(bras,nowDay)
   }
+  def getLinecardhostCurrent(bras: String,nowDay: String): Array[(String,String)]= {
+    BrasDAO.getLinecardhostCurrent(bras,nowDay)
+  }
 
   def getErrorSeverityResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
     BrasDAO.getErrorSeverityResponse(bras,nowDay)
+  }
+  def getErrorSeverityES(bras: String,nowDay: String): Array[(String,Long)] = {
+    BrasDAO.getErrorSeverityES(bras,nowDay)
   }
 
   def getErrorTypeResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
     BrasDAO.getErrorTypeResponse(bras,nowDay)
   }
+  def getErrorTypeES(bras: String,nowDay: String): Array[(String,Long)] = {
+    BrasDAO.getErrorTypeES(bras,nowDay)
+  }
 
   def getFacilityResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
     BrasDAO.getFacilityResponse(bras,nowDay)
+  }
+  def getFacilityES(bras: String,nowDay: String): Array[(String,Long)] = {
+    BrasDAO.getFacilityES(bras,nowDay)
   }
 
   def getDdosResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
     BrasDAO.getDdosResponse(bras,nowDay)
   }
+  def getDdosES(bras: String,nowDay: String): Array[(String,Long)] = {
+    BrasDAO.getDdosES(bras,nowDay)
+  }
 
-  def getSeveValueResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {
+  def getSeveValueResponse(bras: String,nowDay: String):Future[Seq[(String,String,Int)]] = {
     BrasDAO.getSeveValueResponse(bras,nowDay)
+  }
+  def getSeveValueES(bras: String,nowDay: String):  Array[((String,String),Long)] = {
+    BrasDAO.getSeveValueES(bras,nowDay)
   }
 
   // end page Search Bras

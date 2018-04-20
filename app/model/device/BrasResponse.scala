@@ -1,13 +1,19 @@
 package model.device
 
 case class BrasInfor(
-                    noOutlier: Seq[(Int)],
-                    siginLogoff: Seq[(Int,Int)]
+                    noOutlier: Int,
+                    siginLogoff:(Int,Int)
                     )
 
 case class KibanaOpviewByTime(
-                       countK: Array[Int],
-                       countOp: Array[Int]
+                       countK: Array[(Int,Int)],
+                       countOp: Array[(Int,Int)]
+                       )
+
+case class SigLogByHost(
+                         arrCates: Array[String],
+                         sumSig: Array[Int],
+                         sumLog: Array[Int]
                        )
 
 case class SigLogByTime(
@@ -22,22 +28,29 @@ case class ServiceNameStatus(
                        )
 
 case class KibanaOverview(
-                              arrSeverity: Seq[(String,Int)],
-                              arrErrorType: Seq[(String,Int)],
-                              arrFacility: Seq[(String,Int)],
-                              arrDdos: Seq[(String,Int)],
-                              arrSevValue: Seq[(String,Int)]
+                              arrSeverity: Array[(String,Long)],
+                              arrErrorType: Array[(String,Long)],
+                              arrFacility: Array[(String,Long)],
+                              arrDdos: Array[(String,Long)],
+                              arrSevValue:  Array[((String,String),Long)]
                             )
+case class BrasOutlier(
+                      time: String,
+                      brasId: String,
+                      signin: Int,
+                      logOff: Int
+                      )
 
 case class BrasResponse(
                             currentsInfo: BrasInfor,
                             kibanaOpviewBytime: KibanaOpviewByTime,
                             sigLogBytime: SigLogByTime,
-                            infErrorBytime: Array[(String,Int)],
+                            infErrorBytime: Array[(Int,Int)],
                             infHostBytime: Seq[(String,(Int,Int))],
                             infModuleBytime: Seq[(String,String,Int,Int,Int)],
                             opServiceStt: Seq[(String,Int)],
                             servNameStt: ServiceNameStatus,
-                            linecardhost: Seq[(String,Int,Int)],
-                            kibanaOverview: KibanaOverview
+                            linecardhost: Array[(String,String)],
+                            kibanaOverview: KibanaOverview,
+                            siglogByhost: SigLogByHost
                        )
