@@ -86,8 +86,8 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         var logoff = 0
         val fromDay = day.split("/")(0)
         var nextDay = CommonService.getNextDay(day.split("/")(1))
-        var siginBytime = new Array[Int](0)
-        var logoffBytime = new Array[Int](0)
+        var siginBytime = new Array[Long](0)
+        var logoffBytime = new Array[Long](0)
         val timeStart= System.currentTimeMillis()
         /* GET ES CURRENT */
         if(day.split("/")(1).equals(CommonService.getCurrentDay())){
@@ -141,7 +141,6 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         val t03 = System.currentTimeMillis()
         val rsLogsigBytime = BrasService.getSigLogBytimeCurrent(brasId,day)
         siginBytime = rsLogsigBytime.sumSig
-        siginBytime.foreach(println)
         logoffBytime = rsLogsigBytime.sumLog
         logger.info("tSigLogBytime: "+(System.currentTimeMillis() - t03))
 
@@ -157,7 +156,7 @@ class DeviceController @Inject()(cc: ControllerComponents) extends AbstractContr
         logger.info("tOpsviewBytime: "+(System.currentTimeMillis() - t1))
         //val arrKibana = Await.result(BrasService.getKibanaBytimeResponse(brasId,day,0), Duration.Inf).toArray
         val t20= System.currentTimeMillis()
-        val arrKibana = BrasService.getKibanaBytimeES(brasId,day)
+        val arrKibana = BrasService.getKibanaBytimeES(brasId,day).groupBy(_._1).mapValues(_.map(_._2).sum).toArray
         val kibanaBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana,x)).toArray
         logger.info("tKibanaBytime: "+(System.currentTimeMillis() - t20))
         // INF ERROR
