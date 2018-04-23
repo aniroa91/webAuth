@@ -17,8 +17,8 @@ case class SigLogByHost(
                        )
 
 case class SigLogByTime(
-                         sumSig: Array[Int],
-                         sumLog: Array[Int]
+                         sumSig: Array[Long],
+                         sumLog: Array[Long]
                        )
 
 case class ServiceNameStatus(
