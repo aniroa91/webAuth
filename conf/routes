@@ -43,8 +43,6 @@ GET      /search/subdomain             controllers.SubdomainController.index(dom
 GET      /search                       controllers.ProfileController.index
 GET      /rank                         controllers.RankController.index
 GET      /report                       controllers.ReportController.index(day: String ?= "")
-GET      /client                       controllers.ClientController.index
-GET      /history                      controllers.ClientController.history(ip: String ?= "", offset: Int ?= 0)
 
 #######################################################################
 ### PROFILE
