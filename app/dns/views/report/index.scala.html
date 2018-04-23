@@ -1,4 +1,4 @@
-@(day: String, response: model.ReportResponse)
+@(day: String, response: model.ReportResponse,email: String)
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
 @import services.domain.CommonService.formatDateDDMMYY
@@ -14,9 +14,9 @@
                     <meta name="viewport" content="width=device-width, initial-scale=1">
 
                     <title>Dashboard Admin </title>
-                    @views.html.common.css("Report",0)
+                    @common.views.html.common.css("Report",0)
                 </head>
-                @views.html.common.top("Report",0,day)
+                @common.views.html.common.top("Report",0,day)
                     <!-- top navigation -->
                 <div class="top_nav">
                     <div class="nav_menu" style="padding-right: 15px">
@@ -27,7 +27,7 @@
                             <ul class="nav navbar-nav navbar-right">
                                 <li class="">
                                     <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                        <img src="../assets/images/user.default.png" alt="">
+                                        <img src="../assets/images/user.default.png" alt="">@email
                                         <span class=" fa fa-angle-down"></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -38,7 +38,7 @@
 
                                     <div class="input-group date" id="dateTime" style="width: 200px">
                                         <input type="text" class="form-control" readonly="true" style="background-color: white" value="@formatDateDDMMYY(day)">
-                                        <span class="input-group-addon" style="background-color: #5A738E"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                                        <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
                                         </span>
                                     </div>
                                 </li>
@@ -298,7 +298,7 @@
     </div>
 
         <!-- jQuery -->
-    @views.html.common.bottom("Report",0)
+    @common.views.html.common.bottom("Report",0)
     @if(response != null) {
         @scripts(day, response.labels, response)
     }
