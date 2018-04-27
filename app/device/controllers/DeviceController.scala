@@ -93,7 +93,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   def search =  withAuth { username => implicit request: Request[AnyContent] =>
-   // try {
+    try {
       if (!searching.bras.equals("")) {
         val _typeS = searching._typeS
         val time = searching.date
@@ -257,10 +257,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       }
       else
         Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
-   /* }
+    }
     catch{
       case e: Exception => Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
-    }*/
+    }
   }
 
   def getHostJson(id: String) = Action { implicit request =>
