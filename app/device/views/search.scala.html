@@ -1,4 +1,4 @@
-@(form: Form[BrasOutlier],email: String,response: model.device.BrasResponse,day: String,bras: String)
+@(form: Form[BrasOutlier],email: String,rsInfhost: model.device.HostResponse,response: model.device.BrasResponse,day: String,bras: String,_typeS: String, postUrl: Call)(implicit request: RequestHeader)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatPattern
 @import play.api.libs.json.Json
@@ -26,10 +26,30 @@
                 <div class="nav toggle" style="margin-bottom: 10px">
                     <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                 </div>
-                <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
 
-                @device.views.html.frmSearchBras(form, routes.DeviceController.search,bras,day)
+                <div style="margin-top: 10px" class="col-md-2 col-sm-2 col-xs-12 form-group  top_search">
+                    <form action="/searchBras" method="POST" id="ctSearch">
+                        @helper.CSRF.formField
+                        <input type="hidden" id="_typeS" name="_typeS" value="@_typeS">
+                        <input type="hidden" id="date" name="date" value="@day">
+                        <input type="text" style="height: 36px" class="form-control autocomplete search" required id="bras" name="bras" placeholder="Search bras..." value="@bras">
+                    </form>
 
+                @*device.views.html.frmSearchBras(form, routes.DeviceController.search,bras,day,_typeS)*@
+
+                </div>
+                <div class="col-lg-2 col-sm-2 col-xs-12 radioBtn">
+                    <div class="input-group">
+                        <div id="radioBtn" class="btn-group">
+                            @if(_typeS.equals("B")) {
+                                <a class="btn btn-primary btn-sm active" data-toggle="search" style="height: 33px" data-title="B">BRAS</a>
+                                <a class="btn btn-primary btn-sm notActive" data-toggle="search" style="height: 33px" data-title="I">HOST</a>
+                            }else{
+                                <a class="btn btn-primary btn-sm notActive" data-toggle="search" style="height: 33px" data-title="B">BRAS</a>
+                                <a class="btn btn-primary btn-sm active" data-toggle="search" style="height: 33px" data-title="I">HOST</a>
+                            }
+                        </div>
+                    </div>
                 </div>
             </nav>
             <ul class="nav navbar-nav navbar-right">
@@ -61,7 +81,248 @@
         <!-- /top navigation -->
         <!-- page content -->
     <div class="right_col" role="main">
+        <!-- PAGE INF SEARCH -->
+        @if(rsInfhost != null){
+            <div class="row top_tiles">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_title">
+                        <h2 class="hvr-pulse txtHead">Host: @bras</h2>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                    <div class="tile-stats" style="background-color: #f1b53d;display: inherit;padding: 14px;height: 138px">
+                        <div class="count ">123,000</div>
+                        <div class="titLb">Outlier</div>
+                    </div>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                    <div class="x_panel tile fixed_height_350" style="padding: 0px;">
+                        <div class="x_content">
+                            <table class="data table table-bordered tbScroll" id="tbInfHost" style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Sf error</th>
+                                        <th>Lofi error</th>
+                                        <th>User down</th>
+                                        <th>Inf down</th>
+                                        <th>Rouge error</th>
+                                        <th>Lost signal</th>
+                                    </tr>
+                                </thead>
+                                @if(rsInfhost.infHostdaily != null) {
+                                    <tfoot>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th>@rsInfhost.infHostdaily.map(x=>x._2).sum</th>
+                                            <th>@rsInfhost.infHostdaily.map(x=>x._3).sum</th>
+                                            <th>@rsInfhost.infHostdaily.map(x=>x._4).sum</th>
+                                            <th>@rsInfhost.infHostdaily.map(x=>x._5).sum</th>
+                                            <th>@rsInfhost.infHostdaily.map(x=>x._6).sum</th>
+                                            <th>@rsInfhost.infHostdaily.map(x=>x._7).sum</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody >
+                                    @for(i <- 0 until rsInfhost.infHostdaily.length) {
+                                        <tr>
+                                            <td>@rsInfhost.infHostdaily(i)._1</td>
+                                            <td>@rsInfhost.infHostdaily(i)._2</td>
+                                            <td>@rsInfhost.infHostdaily(i)._3</td>
+                                            <td>@rsInfhost.infHostdaily(i)._4</td>
+                                            <td>@rsInfhost.infHostdaily(i)._5</td>
+                                            <td>@rsInfhost.infHostdaily(i)._6</td>
+                                            <td>@rsInfhost.infHostdaily(i)._7</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="x_panel tile" style="padding: 0px">
+                        <div class="card-header">
+                            Total Error By Hourly
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content fixed_height_320">
+                            <div id="heat_map" style="height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="x_panel tile" style="padding: 0px">
+                        <div class="card-header">
+                           Signin & Logoff By Module And Index
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content fixed_height_320">
+                            <div id="buble-module" style="height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="x_panel tile" style="padding: 0px">
+                        <div class="card-header">
+                            Suyhao By Module
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content fixed_height_320">
+                            <div id="line-suyhao" style="height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="x_panel tile" style="padding: 0px">
+                        <div class="card-header">
+                            Signin & Logoff By Time
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content fixed_height_320">
+                            <div id="col-lineSigLog" style="height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile" style="height: 375px;padding: 0px;">
+                        <div class="card-header">
+                            Total Error By Module And Index
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <input id="nModule" type="hidden" value="@rsInfhost.errModuleIndex.arrModule.length"/>
+                            @if(rsInfhost.errModuleIndex.arrModule.length >0) {
+                                <table class="data table table-bordered tbScroll" id="tbIndex" style="width: 100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="background">
+                                                <div><span class="bottom">Index</span>
+                                                    <span class="top">Module</span>
+                                                    <div class="line"></div>
+                                                </div>
+                                            </th>
+                                            @for(i <- 0 until rsInfhost.errModuleIndex.arrModule.length) {
+                                                <th class="txtCenter">@rsInfhost.errModuleIndex.arrModule(i)</th>
+                                            }
+                                            <th class="txtCenter">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th class="txtCenter">Total</th>
+                                            @for(i <- 0 until rsInfhost.errModuleIndex.arrModule.length) {
+                                                <th class="txtCenter" id="tdSum@i"></th>
+                                            }
+                                            <th class="txtCenter" id="ttSum"></th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        @tableIndex(rsInfhost.errModuleIndex.arrModule,rsInfhost.errModuleIndex.arrIndex,rsInfhost.errModuleIndex.err)
+                                    </tbody>
+                                </table>
+                            }else {
+                                <div style="font-size: 14px;text-align: center">No data available in table</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile " style="height: 375px;padding: 0px;">
+                        <div class="card-header">
+                            Contract with sf >300
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
+                                <thead >
+                                    <tr>
+                                        <th>Module</th>
+                                        <th>Index</th>
+                                        <th>Sf</th>
+                                        <th>Signin</th>
+                                        <th>Logoff</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="2" class="txtCenter">Total</th>
+                                        <th>@rsInfhost.sfContract.map(x=> x._3).sum</th>
+                                        <th>@rsInfhost.sfContract.map(x=> x._4).sum</th>
+                                        <th>@rsInfhost.sfContract.map(x=> x._5).sum</th>
+                                    </tr>
+                                </tfoot>
+                                @if(rsInfhost.sfContract != null) {
+                                    <tbody >
+                                    @for(i <- 0 until rsInfhost.sfContract.length) {
+                                        <tr>
+                                            <th>@rsInfhost.sfContract(i)._1</th>
+                                            <th>@rsInfhost.sfContract(i)._2</th>
+                                            <td>@rsInfhost.sfContract(i)._3</td>
+                                            <td>@rsInfhost.sfContract(i)._4</td>
+                                            <td>@rsInfhost.sfContract(i)._5</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="x_panel tile" style="height: 375px;padding: 0px;">
+                        <div class="x_content">
+                            <table class="data table table-bordered tbScroll" id="tbSplitter" style="width: 100%">
+                                <thead  style="background: #4980b5;color:#fff">
+                                    <tr>
+                                        <th>Splitter</th>
+                                        <th>Lost Signal</th>
+                                    </tr>
+                                </thead>
+                                @if(rsInfhost.splitterByHost != null) {
+                                    <tfoot>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th>@rsInfhost.splitterByHost.map(x=>x._2).sum</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody >
+                                    @for(i <- 0 until rsInfhost.splitterByHost.length) {
+                                        <tr>
+                                            <td>@rsInfhost.splitterByHost(i)._1</td>
+                                            <td>@rsInfhost.splitterByHost(i)._2</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <!-- PAGE BRAS SEARCH -->
         @if(response != null) {
+            <div class="row top_tiles">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_title">
+                        <h2 class="hvr-pulse txtHead">Bras: @bras</h2>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row top_tiles">
                 <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="tile-stats" style="background-color: #64b0f2;
@@ -365,7 +626,8 @@
                     </div>
                 </div>
             </div>
-        } else{
+        }
+        @if(response == null && rsInfhost == null ){
             <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
         }
     </div>
@@ -391,6 +653,7 @@
         <!-- Hight chart -->
     <script src="../assets/javascripts/highcharts.js"></script>
     <script src="../assets/javascripts/highcharts-more.js"></script>
+    <script src="../assets/javascripts/drilldown.js"></script>
     <script src="../assets/javascripts/exporting.js"></script>
     <script src="../assets/javascripts/heatmap.js"></script>
     <script src="../assets/javascripts/treemap.js"></script>
@@ -420,16 +683,58 @@
 
     <script type="text/javascript">
             $(document).ready(function () {
-                // autocomplete
-                jQuery.get('../assets/bras.csv', function(data) {
-                    $(".autocomplete").autocomplete({
-                        source: data.split('\n'),
-                        select: function (event, ui) {
-                            $("#bras").val(ui.item.value);
-                            $("#ctSearch").submit();
-                        }
+                // radio button click
+                $('#radioBtn a').on('click', function(){
+                    var sel = $(this).data('title');
+                    var tog = $(this).data('toggle');
+                    $('a[data-toggle="'+tog+'"]').not('[data-title="'+sel+'"]').removeClass('active').addClass('notActive');
+                    $('a[data-toggle="'+tog+'"][data-title="'+sel+'"]').removeClass('notActive').addClass('active');
+                    var csvFile = 'bras.csv'
+                    if(sel == "B"){
+                        $('#_typeS').val("B")
+                        $('#bras').val("")
+                        $('#bras').attr('placeholder','Search bras...');
+                        csvFile = 'bras.csv'
+                    }
+                    else{
+                        $('#_typeS').val("I")
+                        $('#bras').val("")
+                        $('#bras').attr('placeholder','Search inf host...');
+                        csvFile = 'host_inf.csv'
+                    }
+                    jQuery.get('../assets/'+csvFile, function (data) {
+                        $(".autocomplete").autocomplete({
+                            source: data.split('\n'),
+                            select: function (event, ui) {
+                                $("#bras").val(ui.item.value);
+                                $("#ctSearch").submit();
+                            }
+                        });
                     });
-                });
+                })
+                // autocomplete
+                if($('#_typeS').val() == "B") {
+                    jQuery.get('../assets/bras.csv', function (data) {
+                        $(".autocomplete").autocomplete({
+                            source: data.split('\n'),
+                            select: function (event, ui) {
+                                $("#bras").val(ui.item.value);
+                                $("#ctSearch").submit();
+                            }
+                        });
+                    });
+                }
+                else{
+                    jQuery.get('../assets/host_inf.csv', function (data) {
+                        $(".autocomplete").autocomplete({
+                            source: data.split('\n'),
+                            select: function (event, ui) {
+                                $("#bras").val(ui.item.value);
+                                $("#ctSearch").submit();
+                            }
+                        });
+                    });
+                }
                 var start = moment();
                 var end = moment();
 
@@ -462,19 +767,365 @@
                     var range = picker.startDate.format('YYYY-MM-DD')+"/"+picker.endDate.format('YYYY-MM-DD');
                     $('#date').val(range);
                     $("#ctSearch").submit();
-                });/*
-                $('#datepicker').datepicker({
-                    format: "yyyy-mm-dd",
-                    autoclose: true,
-                    endDate: '+0d',
-                    todayHighlight: true
-                }).on('changeDate', function (e) {
-                   // window.location.href = '/searchBras?date=' + e.date.format('Y-m-d')
-                    var year = e.date .getFullYear()
-                    var month = e.date.getMonth() < 9 ? ('0' + Number(e.date.getMonth()+1)) : (Number(e.date.getMonth()+1));
-                    $("#date").val(year+"-"+month+"-"+e.date .getDate());
-                    $("#ctSearch").submit();
-                });*/
+                });
+                @if(rsInfhost != null){
+                    /* INF HOST SEARCHING*/
+                    var sumAll = 0
+                    var arrSumTd = new Array(Number($('#nModule').val())).fill(0)
+                    // redraw table tbody module index
+                    $('#tbIndex tbody tr').each(function (){
+                        var cell = ''
+                        var values = ''
+                        $(this).find('td').each(function(){
+                            cell += $(this).attr('class')+","
+                            values += $(this).attr('name')+","
+                        })
+                        var arrCell = cell.substring(0,cell.length-1).split(',').map( Number );
+                        var arrValues = values.substring(0,values.length-1).split(',').map( Number );
+                        var th = $(this).find('th').text()
+                        $(this).html('')
+                        var td = '<th>'+th+'</th>'
+                        var sumVl = 0
+                        for(var i=0;i< $('#nModule').val();i++){
+                            if(arrCell.indexOf(i)>=0){
+                                sumVl += arrValues[arrCell.indexOf(i)]
+                                td += '<td>'+arrValues[arrCell.indexOf(i)]+'</td>'
+                                arrSumTd[i] += Number(arrValues[arrCell.indexOf(i)])
+                            }
+                            else{
+                                td+='<td></td>'
+                                arrSumTd[i] += 0
+                            }
+                        }
+                        sumAll += sumVl
+                        td += '<th>'+sumVl+'</th>'
+                        $(this).append(td)
+                    })
+                    // set value for sum by module and index
+                    $('#ttSum').text(sumAll)
+                    for(var i=0;i<$('#nModule').val();i++){
+                        $('#tdSum'+i).text(arrSumTd[i])
+                    }
+
+                    $('#tbIndex').DataTable( {
+                        "scrollY":        "200px",
+                        "scrollCollapse": true,
+                        "paging":         false,
+                        "info":     false,
+                        "searching":     false,
+                        "sort":     false
+                    });
+                    $('#tbSf').DataTable( {
+                        "scrollY":        "200px",
+                        "scrollCollapse": true,
+                        "paging":         false,
+                        "info":     false,
+                        "searching":     false,
+                        "sort":     false
+                    });
+                    $('#tbSplitter').DataTable( {
+                        "scrollY":        "200px",
+                        "scrollCollapse": true,
+                        "paging":         false,
+                        "info":     false,
+                        "searching":     false,
+                        "sort":     false
+                    });
+                    $('#tbInfHost').DataTable( {
+                        "scrollY":        "200px",
+                        "scrollCollapse": true,
+                        "paging":         false,
+                        "info":     false,
+                        "searching":     false,
+                        "sort":     false
+                    });
+                    // line col signin and logoff by hourly
+                    @if(rsInfhost.sigLogByHourly != null){
+                        Highcharts.chart('col-lineSigLog', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            plotOptions: {
+                                column: {
+                                    colorByPoint: true
+                                }
+                            },
+                            colors: [
+                                '#1ABB9C', 'rgba(255, 102, 86, 1)'
+                            ],
+                            xAxis: {
+                                categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
+                            },
+                            yAxis: {
+                                title: {
+                                    text: "Size"
+                                }
+
+                            },
+                            tooltip: {
+                                crosshairs: true,
+                                shared: true
+                            },
+                            plotOptions: {
+                                spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                                }
+                            },
+                            series: [{
+                                type: 'spline',
+                                name: 'Signin',
+                                data: @Html(Json.stringify(Json.toJson(rsInfhost.sigLogByHourly.sumSig)))
+                            },
+                                {
+                                    type: 'spline',
+                                    name: 'Logoff',
+                                    data: @Html(Json.stringify(Json.toJson(rsInfhost.sigLogByHourly.sumLog)))
+                                }]
+                        });
+                    }
+                    // col and line suyhao
+                    @if(rsInfhost.suyhaoModule != null){
+                        // line Sigin and logoff by host
+                        Highcharts.chart('line-suyhao', {
+                            chart: {
+                                zoomType: 'xy'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: [{
+                                categories: @Html(Json.stringify(Json.toJson(rsInfhost.suyhaoModule.map(x=>x._1)))),
+                                crosshair: true,
+                                title: {
+                                    text: '',
+                                }
+                            }],
+                            yAxis: [{ // Primary yAxis
+                                labels: {
+                                    format: '{value}',
+                                    style: {
+                                        color: "#f1b53d"
+                                    }
+                                },
+                                title: {
+                                    style: {
+                                        color: "#f1b53d"
+                                    }
+                                }
+                            }, { // Secondary yAxis
+                                title: {
+                                    style: {
+                                        color: "#1ABB9C"
+                                    }
+                                },
+                                labels: {
+                                    format: '{value}',
+                                    style: {
+                                        color: "#1ABB9C"
+                                    }
+                                },
+                                opposite: true
+                            }],
+                            tooltip: {
+                                shared: true
+                            },
+
+                            series: [
+                                {
+                                    type: 'column',
+                                    name: 'Passed_true',
+                                    yAxis: 0,
+                                    color: "#f1b53d",
+                                    data: @Html(Json.stringify(Json.toJson(rsInfhost.suyhaoModule.map(x=>x._2))))
+                                },
+                                {
+                                    type: 'column',
+                                    name: 'Passed_false',
+                                    yAxis: 0,
+                                    color: "rgb(148, 50, 115)",
+                                    data: @Html(Json.stringify(Json.toJson(rsInfhost.suyhaoModule.map(x=>x._3))))
+                                }, {
+                                    name: 'Rate',
+                                    type: 'spline',
+                                    yAxis: 1,
+                                    color: "#1ABB9C",
+                                    data: @Html(Json.stringify(Json.toJson(rsInfhost.suyhaoModule.map(x=>x._4))))
+
+                                }]
+                        });
+                    }
+                    // heat-map hourly error
+                    @if(rsInfhost.errorHourly != null){
+                        Highcharts.chart('heat_map', {
+                            chart: {
+                                type: 'heatmap',
+                                marginTop: 40,
+                                marginBottom: 80,
+                                plotBorderWidth: 1
+                            },
+
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
+                            },
+
+                            yAxis: {
+                                categories: ['user_down','inf_down','sf_error','lofi_error','rouge_error','lost_signal'],
+                                title: null
+                            },
+
+                            colorAxis: {
+                                min: 0,
+                                minColor: '#FFFFFF',
+                                maxColor: '#d9534f'
+                            },
+
+                            legend: {
+                                align: 'right',
+                                layout: 'vertical',
+                                margin: 0,
+                                verticalAlign: 'top',
+                                y: 25,
+                                symbolHeight: 280
+                            },
+
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br> has <b>' +
+                                            this.point.value + ' <b>' + this.series.yAxis.categories[this.point.y] + '</b>';
+                                }
+                            },
+
+                            series: [{
+                                name: 'Logoff per card',
+                                borderWidth: 1,
+                                data: getErrorHourlyHeatmap(@Html(Json.stringify(Json.toJson(rsInfhost.errorHourly)))),
+                                /*[[0, 0, 10], [1, 0, 92], [2, 0, 35], [3, 0, 72], [4, 0, 38], [5, 0, 88],  [6, 0, 13], [7, 0, 31], [8, 0, 85],  [9, 0, 47]],*/
+                                dataLabels: {
+                                    enabled: true,
+                                    color: '#000000'
+                                }
+                            }]
+
+                        });
+                    }
+                  // bubble chart module index
+                  @if(rsInfhost.infHostdaily != null){
+                    Highcharts.chart('buble-module', {
+                        chart: {
+                            type: 'bubble',
+                            plotBorderWidth: 1,
+                            height: 300,
+                            zoomType: 'xy'
+                        },
+
+                        title: {
+                            text: 'Signin and logoff'
+                        },
+
+                        xAxis: {
+                            gridLineWidth: 1,
+                            title: {
+                                text: 'Signin'
+                            }
+                        },
+
+                        yAxis: {
+                            startOnTick: false,
+                            endOnTick: false,
+                            title: {
+                                text: 'Logoff'
+                            }
+                        },
+                        tooltip: {
+                            headerFormat: '',
+                            pointFormat: '<b>{point.name}</b><br/> Signin: <b>{point.x}</b><br/> Logoff: <b>{point.y}</b>'
+                        },
+                        series: [{
+                            name: 'Module',
+                            data: getJsonBubleChart(@Html(Json.stringify(Json.toJson(rsInfhost.sigLogByModule))),0)
+                             /*[{
+                                name: 'Animals',
+                                x: 4, y: 5, z:10,
+                                drilldown: '1'
+                            }, {
+                                name: 'Fruits',
+                                x: 14, y: 20, z:20,
+                                drilldown: '2'
+                            }, {
+                                name: 'Cars',
+                                x: 8, y: 9, z:7,
+                                drilldown: '3'
+                            }]*/
+                        }],
+                        drilldown: {
+                            drillUpButton: {
+                                relativeTo: 'spacingBox',
+                                position: {
+                                    y: 0,
+                                    x: 0
+                                },
+                                theme: {
+                                    fill: '#85d088',
+                                    'stroke-width': 1,
+                                    stroke: 'silver',
+                                    r: 0,
+                                    states: {
+                                        hover: {
+                                            fill: '#85d088',
+                                        }
+                                    }
+                                }
+                            },
+                            series: getDrilldownBubleChart(@Html(Json.stringify(Json.toJson(rsInfhost.sigLogbyModuleIndex))),@Html(Json.stringify(Json.toJson(rsInfhost.sigLogByModule.map(x=>x._1)))))
+                           /* [{
+                                name: '1',
+                                id: '1',
+                                data: [
+                                    { name: 'Cats', x: 5, y: 9, z:7},
+                                    { name: 'Dogs', x: 8, y: 8, z:9},
+                                    { name: 'Cows', x: 1, y: 5, z:2},
+                                    { name: 'Sheep', x: 4, y: 7, z:2},
+                                    { name: 'Pigs', x: 4, y: 5, z:7}
+                                ]
+                            }, {
+                                name: '2',
+                                id: '2',
+                                data: [
+                                    { name: 'Apples', x: 2, y: 9, z:6},
+                                    { name: 'Oranges', x: 6, y: 5, z:1}
+                                ]
+                            }, {
+                                name: '3',
+                                id: '3',
+                                data: [
+                                    { name: 'Toyota', x: 2, y: 8, z:7},
+                                    { name: 'Opel', x: 8, y: 2, z:4},
+                                    { name: 'Volkswagen', x: 4, y: 4, z:4}
+                                ]
+                            }]*/
+                        }
+                    });
+                  }
+                }
+
+                @if(response != null){
+                /* RESULT BRAS SEARCHING*/
                 $('#tbBras').DataTable( {
                     "scrollY":        "200px",
                     "scrollCollapse": true,
@@ -488,7 +1139,7 @@
                     var mapService = @Html(Json.stringify(Json.toJson(response.servNameStt.arrService)))
                     var arrName = @Html(Json.stringify(Json.toJson(response.servNameStt.arrName)))
                     var arrStt = @Html(Json.stringify(Json.toJson(response.servNameStt.arrStatus)))
-                    $('#tbOpview tbody').append(getBodyService(mapService, arrName, arrStt))
+                            $('#tbOpview tbody').append(getBodyService(mapService, arrName, arrStt))
                     // set total all by col opview table
                     var sumColAll = 0;
                     $('.ttRow').each(function () {
@@ -504,17 +1155,6 @@
                         $('#col-' + i).text(sumCol);
                     }
                 }
-                /* $('#tabOp').click(function(){
-                     $('#tbOpview').DataTable( {
-                         "scrollY":        "200px",
-                         "scrollCollapse": true,
-                         "paging":         false,
-                         "info":     false,
-                         "searching":     false,
-                         "sort":     false
-                     });
-                 });*/
-                @if(response != null){
                 /* OPVIEW JS */
                 // Tree map status
                 @if( response.opServiceStt != null){
@@ -595,7 +1235,7 @@
                             followPointer: true
                         },
 
-                        series: getJsonLinecardhost(@Html(Json.stringify(Json.toJson(response.linecardhost))))
+                        series: getJsonBubleChart(@Html(Json.stringify(Json.toJson(response.linecardhost))),1)
                         /*[{
                             data: [{"x":134,"y":222}],
                             name: "Black",
@@ -1099,6 +1739,17 @@
                 return jsonArr
             }
 
+            function getErrorHourlyHeatmap(data){
+                var jsonArr = [];
+                for (var i =0 ; i < data.length; i++) {
+                    for(var j=0;j<6;j++){
+                      if(Number(data[i][j])>0)
+                          jsonArr.push([Number(data[i][0]),j,Number(data[i][j])]);
+                    }
+                }
+                return jsonArr
+            }
+
             function getDataHeatmap(data){
                 var jsonArr = [];
                 for (var i =0 ; i < data.length; i++) {
@@ -1107,7 +1758,42 @@
                 return jsonArr
             }
 
-            function getJsonLinecardhost(dta){
+            function getDrilldownBubleChart(dta,arrModule){
+                var colors = ['#dc5a78', '#3498DB', '#9B59B6', '#f1b53d', '#E74C3C', '#73879C', '#1ABB9C', '#832d1d', '#0000cc', '#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'];
+                var jsonDta = []
+                for(var i=0;i<arrModule.length;i++) {
+                    var arrIndex = []
+                    for (var j = 0; j < dta.length; j++) {
+                        if(arrModule[i] == dta[j][0]){
+                            arrIndex.push({
+                                name: "Index: "+dta[j][1],
+                                x:Number(dta[j][2]),
+                                y:Number(dta[j][3]),
+                                z:(Number(dta[j][2])+Number(dta[j][3]))/2,
+                                marker: {
+                                    fillColor: {
+                                        radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
+                                        stops: [
+                                            [0, colors[i]],
+                                            [1, Highcharts.Color(colors[i]).setOpacity(0.9).get('rgba')]
+                                        ]
+                                    }
+                                }
+                            })
+                        }
+                    }
+                    jsonDta.push({
+                        name:"Module "+arrModule[i],
+                        id: arrModule[i],
+                        data: arrIndex
+                    })
+                }
+                return jsonDta
+            }
+
+            function getJsonBubleChart(dta,_type){
+                // _type=0: group single column
+                // _type=1: group multi columns
                 var colors = [
                     '#dc5a78',
                     '#3498DB',
@@ -1131,29 +1817,50 @@
                     '#ffff00'];
                 var jsonArr = [];
                 for(var i=0;i<dta.length;i++){
-                    var sigin=0,logoff=0;
-                    if(dta[i][1].indexOf("_")>=0){
-                        var arrLogSig = dta[i][1].split("_")
-                        sigin = Number(arrLogSig[0].split("-")[0])+Number(arrLogSig[1].split("-")[0])
-                        logoff = Number(arrLogSig[0].split("-")[1])+Number(arrLogSig[1].split("-")[1])
+                    var sigin= Number(dta[i][1]),logoff=Number(dta[i][2]);
+                    if(_type == 1) {
+                        if (dta[i][1].indexOf("_") >= 0) {
+                            var arrLogSig = dta[i][1].split("_")
+                            sigin = Number(arrLogSig[0].split("-")[0]) + Number(arrLogSig[1].split("-")[0])
+                            logoff = Number(arrLogSig[0].split("-")[1]) + Number(arrLogSig[1].split("-")[1])
+                        }
+                        else {
+                            sigin = Number(dta[i][1].split("-")[0])
+                            logoff = Number(dta[i][1].split("-")[1])
+                        }
+                        jsonArr.push({
+                            data: [{"x":sigin,"y":logoff}],
+                            name: dta[i][0],
+                            marker: {
+                                fillColor: {
+                                    radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
+                                    stops: [
+                                        [0, colors[i]],
+                                        [1, Highcharts.Color(colors[i]).setOpacity(0.9).get('rgba')]
+                                    ]
+                                }
+                            }
+                        });
                     }
                     else{
-                        sigin = Number(dta[i][1].split("-")[0])
-                        logoff = Number(dta[i][1].split("-")[1])
+                        var arrSigLog = dta[i][1].split("_")
+                        jsonArr.push({
+                            name: "Module: "+dta[i][0],
+                            x:Number(arrSigLog[0]),
+                            y:Number(arrSigLog[1]),
+                            z:(Number(arrSigLog[0])+Number(arrSigLog[1]))/2,
+                            marker: {
+                                fillColor: {
+                                    radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
+                                    stops: [
+                                        [0, colors[i]],
+                                        [1, Highcharts.Color(colors[i]).setOpacity(0.9).get('rgba')]
+                                    ]
+                                }
+                            },
+                            drilldown:dta[i][0]
+                        });
                     }
-                    jsonArr.push({
-                       data: [{"x":sigin,"y":logoff}],
-                       name: dta[i][0],
-                       marker: {
-                            fillColor: {
-                                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
-                                stops: [
-                                    [0, colors[i]],
-                                    [1, Highcharts.Color(colors[i]).setOpacity(0.9).get('rgba')]
-                                ]
-                            }
-                       }
-                    });
                 }
                 return jsonArr;
             }

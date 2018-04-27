@@ -49,17 +49,17 @@ object BrasDAO {
                   """
         .as[(Int,Int)])
   }
-  def getSigLogCurrent(bras: String, nowDay: String): (Int,Int) = {
+  def getSigLogCurrent(bras: String, day: String): (Int,Int) = {
     val multiRs = client.execute(
       multi(
-        search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("typeLog", "SignIn"),termQuery("nasName",bras.toLowerCase)) },
-        search(s"radius-streaming-$nowDay" / "con")
-          query { must(termQuery("typeLog", "LogOff"),termQuery("nasName",bras.toLowerCase)) }
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("typeLog", "SignIn"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) },
+        search(s"radius-streaming-*" / "con")
+          query { must(termQuery("typeLog", "LogOff"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
       )
     ).await
     val signin = multiRs.responses(0).totalHits.toInt
-    val logoff = multiRs.responses(0).totalHits.toInt
+    val logoff = multiRs.responses(1).totalHits.toInt
     (signin,logoff)
   }
 

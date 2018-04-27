@@ -27,6 +27,7 @@ GET      /logout                       controllers.LoginController.logout
 ### DEVICE
 GET      /device                       controllers.DeviceController.dashboard
 GET      /searchBras                   controllers.DeviceController.search
+POST     /searchBras                   controllers.DeviceController.getFormBras
 GET      /bras                         controllers.BrasController.index
 GET      /brasInfo                     controllers.BrasDetailController.index
 GET      /device/realtime-bras         controllers.DeviceController.realtimeBras

@@ -1015,10 +1015,15 @@
             .timeline__content p{
                 font-size: 12px;
             }
-            .activeBox{
-                border: 1px solid #daa120;
-                background: #daa120;
+            .activeBoxRed{
+                background: #d9534f;
                 color: #fff;
+                border: 1px solid #d9534f;
+            }
+            .activeBoxGreen{
+                background: #149c7f;
+                color: #fff;
+                border: 1px solid #149c7f;
             }
             .card-header{
                 color: #fff;
@@ -1307,6 +1312,60 @@
                 .thTop{
                     border-bottom-width:1px!important;
                     border-top:1!important;
+                }
+                #radioBtn .notActive{
+                    color: #3276b1;
+                    background-color: #fff;
+                }
+                .radioBtn{
+                    margin-left: -7px;
+                    margin-top: 12px;
+                }
+                .txtHead{
+                    font-weight: 700;color:green;font-size: 24px
+                }
+                .highcharts-contextbutton{display: none}
+                .highcharts-title{ opacity: 0}
+                .line{
+                    width: 136px;
+                    background: #ddd;
+                    border-bottom: 1px solid #ddd;
+                    transform: translateY(23px) translateX(-19px) rotate(29deg);
+                    position: absolute;
+                }
+                .background {
+                    width: 100px;
+                    height: 50px;
+                    padding: 0;
+                    margin: 0;
+                }
+                .background>div {
+                    position: relative;
+                    height: 100%;
+                    width: 100%;
+                    top: 0;
+                    left: 0;
+                }
+
+                .bottom {
+                    position: absolute;
+                    bottom: 1px;
+                    left: 1px;
+                }
+                .top {
+                    position: absolute;
+                    top: 1px;
+                    right: -4px;
+                }
+                #tbIndex th,#tbIndex td{
+                    text-align: center;
+                }
+                .txtCenter{
+                    text-align: center;
+                }
+                tfoot{
+                    background: #fafafa;
+                    color: #096898;
                 }
         </style>
     }
