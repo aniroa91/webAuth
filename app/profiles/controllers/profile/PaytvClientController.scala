@@ -2,25 +2,20 @@ package controllers
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import play.api.mvc._
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
-import services.CacheService
 import services.domain.CommonService
-
+import services.user.DashboardService
+import play.api.mvc._
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
   */
-
-case class AuthenticatedRequest (val username: String, request: Request[AnyContent])
-  extends WrappedRequest(request)
-
 @Singleton
-class DashboardController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
+class PaytvClientController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
   /* Authentication action*/
- def Authenticated(f: AuthenticatedRequest => Result) = {
+  def Authenticated(f: AuthenticatedRequest => Result) = {
     Action { request =>
       val username = request.session.get("username").get.toString
       username match {
@@ -34,8 +29,9 @@ class DashboardController @Inject()(cc: ControllerComponents) extends AbstractCo
     }
   }
 
-  def index =  Authenticated { implicit request =>
-    Ok(dns.views.html.dashboard.index(CacheService.getDaskboard()._1,request.session.get("username").get.toString))
+  def index() = Authenticated { implicit request =>
+    val response = DashboardService.get()
+    Ok(profiles.views.html.paytv.index(response,request.session.get("username").get.toString))
   }
+  
 }
-
