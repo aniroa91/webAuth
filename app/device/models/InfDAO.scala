@@ -45,7 +45,7 @@ object InfDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select module, sum(passed_true),sum(passed_false),sum(rate)
+      sql"""select 'Module ' || module as module, sum(passed_true),sum(passed_false),sum(rate)
             from dmt_portpon_suyhao
             where host= $host and date >= $fromDay::TIMESTAMP and date < $nextDay::TIMESTAMP
             group by module
