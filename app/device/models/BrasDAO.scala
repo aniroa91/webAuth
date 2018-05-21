@@ -28,6 +28,90 @@ object BrasDAO {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
+  def getSpliterMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+    val dt = new DateTime();
+    val aDay = dt.minusHours(12);
+    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""select date_time,host,splitter,sum(lost_signal)
+            from dwh_inf_splitter
+            where date_time >= $aDayTime::TIMESTAMP AND lost_signal>0
+            group by date_time,host,splitter
+            order by date_time desc
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def checkOutlier(strId: String): Future[Seq[(Int)]] = {
+    val id = strId.split('/')(0)
+    val module = strId.split('/')(1)
+    val bras = strId.split('/')(2)
+    val time = strId.split('/')(3)
+    // val strTime = time.substring(0,time.indexOf(".")+2)
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    dbConfig.db.run(
+      sql"""SELECT label from dwh_inf_module
+            WHERE bras_id=$bras and host=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP AND module =$module
+                  """
+        .as[(Int)])
+  }
+
+  def getSflofiMudule(userInf_down: String): Future[Seq[(String,String,String,Int,Int)]] = {
+    val dt = new DateTime();
+    val aDay = dt.minusHours(12);
+    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""select date_time,host,module,sum(sf_error),sum(lofi_error)
+            from dwh_inf_module
+            where date_time >= $aDayTime::TIMESTAMP AND label =1
+            group by date_time,host,module
+            order by date_time desc
+                  """
+        .as[(String,String,String,Int,Int)])
+  }
+
+  def getIndexRougeMudule(userInf_down: String): Future[Seq[(String,String,String,String,Int)]] = {
+    val dt = CommonService.getCurrentDay()
+    dbConfig.db.run(
+      sql"""select date_time,host,module,index,sum(rouge_error)
+            from dwh_inf_index
+            where date_time >= $dt::TIMESTAMP AND rouge_error >0
+            group by date_time,host,module,index
+            order by date_time desc
+                  """
+        .as[(String,String,String,String,Int)])
+  }
+
+  def getUserDownMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+    val dt = new DateTime();
+    val aDay = dt.minusHours(12);
+    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""select date_time,host,module,sum(user_down)
+            from dwh_inf_module
+            where date_time >= $aDayTime::TIMESTAMP AND user_down>0
+            group by date_time,host,module
+            order by date_time desc
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getInfDownMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+    val dt = new DateTime();
+    val aDay = dt.minusHours(12);
+    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""select date_time,host,module,sum(inf_down)
+            from dwh_inf_module
+            where date_time >= $aDayTime::TIMESTAMP AND inf_down>0
+            group by date_time,host,module
+            order by date_time desc
+                  """
+        .as[(String,String,String,Int)])
+  }
+
   def getBrasOutlierCurrent(nowDay: String): Future[Seq[(String,String,Int,Int,String)]] = {
     //val sumDay = CommonService.getRangeDay(nowDay).split(",").length
     dbConfig.db.run(
@@ -52,10 +136,10 @@ object BrasDAO {
   def getSigLogCurrent(bras: String, day: String): (Int,Int) = {
     val multiRs = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("typeLog", "SignIn"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) },
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("typeLog", "LogOff"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("typeLog.keyword", "SignIn"),termQuery("nasName.keyword",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) },
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("typeLog.keyword", "LogOff"),termQuery("nasName.keyword",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
       )
     ).await
     val signin = multiRs.responses(0).totalHits.toInt
@@ -137,8 +221,8 @@ object BrasDAO {
   def getSigLogBytimeCurrent(bras: String, day: String): SigLogByTime = {
     val mulRes = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("nasName.keyword",bras.toLowerCase),termQuery("typeLog.keyword", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           dateHistogramAggregation("hourly")
             .field("timestamp")
@@ -146,7 +230,7 @@ object BrasDAO {
             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
           ),
         search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+          query { must(termQuery("type.keyword", "con"),termQuery("nasName.keyword",bras.toLowerCase),termQuery("typeLog.keyword", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           dateHistogramAggregation("hourly")
             .field("timestamp")
@@ -191,7 +275,7 @@ object BrasDAO {
     dbConfig.db.run(
       sql"""select host, module,sum(sf_error) as cpe,sum(lofi_error) as lostip,sum(sf_error)+sum(lofi_error) as sumAll
             from dwh_inf_module
-            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and module <> '-1'
             group by host,module
                   """
         .as[(String,String,Int,Int,Int)])
@@ -245,8 +329,8 @@ object BrasDAO {
   def getLinecardhostCurrent(bras: String,day: String): Array[(String,String)] = {
     val multiRs = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("nasName.keyword", bras.toLowerCase),termQuery("typeLog.keyword", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -259,8 +343,8 @@ object BrasDAO {
                 )
             )
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("nasName.keyword", bras.toLowerCase),termQuery("typeLog.keyword", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -423,17 +507,17 @@ object BrasDAO {
     }
     val multiRs = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("nasName.keyword", bras.toLowerCase),termQuery("typeLog.keyword", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
           aggregations (
           termsAggregation("olt")
-            .field("card.olt")
+            .field("card.olt.keyword")
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("nasName.keyword", bras.toLowerCase),termQuery("typeLog.keyword", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
           aggregations (
           termsAggregation("olt")
-            .field("card.olt")
+            .field("card.olt.keyword")
           )
       )
     ).await

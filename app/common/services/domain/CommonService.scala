@@ -123,6 +123,18 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def getAggregationsKeyString(aggr: Option[AnyRef]): Array[(String, Long)] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key_as_string", "0L").toString
+        val count = x.getOrElse("doc_count", 0L).toString().toLong
+        (key, count)
+      })
+      .toArray
+  }
+
   def getMultiAggregations(aggr: Option[AnyRef]):  Array[(String, Array[(String, Array[(String, Long)])])] = {
     aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]

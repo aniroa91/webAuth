@@ -70,8 +70,8 @@ object InfDAO {
     // cable.ontId: module, card.indexId: index
     val mulRes = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("card.olt",host),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("card.olt",host),termQuery("typeLog.keyword", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations(
           termsAggregation("module")
             .field("cable.ontId")
@@ -80,8 +80,8 @@ object InfDAO {
                 .field("cable.indexId")
             )
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("card.olt",host),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("card.olt",host),termQuery("typeLog.keyword", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations(
           termsAggregation("module")
             .field("cable.ontId")
@@ -105,16 +105,16 @@ object InfDAO {
   def getSiglogByHourly(host: String,day: String): SigLogByTime = {
     val mulRes = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("card.olt",host),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("card.olt",host),termQuery("typeLog.keyword", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations(
           dateHistogramAggregation("hourly")
             .field("timestamp")
             .interval(DateHistogramInterval.HOUR)
             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("card.olt",host),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("card.olt",host),termQuery("typeLog.keyword", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations(
           dateHistogramAggregation("hourly")
             .field("timestamp")

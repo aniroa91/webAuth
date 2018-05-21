@@ -25,7 +25,10 @@ GET      /logout                       controllers.LoginController.logout
 
 #######################################################################
 ### DEVICE
-GET      /device                       controllers.DeviceController.dashboard
+GET      /noc                          controllers.DeviceController.dashboard
+GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
+GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")
+GET      /checkOutlier                 controllers.DeviceController.checkOutlier(id: String ?= "")
 GET      /searchBras                   controllers.DeviceController.search
 POST     /searchBras                   controllers.DeviceController.getFormBras
 GET      /bras                         controllers.BrasController.index
@@ -35,6 +38,7 @@ GET      /host-json                    controllers.DeviceController.getHostJson(
 GET      /bras-json                    controllers.DeviceController.getBrasJson(id: String ?= "")
 GET      /confirmLabel                 controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
 GET      /rejectLabel                  controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
+
 
 #######################################################################
 ### DNS

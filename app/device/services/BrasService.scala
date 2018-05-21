@@ -3,6 +3,7 @@ package service
 import model.device._
 import services.domain.{AbstractService, CommonService}
 import com.sksamuel.elastic4s.http.ElasticDsl._
+
 import scala.concurrent.Future
 import org.elasticsearch.search.sort.SortOrder
 import services.domain.CommonService.formatUTC
@@ -35,6 +36,30 @@ object BrasService extends AbstractService{
     BrasDAO.getBrasOutlierCurrent(day)
   }
 
+  def checkOutlier(id: String): Future[Seq[(Int)]]   ={
+    BrasDAO.checkOutlier(id)
+  }
+
+  def getUserDownMudule(day: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getUserDownMudule(day)
+  }
+
+  def getSpliterMudule(day: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getSpliterMudule(day)
+  }
+
+  def getSflofiMudule(day: String): Future[Seq[(String,String,String,Int,Int)]]   ={
+    BrasDAO.getSflofiMudule(day)
+  }
+
+  def getIndexRougeMudule(day: String): Future[Seq[(String,String,String,String,Int)]]   ={
+    BrasDAO.getIndexRougeMudule(day)
+  }
+
+  def getInfDownMudule(day: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getInfDownMudule(day)
+  }
+
   /*def getBrasOutlierJson(day: String): Array[(String,String,Int,Int)] ={
     val response = client.execute(
       search(s"monitor-radius-$day" / "docs")
@@ -56,8 +81,8 @@ object BrasService extends AbstractService{
     val dateTime = DateTime.parse(time, formatter)
     val nextMinute  = dateTime.plusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val response = client.execute(
-      search(s"radius-streaming-*" / "con")
-        query { must(termQuery("nasName", bras.toLowerCase),not(termQuery("card.olt", "")),not(termQuery("card.olt", "N/A")),not(termQuery("card.indexId", -1)),not(termQuery("card.ontId", -1)),termQuery("typeLog", typeLog),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(time)).lt(CommonService.formatStringToUTC(nextMinute)))} size 100
+      search(s"radius-streaming-*" / "docs")
+        query { must(termQuery("type.keyword", "con"), termQuery("nasName.keyword", bras.toLowerCase),not(termQuery("card.olt.keyword", "")),not(termQuery("card.olt.keyword", "N/A")),not(termQuery("card.indexId", -1)),not(termQuery("card.ontId", -1)),termQuery("typeLog.keyword", typeLog),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(time)).lt(CommonService.formatStringToUTC(nextMinute)))} size 100
         sortBy { fieldSort("timestamp") order SortOrder.DESC }
     ).await
     val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
@@ -75,8 +100,8 @@ object BrasService extends AbstractService{
     val oldHalfHour  = dateTime.minusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val afterHalfHour  = dateTime.plusMinutes(1).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val response = client.execute(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(time)).lt(CommonService.formatStringToUTC(afterHalfHour)))}
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"), termQuery("nasName.keyword", bras.toLowerCase),termQuery("typeLog.keyword", _type),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(time)).lt(CommonService.formatStringToUTC(afterHalfHour)))}
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -84,11 +109,51 @@ object BrasService extends AbstractService{
               termsAggregation("card")
                 .field("card.id")
             )
-          )
+          ) size 0
     ).await
     val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"),"card")
     mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 -> x._2._1) -> x._2._2)/*.filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")*/
+  }
+
+  def getSigLogInfjson(id: String): (Array[(String, Int)], Array[(String, Int)]) = {
+    //module: cable.ontId
+    // host: card.olt
+    val time = id.split("/")(0)
+    val host = id.split("/")(1)
+    val module = id.split("/")(2)
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldHalfHour  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val afterHalfHour  = dateTime.plusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val mulRes = client.execute(
+      multi(
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword","con"),termQuery("card.olt.keyword",host),termQuery("typeLog.keyword","SignIn"),termQuery("cable.ontId",module),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
+          aggregations(
+          dateHistogramAggregation("minutes")
+            .field("timestamp")
+            .interval(new DateHistogramInterval("5m"))
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          )
+          sortBy { fieldSort("timestamp") order SortOrder.DESC },
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword","con"),termQuery("card.olt.keyword",host),termQuery("typeLog.keyword","LogOff"),termQuery("cable.ontId",module),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(oldHalfHour)).lte(CommonService.formatStringToUTC(afterHalfHour))) } size 100
+          aggregations(
+          dateHistogramAggregation("minutes")
+            .field("timestamp")
+            .interval(new DateHistogramInterval("5m"))
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          )
+          sortBy { fieldSort("timestamp") order SortOrder.DESC }
+      )
+    ).await
+    val arrSigin = CommonService.getAggregationsKeyString(mulRes.responses(0).aggregations.get("minutes"))
+    val arrLogoff = CommonService.getAggregationsKeyString(mulRes.responses(1).aggregations.get("minutes"))
+    val timesKey = (arrSigin++arrLogoff).groupBy(_._1).map(x=> x._1).toArray.sorted
+    val rsSigin = timesKey.map(x=> x->CommonService.getLongValueByKey(arrSigin,x)).map(x=>CommonService.formatUTC(x._1)->x._2)
+    val rsLog = timesKey.map(x=> x->CommonService.getLongValueByKey(arrLogoff,x)).map(x=>CommonService.formatUTC(x._1)->x._2)
+    (rsSigin,rsLog)
   }
 
   def getJsonESBrasChart(bras: String,time: String):Array[(String,Int,Int,Int)] = {
@@ -227,7 +292,7 @@ object BrasService extends AbstractService{
     BrasesCard.listBrasById(id)
   }
 
-  def getHostBras(id: String): Future[Seq[(String,String,String, String)]] = {
+  def getHostBras(id: String): Future[Seq[(String,String,Int, Int,Int, Int,Int)]] = {
     BrasesCard.getHostCard(id)
   }
 

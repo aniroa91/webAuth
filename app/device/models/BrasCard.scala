@@ -14,7 +14,7 @@ object BrasesCard {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
-  def getHostCard(strId: String): Future[Seq[(String,String,String, String)]] = {
+  def getHostCard(strId: String): Future[Seq[(String,String,Int, Int,Int, Int,Int)]] = {
     val id = strId.split('/')(0)
     val time = strId.split('/')(1)
    // val strTime = time.substring(0,time.indexOf(".")+2)
@@ -22,11 +22,20 @@ object BrasesCard {
     val dateTime = DateTime.parse(time, formatter)
     val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     dbConfig.db.run(
-      sql"""SELECT host,module,sum(sf_error),sum(lofi_error) from dwh_inf_module
-            WHERE bras_id=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP
-            GROUP BY host,module
+      sql""" select tb2.*,tb1.label
+             from
+             (SELECT host,module,label
+                         from dwh_inf_module
+                         WHERE bras_id=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP
+                         GROUP BY host,module,label
+             ) as tb1
+             join (SELECT host,module,sum(sign_in),sum(log_off),sum(sf_error),sum(lofi_error)
+                       from dwh_inf_module
+                       WHERE bras_id=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP
+                       GROUP BY host,module) tb2
+                on tb1.host=tb2.host and tb1.module=tb2.module
                   """
-        .as[(String, String,String, String)])
+        .as[(String, String,Int, Int,Int, Int,Int)])
   }
 
   def listNocOutlier: Future[Seq[(String,String)]] = {

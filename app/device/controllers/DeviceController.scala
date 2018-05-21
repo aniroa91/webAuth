@@ -66,6 +66,45 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
+  def checkOutlier(id: String) = Action { implicit request =>
+    try{
+      val res =  Await.result(BrasService.checkOutlier(id.trim()), Duration.Inf)
+      Ok(Json.toJson(res.toList.mkString(",")))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
+
+  def getSigLogInfjson(id: String) = Action { implicit request =>
+    try{
+      val res =  BrasService.getSigLogInfjson(id.trim())
+      val jsInf = Json.obj(
+        "time" -> res._2.map(x=>x._1),
+        "logoff" -> res._2.map({ t =>t._2}),
+        "signin" -> res._1.map({ t => t._2})
+      )
+      Ok(Json.toJson(jsInf))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
+
+  def inf(id: String) =  withAuth { username => implicit request =>
+    try {
+      val infDown = Await.result(BrasService.getInfDownMudule("*"),Duration.Inf)
+      val userDown = Await.result(BrasService.getUserDownMudule("*"),Duration.Inf)
+      val spliter = Await.result(BrasService.getSpliterMudule("*"),Duration.Inf)
+      val sfLofi = Await.result(BrasService.getSflofiMudule("*"),Duration.Inf)
+      val indexRouge = Await.result(BrasService.getIndexRougeMudule("*"),Duration.Inf)
+      Ok(device.views.html.inf(username,InfResponse(userDown,infDown,spliter,sfLofi,indexRouge)))
+    }
+    catch{
+      case e: Exception => Ok(device.views.html.inf(username,null))
+    }
+  }
+
   def realtimeBras() =  withAuth { username => implicit request =>
     val bras = Await.result(BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay()),Duration.Inf)
     val jsBras = Json.obj(
@@ -265,6 +304,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def getHostJson(id: String) = Action { implicit request =>
     try{
+      val t0 = System.currentTimeMillis()
       val rsHost = Await.result(BrasService.getHostBras(id), Duration.Inf)
     //logger.info("success 0")
       val re = rsHost.map(
@@ -274,8 +314,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
             "module" -> iter._2
           ) ->
             Json.obj(
-              "cpe" -> iter._3,
-              "lostip" -> iter._4
+              "signin" -> iter._3,
+              "logoff" -> iter._4,
+              "sf" -> iter._5,
+              "lofi" -> iter._6,
+              "label" -> iter._7
             )
       )
       val idBras = id.split('/')(0)
@@ -314,6 +357,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "mapBras" -> brasOpKiba,
         "userLogoff" -> userLogoff
       )
+      println("time:"+ (System.currentTimeMillis() -t0))
       Ok(Json.toJson(jsBras))
     }
     catch{
