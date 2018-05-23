@@ -45,16 +45,81 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     )(BrasOutlier.apply)(BrasOutlier.unapply)
   )
 
-  /*def index =  withAuth { username => implicit request =>
+  def overview =  withAuth { username => implicit request =>
     try {
-      // get data for map chart
-      val mapNoc = Await.result(BrasService.listNocOutlier, Duration.Inf)
-      Ok(views.html.device.index(username,mapNoc))
+      //val mapNoc = Await.result(BrasService.listNocOutlier, Duration.Inf)
+      Ok(device.views.html.overview(username,null))
     }
     catch{
-      case e: Exception => Ok(views.html.device.index(username,null))
+      case e: Exception => Ok(device.views.html.overview(username,null))
     }
-  }*/
+  }
+
+  def overviewJson(month: String) = Action { implicit request =>
+    try{
+      val monthString = if(month.equals("")) "Lastest 3 months" else month
+      // get Top Sigin
+      val topSignin = Await.result(BrasService.getTopSignin(month), Duration.Inf)
+      val siginObj = Json.obj(
+        "data" -> topSignin,
+        "dataBras" -> topSignin.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topSignin.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+      )
+      // get Top Logoff
+      val topLogoff = Await.result(BrasService.getTopLogoff(month), Duration.Inf)
+      val logoffObj = Json.obj(
+        "data" -> topLogoff,
+        "dataBras" -> topLogoff.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topLogoff.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+      )
+      // get Top total kibana
+      val topKibana = Await.result(BrasService.getTopKibana(month), Duration.Inf)
+      val kibanaObj = Json.obj(
+        "data" -> topKibana.map(x=>x._2),
+        "categories" -> topKibana.map(x=>x._1)
+      )
+      // get Top total opsview
+      val topOpsview = Await.result(BrasService.getTopOpsview(month), Duration.Inf)
+      val opsviewObj = Json.obj(
+        "data" -> topOpsview.map(x=>x._2),
+        "categories" -> topOpsview.map(x=>x._1)
+      )
+      // get Top total Inf
+      val topInf = Await.result(BrasService.getTopInf(month), Duration.Inf)
+      val infObj = Json.obj(
+        "data" -> topInf,
+        "dataBras" -> topInf.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topInf.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+      )
+      // get Top Not Passed Suyhao
+      val topSuyhao = Await.result(BrasService.getTopnotSuyhao(month), Duration.Inf)
+      val suyhaoObj = Json.obj(
+        "data" -> topSuyhao.map(x=>x._2),
+        "categories" -> topSuyhao.map(x=>x._1)
+      )
+      // get Top Not Passed Suyhao
+      val topPoor = Await.result(BrasService.getTopPoorconn(month), Duration.Inf)
+      val poorObj = Json.obj(
+        "data" -> topPoor.map(x=>x._2),
+        "categories" -> topPoor.map(x=>x._1)
+      )
+
+      val rs = Json.obj(
+        "month" -> monthString,
+        "topSignin" -> siginObj,
+        "topLogoff" -> logoffObj,
+        "topKibana" -> kibanaObj,
+        "topOpsview" -> opsviewObj,
+        "topInf" -> infObj,
+        "topSuyhao" ->suyhaoObj,
+        "topPoor" -> poorObj
+      )
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
 
   def dashboard =  withAuth { username => implicit request =>
     try {
@@ -63,6 +128,26 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
     catch{
       case e: Exception => Ok(device.views.html.dashboard(username,null))
+    }
+  }
+
+  def confirmLabel(host: String,module: String,time: String,bras: String) = Action { implicit request =>
+    try{
+      val res =  Await.result(BrasService.confirmLabelInf(host,module,time,bras), Duration.Inf)
+      Ok(Json.toJson(res))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
+
+  def rejectLabel(host: String,module: String,time: String,bras: String) = Action { implicit request =>
+    try{
+      val res =  Await.result(BrasService.rejectLabelInf(host,module,time,bras), Duration.Inf)
+      Ok(Json.toJson(res))
+    }
+    catch{
+      case e: Exception => Ok("error")
     }
   }
 
@@ -98,10 +183,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val spliter = Await.result(BrasService.getSpliterMudule("*"),Duration.Inf)
       val sfLofi = Await.result(BrasService.getSflofiMudule("*"),Duration.Inf)
       val indexRouge = Await.result(BrasService.getIndexRougeMudule("*"),Duration.Inf)
-      Ok(device.views.html.inf(username,InfResponse(userDown,infDown,spliter,sfLofi,indexRouge)))
+      Ok(device.views.html.inf(username,InfResponse(userDown,infDown,spliter,sfLofi,indexRouge),id))
     }
     catch{
-      case e: Exception => Ok(device.views.html.inf(username,null))
+      case e: Exception => Ok(device.views.html.inf(username,null,id))
     }
   }
 

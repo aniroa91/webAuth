@@ -1,4 +1,4 @@
-@(email: String, response: model.device.InfResponse)
+@(email: String, response: model.device.InfResponse,ids: String)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatPattern
 @import play.api.libs.json.Json
@@ -28,8 +28,11 @@
                 </div>
                 <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
 
-                    <input type="text" class="form-control autocomplete" id="search" placeholder="Search..." style="border-radius:0">
 
+                    <div class="input-group">
+                        <input type="text" class="form-control autocomplete" id="search" placeholder="Search host ..." style="border-radius:0">
+                        <div class="input-group-addon groupSearch" ><i class="fa fa-search"></i></div>
+                    </div>
                 </div>
             </nav>
             <ul class="nav navbar-nav navbar-right">
@@ -62,7 +65,7 @@
                             <table class="data table table-bordered tbScroll" id="tbUserDown" style="width: 100%">
                                 <thead >
                                     <tr>
-                                        <th style="width: 28%">Date time</th>
+                                        <th style="width: 40%">Date time</th>
                                         <th>Host</th>
                                         <th>Module</th>
                                         <th>User Down</th>
@@ -77,13 +80,13 @@
                                 @if(response.userDown != null) {
                                     <tbody >
                                     @for(i <- 0 until response.userDown.length) {
-                                        <tr onclick="showSigLogChart(this,@i,'userDown')" class="aTag" name="@response.userDown(i)._1/@response.userDown(i)._2/@response.userDown(i)._3">
+                                        <tr onclick="showSigLogChart(this,@i,'userDown',4)" class="aTag" name="@response.userDown(i)._1/@response.userDown(i)._2/@response.userDown(i)._3">
                                             <th>@response.userDown(i)._1</th>
                                             <th>@response.userDown(i)._2</th>
                                             <th>@response.userDown(i)._3</th>
                                             <td>@response.userDown(i)._4</td>
                                         </tr>
-                                        <tr>
+                                        @*<tr>
                                             <td colspan="4" style="padding: 0px;">
                                                 <div class="collapse" id="userDown@i">
                                                 </div>
@@ -91,7 +94,7 @@
                                             <td style="display: none"></td>
                                             <td style="display: none"></td>
                                             <td style="display: none"></td>
-                                        </tr>
+                                        </tr>*@
                                     }
                                     </tbody>
                                 }
@@ -105,7 +108,7 @@
                             <table class="data table table-bordered tbScroll" id="tbInf" style="width: 100%">
                                 <thead >
                                     <tr>
-                                        <th style="width: 28%">Date time</th>
+                                        <th style="width: 40%">Date time</th>
                                         <th>Host</th>
                                         <th>Module</th>
                                         <th>Inf Down</th>
@@ -120,13 +123,13 @@
                                 @if(response.infDown != null) {
                                     <tbody >
                                     @for(i <- 0 until response.infDown.length) {
-                                        <tr onclick="showSigLogChart(this,@i,'infDown')" class="aTag" name="@response.infDown(i)._1/@response.infDown(i)._2/@response.infDown(i)._3">
+                                        <tr onclick="showSigLogChart(this,@i,'infDown',4)" class="aTag" name="@response.infDown(i)._1/@response.infDown(i)._2/@response.infDown(i)._3">
                                             <th>@response.infDown(i)._1</th>
                                             <th>@response.infDown(i)._2</th>
                                             <th>@response.infDown(i)._3</th>
                                             <th>@response.infDown(i)._4</th>
                                         </tr>
-                                        <tr>
+                                       @* <tr>
                                             <td colspan="4" style="padding: 0px;">
                                                 <div class="collapse" id="infDown@i">
                                                 </div>
@@ -134,7 +137,7 @@
                                             <td style="display: none"></td>
                                             <td style="display: none"></td>
                                             <td style="display: none"></td>
-                                        </tr>
+                                        </tr>*@
                                     }
                                     </tbody>
                                 }
@@ -187,6 +190,7 @@
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="x_panel tile " style="height: 480px;padding: 0px;">
                         <div class="x_content">
+                            <input type="hidden" id="ids" value="@ids">
                             <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
                                 <thead >
                                     <tr>
@@ -209,13 +213,17 @@
                                 @for(i <- 0 until response.sfLofi.length) {
                                     <tr>
                                         <th>@response.sfLofi(i)._1</th>
-                                        <th>@response.sfLofi(i)._2</th>
+                                        <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._1/@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
                                         <th>@response.sfLofi(i)._3</th>
                                         <td>@response.sfLofi(i)._4</td>
                                         <th>@response.sfLofi(i)._5</th>
                                         <th style="text-align: center">
-                                            <a onclick="rejectOutlier(this)" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
-                                            <a onclick="confirmOutlier(this)" class="btn btn-info btn-xs"><i class="fa fa-check"></i></a>
+                                            <span class="brasHide">@response.sfLofi(i)._7</span>
+                                            @if(response.sfLofi(i)._6) {
+                                                <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
+                                            }else {
+                                                <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-info btn-xs"><i class="fa fa-check"></i></a>
+                                            }
                                         </th>
                                     </tr>
                                 }
@@ -244,17 +252,16 @@
                                     <th>@response.indexRouge.map(x=> x._5).sum</th>
                                 </tfoot>
                                 @for(i <- 0 until response.indexRouge.length) {
-                                    <tr onclick="showSigLogChart(this,@i,'indexRouge')" class="aTag" name="@response.indexRouge(i)._1/@response.indexRouge(i)._2/@response.indexRouge(i)._3">
+                                    <tr onclick="showSigLogChart(this,@i,'indexRouge',5)" class="aTag" name="@response.indexRouge(i)._1/@response.indexRouge(i)._2/@response.indexRouge(i)._3">
                                         <th>@response.indexRouge(i)._1</th>
                                         <th>@response.indexRouge(i)._2</th>
                                         <th>@response.indexRouge(i)._3</th>
                                         <th>@response.indexRouge(i)._4</th>
                                         <th>@response.indexRouge(i)._5</th>
-                                    <tr/>
+                                    </tr>
                                     <tr>
                                         <td colspan="5" style="padding: 0px;">
-                                            <div class="collapse" id="indexRouge@i">
-                                                </div>
+                                            <div class="collapse" id="indexRouge@i"></div>
                                         </td>
                                         <td style="display: none"></td>
                                         <td style="display: none"></td>
@@ -316,6 +323,13 @@
     <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
     <script>
         $(document).ready(function(){
+            // active host module outlier
+            $('#tbSf .aTag').each(function () {
+                var names = $(this).attr('name').trim();
+                var ids = $('#ids').val().trim()
+                if(ids == names)
+                    $(this).parent().addClass('aActive')
+            });
             var tbIndex = $('#tbIndex').DataTable( {
                 dom: 'Bfrtip',
                 "scrollY":        "350px",
@@ -370,7 +384,7 @@
             });
             var tbUserDown = $('#tbUserDown').DataTable( {
                 dom: 'Bfrtip',
-                "scrollY":        "320px",
+                "scrollY":        "330px",
                 "scrollCollapse": true,
                 "paging":         false,
                 "info":     false,
@@ -387,7 +401,7 @@
             });
             var tbInf = $('#tbInf').DataTable( {
                 dom: 'Bfrtip',
-                "scrollY":        "320px",
+                "scrollY":        "330px",
                 "scrollCollapse": true,
                 "paging":         false,
                 "info":     false,
@@ -412,7 +426,7 @@
             });
         })
 
-        function showSigLogChart(el,_index,_type){
+        function showSigLogChart(el,_index,_type,totalCol){
             var container = _type+'' + _index
             var id = $(el).attr('name')
             if($('#'+_type+''+_index).hasClass('in')){
@@ -420,8 +434,25 @@
                 $('#'+_type+''+_index).collapse('hide');
             }
             else {
+                var rows = ''
+                for(var i=0;i<totalCol-1;i++){
+                    rows+= '<td style="display: none"></td>'
+                }
+                var html = '<tr class="chartTr">' +
+                        '<td colspan="'+totalCol+'" style="padding: 0px;">' +
+                        '  <div class="collapse" id="'+_type+''+_index+'"></div>' +
+                        '</td>' + rows +
+                        '</tr>'
+                $('.chartTr').remove();
+                $('.aActive').removeClass('aActive')
+                if(_type == "sfLofi"){
+                    $(el).parent().after(html)
+                    $(el).parent().addClass('aActive')
+                } else{
+                    $(el).after(html)
+                    $(el).addClass('aActive')
+                }
                 $('#'+_type+'' + _index).collapse('show');
-                $(el).addClass('aActive')
                 $.ajax({
                     url: "/inf-json?id=" + id,
                     cache: false,
@@ -482,46 +513,32 @@
         }
 
         function rejectOutlier(element){
-            var strId = $(element).attr('id')
-            var id = strId.split("/")[0]
-            var time = strId.split("/")[1]
+            var time = $(element).parent().parent().find("th:eq(0)").text().trim()
+            var host = $(element).parent().parent().find("th:eq(1)").text().trim()
+            var module = $(element).parent().parent().find("th:eq(2)").text().trim()
+            var bras = $(element).parent().parent().find("th:last .brasHide").text().trim()
             $.ajax({
-                url: "/rejectLabel?id="+id+"&time="+time,
+                url: "/inf/rejectLabel?host="+host+'&module='+module+'&time='+time+'&bras='+bras,
                 success: function (data) {
-                    if(data!= "error") {
-                        $(element).attr('disabled', 'disabled');
+                    if(data!= "error"){
+                        $(element).attr('disabled','disabled');
                         $(element).prop('onclick', null);
-                        $("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
-                            $("#success-alert").slideUp(500);
-                        });
-                    }
-                    else{
-                        $("#error-alert").fadeTo(2000, 500).slideUp(500, function(){
-                            $("#error-alert").slideUp(500);
-                        });
                     }
                 }
             });
         }
 
         function confirmOutlier(element){
-            var strId = $(element).attr('id')
-            var id = strId.split("/")[0]
-            var time = strId.split("/")[1]
+            var time = $(element).parent().parent().find("th:eq(0)").text().trim()
+            var host = $(element).parent().parent().find("th:eq(1)").text().trim()
+            var module = $(element).parent().parent().find("th:eq(2)").text().trim()
+            var bras = $(element).parent().parent().find("th:last .brasHide").text().trim()
             $.ajax({
-                url: "/confirmLabel?id="+id+"&time="+time,
+                url: "/inf/confirmLabel?host="+host+'&module='+module+'&time='+time+'&bras='+bras,
                 success: function (data) {
                     if(data!= "error"){
                         $(element).attr('disabled','disabled');
                         $(element).prop('onclick', null);
-                        $("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
-                            $("#success-alert").slideUp(500);
-                        });
-                    }
-                    else{
-                        $("#error-alert").fadeTo(2000, 500).slideUp(500, function(){
-                            $("#error-alert").slideUp(500);
-                        });
                     }
                 }
             });

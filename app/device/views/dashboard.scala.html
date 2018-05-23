@@ -785,12 +785,13 @@
                         }
                         else if(id!= undefined && id.indexOf('/')>=0){
                             var params = id+'/'+$('#lbHost').text().split('/')[0].split(':')[1]+'/'+$('#lbHost').text().split('/')[1]
+                            var ids = $('#lbHost').text().split('/')[1].trim()+'/'+id
                             $.ajax({
                                 url: "/checkOutlier?id="+params,
                                 success: function (dta) {
                                     console.log(dta)
                                     if(dta.indexOf("1")>=0){
-                                        window.location.href = '/inf?id='+params;
+                                        window.location.href = '/inf?id='+ids;
                                     }
                                 }
                             });
@@ -824,8 +825,8 @@
 
             function confirmOutlier(element){
                 var strId = $(element).attr('id')
-                var id = strId.split("/")[0]
-                var time = strId.split("/")[1]
+                var id = strId.split("/")[0].trim()
+                var time = strId.split("/")[1].trim()
                 $.ajax({
                     url: "/confirmLabel?id="+id+"&time="+time,
                     success: function (data) {

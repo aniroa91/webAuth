@@ -42,6 +42,7 @@ import java.time.format.DateTimeFormatter
 
 object CommonService extends AbstractService {
 
+  val monthSize = 20*3
   val SIZE_DEFAULT = 20
   val RANK_HOURLY = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"
   /**
@@ -88,6 +89,11 @@ object CommonService extends AbstractService {
   def getCurrentDay(): String = {
     val date = new DateTime()
     date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
+  }
+
+  def get3MonthAgo(): String = {
+    val date = new DateTime()
+    date.minusMonths(3).toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
   def getpreviousMinutes(times: Int): String = {

@@ -1,0 +1,640 @@
+@(email: String,response: String)
+@import play.api.libs.json.Json
+@import services.domain.CommonService.formatPattern
+@import play.api.libs.json.Json
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Dashboard Admin </title>
+
+            <!-- Bootstrap -->
+        @common.views.html.common.css("Overview",2)
+    </head>
+    @common.views.html.common.top("Overview",2,"")
+        <!-- top navigation -->
+    <div class="top_nav">
+        <div class="nav_menu">
+            <nav>
+                <div class="nav toggle" style="margin-bottom: 10px">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                </div>
+            </nav>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                    <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <img src="../assets/images/user.default.png" alt="">@email
+                        <span class=" fa fa-angle-down"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-usermenu pull-right">
+                        <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+        <!-- /top navigation -->
+        <!-- page content -->
+    <div class="right_col" role="main">
+        <div class="row top_tiles">
+            <div class="col-xs-12">
+                <div class="container">
+                    <div class="tab-slider--nav" style="padding: 5px 20px 0px 20px;margin-bottom: 10px;">
+                        <ul class="tab-slider--tabs">
+                            <li class="tab-slider--trigger active" rel="tabOverview">Overview</li>
+                            <li class="tab-slider--trigger" rel="tabTop">Top N Bas</li>
+                        </ul>
+                        <div class="input-group date" id="monthPicker" style="display: none;width: 200px;float: right">
+                            <input type="text" id="month" class="form-control" readonly="true" style="cursor: pointer;background-color: white" placeholder="Choose month...">
+                            <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="tab-slider--container">
+                        <div id="tabOverview" class="tab-slider--body">
+                        @if(response != null){
+
+                        }else{
+                            <div class="row"><h2 class="noData-title">Not enough data. Sorry!</h2></div>
+                        }
+                        </div>
+                        <div id="tabTop" class="tab-slider--body">
+                            <div class="col-xs-12" id="divTabTop">
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 Signin By Bras</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="bar-signin" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Top 10 Logoff By Bras</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="bar-logoff" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 Total Kibana By Bras</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="bar-kibana" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Top 10 Total Opsview</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="bar-opsview" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-xs-12">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;font-size: 24px"> Top 20 Total Inf By Bras</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="bar-inf" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 Not Passed Suyhao By Host</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="bar-suyhao" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Top 10 Poor Conn By Host</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="bar-poor" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+    <footer>
+        <div class="pull-right">
+            Dashboard Admin 21/09/2017
+        </div>
+        <div class="clearfix"></div>
+    </footer>
+        <!-- /footer content -->
+    </div>
+    </div>
+
+        <!-- jQuery -->
+    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- Custom Theme Scripts -->
+    <script src="../assets/custom/js/custom.min.js"></script>
+
+        <!-- Counter number -->
+    <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
+        <!-- Autocomplete -->
+    <script src="../assets/javascripts/jquery-ui.js"></script>
+    <script src="../assets/javascripts/waitMe.js"></script>
+        <!-- Hight chart -->
+    <script src="../assets/javascripts/highcharts.js"></script>
+    <script src="../assets/javascripts/exporting.js"></script>
+    <script src="../assets/javascripts/drilldown.js"></script>
+        <!-- Datatable -->
+    <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="../assets/vendors/jszip/jszip.min.js"></script>
+    <script src="../assets/vendors/jszip/pdfmake.min.js"></script>
+    <script src="../assets/vendors/jszip/vfs_fonts.js"></script>
+
+    <script src="../assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="../assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
+        <!--  Datepicker -->
+    <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
+    <script>
+            $(document).ready(function(){
+                $('#monthPicker').datepicker({
+                    autoclose: true,
+                    minViewMode: 1,
+                    endDate: '+0d',
+                    format: 'yyyy-mm'
+                }).on('changeDate', function(selected){
+                    var startDate = new Date(selected.date.valueOf());
+                    var yr = startDate.getFullYear();
+                    var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
+                    var newDate = yr + '-' + month;
+                    callAjaxTopN(newDate)
+                });
+                $(".tab-slider--body").hide();
+                $(".tab-slider--body:first").show();
+            });
+
+            $(".tab-slider--nav li").click(function() {
+                var active = 0
+                if($(this).hasClass('active')){
+                    active = 1
+                }
+                $(".tab-slider--body").hide();
+                var activeTab = $(this).attr("rel");
+                $("#"+activeTab).fadeIn();
+                // for tab TOP N
+                if($(this).attr("rel") == "tabTop"){
+                    $('#monthPicker').show();
+                    $('.tab-slider--tabs').addClass('slide');
+                    $(".tab-slider--nav li").removeClass("active");
+                    $(this).addClass("active");
+                    if(active == 0)
+                      callAjaxTopN($('#month').val());
+                }
+                // for tab Overview
+                else{
+                    $('#monthPicker').hide()
+                    $('.tab-slider--tabs').removeClass('slide');
+                    $(".tab-slider--nav li").removeClass("active");
+                    $(this).addClass("active");
+                }
+            });
+
+            function callAjaxTopN(month){
+                $.ajax({
+                    url: "/overview-json?month="+month,
+                    cache: false,
+                    beforeSend: function () {
+                        $('#divTabTop').waitMe({
+                            effect: 'roundBounce',
+                            text: 'Please wait...',
+                            bg: 'rgba(255,255,255,0.7)',
+                            color: '#000',
+                            textPos: 'vertical'
+                        });
+                    },
+                    success: function (dta) {
+                        if(dta != "Error"){
+                            // top 10 sigin
+                            Highcharts.chart('bar-signin', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    type: 'category'
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal'
+                                    }
+                                },
+                                tooltip : {
+                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>',
+                                    pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
+                                },
+                                series: [{
+                                    name: 'Bras',
+                                    data: getJsonDrillParent(dta.topSignin.dataBras),
+                                    color: '#1ABB9C'
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
+                                            }
+                                        }
+                                    },
+                                    series: getJsonDrillChildren(dta.topSignin.data,dta.topSignin.categories)
+                                },
+                            });
+                            // top 10 Logoff
+                            Highcharts.chart('bar-logoff', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    type: 'category'
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                tooltip : {
+                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>',
+                                    pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal'
+                                    }
+                                },
+                                series: [{
+                                    name: 'Bras',
+                                    data: getJsonDrillParent(dta.topLogoff.dataBras),
+                                    color: '#d9534f'
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
+                                            }
+                                        }
+                                    },
+                                    series: getJsonDrillChildren(dta.topLogoff.data,dta.topLogoff.categories)
+                                },
+                            });
+                            // top 10 Kibana
+                            Highcharts.chart('bar-kibana', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    categories: dta.topKibana.categories
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal'
+                                    }
+                                },
+                                series: [{
+                                    name: dta.month,
+                                    data: dta.topKibana.data,
+                                    color: '#f1b53d'
+                                }]
+                            });
+                            // top 10 Opsview
+                            Highcharts.chart('bar-opsview', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    categories: dta.topOpsview.categories
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal'
+                                    }
+                                },
+                                series: [{
+                                    name: dta.month,
+                                    data: dta.topOpsview.data,
+                                    color: '#73879C'
+                                }]
+                            });
+                            // top 10 Inf
+                            Highcharts.chart('bar-inf', {
+                                chart: {
+                                    type: 'column'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    type: 'category'
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                tooltip : {
+                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>',
+                                    pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal'
+                                    }
+                                },
+                                series: [{
+                                    name: 'Bras',
+                                    data: getJsonDrillParent(dta.topInf.dataBras),
+                                    color: '#832d1d'
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
+                                            }
+                                        }
+                                    },
+                                    series: getJsonDrillChildren(dta.topInf.data,dta.topInf.categories)
+                                },
+                            });
+                            // top 10 Suyhao
+                            Highcharts.chart('bar-suyhao', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    categories: dta.topSuyhao.categories
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal'
+                                    }
+                                },
+                                series: [{
+                                    name: dta.month,
+                                    data: dta.topSuyhao.data,
+                                    color: '#4980b5'
+                                }]
+                            });
+                            // top 10 Poor conn
+                            Highcharts.chart('bar-poor', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    categories: dta.topPoor.categories
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal'
+                                    }
+                                },
+                                series: [{
+                                    name: dta.month,
+                                    data: dta.topPoor.data,
+                                    color: '#9B59B6'
+                                }]
+                            });
+                        }
+                    },
+                    complete: function () {
+                        $('#divTabTop').waitMe("hide");
+                    },
+                });
+            }
+
+            function getJsonDrillParent(dta){
+                var rs = []
+                for(var i=0;i<dta.length;i++){
+                    rs.push({
+                        name: dta[i][0],
+                        y: dta[i][1],
+                        drilldown: dta[i][0]
+                    })
+                }
+                return rs
+            }
+
+            function getJsonDrillChildren(dta,arrKey){
+                var rs = []
+                for(var i=0;i<arrKey.length;i++){
+                    var arrDta = []
+                    for(var j=0;j<dta.length;j++){
+                        if(arrKey[i] == dta[j][0]){
+                            arrDta.push([dta[j][1],dta[j][2]])
+                        }
+                    }
+                    rs.push({
+                        id: arrKey[i],
+                        name:'Hosts of bras: '+arrKey[i],
+                        data: arrDta
+                    })
+                }
+                return rs
+            }
+
+            /*function getJsonMultiColumns(dta,  arrKey,arrMonth,_type){
+                var jsArray = []
+                var colorsSigin = ['#d9534f', '#73879C', '#1ABB9C']
+                var colorsLogoff = ['#1ABB9C', '#73879C', '#d9534f']
+                var colorsInf =  ['#f1b53d','#832d1d','#73879C']
+                for(var month=0;month< arrMonth.length;month++ ){
+                    var arrData = []
+                    for(var key=0;key<arrKey.length;key++ ) {
+                        var existKey = 0
+                        for (var i = 0; i < dta.length; i++) {
+                            if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][1]){
+                                arrData.push(dta[i][2]);
+                                existKey = 1
+                            }
+                        }
+                        if(existKey == 0) arrData.push(0)
+                    }
+                    var color = colorsSigin[month]
+                    if(_type == "logoff")
+                        color = colorsLogoff[month]
+                    else if(_type=="inf")
+                        color = colorsInf[month]
+                    jsArray.push({
+                        name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                        data: arrData,
+                        color: color
+                    })
+                }
+                return jsArray
+            }*/
+    </script>
+    </body>
+</html>
