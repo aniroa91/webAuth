@@ -59,6 +59,30 @@ object BrasDAO {
     )
   }
 
+  def getSigLogByRegion(month: String): Future[Seq[(String,String,Int,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select month,province,sum(signin) as signin, sum(logoff) as logoff
+              from dmt_overview_conn
+              where month > $month::TIMESTAMP
+              group by month,province
+              order by month desc
+                  """
+          .as[(String,String,Int,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select month,province,sum(signin) as signin, sum(logoff) as logoff
+              from dmt_overview_conn
+              where month = $query::TIMESTAMP
+              group by month,province
+              order by month desc
+                  """
+          .as[(String,String,Int,Int)])
+    }
+  }
+
   def checkOutlier(strId: String): Future[Seq[(Int)]] = {
     val id = strId.split('/')(0).trim
     val module = strId.split('/')(1).trim
@@ -126,6 +150,80 @@ object BrasDAO {
             order by date_time desc
                   """
         .as[(String,String,String,Int)])
+  }
+
+  def getProvinceOpsview(): Future[Seq[(String,String,String,Int)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,province,bras_id,sum(total_opsview) as total_opsview
+            from dmt_overview_noc
+            where month > $month::TIMESTAMP
+            group by month,province,bras_id
+            order by month desc, province
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getProvinceContract(): Future[Seq[(String,String,String,Int,Int,Int)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,province,host,sum(no_contract) as no_contract,sum(no_device) as no_device,sum(poor_conn) as poor_conn
+            from dmt_overview_device
+            where month > $month::TIMESTAMP
+            group by month,province,host
+            order by month desc, province
+                  """
+        .as[(String,String,String,Int,Int,Int)])
+  }
+
+  def getProvinceKibana(): Future[Seq[(String,String,String,Int)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,province,bras_id,sum(total_kibana) as total_kibana
+            from dmt_overview_noc
+            where month > $month::TIMESTAMP
+            group by month,province,bras_id
+            order by month desc, province
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getProvinceSuyhao(): Future[Seq[(String,String,String,Int)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,province,host,sum(not_passed_suyhao) as not_passed_suyhao
+            from dmt_overview_suyhao
+            where month > $month::TIMESTAMP
+            group by month,province,host
+            order by month desc, province
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getProvinceCount(month: String): Future[Seq[(String,String,Int,Int,Int,Int,Int,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select province,bras_id,sum(alert_count) as alert_count,sum(crit_count) as crit_count,sum(warning_count) as warning_count,
+                      sum(notice_count) as notice_count, sum(err_count) as err_count,sum(emerg_count) as emerg_count
+              from dmt_overview_noc
+              where month > $month::TIMESTAMP
+              group by province,bras_id
+              order by province
+                  """
+          .as[(String,String,Int,Int,Int,Int,Int,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select province,bras_id,sum(alert_count) as alert_count,sum(crit_count) as crit_count,sum(warning_count) as warning_count,
+                      sum(notice_count) as notice_count, sum(err_count) as err_count,sum(emerg_count) as emerg_count
+              from dmt_overview_noc
+              where month = $query::TIMESTAMP
+              group by province,bras_id
+              order by province
+                  """
+          .as[(String,String,Int,Int,Int,Int,Int,Int)])
+    }
   }
 
   def getTopSignin(month: String): Future[Seq[(String,String,Int)]] = {

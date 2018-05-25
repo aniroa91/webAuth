@@ -29,7 +29,8 @@ GET      /device                       controllers.DeviceController.overview
 GET      /noc                          controllers.DeviceController.dashboard
 GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
 GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")
-GET      /overview-json                controllers.DeviceController.overviewJson(month: String ?= "")
+GET      /region-countType             controllers.DeviceController.getcountType(id: String ?= "")
+GET      /topN-json                    controllers.DeviceController.topNJson(month: String ?= "")
 GET      /checkOutlier                 controllers.DeviceController.checkOutlier(id: String ?= "")
 GET      /inf/rejectLabel              controllers.DeviceController.rejectLabel(host: String ?= "",module: String ?= "",time: String ?= "",bras: String ?= "")
 GET      /inf/confirmLabel             controllers.DeviceController.confirmLabel(host: String ?= "",module: String ?= "",time: String ?= "",bras: String ?= "")

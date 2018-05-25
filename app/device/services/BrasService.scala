@@ -36,6 +36,26 @@ object BrasService extends AbstractService{
     BrasDAO.getBrasOutlierCurrent(day)
   }
 
+  def getProvinceOpsview(): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getProvinceOpsview()
+  }
+
+  def getProvinceContract(): Future[Seq[(String,String,String,Int,Int,Int)]]   ={
+    BrasDAO.getProvinceContract()
+  }
+
+  def getProvinceKibana(): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getProvinceKibana()
+  }
+
+  def getProvinceSuyhao(): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getProvinceSuyhao()
+  }
+
+  def getProvinceCount(month: String): Future[Seq[(String,String,Int,Int,Int,Int,Int,Int)]]   ={
+    BrasDAO.getProvinceCount(month)
+  }
+
   def getTopSignin(month: String): Future[Seq[(String,String,Int)]]   ={
     BrasDAO.getTopSignin(month)
   }
@@ -46,6 +66,10 @@ object BrasService extends AbstractService{
 
   def getTopKibana(month: String): Future[Seq[(String,Int)]]   ={
     BrasDAO.getTopKibana(month)
+  }
+
+  def getSigLogByRegion(month: String): Future[Seq[(String,String,Int,Int)]]   ={
+    BrasDAO.getSigLogByRegion(month)
   }
 
   def getTopOpsview(month: String): Future[Seq[(String,Int)]]   ={

@@ -1,4 +1,4 @@
-@(email: String,response: String)
+@(email: String,response: model.device.RegionOverview)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatPattern
 @import play.api.libs.json.Json
@@ -61,12 +61,180 @@
                     <div class="tab-slider--container">
                         <div id="tabOverview" class="tab-slider--body">
                         @if(response != null){
+                            <div class="col-xs-12" id="divTabOverview">
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Total Inf By Region</h2>
 
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-inf" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Total Opsview By Region</h2>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-opsview" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;font-size: 24px"> Total Kibana By Region</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-kibana" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Signin and Logoff</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-sigLog" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Not Passed Suyhao By Region</h2>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-suyhao" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;font-size: 24px"> No Contract By Region</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-contract" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Noc count By Region</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-nocCount" style="height: 350px;"></div>
+                                                <form style="text-align: center">
+                                                    <label class="radio-inline radioText">
+                                                        <input type="radio" value="AlertCount" name="optradio" checked>AlertCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="CritCount" name="optradio">CritCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="WarningCount" name="optradio">WarningCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="NoticeCount" name="optradio">NoticeCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="ErrCount" name="optradio">ErrCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="EmergCount" name="optradio">EmergCount
+                                                    </label>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Signin and Logoff By Region</h2>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-siglog-bar" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Opsview Types Region</h2>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-opsview-heatmap" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Inf Error By Region</h2>
+
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-infError" style="height: 350px;"></div>
+                                                <form style="text-align: center">
+                                                    <label class="radio-inline radioText">
+                                                        <input type="radio" value="InfDown" name="infradio" checked>InfDown
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="UseDown" name="infradio">UseDown
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="RougeError" name="infradio">RougeError
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="LostSignal" name="infradio">LostSignal
+                                                    </label>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         }else{
                             <div class="row"><h2 class="noData-title">Not enough data. Sorry!</h2></div>
                         }
                         </div>
                         <div id="tabTop" class="tab-slider--body">
+                            <input type="hidden" id="isClicked" value="0">
                             <div class="col-xs-12" id="divTabTop">
                                 <div class="col-lg-12" style="padding:0px;">
                                     <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
@@ -232,6 +400,281 @@
                 });
                 $(".tab-slider--body").hide();
                 $(".tab-slider--body:first").show();
+
+                // Click radio button choose Count Type Noc
+                $('form input:radio').change(function(){
+                    $('.radio-inline').removeClass('radioText')
+                    $(this).parent().addClass('radioText')
+                    var id =$(this).val()
+                    $.ajax({
+                        url: "/region-countType?id=" + id.trim(),
+                        cache: false,
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                Highcharts.chart('region-nocCount', {
+
+                                    legend: {
+                                        enabled: true
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: 'Counts'
+                                        }
+                                    },
+                                    xAxis: {
+                                        type: 'category'
+                                    },
+                                    colors:['#f60'],
+
+                                    series: [{
+                                        name: id,
+                                        data: getDrillDownStackedAndLine( dta.dtaByRegion)
+                                    }],
+                                    drilldown:{
+                                        series: getDrillDown1Level(dta.data,dta.arrRegion)
+                                    }
+                                });
+                            }
+                        },
+                    });
+                })
+
+                // Total Opsview by Region
+                Highcharts.chart('region-opsview', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        type:'category'
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    legend: {
+                        reversed: true
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct.sorted))),0),
+                    drilldown:{
+                        drillUpButton:{
+                            relativeTo: 'spacingBox',
+                            position:{
+                                align:"right",
+                                verticalAlign:"top",
+                                x:10,
+                                y:-10
+                            }
+                        },
+                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct.sorted))),'normal')}
+                });
+                // Total Opsview by Region
+                Highcharts.chart('region-kibana', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        type:'category'
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    legend: {
+                        reversed: true
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct.sorted))),1),
+                    drilldown:{
+                        drillUpButton:{
+                            relativeTo: 'spacingBox',
+                            position:{
+                                align:"right",
+                                verticalAlign:"top",
+                                x:10,
+                                y:-10
+                            }
+                        },
+                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct.sorted))),'normal')}
+                });
+                // Suyhao not passed
+                Highcharts.chart('region-suyhao', {
+                    chart: {
+                        type: 'area'
+                    },
+                    xAxis: {
+                        type:'category'
+                    },
+
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+                    title:{
+                        text: ''
+                    },
+                    tooltip: {
+                        shared: true
+                    },
+                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted))),2),
+                    drilldown:{
+                        drillUpButton:{
+                            relativeTo: 'spacingBox',
+                            position:{
+                                align:"right",
+                                verticalAlign:"top",
+                                x:10,
+                                y:-10
+                            }
+                        },
+                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted))),'normal')}
+                });
+                // Bar Logoff and Signin
+                Highcharts.chart('region-siglog-bar', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    xAxis: [{
+                        categories: @Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff.map(x=>x._1)))),
+                        reversed: false,
+                    }, { // mirror axis on right side
+                        opposite: true,
+                        reversed: false,
+                        categories: @Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff.map(x=>x._1)))),
+                        linkedTo: 0,
+                    }],
+                    yAxis: {
+                        title: {
+                            text: null
+                        },
+                        labels: {
+                            formatter: function () {
+                                return Math.abs(this.value);
+                            }
+                        },
+                    },
+
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.name + '</b><br/><b>Region: ' + this.point.category + '</b><br/>'
+                                    +'Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
+                        }
+                    },
+
+                    series: [{
+                        name: 'Signin',
+                        color:'#669999',
+                        data: @Html(Json.stringify(Json.toJson(response.sigLogRegion.signin.map(x=> -x._2))))
+                    }, {
+                        name: 'Logoff',
+                        color:'#832d1d',
+                        data: @Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff.map(x=>x._2))))
+                    }]
+                });
+                // Noc Count alert By Region
+                Highcharts.chart('region-nocCount', {
+
+                    legend: {
+                        enabled: true
+                    },
+                    title: {
+                        text: ''
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Counts'
+                        }
+                    },
+                    xAxis: {
+                        type: 'category'
+                    },
+                    colors:['#f60'],
+
+                    series: [{
+                        name:'Alert count',
+                        data: getDrillDownStackedAndLine( @Html(Json.stringify(Json.toJson(response.nocCount.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray))))
+                    }],
+                    drilldown:{
+                        series: getDrillDown1Level(@Html(Json.stringify(Json.toJson(response.nocCount.alertCount))),@Html(Json.stringify(Json.toJson(response.nocCount.alertCount.map(x=> x._1).toSeq.distinct.sorted.toArray))))
+                    }
+                });
+                // Total Contract Device by Region
+                Highcharts.chart('region-contract', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        type:'category'
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    tooltip: {
+                        formatter: function() {
+                            return  '<b>'+this.point.name+' - '+this.series.name+'</b><br/><b>No contract: ' + this.point.y + '</b><br/>'+this.point.z+'<br/>'+this.point.k;
+                        }
+                    },
+                    legend: {
+                        reversed: true
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+                    series: getDrildownContractDevice(@Html(Json.stringify(Json.toJson(response.contracts))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._1).toSeq.distinct.sorted)))),
+                    drilldown:{
+                        drillUpButton:{
+                            relativeTo: 'spacingBox',
+                            position:{
+                                align:"right",
+                                verticalAlign:"top",
+                                x:10,
+                                y:-10
+                            }
+                        },
+                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.contracts))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._1).toSeq.distinct.sorted))),'contract')}
+                });
             });
 
             $(".tab-slider--nav li").click(function() {
@@ -248,7 +691,7 @@
                     $('.tab-slider--tabs').addClass('slide');
                     $(".tab-slider--nav li").removeClass("active");
                     $(this).addClass("active");
-                    if(active == 0)
+                    if(active == 0 && $('#isClicked').val()==0)
                       callAjaxTopN($('#month').val());
                 }
                 // for tab Overview
@@ -260,9 +703,224 @@
                 }
             });
 
+            function getDrillDown1Level(dta,arrRegion){
+                var jsArray = []
+                for(var region=0;region<arrRegion.length;region++){
+                    // get array provinces and bras by month&region
+                    var arrProvinceBras = [], dtaRegion = []
+                    for(var i=0;i< dta.length;i++){
+                        if (arrRegion[region] == dta[i][0]){
+                            arrProvinceBras.push({
+                                province:dta[i][1],
+                                bras: dta[i][2],
+                                value:dta[i][3]
+                            })
+                        }
+                    }
+                    // set array data by province
+                    var nameOld = arrProvinceBras[0].province, sumOld= Number(arrProvinceBras[0].value), isMoreProv =0,dtaProvince = []
+                    for(var k=1;k<arrProvinceBras.length;k++){
+                        if(nameOld != arrProvinceBras[k].province){
+                            dtaRegion.push({
+                                name: nameOld,
+                                y: sumOld,
+                                drilldown:nameOld
+                            })
+                            // set series province& bras
+                            jsArray.push({
+                                id: nameOld,
+                                name: nameOld,
+                                data: dtaProvince
+                            })
+                            dtaProvince = []
+                            nameOld = arrProvinceBras[k].province
+                            sumOld = 0
+                            isMoreProv =1
+                        }
+                        else{
+                            sumOld += Number(arrProvinceBras[k].value)
+                        }
+                        dtaProvince.push([arrProvinceBras[k].bras,Number(arrProvinceBras[k].value)])
+                    }
+                    if(isMoreProv ==0){
+                        dtaRegion.push({
+                            name: nameOld,
+                            y: Number(sumOld),
+                            drilldown:nameOld
+                        })
+                        // set series province& bras
+                        jsArray.push({
+                            id: nameOld,
+                            name: nameOld,
+                            data: dtaProvince
+                        })
+                    }
+
+                    // set series regions& province
+                    jsArray.push({
+                        id: arrRegion[region],
+                        name: arrRegion[region],
+                        data: dtaRegion
+                    })
+                }
+                console.log(jsArray)
+                return jsArray
+            }
+
+            function getDrillDownStackedAndLine(dta){
+                var rs = []
+                for(var i=0;i<dta.length;i++){
+                    rs.push({
+                        name:dta[i][0],
+                        y:dta[i][1],
+                        drilldown:dta[i][0]
+                    })
+                }
+                return rs
+            }
+
+            function getDrillDown2Level(dta,arrRegion,arrMonth,_type){
+                var jsArray = []
+                for(var region=0;region< arrRegion.length;region++ ){
+                    for(var month=0;month< arrMonth.length;month++){
+                        // get array provinces and bras by month&region
+                        var arrProvinceBras = [], dtaRegion = []
+                        for(var i=0;i< dta.length;i++){
+                            if (arrMonth[month] == dta[i][0] && arrRegion[region] == dta[i][2]){
+                                if(_type=='normal'){
+                                    arrProvinceBras.push({
+                                        province:dta[i][1],
+                                        bras: dta[i][4],
+                                        value:dta[i][3]
+                                    })
+                                }
+                                else{
+                                    arrProvinceBras.push({
+                                        province:dta[i][1],
+                                        bras: dta[i][3],
+                                        value:dta[i][4],
+                                        noDevice:dta[i][5],
+                                        poorconn:dta[i][6],
+                                    })
+                                }
+                            }
+                        }
+                        // set array data by province
+                        var nameOld = arrProvinceBras[0].province, sumOld= 0,
+                                isMoreProv =0,dtaProvince = [],sumPoorconn =0,
+                                sumNodevice =0
+                        for(var k=0;k<arrProvinceBras.length;k++){
+                            if(nameOld != arrProvinceBras[k].province){
+                                if(_type == 'normal')
+                                    dtaRegion.push({
+                                        name: nameOld,
+                                        y: sumOld,
+                                        drilldown:nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                                    })
+                                else
+                                    dtaRegion.push({
+                                        name: nameOld,
+                                        y: sumOld,
+                                        z: 'No device: '+sumNodevice,
+                                        k: 'Poor conn: '+sumPoorconn,
+                                        drilldown:nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                                    })
+                                // set series province& bras
+                                //console.log(sortObjectsArray(dtaProvince,'y').slice(0,10))
+                                var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,10)
+                                jsArray.push({
+                                    id: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                                    name: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                                    data: top10Prov
+                                })
+                                dtaProvince = []
+                                nameOld = arrProvinceBras[k].province
+                                sumOld = 0
+                                sumNodevice = 0
+                                sumPoorconn = 0
+                                isMoreProv =1
+                            }
+                            else{
+                                sumOld += Number(arrProvinceBras[k].value)
+                                sumNodevice += Number(arrProvinceBras[k].noDevice)
+                                sumPoorconn += Number(arrProvinceBras[k].poorconn)
+                            }
+                            dtaProvince.push({
+                                name: arrProvinceBras[k].bras,
+                                y:Number(arrProvinceBras[k].value),
+                                z:'No device: '+Number(arrProvinceBras[k].noDevice),
+                                k:'Poor conn: '+Number(arrProvinceBras[k].poorconn)
+                            })
+                        }
+                        if(isMoreProv ==0){
+                            if(_type == 'normal')
+                                dtaRegion.push({
+                                    name: nameOld,
+                                    y: Number(sumOld),
+                                    drilldown:nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                                })
+                            else
+                                dtaRegion.push({
+                                    name: nameOld,
+                                    y: Number(sumOld),
+                                    z: 'No device: '+sumNodevice,
+                                    k: 'Poor conn: '+sumPoorconn,
+                                    drilldown:nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                                })
+                            // set series province& bras
+                            jsArray.push({
+                                id: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                                name: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                                data: sortObjectsArray(dtaProvince,'name').slice(0,10)
+                            })
+                        }
+
+                        // set series regions& province
+                        jsArray.push({
+                            id: arrRegion[region]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                            name: arrRegion[region]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                            data: dtaRegion
+                        })
+                    }
+
+                }
+                return jsArray
+            }
+
+            // order by array objects
+            function sortObjectsArray(objectsArray, sortKey)
+            {
+                // Quick Sort:
+                var retVal;
+
+                if (1 < objectsArray.length)
+                {
+                    var pivotIndex = Math.floor((objectsArray.length - 1) / 2);  // middle index
+                    var pivotItem = objectsArray[pivotIndex];                    // value in the middle index
+                    var less = [], more = [];
+
+                    objectsArray.splice(pivotIndex, 1);                          // remove the item in the pivot position
+                    objectsArray.forEach(function(value, index, array)
+                    {
+                        value[sortKey] >= pivotItem[sortKey] ?                   // compare the 'sortKey' proiperty
+                                less.push(value) :
+                                more.push(value) ;
+                    });
+
+                    retVal = sortObjectsArray(less, sortKey).concat([pivotItem], sortObjectsArray(more, sortKey));
+                }
+                else
+                {
+                    retVal = objectsArray;
+                }
+
+                return retVal;
+            }
+
+            // for page TOP N
             function callAjaxTopN(month){
                 $.ajax({
-                    url: "/overview-json?month="+month,
+                    url: "/topN-json?month="+month,
                     cache: false,
                     beforeSend: function () {
                         $('#divTabTop').waitMe({
@@ -275,6 +933,7 @@
                     },
                     success: function (dta) {
                         if(dta != "Error"){
+                            $('#isClicked').val(1)
                             // top 10 sigin
                             Highcharts.chart('bar-signin', {
                                 chart: {
@@ -605,28 +1264,29 @@
                 return rs
             }
 
-            /*function getJsonMultiColumns(dta,  arrKey,arrMonth,_type){
+            function getDrildownStackBar(dta,arrKey,arrMonth,_type){
                 var jsArray = []
-                var colorsSigin = ['#d9534f', '#73879C', '#1ABB9C']
-                var colorsLogoff = ['#1ABB9C', '#73879C', '#d9534f']
-                var colorsInf =  ['#f1b53d','#832d1d','#73879C']
+                var colors1 = ['#d9534f', '#73879C', '#1ABB9C']
+                var colors2 = ['#f1b53d','#832d1d','#73879C']
+                var colors3 = ['#9B59B6', '#73879C', '#d9534f']
                 for(var month=0;month< arrMonth.length;month++ ){
                     var arrData = []
                     for(var key=0;key<arrKey.length;key++ ) {
-                        var existKey = 0
+                        var sumVl =0
                         for (var i = 0; i < dta.length; i++) {
-                            if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][1]){
-                                arrData.push(dta[i][2]);
-                                existKey = 1
+                            if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][2]){
+                                sumVl += dta[i][3]
                             }
                         }
-                        if(existKey == 0) arrData.push(0)
+                        arrData.push({
+                            name: arrKey[key],
+                            y: sumVl,
+                            drilldown: arrKey[key]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                        })
                     }
-                    var color = colorsSigin[month]
-                    if(_type == "logoff")
-                        color = colorsLogoff[month]
-                    else if(_type=="inf")
-                        color = colorsInf[month]
+                    var color = colors1[month]
+                    if(_type == 1) color = colors2[month]
+                    else if(_type == 2) color = colors3[month]
                     jsArray.push({
                         name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
                         data: arrData,
@@ -634,7 +1294,65 @@
                     })
                 }
                 return jsArray
-            }*/
+            }
+
+            function getDrildownContractDevice(dta,arrKey,arrMonth){
+                var jsArray = []
+                var colors = ['#3276b1','#f2473c','#ff9600']
+                for(var month=0;month< arrMonth.length;month++ ){
+                    var arrData = []
+                    for(var key=0;key<arrKey.length;key++ ) {
+                        var sumVl =0, sumNodevice =0 , sumPoorconn = 0
+                        for (var i = 0; i < dta.length; i++) {
+                            if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][2]){
+                                sumVl += dta[i][4]
+                                sumNodevice += dta[i][5]
+                                sumPoorconn += dta[i][6]
+                            }
+                        }
+                        arrData.push({
+                            name: arrKey[key],
+                            y: sumVl,
+                            z: 'No device: '+sumNodevice,
+                            k: 'Poor conn: '+sumPoorconn,
+                            drilldown: arrKey[key]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                        })
+                    }
+                    var color = colors[month]
+                    jsArray.push({
+                        name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                        data: arrData,
+                        color: color
+                    })
+                }
+                return jsArray
+            }
+
+            function getJsonMultiColumns(dta,  arrKey,arrMonth){
+                var jsArray = []
+                var colorsSigin = ['#d9534f', '#73879C', '#1ABB9C']
+                var colorsLogoff = ['#1ABB9C', '#73879C', '#d9534f']
+                var colorsInf =  ['#f1b53d','#832d1d','#73879C']
+                for(var month=0;month< arrMonth.length;month++ ){
+                    var arrData = []
+                    for(var key=0;key<arrKey.length;key++ ) {
+                        var sumVl =0
+                        for (var i = 0; i < dta.length; i++) {
+                            if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][2]){
+                                sumVl += dta[i][3]
+                            }
+                        }
+                        arrData.push(sumVl)
+                    }
+                    var color = colorsSigin[month]
+                    jsArray.push({
+                        name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                        data: arrData,
+                        color: color
+                    })
+                }
+                return jsArray
+            }
     </script>
     </body>
 </html>

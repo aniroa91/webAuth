@@ -1,5 +1,26 @@
 package model.device
 
+case class RegionOverview(
+                         opsviews: Array[(String,String,String,Int,String)],
+                         kibana: Array[(String,String,String,Int,String)],
+                         suyhao: Array[(String,String,String,Int,String)],
+                         sigLogRegion: SigLogRegion,
+                         nocCount : NocCount,
+                         contracts: Array[(String,String,String,String,Int,Int,Int)]
+                         )
+case class SigLogRegion(
+                               signin: Array[(String,Int)],
+                               logoff: Array[(String,Int)]
+                             )
+case class NocCount(
+                    alertCount: Array[(String,String,String,Int)],
+                    critCount: Array[(String,String,String,Int)],
+                    warningCount: Array[(String,String,String,Int)],
+                    noticeCount: Array[(String,String,String,Int)],
+                    errCount: Array[(String,String,String,Int)],
+                    emergCount: Array[(String,String,String,Int)]
+                  )
+
 case class BrasInfor(
                     noOutlier: Int,
                     siginLogoff:(Int,Int)

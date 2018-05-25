@@ -5,7 +5,7 @@ import javax.inject.Singleton
 
 import play.api.mvc._
 import com.google.common.util.concurrent.AbstractService
-import model.device._
+import model.device.{NocCount, _}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
@@ -24,6 +24,8 @@ import services.domain.CommonService.formatYYYYmmddHHmmss
 
 import scala.util.control.Breaks._
 import play.api.Logger
+import device.utils.LocationUtils
+import com.ftel.bigdata.utils.FileUtil
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -44,18 +46,68 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       "date" -> text
     )(BrasOutlier.apply)(BrasOutlier.unapply)
   )
-
+  var nocCount:NocCount = null
+  // index page Dashboard Device
   def overview =  withAuth { username => implicit request =>
     try {
-      //val mapNoc = Await.result(BrasService.listNocOutlier, Duration.Inf)
-      Ok(device.views.html.overview(username,null))
+      // get Opsview
+      val mapProvinceOpsview = Await.result(BrasService.getProvinceOpsview(), Duration.Inf)
+      val opsview = mapProvinceOpsview.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3)).toArray
+      // get Kibana
+      val mapProvinceKibana = Await.result(BrasService.getProvinceKibana(), Duration.Inf)
+      val kibana = mapProvinceKibana.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3)).toArray
+      // get Not passed Suyhao
+      val mapSuyhao = Await.result(BrasService.getProvinceSuyhao(), Duration.Inf)
+      val suyhao = mapSuyhao.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3)).toArray
+      // get Signin and Logoff by Region
+      val mapSiglog = Await.result(BrasService.getSigLogByRegion(""), Duration.Inf)
+      val signIn = mapSiglog.map(x=> (LocationUtils.getRegion(x._2.trim),x._3)).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
+      val logoff = mapSiglog.map(x=> (LocationUtils.getRegion(x._2.trim),x._4)).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
+      // get NOC count by Region
+      val mapCount = Await.result(BrasService.getProvinceCount(""), Duration.Inf)
+      val alertCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
+      val critCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
+      val warningCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
+      val noticeCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
+      val errCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._7)).toArray
+      val emergCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._8)).toArray
+      nocCount = NocCount(alertCount,critCount,warningCount,noticeCount,errCount,emergCount)
+      // get Contract Device
+      val mapContract = Await.result(BrasService.getProvinceContract(), Duration.Inf)
+      val contracts = mapContract.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
+
+      Ok(device.views.html.overview(username,RegionOverview(opsview,kibana,suyhao,SigLogRegion(signIn,logoff),nocCount,contracts)))
     }
     catch{
       case e: Exception => Ok(device.views.html.overview(username,null))
     }
   }
 
-  def overviewJson(month: String) = Action { implicit request =>
+  def getcountType(id: String) = Action { implicit request =>
+    try{
+      val res =  nocCount
+      val regionType = id match {
+        case "AlertCount" => res.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+        case "CritCount" => res.critCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+        case "WarningCount" => res.warningCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+        case "NoticeCount" => res.noticeCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+        case "ErrCount" => res.errCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+        case "EmergCount" => res.emergCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+      }
+      val jsInf = Json.obj(
+        "dtaByRegion" -> regionType,
+        "data" -> res.alertCount,
+        "arrRegion" -> res.alertCount.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+      )
+      Ok(Json.toJson(jsInf))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
+
+  // Tab TOP N
+  def topNJson(month: String) = Action { implicit request =>
     try{
       val monthString = if(month.equals("")) "Lastest 3 months" else month
       // get Top Sigin
@@ -121,6 +173,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
+  // page NOC
   def dashboard =  withAuth { username => implicit request =>
     try {
       val mapBrasOutlier = Await.result(BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay()),Duration.Inf)
