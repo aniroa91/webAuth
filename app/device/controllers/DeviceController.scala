@@ -75,8 +75,16 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       // get Contract Device
       val mapContract = Await.result(BrasService.getProvinceContract(), Duration.Inf)
       val contracts = mapContract.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
+      // get Opsview Types
+      val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(""), Duration.Inf)
+      val opsviewType = mapOpsviewType.map(x=> (LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
+      val ok_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
+      val warning_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.toArray
+      val unknown_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+      val crit_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._5).sum).toSeq.sorted.toArray
+      val heatmapOpsview = (ok_opsview++warning_opsview++unknown_opsview++crit_opsview).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toSeq.sorted.toArray
 
-      Ok(device.views.html.overview(username,RegionOverview(opsview,kibana,suyhao,SigLogRegion(signIn,logoff),nocCount,contracts)))
+      Ok(device.views.html.overview(username,RegionOverview(opsview,kibana,suyhao,SigLogRegion(signIn,logoff),nocCount,contracts,heatmapOpsview)))
     }
     catch{
       case e: Exception => Ok(device.views.html.overview(username,null))

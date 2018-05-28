@@ -56,6 +56,10 @@ object BrasService extends AbstractService{
     BrasDAO.getProvinceCount(month)
   }
 
+  def getProvinceOpsviewType(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]]   ={
+    BrasDAO.getProvinceOpsviewType(month)
+  }
+
   def getTopSignin(month: String): Future[Seq[(String,String,Int)]]   ={
     BrasDAO.getTopSignin(month)
   }

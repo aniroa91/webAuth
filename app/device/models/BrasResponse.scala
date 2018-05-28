@@ -6,7 +6,8 @@ case class RegionOverview(
                          suyhao: Array[(String,String,String,Int,String)],
                          sigLogRegion: SigLogRegion,
                          nocCount : NocCount,
-                         contracts: Array[(String,String,String,String,Int,Int,Int)]
+                         contracts: Array[(String,String,String,String,Int,Int,Int)],
+                         opsviewType: Array[(String,String)]
                          )
 case class SigLogRegion(
                                signin: Array[(String,Int)],

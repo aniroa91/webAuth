@@ -226,6 +226,30 @@ object BrasDAO {
     }
   }
 
+  def getProvinceOpsviewType(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select month,province,sum(ok_opsview) as ok_opsview,sum(warn_opsview) as warn_opsview,sum(unknown_opsview) as unknown_opsview,
+                      sum(crit_opsview) as crit_opsview
+              from dmt_overview_noc
+              where month > $month::TIMESTAMP
+              group by month,province
+                  """
+          .as[(String,String,Int,Int,Int,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select month,province,sum(ok_opsview) as ok_opsview,sum(warn_opsview) as warn_opsview,sum(unknown_opsview) as unknown_opsview,
+                      sum(crit_opsview) as crit_opsview
+              from dmt_overview_noc
+              where month = $query::TIMESTAMP
+              group by month,province
+                  """
+          .as[(String,String,Int,Int,Int,Int)])
+    }
+  }
+
   def getTopSignin(month: String): Future[Seq[(String,String,Int)]] = {
     if(month.equals("")) {
       val month = CommonService.get3MonthAgo()+"-01"

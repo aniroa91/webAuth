@@ -367,6 +367,7 @@
         <!-- Hight chart -->
     <script src="../assets/javascripts/highcharts.js"></script>
     <script src="../assets/javascripts/exporting.js"></script>
+    <script src="../assets/javascripts/heatmap.js"></script>
     <script src="../assets/javascripts/drilldown.js"></script>
         <!-- Datatable -->
     <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
@@ -675,6 +676,83 @@
                         },
                         series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.contracts))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._1).toSeq.distinct.sorted))),'contract')}
                 });
+                // Heatmap Opsview Types
+                Highcharts.chart('region-opsview-heatmap', {
+                    chart: {
+                        type: 'heatmap',
+                        marginTop: 40,
+                        marginBottom: 80,
+                        plotBorderWidth: 1
+                    },
+
+                    title: {
+                        text: ''
+                    },
+
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.opsviewType.map(x=>x._1))))
+                    },
+
+                    yAxis: {
+                        categories: ['ok_opsview','warn_opsview','unknown_opsview','crit_opsview'],
+                        title: null
+                    },
+
+                    colorAxis: {
+                        min: 0,
+                        minColor: '#FFFFFF',
+                        maxColor: '#1ABB9C'
+                    },
+
+                    legend: {
+                        align: 'right',
+                        layout: 'vertical',
+                        margin: 0,
+                        verticalAlign: 'top',
+                        y: 25,
+                        symbolHeight: 280
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                    this.point.value + '</b> ';
+                        }
+                    },
+
+                    series: [{
+                        name: 'Opsview types',
+                        borderWidth: 1,
+                        data: getDataHeatMap(@Html(Json.stringify(Json.toJson(response.opsviewType)))),
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000'
+                        }
+                    }]
+
+                });
+                // Inf down error by Region
+                Highcharts.chart('region-infError', {
+                    chart: {
+                        type: 'area'
+                    },
+                    xAxis: {
+                        type:'category'
+                    },
+
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+                    title:{
+                        text: ''
+                    },
+                    tooltip: {
+                        shared: true
+                    },
+                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted))),2),
+                });
             });
 
             $(".tab-slider--nav li").click(function() {
@@ -702,6 +780,16 @@
                     $(this).addClass("active");
                 }
             });
+
+            function getDataHeatMap(data){
+                var jsonArr = [];
+                for (var i =0 ; i < data.length; i++) {
+                   var arrOpsview = data[i][1].split('_')
+                   for(var j=0;j<arrOpsview.length;j++)
+                    jsonArr.push([i,j,Number(arrOpsview[j])]);
+                }
+                return jsonArr
+            }
 
             function getDrillDown1Level(dta,arrRegion){
                 var jsArray = []
