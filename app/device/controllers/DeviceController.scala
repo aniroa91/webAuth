@@ -46,14 +46,17 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       "date" -> text
     )(BrasOutlier.apply)(BrasOutlier.unapply)
   )
-  var nocCount:NocCount = null
+  var nocCount: NocCount = null
+  var infTypeError: InfTypeError = null
+  var sigLogMonth: Seq[(String,String,String)]= null
+
   // index page Dashboard Device
   def overview =  withAuth { username => implicit request =>
     try {
-      // get Opsview
+      // get Total Opsview By Region
       val mapProvinceOpsview = Await.result(BrasService.getProvinceOpsview(), Duration.Inf)
       val opsview = mapProvinceOpsview.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3)).toArray
-      // get Kibana
+      // get Total Kibana By Region
       val mapProvinceKibana = Await.result(BrasService.getProvinceKibana(), Duration.Inf)
       val kibana = mapProvinceKibana.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3)).toArray
       // get Not passed Suyhao
@@ -83,8 +86,23 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val unknown_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
       val crit_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._5).sum).toSeq.sorted.toArray
       val heatmapOpsview = (ok_opsview++warning_opsview++unknown_opsview++crit_opsview).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toSeq.sorted.toArray
+      // get Inf down, user down,lost signal,rouge error by Region
+      val mapInfType = Await.result(BrasService.getProvinceInfDownError(""), Duration.Inf)
+      val infDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
+      val userDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
+      val rougeError = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
+      val lostSignal = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
+      infTypeError = InfTypeError(infDown,userDown,rougeError,lostSignal)
+      // get Total INF
+      val mapProvinceTotalInf = Await.result(BrasService.getProvinceTotalInf(), Duration.Inf)
+      val totalInf = mapProvinceTotalInf.map(x=> (x._1,LocationUtils.getRegion(x._2.trim),x._3)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+      // get Total Signin and Logoff
+      val mapSiglogbyMonth = Await.result(BrasService.getProvinceSigLogoff(),Duration.Inf)
+      val signinMonth = mapSiglogbyMonth.map(x=> (x._1,LocationUtils.getRegion(x._2.trim),x._3)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+      val logoffMonth = mapSiglogbyMonth.map(x=> (x._1,LocationUtils.getRegion(x._2.trim),x._4)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+      sigLogMonth = (signinMonth++logoffMonth).groupBy(x=> (x._1,x._2)).map{case (k,v) => k -> v.map(x=> x._3.toString).mkString("_")}.toSeq.sorted.map(x=> (x._1._1,x._1._2,x._2))
 
-      Ok(device.views.html.overview(username,RegionOverview(opsview,kibana,suyhao,SigLogRegion(signIn,logoff),nocCount,contracts,heatmapOpsview)))
+      Ok(device.views.html.overview(username,RegionOverview(opsview,kibana,suyhao,SigLogRegion(signIn,logoff),nocCount,contracts,heatmapOpsview,infTypeError,totalInf,sigLogMonth.toArray)))
     }
     catch{
       case e: Exception => Ok(device.views.html.overview(username,null))
@@ -95,19 +113,90 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     try{
       val res =  nocCount
       val regionType = id match {
-        case "AlertCount" => res.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
-        case "CritCount" => res.critCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
-        case "WarningCount" => res.warningCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
-        case "NoticeCount" => res.noticeCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
-        case "ErrCount" => res.errCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
-        case "EmergCount" => res.emergCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+        case "AlertCount" => {
+          Json.obj(
+            "dtaByRegion" -> res.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.alertCount,
+            "arrRegion" -> res.alertCount.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+        case "CritCount" =>{
+          Json.obj(
+            "dtaByRegion" -> res.critCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.critCount,
+            "arrRegion" -> res.critCount.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+        case "WarningCount" => {
+          Json.obj(
+            "dtaByRegion" -> res.warningCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.warningCount,
+            "arrRegion" -> res.warningCount.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+        case "NoticeCount" => {
+          Json.obj(
+            "dtaByRegion" -> res.noticeCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.noticeCount,
+            "arrRegion" -> res.noticeCount.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+        case "ErrCount" => {
+          Json.obj(
+            "dtaByRegion" -> res.errCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.errCount,
+            "arrRegion" -> res.errCount.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+        case "EmergCount" => {
+          Json.obj(
+            "dtaByRegion" -> res.emergCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.emergCount,
+            "arrRegion" -> res.emergCount.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
       }
-      val jsInf = Json.obj(
-        "dtaByRegion" -> regionType,
-        "data" -> res.alertCount,
-        "arrRegion" -> res.alertCount.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
-      )
-      Ok(Json.toJson(jsInf))
+      Ok(Json.toJson(regionType))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
+
+  def geterrorType(id: String) = Action { implicit request =>
+    try{
+      val res =  infTypeError
+      val regionType = id match {
+        case "InfDown" => {
+          Json.obj(
+            "dtaByRegion" -> res.infDown.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.infDown,
+            "arrRegion" -> res.infDown.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+        case "UseDown" => {
+          Json.obj(
+            "dtaByRegion" -> res.userDown.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.userDown,
+            "arrRegion" -> res.userDown.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+        case "RougeError" => {
+          Json.obj(
+            "dtaByRegion" -> res.rougeError.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.rougeError,
+            "arrRegion" -> res.rougeError.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+        case "LostSignal" => {
+          Json.obj(
+            "dtaByRegion" -> res.lostSignal.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+            "data" -> res.lostSignal,
+            "arrRegion" -> res.lostSignal.map(x=> x._1).asInstanceOf[Array[(String)]].toSeq.distinct.sorted
+          )
+        }
+      }
+      Ok(Json.toJson(regionType))
     }
     catch{
       case e: Exception => Ok("error")
@@ -234,6 +323,113 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
     catch{
       case e: Exception => Ok("error")
+    }
+  }
+
+  def drilldownSigLogMonth(id: String) = Action {implicit  request =>
+    try{
+      val rs = id match {
+        // get inf by Region
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
+          val mapSiglogbyMonth = Await.result(BrasService.getProvinceSigLogoff(),Duration.Inf)
+          val signinMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,LocationUtils.getRegion(x._2.trim),x._3)).filter(x=> x._3==id).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._4).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          val logoffMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,LocationUtils.getRegion(x._2.trim),x._4)).filter(x=> x._3==id).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._4).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          (signinMonth++logoffMonth).groupBy(x=> (x._1,x._2)).map{case (k,v) => k -> v.map(x=> x._3.toString).mkString("_")}.toSeq.sorted.map(x=> (x._1._1,LocationUtils.getNameProvincebyCode(x._1._2),x._2)).toArray
+        }
+        // get inf by Province
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
+          val mapSiglogbyMonth = Await.result(BrasService.getSigLogconnbyProvince(LocationUtils.getCodeProvincebyName(id)), Duration.Inf)
+          val signinMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,x._3)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          val logoffMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,x._4)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          (signinMonth++logoffMonth).groupBy(x=> (x._1,x._2)).map{case (k,v) => k -> v.map(x=> x._3.toString).mkString("_")}.toSeq.sorted.map(x=> (x._1._1,x._1._2,x._2)).toArray
+        }
+        // get inf by Bras
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) =>{
+          val mapSiglogbyMonth = Await.result(BrasService.getSigLogconnbyBras(id), Duration.Inf)
+          val signinMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,x._3)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          val logoffMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,x._4)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          (signinMonth++logoffMonth).groupBy(x=> (x._1,x._2)).map{case (k,v) => k -> v.map(x=> x._3.toString).mkString("_")}.toSeq.sorted.map(x=> (x._1._1,x._1._2,x._2)).toArray
+        }
+      }
+      val jsInf = Json.obj(
+        "data" -> rs,
+        "categories" -> rs.map(x=>x._2).distinct.sorted,
+        "month" -> rs.map(x=>x._1).distinct.sorted
+      )
+      Ok(Json.toJson(jsInf))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def drillUpSigLogmonth(id: String) = Action { implicit request  =>
+    try{
+      val rs = id match {
+        case id if(id.equals("*")) => sigLogMonth
+        case id if(id.indexOf("Region")>=0) => {
+          val mapSiglogbyMonth = Await.result(BrasService.getProvinceSigLogoff(),Duration.Inf)
+          val signinMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,LocationUtils.getRegion(x._2.trim),x._3)).filter(x=> x._3==id.split(":")(1)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._4).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          val logoffMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,LocationUtils.getRegion(x._2.trim),x._4)).filter(x=> x._3==id.split(":")(1)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._4).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          (signinMonth++logoffMonth).groupBy(x=> (x._1,x._2)).map{case (k,v) => k -> v.map(x=> x._3.toString).mkString("_")}.toSeq.sorted.map(x=> (x._1._1,LocationUtils.getNameProvincebyCode(x._1._2),x._2))
+        }
+        case id if(id.indexOf("Province")>=0) => {
+          val mapSiglogbyMonth = Await.result(BrasService.getSigLogconnbyProvince(LocationUtils.getCodeProvincebyName(id.split(":")(1))), Duration.Inf)
+          val signinMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,x._3)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          val logoffMonth = mapSiglogbyMonth.map(x=> (x._1,x._2,x._4)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+          (signinMonth++logoffMonth).groupBy(x=> (x._1,x._2)).map{case (k,v) => k -> v.map(x=> x._3.toString).mkString("_")}.toSeq.sorted.map(x=> (x._1._1,x._1._2,x._2))
+        }
+      }
+      val jsInf = Json.obj(
+        "data" -> rs,
+        "categories" -> rs.map(x=>x._2).asInstanceOf[Seq[(String)]].distinct.sorted,
+        "month" -> rs.map(x=>x._1).asInstanceOf[Seq[(String)]].distinct.sorted
+      )
+      Ok(Json.toJson(jsInf))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def drilldownTotalInf(id: String) = Action {implicit  request =>
+    try{
+      val rs = id match {
+          // get inf by Region
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => Await.result(BrasService.getProvinceTotalInf(), Duration.Inf).map(x=> (x._1,x._2,LocationUtils.getRegion(x._2.trim),x._3)).asInstanceOf[Seq[(String,String,String,Double)]].filter(x=> x._3==id).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._4).sum).toSeq.sorted.map(x=> (x._1._1,LocationUtils.getNameProvincebyCode(x._1._2),x._2))
+        // get inf by Province
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => Await.result(BrasService.getTotalInfbyProvince(LocationUtils.getCodeProvincebyName(id)), Duration.Inf).map(x=>(x._1,x._2,x._3))
+        // get inf by Bras
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) => Await.result(BrasService.getTotalInfbyBras(id), Duration.Inf).map(x=>(x._1,x._2,x._3))
+      }
+      val jsInf = Json.obj(
+        "data" -> rs,
+        "categories" -> rs.map(x=>x._2).asInstanceOf[Seq[(String)]].distinct.sorted,
+        "month" -> rs.map(x=>x._1).asInstanceOf[Seq[(String)]].distinct.sorted
+      )
+      Ok(Json.toJson(jsInf))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def drillUpTotalInf(id: String) = Action { implicit request  =>
+    try{
+      val rs = id match {
+        case id if(id.equals("*")) => Await.result(BrasService.getProvinceTotalInf(), Duration.Inf).map(x=> (x._1,LocationUtils.getRegion(x._2.trim),x._3)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> (x._1._1,x._1._2,x._2))
+        case id if(id.indexOf("Region")>=0) => Await.result(BrasService.getProvinceTotalInf(), Duration.Inf).map(x=> (x._1,x._2,LocationUtils.getRegion(x._2.trim),x._3)).asInstanceOf[Seq[(String,String,String,Double)]].filter(x=> x._3==id.split(":")(1)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._4).sum).toSeq.sorted.map(x=> (x._1._1,LocationUtils.getNameProvincebyCode(x._1._2),x._2))
+        case id if(id.indexOf("Province")>=0) => Await.result(BrasService.getTotalInfbyProvince(LocationUtils.getCodeProvincebyName(id.split(":")(1))), Duration.Inf).map(x=>(x._1,x._2,x._3))
+      }
+      val jsInf = Json.obj(
+        "data" -> rs,
+        "categories" -> rs.map(x=>x._2).asInstanceOf[Seq[(String)]].distinct.sorted,
+        "month" -> rs.map(x=>x._1).asInstanceOf[Seq[(String)]].distinct.sorted
+      )
+      Ok(Json.toJson(jsInf))
+    }
+    catch{
+      case e: Exception => Ok("Error")
     }
   }
 

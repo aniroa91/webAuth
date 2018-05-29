@@ -7,7 +7,10 @@ case class RegionOverview(
                          sigLogRegion: SigLogRegion,
                          nocCount : NocCount,
                          contracts: Array[(String,String,String,String,Int,Int,Int)],
-                         opsviewType: Array[(String,String)]
+                         opsviewType: Array[(String,String)],
+                         infTypeError: InfTypeError,
+                         totalInf: Array[(String,String,Double)],
+                         sigLogMonth: Array[(String,String,String)]
                          )
 case class SigLogRegion(
                                signin: Array[(String,Int)],
@@ -22,6 +25,12 @@ case class NocCount(
                     emergCount: Array[(String,String,String,Int)]
                   )
 
+case class InfTypeError(
+                         infDown: Array[(String,String,String,Int)],
+                         userDown: Array[(String,String,String,Int)],
+                         rougeError: Array[(String,String,String,Int)],
+                         lostSignal: Array[(String,String,String,Int)]
+                       )
 case class BrasInfor(
                     noOutlier: Int,
                     siginLogoff:(Int,Int)

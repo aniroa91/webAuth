@@ -29,7 +29,12 @@ GET      /device                       controllers.DeviceController.overview
 GET      /noc                          controllers.DeviceController.dashboard
 GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
 GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")
+GET      /drillUpTotalInf              controllers.DeviceController.drillUpTotalInf(id: String ?= "")
+GET      /drilldownTotalInf            controllers.DeviceController.drilldownTotalInf(id: String ?= "")
+GET      /drillUpSigLogmonth           controllers.DeviceController.drillUpSigLogmonth(id: String ?= "")
+GET      /drilldownSigLogMonth         controllers.DeviceController.drilldownSigLogMonth(id: String ?= "")
 GET      /region-countType             controllers.DeviceController.getcountType(id: String ?= "")
+GET      /region-errorType             controllers.DeviceController.geterrorType(id: String ?= "")
 GET      /topN-json                    controllers.DeviceController.topNJson(month: String ?= "")
 GET      /checkOutlier                 controllers.DeviceController.checkOutlier(id: String ?= "")
 GET      /inf/rejectLabel              controllers.DeviceController.rejectLabel(host: String ?= "",module: String ?= "",time: String ?= "",bras: String ?= "")

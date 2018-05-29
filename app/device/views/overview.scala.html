@@ -65,10 +65,14 @@
                                 <div class="col-lg-12" style="padding:0px;">
                                     <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                                         <div class="x_panel tile">
+                                            <input type="hidden" id="regionInf">
+                                            <input type="hidden" id="isRegion">
+                                            <input type="hidden" id="isProvince">
+
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
                                                     font-size: 24px"> Total Inf By Region</h2>
-
+                                                <a class="btn btn-warning" id="backInfTotal" onclick="backInfTotal()" style="display: none;float: right"></a>
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
@@ -104,10 +108,13 @@
                                 <div class="col-lg-12" style="padding:0px;">
                                     <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                                         <div class="x_panel tile">
+                                            <input type="hidden" id="regionSigLog">
+                                            <input type="hidden" id="isRegionSigLog">
+                                            <input type="hidden" id="isProvinceSigLog">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
                                                     font-size: 24px"> Signin and Logoff</h2>
-
+                                                <a class="btn btn-warning" id="backSigLog" onclick="backSigLogmonth()" style="display: none;float: right"></a>
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
@@ -140,6 +147,40 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="col-lg-12">
+                                    <div class="input-group date" id="divMonthGroup" style="width: 200px;float: right">
+                                        <input type="text" id="monthGroup" class="form-control" readonly="true" style="cursor: pointer;background-color: white" placeholder="Choose month...">
+                                        <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" style="padding:0px;">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Opsview Types Region</h2>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-opsview-heatmap" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Signin and Logoff By Region</h2>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="region-siglog-bar" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-lg-12" style="padding:0px;">
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
@@ -151,7 +192,7 @@
                                             </div>
                                             <div class="x_content">
                                                 <div id="region-nocCount" style="height: 350px;"></div>
-                                                <form style="text-align: center">
+                                                <form id="frmNoccount" style="text-align: center">
                                                     <label class="radio-inline radioText">
                                                         <input type="radio" value="AlertCount" name="optradio" checked>AlertCount
                                                     </label>
@@ -178,39 +219,13 @@
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Signin and Logoff By Region</h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="region-siglog-bar" style="height: 350px;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12" style="padding:0px;">
-                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
-                                        <div class="x_panel tile">
-                                            <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Opsview Types Region</h2>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="region-opsview-heatmap" style="height: 350px;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
-                                        <div class="x_panel tile">
-                                            <div class="x_title">
-                                                <h2 style="font-weight: 500;
                                                     font-size: 24px"> Inf Error By Region</h2>
 
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
                                                 <div id="region-infError" style="height: 350px;"></div>
-                                                <form style="text-align: center">
+                                                <form id="frmInferror" style="text-align: center">
                                                     <label class="radio-inline radioText">
                                                         <input type="radio" value="InfDown" name="infradio" checked>InfDown
                                                     </label>
@@ -399,12 +414,26 @@
                     var newDate = yr + '-' + month;
                     callAjaxTopN(newDate)
                 });
+
+                // group div picker choose month
+                $('#divMonthGroup').datepicker({
+                    autoclose: true,
+                    minViewMode: 1,
+                    endDate: '+0d',
+                    format: 'yyyy-mm'
+                }).on('changeDate', function(selected){
+                    var startDate = new Date(selected.date.valueOf());
+                    var yr = startDate.getFullYear();
+                    var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
+                    var newDate = yr + '-' + month;
+                    
+                });
                 $(".tab-slider--body").hide();
                 $(".tab-slider--body:first").show();
 
                 // Click radio button choose Count Type Noc
-                $('form input:radio').change(function(){
-                    $('.radio-inline').removeClass('radioText')
+                $('#frmNoccount input:radio').change(function(){
+                    $('#frmNoccount .radio-inline').removeClass('radioText')
                     $(this).parent().addClass('radioText')
                     var id =$(this).val()
                     $.ajax({
@@ -435,7 +464,49 @@
                                         data: getDrillDownStackedAndLine( dta.dtaByRegion)
                                     }],
                                     drilldown:{
-                                        series: getDrillDown1Level(dta.data,dta.arrRegion)
+                                        series: getDrillDownNotStacked2Level(dta.data,dta.arrRegion)
+                                    }
+                                });
+                            }
+                        },
+                    });
+                })
+
+                // Click radio button choose INF down error
+                $('#frmInferror input:radio').change(function(){
+                    $('#frmInferror .radio-inline').removeClass('radioText')
+                    $(this).parent().addClass('radioText')
+                    var id =$(this).val()
+                    $.ajax({
+                        url: "/region-errorType?id=" + id.trim(),
+                        cache: false,
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                Highcharts.chart('region-infError', {
+                                    chart: {
+                                        type: 'areaspline'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        type: 'category'
+                                    },
+                                    legend: {
+                                        enabled: true
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    colors: ['#5A738E'],
+                                    series: [{
+                                        name: id,
+                                        data: getDrillDownStackedAndLine( dta.dtaByRegion)
+                                    }],
+                                    drilldown:{
+                                        series: getDrillDownNotStacked2Level(dta.data,dta.arrRegion)
                                     }
                                 });
                             }
@@ -468,7 +539,7 @@
                             stacking: 'normal'
                         }
                     },
-                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct.sorted))),0),
+                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),0),
                     drilldown:{
                         drillUpButton:{
                             relativeTo: 'spacingBox',
@@ -479,7 +550,7 @@
                                 y:-10
                             }
                         },
-                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct.sorted))),'normal')}
+                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),'normal')}
                 });
                 // Total Opsview by Region
                 Highcharts.chart('region-kibana', {
@@ -506,7 +577,7 @@
                             stacking: 'normal'
                         }
                     },
-                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct.sorted))),1),
+                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct))),1),
                     drilldown:{
                         drillUpButton:{
                             relativeTo: 'spacingBox',
@@ -517,7 +588,7 @@
                                 y:-10
                             }
                         },
-                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct.sorted))),'normal')}
+                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct))),'normal')}
                 });
                 // Suyhao not passed
                 Highcharts.chart('region-suyhao', {
@@ -630,7 +701,7 @@
                         data: getDrillDownStackedAndLine( @Html(Json.stringify(Json.toJson(response.nocCount.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray))))
                     }],
                     drilldown:{
-                        series: getDrillDown1Level(@Html(Json.stringify(Json.toJson(response.nocCount.alertCount))),@Html(Json.stringify(Json.toJson(response.nocCount.alertCount.map(x=> x._1).toSeq.distinct.sorted.toArray))))
+                        series: getDrillDownNotStacked2Level(@Html(Json.stringify(Json.toJson(response.nocCount.alertCount))),@Html(Json.stringify(Json.toJson(response.nocCount.alertCount.map(x=> x._1).toSeq.distinct.sorted.toArray))))
                     }
                 });
                 // Total Contract Device by Region
@@ -663,7 +734,7 @@
                             stacking: 'normal'
                         }
                     },
-                    series: getDrildownContractDevice(@Html(Json.stringify(Json.toJson(response.contracts))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._1).toSeq.distinct.sorted)))),
+                    series: getDrildownContractDevice(@Html(Json.stringify(Json.toJson(response.contracts))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._1).toSeq.distinct)))),
                     drilldown:{
                         drillUpButton:{
                             relativeTo: 'spacingBox',
@@ -674,7 +745,7 @@
                                 y:-10
                             }
                         },
-                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.contracts))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._1).toSeq.distinct.sorted))),'contract')}
+                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.contracts))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._1).toSeq.distinct))),'contract')}
                 });
                 // Heatmap Opsview Types
                 Highcharts.chart('region-opsview-heatmap', {
@@ -734,24 +805,158 @@
                 // Inf down error by Region
                 Highcharts.chart('region-infError', {
                     chart: {
-                        type: 'area'
+                        type: 'areaspline'
+                    },
+                    title: {
+                        text: ''
                     },
                     xAxis: {
-                        type:'category'
+                        type: 'category'
+                    },
+                    legend: {
+                        enabled: true
+                    },
+                    yAxis: {
+                        title: {
+                            text: ''
+                        }
+                    },
+                    colors: ['#5A738E'],
+                    series: [{
+                        name:'Inf down',
+                        data: getDrillDownStackedAndLine( @Html(Json.stringify(Json.toJson(response.infTypeError.infDown.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray))))
+                    }],
+                    drilldown:{
+                        series: getDrillDownNotStacked2Level(@Html(Json.stringify(Json.toJson(response.infTypeError.infDown))),@Html(Json.stringify(Json.toJson(response.infTypeError.infDown.map(x=> x._1).toSeq.distinct.sorted.toArray))))
+                    }
+                });
+                // Heatmap Total INF
+                Highcharts.chart('region-inf', {
+                    chart: {
+                        type: 'heatmap',
+                        marginTop: 40,
+                        marginBottom: 40,
+                        plotBorderWidth: 1
+                    },
+
+                    title: {
+                        text: ''
+                    },
+
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.totalInf.map(x=>x._1.substring(0,x._1.lastIndexOf("-"))).toSeq.distinct.sorted)))
+                    },
+
+                    yAxis: {
+                        categories:  @Html(Json.stringify(Json.toJson(response.totalInf.map(x=>x._2).toSeq.distinct.sorted))),
+                        title: null
+                    },
+
+                    colorAxis: {
+                        min: 0,
+                        minColor: '#FFFFFF',
+                        maxColor: '#E74C3C'
+                    },
+
+                    legend: {
+                        align: 'top',
+                        layout: 'horizontal',
+                        margin: 0,
+                        y: -20,
+                        verticalAlign: 'right',
                     },
 
                     plotOptions: {
                         series: {
-                            stacking: 'normal'
+                            events: {
+                                click: function (event) {
+                                    callDrilldownTotalInf(event.point.series.yAxis.categories[event.point.y])
+                                }
+                            }
                         }
                     },
-                    title:{
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                    this.point.value + '</b> ';
+                        }
+                    },
+
+                    series: [{
+                        name: 'total inf',
+                        borderWidth: 1,
+                        data: getDataHeatMapForDrilldownInferror(@Html(Json.stringify(Json.toJson(response.totalInf))),@Html(Json.stringify(Json.toJson(response.totalInf.map(x=>x._1).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.totalInf.map(x=>x._2).toSeq.distinct.sorted)))),
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000'
+                        }
+                    }]
+
+                });
+                // Heatmap signin and logoff by month
+                Highcharts.chart('region-sigLog', {
+                    chart: {
+                        type: 'heatmap',
+                        marginTop: 40,
+                        marginBottom: 40,
+                        plotBorderWidth: 1
+                    },
+
+                    title: {
                         text: ''
                     },
-                    tooltip: {
-                        shared: true
+
+                    xAxis: {
+                        categories: getCategoryGroup(@Html(Json.stringify(Json.toJson(response.sigLogMonth.map(x=>x._1.substring(0,x._1.lastIndexOf("-"))).toSeq.distinct.sorted))))
                     },
-                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted))),2),
+
+                    yAxis: {
+                        categories:  @Html(Json.stringify(Json.toJson(response.sigLogMonth.map(x=>x._2).toSeq.distinct.sorted))),
+                        title: null
+                    },
+
+                    colorAxis: {
+                        min: 0,
+                        minColor: '#FFFFFF',
+                        maxColor: '#3276b1'
+                    },
+
+                    legend: {
+                        align: 'top',
+                        layout: 'horizontal',
+                        margin: 0,
+                        y: -20,
+                        verticalAlign: 'right',
+                    },
+
+                    plotOptions: {
+                        series: {
+                            events: {
+                                click: function (event) {
+                                    callDrilldownSigLog(event.point.series.yAxis.categories[event.point.y])
+                                }
+                            }
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                    this.point.value + '</b> ';
+                        }
+                    },
+
+                    series: [{
+                        name: 'total inf',
+                        borderWidth: 1,
+                        data: getDataHeatMapForDrilldownSiglog(@Html(Json.stringify(Json.toJson(response.sigLogMonth))),@Html(Json.stringify(Json.toJson(response.sigLogMonth.map(x=>x._1).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.sigLogMonth.map(x=>x._2).toSeq.distinct.sorted)))),
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000'
+                        }
+                    }]
+
                 });
             });
 
@@ -791,7 +996,396 @@
                 return jsonArr
             }
 
-            function getDrillDown1Level(dta,arrRegion){
+            function backInfTotal() {
+                var id = ""
+                if($('#backInfTotal').text() == "Back to bras"){
+                    $('#backInfTotal').show()
+                    $('#backInfTotal').text('Back to province')
+                    id = "Province:"+$('#isProvince').val()
+                }
+                else if($('#backInfTotal').text() == "Back to province"){
+                    $('#backInfTotal').show()
+                    $('#backInfTotal').text('Back to region')
+                    id = "Region:"+$('#isRegion').val()
+                }
+                else {
+                    $('#backInfTotal').hide()
+                    id = "*"
+                }
+                $.ajax({
+                    url: "/drillUpTotalInf?id="+id,
+                    cache: false,
+                    success: function (dta) {
+                        if (dta != "Error") {
+                            Highcharts.chart('region-inf', {
+                                chart: {
+                                    type: 'heatmap',
+                                    marginTop: 40,
+                                    marginBottom: 40,
+                                    plotBorderWidth: 1
+                                },
+
+                                title: {
+                                    text: ''
+                                },
+
+                                xAxis: {
+                                    categories: dta.month
+                                },
+
+                                yAxis: {
+                                    categories: dta.categories,
+                                    title: null
+                                },
+
+                                colorAxis: {
+                                    min: 0,
+                                    minColor: '#FFFFFF',
+                                    maxColor: '#E74C3C'
+                                },
+
+                                legend: {
+                                    align: 'top',
+                                    layout: 'horizontal',
+                                    margin: 0,
+                                    y: -20,
+                                    verticalAlign: 'right',
+                                },
+
+                                plotOptions: {
+                                    series: {
+                                        events: {
+                                            click: function (event) {
+                                                callDrilldownTotalInf(event.point.series.yAxis.categories[event.point.y])
+                                            }
+                                        }
+                                    }
+                                },
+
+                                tooltip: {
+                                    formatter: function () {
+                                        return '<b>' + this.series.xAxis.categories[this.point.x] + ' & ' + this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                this.point.value + '</b> ';
+                                    }
+                                },
+
+                                series: [{
+                                    name: 'total inf',
+                                    borderWidth: 1,
+                                    data: getDataHeatMapForDrilldownInferror(dta.data, dta.month, dta.categories),
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000'
+                                    }
+                                }]
+
+                            });
+                        }
+                    }
+                })
+            }
+
+            function callDrilldownTotalInf(id){
+                $.ajax({
+                    url: "/drilldownTotalInf?id=" + id,
+                    cache: false,
+                    success: function (dta) {
+                        if(dta != "Error"){
+                            // Apply for button back
+                            $('#regionInf').val(id)
+                            if(!isNaN(id.substring(id.indexOf(" ")+1))){
+                                $('#backInfTotal').text("Back to region")
+                                $('#isRegion').val(id)
+                            }
+                            else if(isNaN(id.substring(id.indexOf(" ")+1)) && id.indexOf("-")<0){
+                                $('#backInfTotal').text("Back to province")
+                                $('#isProvince').val(id)
+                            }
+                            else if(isNaN(id.substring(id.indexOf(" ")+1)) && id.indexOf("-")>=0){
+                                $('#backInfTotal').text("Back to bras")
+                            }
+                            $('#backInfTotal').show()
+
+                            Highcharts.chart('region-inf', {
+                                chart: {
+                                    type: 'heatmap',
+                                    marginTop: 40,
+                                    marginBottom: 40,
+                                    plotBorderWidth: 1
+                                },
+
+                                title: {
+                                    text: ''
+                                },
+
+                                xAxis: {
+                                    categories: dta.month
+                                },
+
+                                yAxis: {
+                                    categories:  dta.categories,
+                                    title: null
+                                },
+
+                                colorAxis: {
+                                    min: 0,
+                                    minColor: '#FFFFFF',
+                                    maxColor: '#E74C3C'
+                                },
+
+                                legend: {
+                                    align: 'top',
+                                    layout: 'horizontal',
+                                    margin: 0,
+                                    y: -20,
+                                    verticalAlign: 'right',
+                                },
+
+                                plotOptions: {
+                                    series: {
+                                        events: {
+                                            click: function (event) {
+                                                callDrilldownTotalInf(event.point.series.yAxis.categories[event.point.y])
+                                            }
+                                        }
+                                    }
+                                },
+
+                                tooltip: {
+                                    formatter: function () {
+                                        return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                this.point.value + '</b> ';
+                                    }
+                                },
+
+                                series: [{
+                                    name: 'total inf',
+                                    borderWidth: 1,
+                                    data: getDataHeatMapForDrilldownInferror(dta.data,dta.month,dta.categories),
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000'
+                                    }
+                                }]
+
+                            });
+                        }
+                    }
+                })
+            }
+
+            function backSigLogmonth() {
+                var id = ""
+                if($('#backSigLog').text() == "Back to bras"){
+                    $('#backSigLog').show()
+                    $('#backSigLog').text('Back to province')
+                    id = "Province:"+$('#isProvinceSigLog').val()
+                }
+                else if($('#backSigLog').text() == "Back to province"){
+                    $('#backSigLog').show()
+                    $('#backSigLog').text('Back to region')
+                    id = "Region:"+$('#isRegionSigLog').val()
+                }
+                else {
+                    $('#backSigLog').hide()
+                    id = "*"
+                }
+                $.ajax({
+                    url: "/drillUpSigLogmonth?id="+id,
+                    cache: false,
+                    success: function (dta) {
+                        if (dta != "Error") {
+                            Highcharts.chart('region-sigLog', {
+                                chart: {
+                                    type: 'heatmap',
+                                    marginTop: 40,
+                                    marginBottom: 40,
+                                    plotBorderWidth: 1
+                                },
+
+                                title: {
+                                    text: ''
+                                },
+
+                                xAxis: {
+                                    categories: getCategoryGroup(dta.month)
+                                },
+
+                                yAxis: {
+                                    categories:  dta.categories,
+                                    title: null
+                                },
+
+                                colorAxis: {
+                                    min: 0,
+                                    minColor: '#FFFFFF',
+                                    maxColor: '#3276b1'
+                                },
+
+                                legend: {
+                                    align: 'top',
+                                    layout: 'horizontal',
+                                    margin: 0,
+                                    y: -20,
+                                    verticalAlign: 'right',
+                                },
+
+                                plotOptions: {
+                                    series: {
+                                        events: {
+                                            click: function (event) {
+                                                callDrilldownSigLog(event.point.series.yAxis.categories[event.point.y])
+                                            }
+                                        }
+                                    }
+                                },
+
+                                tooltip: {
+                                    formatter: function () {
+                                        return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                this.point.value + '</b> ';
+                                    }
+                                },
+
+                                series: [{
+                                    name: 'total inf',
+                                    borderWidth: 1,
+                                    data: getDataHeatMapForDrilldownSiglog(dta.data,dta.month,dta.categories),
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000'
+                                    }
+                                }]
+
+                            });
+                        }
+                    }
+                })
+            }
+
+            function callDrilldownSigLog(id){
+                $.ajax({
+                    url: "/drilldownSigLogMonth?id=" + id,
+                    cache: false,
+                    success: function (dta) {
+                        if(dta != "Error"){
+                            // Apply for button back
+                            $('#regionSigLog').val(id)
+                            if(!isNaN(id.substring(id.indexOf(" ")+1))){
+                                $('#backSigLog').text("Back to region")
+                                $('#isRegionSigLog').val(id)
+                            }
+                            else if(isNaN(id.substring(id.indexOf(" ")+1)) && id.indexOf("-")<0){
+                                $('#backSigLog').text("Back to province")
+                                $('#isProvinceSigLog').val(id)
+                            }
+                            else if(isNaN(id.substring(id.indexOf(" ")+1)) && id.indexOf("-")>=0){
+                                $('#backSigLog').text("Back to bras")
+                            }
+                            $('#backSigLog').show()
+
+                            Highcharts.chart('region-sigLog', {
+                                chart: {
+                                    type: 'heatmap',
+                                    marginTop: 40,
+                                    marginBottom: 40,
+                                    plotBorderWidth: 1
+                                },
+
+                                title: {
+                                    text: ''
+                                },
+
+                                xAxis: {
+                                    categories: getCategoryGroup(dta.month)
+                                },
+
+                                yAxis: {
+                                    categories:  dta.categories,
+                                    title: null
+                                },
+
+                                colorAxis: {
+                                    min: 0,
+                                    minColor: '#FFFFFF',
+                                    maxColor: '#3276b1'
+                                },
+
+                                legend: {
+                                    align: 'top',
+                                    layout: 'horizontal',
+                                    margin: 0,
+                                    y: -20,
+                                    verticalAlign: 'right',
+                                },
+
+                                plotOptions: {
+                                    series: {
+                                        events: {
+                                            click: function (event) {
+                                                callDrilldownSigLog(event.point.series.yAxis.categories[event.point.y])
+                                            }
+                                        }
+                                    }
+                                },
+
+                                tooltip: {
+                                    formatter: function () {
+                                        return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                this.point.value + '</b> ';
+                                    }
+                                },
+
+                                series: [{
+                                    name: 'total inf',
+                                    borderWidth: 1,
+                                    data: getDataHeatMapForDrilldownSiglog(dta.data,dta.month,dta.categories),
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000'
+                                    }
+                                }]
+
+                            });
+                        }
+                    }
+                })
+            }
+
+            function getDataHeatMapForDrilldownInferror(dta,arrMonth,arrRegion){
+                var jsonArr = [];
+                for (var month =0 ; month < arrMonth.length; month++) {
+                    for(var key=0;key<arrRegion.length;key++)
+                        for(var i=0;i<dta.length;i++)
+                            if(dta[i][0] == arrMonth[month] && dta[i][1] == arrRegion[key])
+                                jsonArr.push([month,key,Number(dta[i][2])])
+                }
+                return jsonArr
+            }
+
+            function getDataHeatMapForDrilldownSiglog(dta,arrMonth,arrRegion){
+                var jsonArr = [];
+                for (var month =0,subcate=0 ; month < arrMonth.length; month++,subcate++) {
+                    for(var key=0;key<arrRegion.length;key++)
+                        for(var i=0;i<dta.length;i++)
+                            if(dta[i][0] == arrMonth[month] && dta[i][1] == arrRegion[key]){
+                                jsonArr.push([month+subcate,key,Number(dta[i][2].split('_')[0])])
+                                jsonArr.push([month+subcate+1,key,Number(dta[i][2].split('_')[1])])
+                            }
+                }
+                return jsonArr
+            }
+
+            function getCategoryGroup(cates){
+                var grpCates = []
+                for(var i=0;i<cates.length;i++){
+                    grpCates.push(cates[i]+'-Signin')
+                    grpCates.push(cates[i]+'-Logoff')
+                }
+                return grpCates
+            }
+
+            function getDrillDownNotStacked2Level(dta,arrRegion){
                 var jsArray = []
                 for(var region=0;region<arrRegion.length;region++){
                     // get array provinces and bras by month&region
@@ -808,7 +1402,8 @@
                     // set array data by province
                     var nameOld = arrProvinceBras[0].province, sumOld= Number(arrProvinceBras[0].value), isMoreProv =0,dtaProvince = []
                     for(var k=1;k<arrProvinceBras.length;k++){
-                        if(nameOld != arrProvinceBras[k].province){
+                        if(k== (arrProvinceBras.length-1) || nameOld != arrProvinceBras[k].province){
+                            if(k== (arrProvinceBras.length-1)) sumOld += arrProvinceBras[k].value
                             dtaRegion.push({
                                 name: nameOld,
                                 y: sumOld,
@@ -822,7 +1417,7 @@
                             })
                             dtaProvince = []
                             nameOld = arrProvinceBras[k].province
-                            sumOld = 0
+                            sumOld = arrProvinceBras[k].value
                             isMoreProv =1
                         }
                         else{
@@ -851,7 +1446,6 @@
                         data: dtaRegion
                     })
                 }
-                console.log(jsArray)
                 return jsArray
             }
 
@@ -898,7 +1492,8 @@
                                 isMoreProv =0,dtaProvince = [],sumPoorconn =0,
                                 sumNodevice =0
                         for(var k=0;k<arrProvinceBras.length;k++){
-                            if(nameOld != arrProvinceBras[k].province){
+                            if(k==(arrProvinceBras.length -1) || nameOld != arrProvinceBras[k].province){
+                                if(k==(arrProvinceBras.length -1)) sumOld += arrProvinceBras[k].value
                                 if(_type == 'normal')
                                     dtaRegion.push({
                                         name: nameOld,
@@ -915,7 +1510,7 @@
                                     })
                                 // set series province& bras
                                 //console.log(sortObjectsArray(dtaProvince,'y').slice(0,10))
-                                var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,10)
+                                var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,9)
                                 jsArray.push({
                                     id: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
                                     name: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
@@ -923,7 +1518,7 @@
                                 })
                                 dtaProvince = []
                                 nameOld = arrProvinceBras[k].province
-                                sumOld = 0
+                                sumOld = arrProvinceBras[k].value
                                 sumNodevice = 0
                                 sumPoorconn = 0
                                 isMoreProv =1
@@ -959,7 +1554,7 @@
                             jsArray.push({
                                 id: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
                                 name: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
-                                data: sortObjectsArray(dtaProvince,'name').slice(0,10)
+                                data: sortObjectsArray(dtaProvince,'name').slice(0,9)
                             })
                         }
 
@@ -1416,31 +2011,6 @@
                 return jsArray
             }
 
-            function getJsonMultiColumns(dta,  arrKey,arrMonth){
-                var jsArray = []
-                var colorsSigin = ['#d9534f', '#73879C', '#1ABB9C']
-                var colorsLogoff = ['#1ABB9C', '#73879C', '#d9534f']
-                var colorsInf =  ['#f1b53d','#832d1d','#73879C']
-                for(var month=0;month< arrMonth.length;month++ ){
-                    var arrData = []
-                    for(var key=0;key<arrKey.length;key++ ) {
-                        var sumVl =0
-                        for (var i = 0; i < dta.length; i++) {
-                            if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][2]){
-                                sumVl += dta[i][3]
-                            }
-                        }
-                        arrData.push(sumVl)
-                    }
-                    var color = colorsSigin[month]
-                    jsArray.push({
-                        name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
-                        data: arrData,
-                        color: color
-                    })
-                }
-                return jsArray
-            }
     </script>
     </body>
 </html>

@@ -188,6 +188,102 @@ object BrasDAO {
         .as[(String,String,String,Int)])
   }
 
+  def getProvinceSigLogoff(): Future[Seq[(String,String,Double,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,province,sum(signin) as signin,sum(logoff) as logoff
+            from dmt_overview_conn
+            where month > $month::TIMESTAMP
+            group by month,province
+            order by month desc
+                  """
+        .as[(String,String,Double,Double)])
+  }
+
+  def getProvinceTotalInf(): Future[Seq[(String,String,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,province,sum(total_inf) as total_inf
+            from dmt_overview_inf
+            where month > $month::TIMESTAMP
+            group by month,province
+            order by month desc
+                  """
+        .as[(String,String,Double)])
+  }
+
+  def getTotalInfbyProvince(id: String): Future[Seq[(String,String,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,bras_id,sum(total_inf) as total_inf
+            from dmt_overview_inf
+            where month > $month::TIMESTAMP and province = $id
+            group by month,bras_id
+            order by month desc
+            limit 30
+                  """
+        .as[(String,String,Double)])
+  }
+
+  def getSigLogconnbyProvince(id: String): Future[Seq[(String,String,Double,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,bras_id,sum(signin) as signin,sum(logoff) as logoff
+            from dmt_overview_conn
+            where month > $month::TIMESTAMP and province = $id
+            group by month,bras_id
+            order by month desc
+            limit 30
+                  """
+        .as[(String,String,Double,Double)])
+  }
+
+  def getSigLogconnbyBras(id: String): Future[Seq[(String,String,Double,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select tbO.month,tbO.host,sum(tbO.signin),sum(tbO.logoff)
+                                   from(
+                                      select row_number() OVER (PARTITION BY conn.month ORDER BY conn.signin desc) AS r,
+                                       conn.*
+                                       from (
+                                           select month,host,sum(signin) as signin,sum(logoff) as logoff
+                                           from dmt_overview_conn
+                                           where month > $month::TIMESTAMP and bras_id = $id
+                                           group by month,host
+                                           order by month desc
+                                       ) conn
+                                   ) tbO
+                                   where tbO.r<=10
+                                   group by tbO.month,tbO.host
+                                   order by tbO.month desc
+                                limit 30
+                  """
+        .as[(String,String,Double,Double)])
+  }
+
+  def getTotalInfbyBras(id: String): Future[Seq[(String,String,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select tbO.month,tbO.host,sum(tbO.total_inf)
+                                   from(
+                                      select row_number() OVER (PARTITION BY conn.month ORDER BY conn.total_inf desc) AS r,
+                                       conn.*
+                                       from (
+                                           select month,host,sum(total_inf) as total_inf
+                                           from dmt_overview_inf
+                                           where month > $month::TIMESTAMP and bras_id = $id
+                                           group by month,host
+                                           order by month desc
+                                       ) conn
+                                   ) tbO
+                                   where tbO.r<=10
+                                   group by tbO.month,tbO.host
+                                   order by tbO.month desc
+                                limit 30
+                  """
+        .as[(String,String,Double)])
+  }
+
   def getProvinceSuyhao(): Future[Seq[(String,String,String,Int)]] = {
     val month = CommonService.get3MonthAgo()+"-01"
     dbConfig.db.run(
@@ -235,6 +331,7 @@ object BrasDAO {
               from dmt_overview_noc
               where month > $month::TIMESTAMP
               group by month,province
+              order by month desc
                   """
           .as[(String,String,Int,Int,Int,Int)])
     } else{
@@ -245,6 +342,33 @@ object BrasDAO {
               from dmt_overview_noc
               where month = $query::TIMESTAMP
               group by month,province
+              order by month desc
+                  """
+          .as[(String,String,Int,Int,Int,Int)])
+    }
+  }
+
+  def getProvinceInfDownError(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select province,bras_id,sum(inf_down) as inf_down,sum(user_down) as user_down,sum(rouge_error) as rouge_error,
+                                   sum(lost_signal) as lost_signal
+                           from dmt_overview_inf
+                           where month > $month::TIMESTAMP
+                           group by province,bras_id
+              order by province,bras_id
+                  """
+          .as[(String,String,Int,Int,Int,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select province,bras_id,sum(inf_down) as inf_down,sum(user_down) as user_down,sum(rouge_error) as rouge_error,
+                                   sum(lost_signal) as lost_signal
+                           from dmt_overview_inf
+                           where month =  $query::TIMESTAMP
+                           group by province,bras_id
+              order by province,bras_id
                   """
           .as[(String,String,Int,Int,Int,Int)])
     }

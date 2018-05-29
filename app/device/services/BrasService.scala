@@ -60,6 +60,34 @@ object BrasService extends AbstractService{
     BrasDAO.getProvinceOpsviewType(month)
   }
 
+  def getProvinceInfDownError(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]]   ={
+    BrasDAO.getProvinceInfDownError(month)
+  }
+
+  def getProvinceTotalInf(): Future[Seq[(String,String,Double)]]   ={
+    BrasDAO.getProvinceTotalInf()
+  }
+
+  def getProvinceSigLogoff(): Future[Seq[(String,String,Double,Double)]]   ={
+    BrasDAO.getProvinceSigLogoff()
+  }
+
+  def getTotalInfbyProvince(id: String): Future[Seq[(String,String,Double)]]   ={
+    BrasDAO.getTotalInfbyProvince(id)
+  }
+
+  def getSigLogconnbyProvince(id: String): Future[Seq[(String,String,Double,Double)]]   ={
+    BrasDAO.getSigLogconnbyProvince(id)
+  }
+
+  def getTotalInfbyBras(id: String): Future[Seq[(String,String,Double)]]   ={
+    BrasDAO.getTotalInfbyBras(id)
+  }
+
+  def getSigLogconnbyBras(id: String): Future[Seq[(String,String,Double,Double)]]   ={
+    BrasDAO.getSigLogconnbyBras(id)
+  }
+
   def getTopSignin(month: String): Future[Seq[(String,String,Int)]]   ={
     BrasDAO.getTopSignin(month)
   }
