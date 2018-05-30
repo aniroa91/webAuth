@@ -214,13 +214,28 @@ object BrasDAO {
 
   def getTotalInfbyProvince(id: String): Future[Seq[(String,String,Double)]] = {
     val month = CommonService.get3MonthAgo()+"-01"
+    val aMonthago = CommonService.getnumMonthAgo(0)
+    val twoMonthago = CommonService.getnumMonthAgo(1)
     dbConfig.db.run(
-      sql"""select month,bras_id,sum(total_inf) as total_inf
+      sql"""select month, bras_id,sum(total_inf) as total_inf
             from dmt_overview_inf
-            where month > $month::TIMESTAMP and province = $id
+            where month > $month::TIMESTAMP and province = $id and bras_id IN(
+            select tb1.bras_id
+            from (
+                (select bras_id
+                        from dmt_overview_inf
+                        where month= $aMonthago::TIMESTAMP and province = $id
+                        group by bras_id) tb1
+                 join (
+                        select bras_id
+                        from dmt_overview_inf
+                        where month= $twoMonthago::TIMESTAMP and province = $id
+                        group by bras_id ) tb2
+                        on tb1.bras_id=tb2.bras_id
+            )
+            )
             group by month,bras_id
             order by month desc
-            limit 30
                   """
         .as[(String,String,Double)])
   }
@@ -263,23 +278,29 @@ object BrasDAO {
 
   def getTotalInfbyBras(id: String): Future[Seq[(String,String,Double)]] = {
     val month = CommonService.get3MonthAgo()+"-01"
+    val aMonthago = CommonService.getnumMonthAgo(0)
+    val twoMonthago = CommonService.getnumMonthAgo(1)
     dbConfig.db.run(
-      sql"""select tbO.month,tbO.host,sum(tbO.total_inf)
-                                   from(
-                                      select row_number() OVER (PARTITION BY conn.month ORDER BY conn.total_inf desc) AS r,
-                                       conn.*
-                                       from (
-                                           select month,host,sum(total_inf) as total_inf
-                                           from dmt_overview_inf
-                                           where month > $month::TIMESTAMP and bras_id = $id
-                                           group by month,host
-                                           order by month desc
-                                       ) conn
-                                   ) tbO
-                                   where tbO.r<=10
-                                   group by tbO.month,tbO.host
-                                   order by tbO.month desc
-                                limit 30
+      sql"""select month, host,sum(total_inf) as total_inf
+            from dmt_overview_inf
+            where month > $month::TIMESTAMP and bras_id = $id and host IN(
+            select tb1.host
+            from (
+                (select host
+                        from dmt_overview_inf
+                        where month= $aMonthago::TIMESTAMP and bras_id = $id
+                        group by host order by sum(total_inf) desc) tb1
+                 join (
+                        select host
+                        from dmt_overview_inf
+                        where month= $twoMonthago::TIMESTAMP and bras_id = $id
+                        group by host ) tb2
+                        on tb1.host=tb2.host
+            )
+            limit 10
+            )
+            group by month,host
+            order by month desc,sum(total_inf)  desc
                   """
         .as[(String,String,Double)])
   }

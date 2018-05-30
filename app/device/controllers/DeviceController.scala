@@ -476,19 +476,35 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def drilldownTotalInf(id: String) = Action {implicit  request =>
     try{
-      val rs = id match {
+      val jsInf = id match {
           // get inf by Region
-        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => Await.result(BrasService.getProvinceTotalInf(), Duration.Inf).map(x=> (x._1,x._2,LocationUtils.getRegion(x._2.trim),x._3)).asInstanceOf[Seq[(String,String,String,Double)]].filter(x=> x._3==id).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._4).sum).toSeq.sorted.map(x=> (x._1._1,LocationUtils.getNameProvincebyCode(x._1._2),x._2))
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
+          val rs = Await.result(BrasService.getProvinceTotalInf(), Duration.Inf).map(x=> (x._1,x._2,LocationUtils.getRegion(x._2.trim),x._3)).asInstanceOf[Seq[(String,String,String,Double)]].filter(x=> x._3==id).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._4).sum).toSeq.sorted.map(x=> (x._1._1,LocationUtils.getNameProvincebyCode(x._1._2),x._2))
+          Json.obj(
+            "data" -> rs,
+            "categories" -> rs.map(x=>x._2).distinct.sorted,
+            "month" -> rs.map(x=>x._1).distinct.sorted
+          )
+        }
         // get inf by Province
-        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => Await.result(BrasService.getTotalInfbyProvince(LocationUtils.getCodeProvincebyName(id)), Duration.Inf).map(x=>(x._1,x._2,x._3))
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
+          val rs = Await.result(BrasService.getTotalInfbyProvince(LocationUtils.getCodeProvincebyName(id)), Duration.Inf).map(x=>(x._1,x._2,x._3))
+          Json.obj(
+            "data" -> rs,
+            "categories" -> rs.map(x=>x._2).distinct.sorted,
+            "month" -> rs.map(x=>x._1).distinct.sorted
+          )
+        }
         // get inf by Bras
-        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) => Await.result(BrasService.getTotalInfbyBras(id), Duration.Inf).map(x=>(x._1,x._2,x._3))
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) => {
+          val rs = Await.result(BrasService.getTotalInfbyBras(id), Duration.Inf).map(x=>(x._1,x._2,x._3))
+          Json.obj(
+            "data" -> rs,
+            "categories" -> rs.map(x=>x._2).slice(0,9),
+            "month" -> rs.map(x=>x._1).distinct.sorted
+          )
+        }
       }
-      val jsInf = Json.obj(
-        "data" -> rs,
-        "categories" -> rs.map(x=>x._2).asInstanceOf[Seq[(String)]].distinct.sorted,
-        "month" -> rs.map(x=>x._1).asInstanceOf[Seq[(String)]].distinct.sorted
-      )
       Ok(Json.toJson(jsInf))
     }
     catch{

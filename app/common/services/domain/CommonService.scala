@@ -96,6 +96,11 @@ object CommonService extends AbstractService {
     date.minusMonths(3).toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
+  def getnumMonthAgo(num: Int): String = {
+    val date = new DateTime()
+    date.minusMonths(num).toString(DateTimeFormat.forPattern("yyyy-MM-01"))
+  }
+
   def getpreviousMinutes(times: Int): String = {
     val date = new DateTime()
     date.minusMinutes(times).toString()
