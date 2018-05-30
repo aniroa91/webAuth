@@ -193,6 +193,7 @@
                                             <div class="x_content">
                                                 <div id="region-nocCount" style="height: 350px;"></div>
                                                 <form id="frmNoccount" style="text-align: center">
+                                                    <input type="hidden" id="typeNocCount" value="AlertCount">
                                                     <label class="radio-inline radioText">
                                                         <input type="radio" value="AlertCount" name="optradio" checked>AlertCount
                                                     </label>
@@ -226,6 +227,7 @@
                                             <div class="x_content">
                                                 <div id="region-infError" style="height: 350px;"></div>
                                                 <form id="frmInferror" style="text-align: center">
+                                                    <input type="hidden" id="typeInfError" value="InfDown">
                                                     <label class="radio-inline radioText">
                                                         <input type="radio" value="InfDown" name="infradio" checked>InfDown
                                                     </label>
@@ -426,21 +428,109 @@
                     var yr = startDate.getFullYear();
                     var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
                     var newDate = yr + '-' + month;
-                    
-                });
-                $(".tab-slider--body").hide();
-                $(".tab-slider--body:first").show();
-
-                // Click radio button choose Count Type Noc
-                $('#frmNoccount input:radio').change(function(){
-                    $('#frmNoccount .radio-inline').removeClass('radioText')
-                    $(this).parent().addClass('radioText')
-                    var id =$(this).val()
                     $.ajax({
-                        url: "/region-countType?id=" + id.trim(),
+                        url: "/groupRegionByMonth?month=" + newDate+"&_typeNoc="+$('#typeNocCount').val()+"&_typeError="+$('#typeInfError').val(),
                         cache: false,
                         success: function (dta) {
                             if(dta != "Error"){
+                                // Bar Logoff and Signin
+                                Highcharts.chart('region-siglog-bar', {
+                                    chart: {
+                                        type: 'bar'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    subtitle: {
+                                        text: ''
+                                    },
+                                    xAxis: [{
+                                        categories: dta.siglogObj.categories,
+                                        reversed: false,
+                                    }, { // mirror axis on right side
+                                        opposite: true,
+                                        reversed: false,
+                                        categories: dta.siglogObj.categories,
+                                        linkedTo: 0,
+                                    }],
+                                    yAxis: {
+                                        title: {
+                                            text: null
+                                        },
+                                        labels: {
+                                            formatter: function () {
+                                                return Math.abs(this.value);
+                                            }
+                                        },
+                                    },
+
+                                    plotOptions: {
+                                        series: {
+                                            stacking: 'normal'
+                                        }
+                                    },
+
+                                    tooltip: {
+                                        formatter: function () {
+                                            return '<b>' + this.series.name + '</b><br/><b>Region: ' + this.point.category + '</b><br/><b>Month: '+newDate+'</b><br/>'
+                                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
+                                        }
+                                    },
+
+                                    series: [{
+                                        name: 'Signin',
+                                        color:'#669999',
+                                        data: dta.siglogObj.signin
+                                    }, {
+                                        name: 'Logoff',
+                                        color:'#832d1d',
+                                        data: dta.siglogObj.logoff
+                                    }]
+                                });
+                                // Inf down error by Region
+                                Highcharts.chart('region-infError', {
+                                    chart: {
+                                        type: 'areaspline'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        type: 'category'
+                                    },
+                                    legend: {
+                                        enabled: true
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'Region: ' + this.point.name + '<br/>'+this.series.name + '<br/>Month: '+newDate+'<br/>'
+                                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
+                                        }
+                                    },
+                                    colors: ['#5A738E'],
+                                    series: [{
+                                        name: $('#typeInfError').val(),
+                                        data: getDrillDownStackedAndLine(dta.infTypeObj.dataSeries)
+                                    }],
+                                    drilldown:{
+                                        drillUpButton:{
+                                            relativeTo: 'spacingBox',
+                                            position:{
+                                                align:"right",
+                                                verticalAlign:"top",
+                                                x:10,
+                                                y:-10
+                                            }
+                                        },
+                                        series: getDrillDownNotStacked2Level(dta.infTypeObj.data,dta.infTypeObj.categories)
+                                    }
+                                });
+                                // Noc Count alert By Region
                                 Highcharts.chart('region-nocCount', {
 
                                     legend: {
@@ -458,12 +548,140 @@
                                         type: 'category'
                                     },
                                     colors:['#f60'],
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'Region: ' + this.point.name + '<br/>'+this.series.name + '<br/>Month: '+newDate+'<br/>'
+                                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
+                                        }
+                                    },
+                                    series: [{
+                                        name:$('#typeNocCount').val(),
+                                        data: getDrillDownStackedAndLine(dta.nocCountObj.dataSeries)
+                                    }],
+                                    drilldown:{
+                                        drillUpButton:{
+                                            relativeTo: 'spacingBox',
+                                            position:{
+                                                align:"right",
+                                                verticalAlign:"top",
+                                                x:10,
+                                                y:-10
+                                            }
+                                        },
+                                        series: getDrillDownNotStacked2Level(dta.nocCountObj.data,dta.nocCountObj.categories)
+                                    }
+                                });
+                                // Heatmap Opsview Types
+                                Highcharts.chart('region-opsview-heatmap', {
+                                    chart: {
+                                        type: 'heatmap',
+                                        marginTop: 40,
+                                        marginBottom: 80,
+                                        plotBorderWidth: 1
+                                    },
+
+                                    title: {
+                                        text: ''
+                                    },
+
+                                    xAxis: {
+                                        categories: dta.heatmapOpsview.categories
+                                    },
+
+                                    yAxis: {
+                                        categories: ['ok_opsview','warn_opsview','unknown_opsview','crit_opsview'],
+                                        title: null
+                                    },
+
+                                    colorAxis: {
+                                        min: 0,
+                                        minColor: '#FFFFFF',
+                                        maxColor: '#1ABB9C'
+                                    },
+
+                                    legend: {
+                                        align: 'right',
+                                        layout: 'vertical',
+                                        margin: 0,
+                                        verticalAlign: 'top',
+                                        y: 25,
+                                        symbolHeight: 280
+                                    },
+
+                                    tooltip: {
+                                        formatter: function () {
+                                            return this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + ' & month '+newDate+' has <br><b>' +
+                                                    this.point.value + '</b> ';
+                                        }
+                                    },
+
+                                    series: [{
+                                        name: 'Opsview types',
+                                        borderWidth: 1,
+                                        data: getDataHeatMap(dta.heatmapOpsview.data),
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000'
+                                        }
+                                    }]
+
+                                });
+                            }
+                        },
+                    });
+                });
+                $(".tab-slider--body").hide();
+                $(".tab-slider--body:first").show();
+
+                // Click radio button choose Count Type Noc
+                $('#frmNoccount input:radio').change(function(){
+                    $('#frmNoccount .radio-inline').removeClass('radioText')
+                    $(this).parent().addClass('radioText')
+                    var id =$(this).val()
+                    $('#typeNocCount').val(id)
+                    $.ajax({
+                        url: "/region-countType?id=" + id.trim()+"&month="+$('#monthGroup').val(),
+                        cache: false,
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                Highcharts.chart('region-nocCount', {
+
+                                    legend: {
+                                        enabled: true
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: 'Counts'
+                                        }
+                                    },
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'Region: ' + this.point.name + '<br/>'+this.series.name + '<br/> '+$('#monthGroup').val()+'<br/>'
+                                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
+                                        }
+                                    },
+                                    xAxis: {
+                                        type: 'category'
+                                    },
+                                    colors:['#f60'],
 
                                     series: [{
                                         name: id,
                                         data: getDrillDownStackedAndLine( dta.dtaByRegion)
                                     }],
                                     drilldown:{
+                                        drillUpButton:{
+                                            relativeTo: 'spacingBox',
+                                            position:{
+                                                align:"right",
+                                                verticalAlign:"top",
+                                                x:10,
+                                                y:-10
+                                            }
+                                        },
                                         series: getDrillDownNotStacked2Level(dta.data,dta.arrRegion)
                                     }
                                 });
@@ -477,8 +695,9 @@
                     $('#frmInferror .radio-inline').removeClass('radioText')
                     $(this).parent().addClass('radioText')
                     var id =$(this).val()
+                    $('#typeInfError').val(id)
                     $.ajax({
-                        url: "/region-errorType?id=" + id.trim(),
+                        url: "/region-errorType?id=" + id.trim()+"&month="+$('#monthGroup').val(),
                         cache: false,
                         success: function (dta) {
                             if(dta != "Error"){
@@ -500,12 +719,27 @@
                                             text: ''
                                         }
                                     },
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'Region: ' + this.point.name + '<br/>'+this.series.name + '<br/> '+$('#monthGroup').val()+'<br/>'
+                                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
+                                        }
+                                    },
                                     colors: ['#5A738E'],
                                     series: [{
                                         name: id,
                                         data: getDrillDownStackedAndLine( dta.dtaByRegion)
                                     }],
                                     drilldown:{
+                                        drillUpButton:{
+                                            relativeTo: 'spacingBox',
+                                            position:{
+                                                align:"right",
+                                                verticalAlign:"top",
+                                                x:10,
+                                                y:-10
+                                            }
+                                        },
                                         series: getDrillDownNotStacked2Level(dta.data,dta.arrRegion)
                                     }
                                 });
@@ -701,6 +935,15 @@
                         data: getDrillDownStackedAndLine( @Html(Json.stringify(Json.toJson(response.nocCount.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray))))
                     }],
                     drilldown:{
+                        drillUpButton:{
+                            relativeTo: 'spacingBox',
+                            position:{
+                                align:"right",
+                                verticalAlign:"top",
+                                x:10,
+                                y:-10
+                            }
+                        },
                         series: getDrillDownNotStacked2Level(@Html(Json.stringify(Json.toJson(response.nocCount.alertCount))),@Html(Json.stringify(Json.toJson(response.nocCount.alertCount.map(x=> x._1).toSeq.distinct.sorted.toArray))))
                     }
                 });
@@ -827,6 +1070,15 @@
                         data: getDrillDownStackedAndLine( @Html(Json.stringify(Json.toJson(response.infTypeError.infDown.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray))))
                     }],
                     drilldown:{
+                        drillUpButton:{
+                            relativeTo: 'spacingBox',
+                            position:{
+                                align:"right",
+                                verticalAlign:"top",
+                                x:10,
+                                y:-10
+                            }
+                        },
                         series: getDrillDownNotStacked2Level(@Html(Json.stringify(Json.toJson(response.infTypeError.infDown))),@Html(Json.stringify(Json.toJson(response.infTypeError.infDown.map(x=> x._1).toSeq.distinct.sorted.toArray))))
                     }
                 });

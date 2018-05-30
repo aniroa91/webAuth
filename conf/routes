@@ -33,8 +33,10 @@ GET      /drillUpTotalInf              controllers.DeviceController.drillUpTotal
 GET      /drilldownTotalInf            controllers.DeviceController.drilldownTotalInf(id: String ?= "")
 GET      /drillUpSigLogmonth           controllers.DeviceController.drillUpSigLogmonth(id: String ?= "")
 GET      /drilldownSigLogMonth         controllers.DeviceController.drilldownSigLogMonth(id: String ?= "")
-GET      /region-countType             controllers.DeviceController.getcountType(id: String ?= "")
-GET      /region-errorType             controllers.DeviceController.geterrorType(id: String ?= "")
+GET      /groupRegionByMonth           controllers.DeviceController.groupRegionByMonth(month: String ?= "",_typeNoc: String ?= "",_typeError: String ?= "")
+
+GET      /region-countType             controllers.DeviceController.getcountType(id: String ?= "",month: String ?= "")
+GET      /region-errorType             controllers.DeviceController.geterrorType(id: String ?= "",month: String ?= "")
 GET      /topN-json                    controllers.DeviceController.topNJson(month: String ?= "")
 GET      /checkOutlier                 controllers.DeviceController.checkOutlier(id: String ?= "")
 GET      /inf/rejectLabel              controllers.DeviceController.rejectLabel(host: String ?= "",module: String ?= "",time: String ?= "",bras: String ?= "")

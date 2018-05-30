@@ -789,7 +789,6 @@
                             $.ajax({
                                 url: "/checkOutlier?id="+params,
                                 success: function (dta) {
-                                    console.log(dta)
                                     if(dta.indexOf("1")>=0){
                                         window.location.href = '/inf?id='+ids;
                                     }

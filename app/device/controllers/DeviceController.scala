@@ -46,8 +46,6 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       "date" -> text
     )(BrasOutlier.apply)(BrasOutlier.unapply)
   )
-  var nocCount: NocCount = null
-  var infTypeError: InfTypeError = null
   var sigLogMonth: Seq[(String,String,String)]= null
 
   // index page Dashboard Device
@@ -74,7 +72,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val noticeCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
       val errCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._7)).toArray
       val emergCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._8)).toArray
-      nocCount = NocCount(alertCount,critCount,warningCount,noticeCount,errCount,emergCount)
+      val nocCount = NocCount(alertCount,critCount,warningCount,noticeCount,errCount,emergCount)
       // get Contract Device
       val mapContract = Await.result(BrasService.getProvinceContract(), Duration.Inf)
       val contracts = mapContract.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
@@ -92,7 +90,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val userDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
       val rougeError = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
       val lostSignal = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
-      infTypeError = InfTypeError(infDown,userDown,rougeError,lostSignal)
+      val infTypeError = InfTypeError(infDown,userDown,rougeError,lostSignal)
       // get Total INF
       val mapProvinceTotalInf = Await.result(BrasService.getProvinceTotalInf(), Duration.Inf)
       val totalInf = mapProvinceTotalInf.map(x=> (x._1,LocationUtils.getRegion(x._2.trim),x._3)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
@@ -109,9 +107,17 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def getcountType(id: String) = Action { implicit request =>
+  def getcountType(id: String,month: String) = Action { implicit request =>
     try{
-      val res =  nocCount
+      // get NOC count by Region
+      val mapCount = Await.result(BrasService.getProvinceCount(month), Duration.Inf)
+      val alertCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
+      val critCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
+      val warningCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
+      val noticeCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
+      val errCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._7)).toArray
+      val emergCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._8)).toArray
+      val res = NocCount(alertCount,critCount,warningCount,noticeCount,errCount,emergCount)
       val regionType = id match {
         case "AlertCount" => {
           Json.obj(
@@ -159,13 +165,19 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       Ok(Json.toJson(regionType))
     }
     catch{
-      case e: Exception => Ok("error")
+      case e: Exception => Ok("Error")
     }
   }
 
-  def geterrorType(id: String) = Action { implicit request =>
+  def geterrorType(id: String,month: String) = Action { implicit request =>
     try{
-      val res =  infTypeError
+      val mapInfType = Await.result(BrasService.getProvinceInfDownError(month), Duration.Inf)
+      val infDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
+      val userDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
+      val rougeError = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
+      val lostSignal = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
+      val res = InfTypeError(infDown,userDown,rougeError,lostSignal)
+
       val regionType = id match {
         case "InfDown" => {
           Json.obj(
@@ -199,7 +211,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       Ok(Json.toJson(regionType))
     }
     catch{
-      case e: Exception => Ok("error")
+      case e: Exception => Ok("Error")
     }
   }
 
@@ -266,7 +278,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       Ok(Json.toJson(rs))
     }
     catch{
-      case e: Exception => Ok("error")
+      case e: Exception => Ok("Error")
     }
   }
 
@@ -287,7 +299,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       Ok(Json.toJson(res))
     }
     catch{
-      case e: Exception => Ok("error")
+      case e: Exception => Ok("Error")
     }
   }
 
@@ -297,7 +309,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       Ok(Json.toJson(res))
     }
     catch{
-      case e: Exception => Ok("error")
+      case e: Exception => Ok("Error")
     }
   }
 
@@ -307,7 +319,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       Ok(Json.toJson(res.toList.mkString(",")))
     }
     catch{
-      case e: Exception => Ok("error")
+      case e: Exception => Ok("Error")
     }
   }
 
@@ -323,6 +335,76 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
     catch{
       case e: Exception => Ok("error")
+    }
+  }
+
+  def groupRegionByMonth(month: String,_typeNoc: String,_typeError: String) = Action { implicit request =>
+    try{
+      // get Signin and Logoff by Region
+      val mapSiglog = Await.result(BrasService.getSigLogByRegion(month), Duration.Inf)
+      val signIn = mapSiglog.map(x=> (LocationUtils.getRegion(x._2.trim),x._3)).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
+      val logoff = mapSiglog.map(x=> (LocationUtils.getRegion(x._2.trim),x._4)).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
+      val siglogObj = Json.obj(
+        "categories" -> logoff.map(x=>x._1.toString),
+        "signin" -> signIn.map(x=> -x._2),
+        "logoff" -> logoff.map(x=> x._2)
+      )
+
+      // get Opsview Types
+      val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(month), Duration.Inf)
+      val opsviewType = mapOpsviewType.map(x=> (LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
+      val ok_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
+      val warning_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.toArray
+      val unknown_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
+      val crit_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._5).sum).toSeq.sorted.toArray
+      val heatmapOpsview = (ok_opsview++warning_opsview++unknown_opsview++crit_opsview).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toSeq.sorted
+      val heatmapOpsObj = Json.obj(
+        "data" -> heatmapOpsview,
+        "categories" -> heatmapOpsview.map(x=>x._1)
+      )
+      // get NOC count by Region
+      val mapCount = Await.result(BrasService.getProvinceCount(month), Duration.Inf)
+
+      val typeCount = _typeNoc match {
+        case "AlertCount" => mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
+        case "CritCount" => mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
+        case "WarningCount" => mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
+        case "NoticeCount" => mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
+        case "ErrCount" => mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._7)).toArray
+        case "EmergCount" => mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._8)).toArray
+      }
+
+      val nocCountObj = Json.obj(
+        "dataSeries" -> typeCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+        "data" -> typeCount,
+        "categories" -> typeCount.map(x=> x._1).toSeq.distinct.sorted
+      )
+      // get Inf down, user down,lost signal,rouge error by Region
+      val mapInfType = Await.result(BrasService.getProvinceInfDownError(month), Duration.Inf)
+      val typeInferr = _typeError match {
+        case "InfDown" => mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
+        case "UseDown" => mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
+        case "RougeError" => mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
+        case "LostSignal" => mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
+      }
+
+      val infTypeObj = Json.obj(
+        "dataSeries" -> typeInferr.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+        "data" -> typeInferr,
+        "categories" -> typeInferr.map(x=> x._1).toSeq.distinct.sorted
+      )
+
+      val rs = Json.obj(
+        "heatmapOpsview" -> heatmapOpsObj,
+        "nocCountObj" -> nocCountObj,
+        "infTypeObj" -> infTypeObj,
+        "siglogObj" -> siglogObj
+      )
+
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
     }
   }
 

@@ -520,7 +520,7 @@
             $.ajax({
                 url: "/inf/rejectLabel?host="+host+'&module='+module+'&time='+time+'&bras='+bras,
                 success: function (data) {
-                    if(data!= "error"){
+                    if(data!= "Error"){
                         $(element).attr('disabled','disabled');
                         $(element).prop('onclick', null);
                     }
@@ -536,7 +536,7 @@
             $.ajax({
                 url: "/inf/confirmLabel?host="+host+'&module='+module+'&time='+time+'&bras='+bras,
                 success: function (data) {
-                    if(data!= "error"){
+                    if(data!= "Error"){
                         $(element).attr('disabled','disabled');
                         $(element).prop('onclick', null);
                     }
