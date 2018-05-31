@@ -32,6 +32,7 @@ case class InfTypeError(
                          lostSignal: Array[(String,String,String,Int)]
                        )
 case class BrasInfor(
+                    noOutlierByhost: Int,
                     noOutlier: Int,
                     siginLogoff:(Int,Int)
                     )

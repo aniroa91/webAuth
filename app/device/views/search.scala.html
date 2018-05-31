@@ -95,7 +95,7 @@
             <div class="row top_tiles">
                 <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-2">
                     <div class="tile-stats" style="background-color: #f1b53d;display: inherit;padding: 14px;height: 138px">
-                        <div class="count ">123,000</div>
+                        <div class="count ">@rsInfhost.noOutlierModule.sum</div>
                         <div class="titLb">Outlier</div>
                     </div>
                 </div>
@@ -328,7 +328,7 @@
                     <div class="tile-stats" style="background-color: #64b0f2;
                         display: inherit">
                         <div class="count ">@formatPattern(response.currentsInfo.noOutlier)</div>
-                        <div class="titLb">No Outlier of Bras</div>
+                        <div class="titLb">Outlier of Bras</div>
                     </div>
                 </div>
                 <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
@@ -348,8 +348,8 @@
                 <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="tile-stats" style="display: inherit;
                         background-color: #ff5d48">
-                        <div class="count">0</div>
-                        <div class="titLb">No Outlier of Hosts</div>
+                        <div class="count">@response.currentsInfo.noOutlierByhost</div>
+                        <div class="titLb">Outlier of Hosts</div>
                     </div>
                 </div>
             </div>

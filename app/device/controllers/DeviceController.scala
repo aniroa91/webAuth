@@ -591,7 +591,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         val timeStart= System.currentTimeMillis()
         // for result INF-HOST
         if(_typeS.equals("I")){
-          val t0 = System.currentTimeMillis()
+          val t00 = System.currentTimeMillis()
           // get errors by host tableIndex
           val errHost = Await.result(HostService.getInfHostDailyResponse(brasId,day), Duration.Inf)
           /* get bubble chart sigin and logoff by host */
@@ -605,23 +605,38 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           val siginByModule = arrSiglogModuleIndex.groupBy(_._1).mapValues(_.map(_._3).sum).toArray
           val logoffByModule = arrSiglogModuleIndex.groupBy(_._1).mapValues(_.map(_._4).sum).toArray
           val sigLogModule = (siginByModule++logoffByModule).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toArray
+          println("t00:"+ (System.currentTimeMillis() - t00))
+          val t0 = System.currentTimeMillis()
+          val noOutlierModule = Await.result(HostService.getNoOutlierInfByHost(brasId,day), Duration.Inf)
+          println("t0:"+ (System.currentTimeMillis() - t0))
+          val t1 = System.currentTimeMillis()
           /* get total error by hourly*/
           val errorHourly = Await.result(HostService.getErrorHostbyHourly(brasId,day), Duration.Inf)
+          println("t1:"+ (System.currentTimeMillis() - t1))
+          val t2 = System.currentTimeMillis()
           /* get suyhao by module*/
           val suyhaoModule = Await.result(HostService.getSuyhaobyModule(brasId,day), Duration.Inf)
+          println("t2:"+ (System.currentTimeMillis() - t2))
+          val t3 = System.currentTimeMillis()
           /* get sigin and logoff by hourly */
           val sigLogByHourly = HostService.getSiglogByHourly(brasId,day)
+          println("t3:"+ (System.currentTimeMillis() - t3))
+          val t4 = System.currentTimeMillis()
           /* get splitter by host*/
           val splitterByHost = Await.result(HostService.getSplitterByHost(brasId,day), Duration.Inf)
+          println("t4:"+ (System.currentTimeMillis() - t4))
+          val t5 = System.currentTimeMillis()
           /* get tableIndex error by module and index */
           val errModuleIndex = Await.result(HostService.getErrorTableModuleIndex(brasId,day), Duration.Inf)
           val arrModule = errModuleIndex.map(x=>x._1).distinct.toArray
           val arrIndex = errModuleIndex.map(x=>x._2).distinct.toArray
+          println("t5:"+ (System.currentTimeMillis() - t5))
+          val t6 = System.currentTimeMillis()
           // get table contract with sf>300
           val sfContract = Await.result(HostService.getContractwithSf(brasId,day), Duration.Inf)
-
-          println("timeHost:"+ (System.currentTimeMillis() - t0))
-          Ok(device.views.html.search(form,username,HostResponse(errHost,errorHourly,sigLogModule,arrSiglogModuleIndex,suyhaoModule,sigLogByHourly,splitterByHost,ErrModuleIndex(arrModule,arrIndex,errModuleIndex),sfContract),null,day,brasId,"I",routes.DeviceController.search))
+          println("t6:"+ (System.currentTimeMillis() - t6))
+          println("timeHost:"+ (System.currentTimeMillis() - t00))
+          Ok(device.views.html.search(form,username,HostResponse(noOutlierModule,errHost,errorHourly,sigLogModule,arrSiglogModuleIndex,suyhaoModule,sigLogByHourly,splitterByHost,ErrModuleIndex(arrModule,arrIndex,errModuleIndex),sfContract),null,day,brasId,"I",routes.DeviceController.search))
         }
         // for result BRAS
         else {
@@ -647,6 +662,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
             numOutlier += noOutlier.sum.toInt
             logger.info("t00: " + (System.currentTimeMillis() - t00))
           }
+          // number outlier of host
+          val noOutlierByhost = Await.result(HostService.getNoOutlierInfByBras(brasId,day), Duration.Inf).sum
           // number sigin and logoff
           val t01 = System.currentTimeMillis()
           val sigLog = BrasService.getSigLogCurrent(brasId, day)
@@ -730,7 +747,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           logger.info("tSiglogByhost: " + (System.currentTimeMillis() - t10))
 
           logger.info("timeAll: " + (System.currentTimeMillis() - timeStart))
-          Ok(device.views.html.search(form, username,null ,BrasResponse(BrasInfor(numOutlier, (sigLog._1, sigLog._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
+          Ok(device.views.html.search(form, username,null ,BrasResponse(BrasInfor(noOutlierByhost,numOutlier, (sigLog._1, sigLog._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
             infErrorBytime, infHostBytime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost, KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost), day, brasId,_typeS,routes.DeviceController.search))
         }
       }
