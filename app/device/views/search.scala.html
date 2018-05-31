@@ -1554,12 +1554,12 @@
                             },
                         },
                         series: [{
-                            name: 'Cpe error',
-                            data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._2._1))))
+                            name: 'Sf',
+                            data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._2))))
                         },
                             {
-                                name: 'Lostip error',
-                                data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._2._2))))
+                                name: 'Lofi',
+                                data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._3))))
                             }]
                     });
                 }

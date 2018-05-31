@@ -667,7 +667,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           // number sigin and logoff
           val t01 = System.currentTimeMillis()
           val sigLog = BrasService.getSigLogCurrent(brasId, day)
-          logger.info("tSigLogBytime: " + (System.currentTimeMillis() - t01))
+          logger.info("tSigLog: " + (System.currentTimeMillis() - t01))
           // SIGNIN LOGOFF BY TIME
           val t03 = System.currentTimeMillis()
           val rsLogsigBytime = BrasService.getSigLogBytimeCurrent(brasId, day)
@@ -692,16 +692,18 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           logger.info("tKibanaBytime: " + (System.currentTimeMillis() - t20))
           // INF ERROR
           val t3 = System.currentTimeMillis()
-          val arrInferror = Await.result(BrasService.getInfErrorBytimeResponse(brasId, day, 0), Duration.Inf).toArray
+          val arrInferror = BrasService.getInfErrorBytimeResponse(brasId, day, 0)
           val infErrorBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrInferror, x)).toArray
+          logger.info("tInfErrorBytime: " + (System.currentTimeMillis() - t3))
+          val t30 = System.currentTimeMillis()
           //val infErrorBytime = null
           // INF HOST
-          val infHostBytime = Await.result(BrasService.getInfhostResponse(brasId, day), Duration.Inf).map(x => x._1 -> (x._2 -> x._3))
-          logger.info("tInfHostBytime: " + (System.currentTimeMillis() - t3))
+          val infHostBytime = BrasService.getInfhostResponse(brasId, day).filter(x=> (x._2 !=0 && x._3 !=0))
+          logger.info("tInfHostBytime: " + (System.currentTimeMillis() - t30))
           // val infHostBytime = null
           val t4 = System.currentTimeMillis()
           // INF MODULE
-          val infModuleBytime = Await.result(BrasService.getInfModuleResponse(brasId, day), Duration.Inf)
+          val infModuleBytime = BrasService.getInfModuleResponse(brasId, day)
           logger.info("tInfModuleBytime: " + (System.currentTimeMillis() - t4))
           //val infModuleBytime = null
           val t5 = System.currentTimeMillis()

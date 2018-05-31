@@ -188,16 +188,31 @@ abstract class AbstractService {
     }
   }
   
-  def getTerm(response: SearchResponse, nameTerm: String, nameSubTerm: String): Array[(String, Long)] = {
+  def getTermGroupMultiSums(response: SearchResponse, nameTerm: String, nameSubTerm1: String,nameSubTerm2: String): Array[(String, Long,Long)] = {
     if (response.aggregations != null) {
     response.aggregations
       .getOrElse(nameTerm, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
       .map(x => x.asInstanceOf[Map[String, AnyRef]])
-      .map(x => x.getOrElse("key", "key").toString() -> x.getOrElse(nameSubTerm, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]])
-      .map(x => x._1 -> x._2.get("value").getOrElse("0").asInstanceOf[Double])
-      .map(x => x._1 -> x._2.toLong).sorted
+      .map(x => (x.getOrElse("key", "key").toString(),x.getOrElse(nameSubTerm1, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]],x.getOrElse(nameSubTerm2, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]))
+      .map(x => (x._1, x._2.get("value").getOrElse("0").asInstanceOf[Double],x._3.get("value").getOrElse("0").asInstanceOf[Double]))
+      .map(x => (x._1,x._2.toLong,x._3.toLong)).sorted
       .toArray
+    } else {
+      Array[(String, Long,Long)]()
+    }
+  }
+
+  def getTerm(response: SearchResponse, nameTerm: String, nameSubTerm: String): Array[(String, Long)] = {
+    if (response.aggregations != null) {
+      response.aggregations
+        .getOrElse(nameTerm, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+        .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+        .map(x => x.asInstanceOf[Map[String, AnyRef]])
+        .map(x => x.getOrElse("key", "key").toString() -> x.getOrElse(nameSubTerm, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]])
+        .map(x => x._1 -> x._2.get("value").getOrElse("0").asInstanceOf[Double])
+        .map(x => x._1 -> x._2.toLong).sorted
+        .toArray
     } else {
       Array[(String, Long)]()
     }

@@ -191,6 +191,26 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def getSecondAggregationsAndSums(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long, Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val key = x.getOrElse("key","0L").toString
+            val sum0 = x.getOrElse("sum0", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum1 = x.getOrElse("sum1", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            (key,sum0,sum1)
+          }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
   def getPreviousDay(day: String, num: Int): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(num).toString(DateTimeUtil.YMD)
@@ -505,6 +525,13 @@ object CommonService extends AbstractService {
    /* val date = DateTime(second,DateTimeUtil.TIMEZONE_HCM)
     date.getHours()*/
     1
+  }
+
+  def formatUTCToHour(date: String):Long = {
+    val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    val formatter = DateTimeFormat.forPattern(ES_5_DATETIME_FORMAT)
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.getHourOfDay()
   }
 
   def formatStringToMillisecond(date: String):Long = {

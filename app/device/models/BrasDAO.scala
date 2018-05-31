@@ -14,12 +14,12 @@ import org.joda.time.format.DateTimeFormat
 import profile.services.internet.HistoryService.client
 import services.Configure
 import services.domain.CommonService
-import services.domain.CommonService.getAggregations
+import services.domain.CommonService.{formatUTC, getAggregations}
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
 import org.elasticsearch.search.sort.SortOrder
-import service.BrasService.client
+import service.BrasService.{client, getValueAsInt, getValueAsString}
 
 object BrasDAO {
 
@@ -769,41 +769,85 @@ object BrasDAO {
     SigLogByTime(arrSigin,arrLogoff)
   }
 
-  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly:Int): Future[Seq[(Int,Int)]] = {
-    val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly:Int): Array[(Int,Int)] = {
+    val response = client_kibana.execute(
+      search(s"infra_dwh_inf_host_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        size 10000
+    ).await
+    val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
+      .map(x=>(
+        CommonService.formatUTCToHour(getValueAsString(x,"date_time")),
+        getValueAsInt(x,"sf_error"),
+        getValueAsInt(x,"lofi_error")
+      ))
+    jsonRs.map(x=> (x._1,x._2+x._3)).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=>x._1.toInt -> x._2).toArray
+
+    /*dbConfig.db.run(
       sql"""select extract(hour from  date_time) as hourly, sum(sf_error)+sum(lofi_error) as sumError
             from dwh_inf_host
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by bras_id,extract(hour from  date_time)
             order by hourly
                   """
-        .as[(Int,Int)])
+        .as[(Int,Int)])*/
   }
 
-  def getInfhostResponse(bras: String,nowDay: String): Future[Seq[(String,Int,Int)]] = {
+  def getInfhostResponse(bras: String,nowDay: String): Array[(String,Long,Long)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_inf_host_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        aggregations(
+        termsAggregation("host")
+          .field("host.keyword")
+          .subaggs(
+            sumAgg("sum0","sf_error"),
+            sumAgg("sum1","lofi_error")
+          ) size 100
+        )
+    ).await
+    CommonService.getTermGroupMultiSums(rs, "host", "sum0","sum1")
+   /* dbConfig.db.run(
       sql"""select host, sum(sf_error) as cpe,sum(lofi_error) as lostip
             from dwh_inf_host
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by host
                   """
-        .as[(String,Int,Int)])
+        .as[(String,Int,Int)])*/
   }
 
-  def getInfModuleResponse(bras: String,nowDay: String): Future[Seq[(String,String,Int,Int,Int)]] = {
+  def getInfModuleResponse(bras: String,nowDay: String): Array[(String,String,Long,Long,Long)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_inf_module_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),not(termQuery("module.keyword","-1")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        aggregations(
+        termsAggregation("host")
+          .field("host.keyword")
+          .subAggregations(
+            termsAggregation("module")
+              .field("module.keyword")
+              .subaggs(
+                sumAgg("sum0","sf_error"),
+                sumAgg("sum1","lofi_error")
+              ) size 100
+        ))
+    ).await
+    val mapHostModule = CommonService.getSecondAggregationsAndSums(rs.aggregations.get("host"),"module")
+    val rsHostMol = mapHostModule.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1, x._2._1, x._2._2,x._2._3,x._2._2+x._2._3))
+    rsHostMol
+
+/*    dbConfig.db.run(
       sql"""select host, module,sum(sf_error) as cpe,sum(lofi_error) as lostip,sum(sf_error)+sum(lofi_error) as sumAll
             from dwh_inf_module
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and module <> '-1'
             group by host,module
                   """
-        .as[(String,String,Int,Int,Int)])
+        .as[(String,String,Int,Int,Int)])*/
   }
 
   def getOpsviewServiceNameResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {

@@ -304,15 +304,15 @@ object BrasService extends AbstractService{
     BrasDAO.getSigLogBytimeCurrent(bras,nowDay)
   }
 
-  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
+  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly: Int): Array[(Int,Int)] = {
     BrasDAO.getInfErrorBytimeResponse(bras,nowDay,hourly)
   }
 
-  def getInfhostResponse(bras: String,nowDay: String):Future[Seq[(String,Int,Int)]] = {
+  def getInfhostResponse(bras: String,nowDay: String):Array[(String,Long,Long)] = {
     BrasDAO.getInfhostResponse(bras,nowDay)
   }
 
-  def getInfModuleResponse(bras: String,nowDay: String):Future[Seq[(String,String,Int,Int,Int)]] = {
+  def getInfModuleResponse(bras: String,nowDay: String): Array[(String,String,Long,Long,Long)] = {
     BrasDAO.getInfModuleResponse(bras,nowDay)
   }
 
