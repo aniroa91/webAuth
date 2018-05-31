@@ -46,7 +46,7 @@
     </div>
         <!-- /top navigation -->
         <!-- page content -->
-    <div class="right_col" role="main" style="background-image: url('../assets/images/bras-bg.jpg')">
+    <div class="right_col" role="main" style="background-image: url('../assets/images/bras-bg1.jpg')">
         <div class="row">
             <div class="alert alert-success" id="success-alert" style="display: none">
                 <button type="button" class="close" data-dismiss="alert">x</button>
@@ -784,16 +784,11 @@
                             }, 500);
                         }
                         else if(id!= undefined && id.indexOf('/')>=0){
-                            var params = id+'/'+$('#lbHost').text().split('/')[0].split(':')[1]+'/'+$('#lbHost').text().split('/')[1]
-                            var ids = $('#lbHost').text().split('/')[1].trim()+'/'+id
-                            $.ajax({
-                                url: "/checkOutlier?id="+params,
-                                success: function (dta) {
-                                    if(dta.indexOf("1")>=0){
-                                        window.location.href = '/inf?id='+ids;
-                                    }
-                                }
-                            });
+                            var params = Number(id.split('/')[2])
+                            //var ids = $('#lbHost').text().split('/')[1].trim()+'/'+id.substring(0,id.lastIndexOf('/'))
+                            if(params == 1){
+                                window.location.href = '/inf?id='+id.substring(0,id.lastIndexOf('/'))
+                            }
                         }
                     });
                 }
@@ -940,7 +935,7 @@
                     for(var j=0;j<arrModule.length;j++){
                         jsonArr.push({
                             from:Object.keys(dtaHost)[i],
-                            to: Object.keys(dtaHost)[i]+"/"+arrModule[j][0].module
+                            to: Object.keys(dtaHost)[i]+"/"+arrModule[j][0].module+"/"+arrModule[j][0].label
                         });
                     }
                 }
@@ -971,7 +966,7 @@
                             colors = "#d9534f"
                         }
                         jsonArr.push({
-                            id: Object.keys(dtaHost)[i]+"/"+arrModule[j][0].module,
+                            id: Object.keys(dtaHost)[i]+"/"+arrModule[j][0].module+"/"+arrModule[j][0].label,
                             label:"Module "+arrModule[j][0].module,
                             color: colors,
                             title: title

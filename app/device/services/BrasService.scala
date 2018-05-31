@@ -128,10 +128,6 @@ object BrasService extends AbstractService{
     BrasDAO.confirmLabelInf(host,module,time,bras)
   }
 
-  def checkOutlier(id: String): Future[Seq[(Int)]]   ={
-    BrasDAO.checkOutlier(id)
-  }
-
   def getUserDownMudule(day: String): Future[Seq[(String,String,String,Int)]]   ={
     BrasDAO.getUserDownMudule(day)
   }

@@ -1470,7 +1470,7 @@
                         text: ''
                     },
                     xAxis: {
-                        categories: ['None', 'DDos', 'Mac move', 'Temperature']
+                        categories: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrErrorType.map(x=> x._1))))
                     },
                     yAxis: {
                         min: 0,

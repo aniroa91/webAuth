@@ -313,16 +313,6 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def checkOutlier(id: String) = Action { implicit request =>
-    try{
-      val res =  Await.result(BrasService.checkOutlier(id.trim()), Duration.Inf)
-      Ok(Json.toJson(res.toList.mkString(",")))
-    }
-    catch{
-      case e: Exception => Ok("Error")
-    }
-  }
-
   def getSigLogInfjson(id: String) = Action { implicit request =>
     try{
       val res =  BrasService.getSigLogInfjson(id.trim())
@@ -780,29 +770,40 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
               "label" -> iter._7
             )
       )
+      logger.info("tRsHost: " + (System.currentTimeMillis() - t0))
+      val t1 = System.currentTimeMillis()
       val idBras = id.split('/')(0)
       val time = id.split('/')(1)
       val brasChart = BrasService.getJsonESBrasChart(idBras,time)
-    //logger.info("success 1")
       //val listCard = Await.result(BrasService.getBrasCard(idBras,time,"",""),Duration.Inf)
       // get data heatmap chart
       val sigLog = brasChart.map({ t => (t._1,t._2,t._3)}).filter(t => CommonService.formatUTC(t._1) == time)
       val numLog = if(sigLog.asInstanceOf[Array[(String,Int,Int)]].length >0) sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._2 else 0
       val numSig = if(sigLog.asInstanceOf[Array[(String,Int,Int)]].length > 0) sigLog.asInstanceOf[Array[(String,Int,Int)]](0)._3 else 0
+      logger.info("tBrasChart: " + (System.currentTimeMillis() - t1))
+      val t2 = System.currentTimeMillis()
+
       val _type = if(numLog>numSig) "LogOff" else "SignIn"
       // get logoff user
       val userLogoff = BrasService.getUserLogOff(idBras,time,_type)
+      logger.info("tUserLogoff: " + (System.currentTimeMillis() - t2))
+      val t3 = System.currentTimeMillis()
+
       // get list card
       val listCard = BrasService.getJsonBrasCard(idBras,time,_type)
       val heatCard = listCard.map(x=> x._1._2)
       val heatLinecard = listCard.map(x=> x._1._1)
-    //logger.info("success 3")
+      logger.info("tCard: " + (System.currentTimeMillis() - t3))
+      val t4 = System.currentTimeMillis()
+
       // get tableIndex kibana and opview
       val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
       val dateTime = DateTime.parse(time, formatter)
       val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
       val brasOpKiba = Await.result(BrasService.opViewKibana(idBras,time,oldTime), Duration.Inf)
-    //logger.info("success 4")
+      logger.info("tOpKiba: " + (System.currentTimeMillis() - t4))
+
+      //logger.info("success 4")
       val jsBras = Json.obj(
         "host" -> re,
         "sigLog" -> sigLog,

@@ -38,7 +38,6 @@ GET      /groupRegionByMonth           controllers.DeviceController.groupRegionB
 GET      /region-countType             controllers.DeviceController.getcountType(id: String ?= "",month: String ?= "")
 GET      /region-errorType             controllers.DeviceController.geterrorType(id: String ?= "",month: String ?= "")
 GET      /topN-json                    controllers.DeviceController.topNJson(month: String ?= "")
-GET      /checkOutlier                 controllers.DeviceController.checkOutlier(id: String ?= "")
 GET      /inf/rejectLabel              controllers.DeviceController.rejectLabel(host: String ?= "",module: String ?= "",time: String ?= "",bras: String ?= "")
 GET      /inf/confirmLabel             controllers.DeviceController.confirmLabel(host: String ?= "",module: String ?= "",time: String ?= "",bras: String ?= "")
 

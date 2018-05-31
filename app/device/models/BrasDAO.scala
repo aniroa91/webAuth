@@ -83,22 +83,6 @@ object BrasDAO {
     }
   }
 
-  def checkOutlier(strId: String): Future[Seq[(Int)]] = {
-    val id = strId.split('/')(0).trim
-    val module = strId.split('/')(1).trim
-    val bras = strId.split('/')(2).trim
-    val time = strId.split('/')(3).trim
-    // val strTime = time.substring(0,time.indexOf(".")+2)
-    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
-    val dateTime = DateTime.parse(time, formatter)
-    val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
-    dbConfig.db.run(
-      sql"""SELECT label from dwh_inf_module
-            WHERE bras_id=$bras and host=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP AND module =$module
-                  """
-        .as[(Int)])
-  }
-
   def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Boolean,String)]] = {
     val dt = new DateTime();
     val aDay = dt.minusHours(12);
@@ -986,7 +970,6 @@ object BrasDAO {
           .field("error_type.keyword")
         )
     ).await
-
     CommonService.getAggregationsSiglog(rs.aggregations.get("error_type"))
   }
 

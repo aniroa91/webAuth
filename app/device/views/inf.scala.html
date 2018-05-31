@@ -213,7 +213,7 @@
                                 @for(i <- 0 until response.sfLofi.length) {
                                     <tr>
                                         <th>@response.sfLofi(i)._1</th>
-                                        <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._1/@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
+                                        <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
                                         <th>@response.sfLofi(i)._3</th>
                                         <td>@response.sfLofi(i)._4</td>
                                         <th>@response.sfLofi(i)._5</th>
@@ -323,13 +323,7 @@
     <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
     <script>
         $(document).ready(function(){
-            // active host module outlier
-            $('#tbSf .aTag').each(function () {
-                var names = $(this).attr('name').trim();
-                var ids = $('#ids').val().trim()
-                if(ids == names)
-                    $(this).parent().addClass('aActive')
-            });
+
             var tbIndex = $('#tbIndex').DataTable( {
                 dom: 'Bfrtip',
                 "scrollY":        "350px",
@@ -363,6 +357,16 @@
                         titleAttr: 'CSV'
                     }
                 ]
+            });
+            // active host module outlier
+            $('#tbSf .aTag').each(function () {
+                var names = $(this).attr('name').trim();
+                var ids = $('#ids').val().trim()
+                if(ids == names){
+                    $(this).parent().addClass('aActive')
+                    $('#search').val(ids.split('/')[0])
+                    tbSf.search(ids.split('/')[0]).draw();
+                }
             });
 
             var tbSpliter = $('#tbSpliter').DataTable( {
