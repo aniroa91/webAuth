@@ -254,49 +254,51 @@
                         url: "/device/realtime-bras",
                         cache: false,
                         success: function (dta) {
-                            var oldestBras = $('.timeline__items .brasText:eq(0)').val().split('/');
-                            for(var i=0;i<dta.bras.length;i++) {
-                                if(dta.bras[i][1] == oldestBras[0] && dta.bras[i][0] == oldestBras[1]){
-                                    var html = ''
-                                    var button = ''
-                                    for(var j=i-1;j>=0;j--){
-                                        console.log(dta.bras[j]);
-                                        if(dta.bras[j][4] != 0 && dta.bras[j][4] != 1){
-                                            button = '<p class="disInline">'+
-                                                    '<span style="padding-top: 5px">'+
-                                                    '<a onclick="confirmOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-default a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
-                                                    '<span class="glyphicon glyphicon-ok" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Confirm</strong></span></a></span>'+
-                                                    '<span style="padding-top: 5px">'+
-                                                    '<a onclick="rejectOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-dark a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
-                                                    '<span class="glyphicon glyphicon-remove" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Reject</strong></span></a></span>'+
-                                                    '</p>'
+                            if(dta != "Error"){
+                                var oldestBras = $('.timeline__items .brasText:eq(0)').val().split('/');
+                                for(var i=0;i<dta.bras.length;i++) {
+                                    if(dta.bras[i][1] == oldestBras[0] && dta.bras[i][0] == oldestBras[1]){
+                                        var html = ''
+                                        var button = ''
+                                        for(var j=i-1;j>=0;j--){
+                                            console.log(dta.bras[j]);
+                                            if(dta.bras[j][4] != 0 && dta.bras[j][4] != 1){
+                                                button = '<p class="disInline">'+
+                                                        '<span style="padding-top: 5px">'+
+                                                        '<a onclick="confirmOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-default a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
+                                                        '<span class="glyphicon glyphicon-ok" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Confirm</strong></span></a></span>'+
+                                                        '<span style="padding-top: 5px">'+
+                                                        '<a onclick="rejectOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-dark a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
+                                                        '<span class="glyphicon glyphicon-remove" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Reject</strong></span></a></span>'+
+                                                        '</p>'
+                                            }
+                                            var classActive = 'activeBoxRed'
+                                            if(Number(dta.bras[j][2]) >= Number(dta.bras[j][3]))
+                                                classActive = 'activeBoxGreen'
+                                            html = '<div class="timeline__item">' +
+                                                    '<div class="timeline__content '+classActive+'">' +
+                                                    '<div class="timeline_box">'+
+                                                    '<input type="hidden" class="signin" value="'+dta.bras[j][2]+'">'+
+                                                    '<input type="hidden" class="logoff" value="'+dta.bras[j][3]+'">'+
+                                                    '<input type="hidden" class="brasText" value="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'">'+
+                                                    '<h2>Bras: ' + dta.bras[j][1] + '</h2>' +
+                                                    '<p>Time: ' + dta.bras[j][0] + '</p>' +
+                                                    '<p><span style="margin-right: 10px;">Signin: ' + dta.bras[j][2] + '</span><span>Logoff: ' + dta.bras[j][3] + '</span></p>' +
+                                                    '</div>' +button+'</div>' +
+                                                    '</div>';
+                                            $('.timeline__items').prepend(html);
                                         }
-                                        var classActive = 'activeBoxRed'
-                                        if(Number(dta.bras[j][2]) >= Number(dta.bras[j][3]))
-                                            classActive = 'activeBoxGreen'
-                                        html = '<div class="timeline__item">' +
-                                                '<div class="timeline__content '+classActive+'">' +
-                                                '<div class="timeline_box">'+
-                                                '<input type="hidden" class="signin" value="'+dta.bras[j][2]+'">'+
-                                                '<input type="hidden" class="logoff" value="'+dta.bras[j][3]+'">'+
-                                                '<input type="hidden" class="brasText" value="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'">'+
-                                                '<h2>Bras: ' + dta.bras[j][1] + '</h2>' +
-                                                '<p>Time: ' + dta.bras[j][0] + '</p>' +
-                                                '<p><span style="margin-right: 10px;">Signin: ' + dta.bras[j][2] + '</span><span>Logoff: ' + dta.bras[j][3] + '</span></p>' +
-                                                '</div>' +button+'</div>' +
-                                                '</div>';
-                                        $('.timeline__items').prepend(html);
+                                        if(html != ''){
+                                            timeline(document.querySelectorAll('.timeline'), {
+                                                forceVerticalMode: 700,
+                                                mode: 'horizontal',
+                                                verticalStartPosition: 'left',
+                                                visibleItems: 8
+                                            });
+                                            activeOnclick();
+                                        }
+                                        break;
                                     }
-                                    if(html != ''){
-                                        timeline(document.querySelectorAll('.timeline'), {
-                                            forceVerticalMode: 700,
-                                            mode: 'horizontal',
-                                            verticalStartPosition: 'left',
-                                            visibleItems: 8
-                                        });
-                                        activeOnclick();
-                                    }
-                                    break;
                                 }
                             }
                         }

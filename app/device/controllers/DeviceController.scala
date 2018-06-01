@@ -536,11 +536,16 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   def realtimeBras() =  withAuth { username => implicit request =>
-    val bras = Await.result(BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay()),Duration.Inf)
-    val jsBras = Json.obj(
-      "bras" -> bras
-    )
-    Ok(Json.toJson(jsBras))
+    try {
+      val bras = Await.result(BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay()), Duration.Inf)
+      val jsBras = Json.obj(
+        "bras" -> bras
+      )
+      Ok(Json.toJson(jsBras))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
   }
 
   // This will be the action that handles our form post
