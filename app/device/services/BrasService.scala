@@ -100,8 +100,8 @@ object BrasService extends AbstractService{
     BrasDAO.getTopLogoff(month)
   }
 
-  def getTopKibana(month: String): Future[Seq[(String,Int)]]   ={
-    BrasDAO.getTopKibana(month)
+  def getTopKibana(month: String,_typeError: String): Future[Seq[(String,Int)]]   ={
+    BrasDAO.getTopKibana(month,_typeError)
   }
 
   def getSigLogByRegion(month: String): Future[Seq[(String,Int,Int)]]   ={
@@ -128,20 +128,20 @@ object BrasService extends AbstractService{
     BrasDAO.getSigLogByBras(month,bras)
   }
 
-  def getTopOpsview(month: String): Future[Seq[(String,Int)]]   ={
-    BrasDAO.getTopOpsview(month)
+  def getTopOpsview(month: String,_typeService: String): Future[Seq[(String,Int)]]   ={
+    BrasDAO.getTopOpsview(month,_typeService)
   }
 
-  def getTopInf(month: String): Future[Seq[(String,String,Int)]]   ={
-    BrasDAO.getTopInf(month)
+  def getTopInf(month: String,_typeInferr: String): Future[Seq[(String,String,Int)]]   ={
+    BrasDAO.getTopInf(month,_typeInferr)
   }
 
   def getTopnotSuyhao(month: String): Future[Seq[(String,Int)]]   ={
     BrasDAO.getTopnotSuyhao(month)
   }
 
-  def getTopPoorconn(month: String): Future[Seq[(String,Int)]]   ={
-    BrasDAO.getTopPoorconn(month)
+  def getTopPoorconn(month: String,_typeOLTpoor: String): Future[Seq[(String,Int)]]   ={
+    BrasDAO.getTopPoorconn(month,_typeOLTpoor)
   }
 
   def rejectLabelInf(host: String,module: String,time: String,bras: String) ={

@@ -243,8 +243,72 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
+  def getErrorKibana(_typeError: String,month: String) = Action { implicit request =>
+    try{
+      // get Top total kibana
+      val topKibana = Await.result(BrasService.getTopKibana(month,_typeError), Duration.Inf)
+      val kibanaObj = Json.obj(
+        "month" -> month,
+        "data" -> topKibana.map(x=>x._2),
+        "categories" -> topKibana.map(x=>x._1)
+      )
+      Ok(Json.toJson(kibanaObj))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getserviceStatus(_typeService: String,month: String) = Action { implicit request =>
+    try{
+      // get Top opsview status
+      val topOpsview = Await.result(BrasService.getTopOpsview(month,_typeService), Duration.Inf)
+      val rs = Json.obj(
+        "month" -> month,
+        "data" -> topOpsview.map(x=>x._2),
+        "categories" -> topOpsview.map(x=>x._1)
+      )
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getOltPoorconn(_typeOlt: String,month: String) = Action { implicit request =>
+    try{
+      // get Top opsview status
+      val topOLT = Await.result(BrasService.getTopPoorconn(month,_typeOlt), Duration.Inf)
+      val rs = Json.obj(
+        "month" -> month,
+        "data" -> topOLT.map(x=>x._2),
+        "categories" -> topOLT.map(x=>x._1)
+      )
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getInfTopErr(_typeInf: String,month: String) = Action { implicit request =>
+    try{
+      // get Top total Inf
+      val topInf = Await.result(BrasService.getTopInf(month,_typeInf), Duration.Inf)
+      val rs = Json.obj(
+        "data" -> topInf,
+        "dataBras" -> topInf.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topInf.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+      )
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
   // Tab TOP N
-  def topNJson(month: String) = Action { implicit request =>
+  def topNJson(month: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = Action { implicit request =>
     try{
       val monthString = if(month.equals("")) "Lastest 3 months" else month
       // get Top Sigin
@@ -262,19 +326,19 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "categories" -> topLogoff.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top total kibana
-      val topKibana = Await.result(BrasService.getTopKibana(month), Duration.Inf)
+      val topKibana = Await.result(BrasService.getTopKibana(month,_typeError), Duration.Inf)
       val kibanaObj = Json.obj(
         "data" -> topKibana.map(x=>x._2),
         "categories" -> topKibana.map(x=>x._1)
       )
       // get Top total opsview
-      val topOpsview = Await.result(BrasService.getTopOpsview(month), Duration.Inf)
+      val topOpsview = Await.result(BrasService.getTopOpsview(month,_typeService), Duration.Inf)
       val opsviewObj = Json.obj(
         "data" -> topOpsview.map(x=>x._2),
         "categories" -> topOpsview.map(x=>x._1)
       )
       // get Top total Inf
-      val topInf = Await.result(BrasService.getTopInf(month), Duration.Inf)
+      val topInf = Await.result(BrasService.getTopInf(month,_typeInferr), Duration.Inf)
       val infObj = Json.obj(
         "data" -> topInf,
         "dataBras" -> topInf.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
@@ -286,8 +350,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "data" -> topSuyhao.map(x=>x._2),
         "categories" -> topSuyhao.map(x=>x._1)
       )
-      // get Top Not Passed Suyhao
-      val topPoor = Await.result(BrasService.getTopPoorconn(month), Duration.Inf)
+      // get Top 10 OLT By Poor Connections
+      val topPoor = Await.result(BrasService.getTopPoorconn(month,_typeOLTpoor), Duration.Inf)
       val poorObj = Json.obj(
         "data" -> topPoor.map(x=>x._2),
         "categories" -> topPoor.map(x=>x._1)
@@ -576,7 +640,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   def drillUpNoticeByStatus(id: String,month: String) = Action { implicit request  =>
-    //try{
+    try{
       val rs = id match {
         case id if(id.equals("*")) => {
           val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(month), Duration.Inf)
@@ -602,10 +666,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "categories" -> rs.map(x=>x._1)
       )
       Ok(Json.toJson(jsInf))
-    /*}
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
   }
 
   def drilldownNoticeByStatus(id: String,month: String) = Action {implicit  request =>

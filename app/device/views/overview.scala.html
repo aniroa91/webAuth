@@ -54,21 +54,24 @@
                             <li class="tab-slider--trigger active" rel="tabOverview">Overview</li>
                             <li class="tab-slider--trigger" rel="tabTop">Top N Bas</li>
                         </ul>
-                       <div id="monthTab1" style="float: right">
+                        <div id="monthTab1" style="float: right">
                            <form action="/searchMonthOverview" class="disInline" method="POST" id="ctSearch">
                                @helper.CSRF.formField
                                <label class="titPicker">From</label>
                                <input class="form-control picker" type="text" id="startMonth" name="startMonth" readonly="true" value="@response.time.fromDate"/>
                                <label class="titPicker">To</label>
                                <input class="form-control picker" type="text" id="endMonth" name="endMonth" readonly="true" value="@response.time.toDate"/>
-                               <input type="submit" class="btn btn-success" value="Apply">
+                               <button type="submit" class="btn btn-success"><i class="fa fa-search" aria-hidden="true"></i></button>
+                               <a href="/device" class="btn btn-info"><i class="fa fa-refresh" aria-hidden="true"></i></a>
                            </form>
-                       </div>
-
-                        <div class="input-group date" id="monthPickerTop" style="display: none;width: 200px;float: right">
-                            <input type="text" id="month" class="form-control" readonly="true" style="cursor: pointer;background-color: white" placeholder="Choose month...">
-                            <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
-                            </span>
+                        </div>
+                        <div id="divTopN" class="disInline" style="display: none;float: right">
+                            <div class="input-group date" id="monthPickerTop" style="width: 200px">
+                                <input type="text" id="month" class="form-control" readonly="true" style="cursor: pointer;background-color: white" placeholder="Choose month...">
+                                <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                                </span>
+                            </div>
+                            <a onclick="getTopNByRegion()" class="btn btn-info" style="margin-bottom: 10px;margin-left: 5px"><i class="fa fa-refresh" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="tab-slider--container">
@@ -162,7 +165,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-12">
+                                <div class="col-lg-12" style="padding: 0px">
                                     <div id="divallMonth">
                                         <input type="hidden" id="monthGroup" value="">
                                         @for(i <- 0 until response.time.rangeMonth.length ){
@@ -264,7 +267,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 Signin By Bras</h2>
+                                                <h2 style="font-weight: 500;font-size: 24px">Top 10 BRAS By SignIn</h2>
 
                                                 <div class="clearfix"></div>
                                             </div>
@@ -277,7 +280,7 @@
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Top 10 Logoff By Bras</h2>
+                                                    font-size: 24px">Top 10 BRAS By LogOff</h2>
 
                                                 <div class="clearfix"></div>
                                             </div>
@@ -291,12 +294,33 @@
                                     <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 Total Kibana By Bras</h2>
+                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 BRAS By Device Errors</h2>
 
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
                                                 <div id="bar-kibana" style="height: 350px;"></div>
+                                                <form id="frmKibanaError" style="text-align: center">
+                                                    <input type="hidden" id="typeKibanaError" value="alert_count">
+                                                    <label class="radio-inline radioText">
+                                                        <input type="radio" value="alert_count" name="optradioE" checked>AlertCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="crit_count" name="optradioE">CritCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="warning_count" name="optradioE">WarningCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="notice_count" name="optradioE">NoticeCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="err_count" name="optradioE">ErrCount
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="emerg_count" name="optradioE">EmergCount
+                                                    </label>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -304,12 +328,27 @@
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Top 10 Total Opsview</h2>
+                                                    font-size: 24px"> Top 10 BRAS By Service Monitor Notices</h2>
 
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
                                                 <div id="bar-opsview" style="height: 350px;"></div>
+                                                <form id="frmServiceStatus" style="text-align: center">
+                                                    <input type="hidden" id="typeServiceStatus" value="crit_opsview">
+                                                    <label class="radio-inline radioText">
+                                                        <input type="radio" value="crit_opsview" name="optradiStt" checked>Crit_opsview
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="ok_opsview" name="optradiStt">Ok_opsview
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="warn_opsview" name="optradiStt">Warn_opsview
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="unknown_opsview" name="optradiStt">Unknown_opsview
+                                                    </label>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -318,12 +357,30 @@
                                     <div class="col-xs-12">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Top 20 Total Inf By Bras</h2>
+                                                <h2 style="font-weight: 500;font-size: 24px"> Top 20 BRAS By INF Errors</h2>
 
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
                                                 <div id="bar-inf" style="height: 350px;"></div>
+                                                <form id="frmInfToperr" style="text-align: center">
+                                                    <input type="hidden" id="typeInftoperr" value="lofi_error">
+                                                    <label class="radio-inline radioText">
+                                                        <input type="radio" value="lofi_error" name="optradioInf" checked>LofiError
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="inf_down" name="optradioInf">InfDown
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="user_down" name="optradioInf">UserDown
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="rouge_error" name="optradioInf">RougeError
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="lost_signal" name="optradioInf">LostSignal
+                                                    </label>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -332,7 +389,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 Not Passed Suyhao By Host</h2>
+                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 OLT By SuyHao Not Pass</h2>
 
                                                 <div class="clearfix"></div>
                                             </div>
@@ -345,12 +402,23 @@
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Top 10 Poor Conn By Host</h2>
-
+                                                    font-size: 24px"> Top 10 OLT By Poor Connections</h2>
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
-                                                <div id="bar-poor" style="height: 350px;"></div>
+                                                <div id="bar-poor" style="height: 330px;"></div>
+                                                <form id="frmOLTpoor" style="text-align: center">
+                                                    <input type="hidden" id="typeOLTpoor" value="no_contract">
+                                                    <label class="radio-inline radioText">
+                                                        <input type="radio" value="no_contract" name="optradioLt" checked>No contract
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="no_device" name="optradioLt">No device
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" value="poor_conn" name="optradioLt">Poor conn
+                                                    </label>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -453,6 +521,7 @@
                 $(".tab-slider--body").hide();
                 $(".tab-slider--body:first").show();
 
+                /* TAB OVERVIEW*/
                 // Click radio button choose Count Type Noc
                 $('#frmNoccount input:radio').change(function(){
                     $('#frmNoccount .radio-inline').removeClass('radioText')
@@ -509,7 +578,6 @@
                         },
                     });
                 })
-
                 // Click radio button choose INF down error
                 $('#frmInferror input:radio').change(function(){
                     $('#frmInferror .radio-inline').removeClass('radioText')
@@ -562,6 +630,217 @@
                                         },
                                         series: getDrillDownNotStacked2Level(dta.data,dta.arrRegion)
                                     }
+                                });
+                            }
+                        },
+                    });
+                })
+
+                /*TAB TOP N*/
+                // Click kibana error types
+                $('#frmKibanaError input:radio').change(function(){
+                    $('#frmKibanaError .radio-inline').removeClass('radioText')
+                    $(this).parent().addClass('radioText')
+                    var id =$(this).val()
+                    $('#typeKibanaError').val(id)
+                    $.ajax({
+                        url: "/region-errorKibana?id=" + id.trim()+"&month="+$('#month').val(),
+                        cache: false,
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                // top 10 Kibana
+                                Highcharts.chart('bar-kibana', {
+                                    chart: {
+                                        type: 'bar'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.categories
+                                    },
+                                    yAxis: {
+                                        min: 0,
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    legend: {
+                                        reversed: true
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            stacking: 'normal'
+                                        }
+                                    },
+                                    series: [{
+                                        name: dta.month,
+                                        data: dta.data,
+                                        color: '#f1b53d'
+                                    }]
+                                });
+                            }
+                        },
+                    });
+                })
+                // Click Opsview status
+                $('#frmServiceStatus input:radio').change(function(){
+                    $('#frmServiceStatus .radio-inline').removeClass('radioText')
+                    $(this).parent().addClass('radioText')
+                    var id =$(this).val()
+                    $('#typeServiceStatus').val(id)
+                    $.ajax({
+                        url: "/region-serviceStatus?id=" + id.trim()+"&month="+$('#month').val(),
+                        cache: false,
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                // top 10 Opsview
+                                Highcharts.chart('bar-opsview', {
+                                    chart: {
+                                        type: 'bar'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.categories
+                                    },
+                                    yAxis: {
+                                        min: 0,
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    legend: {
+                                        reversed: true
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            stacking: 'normal'
+                                        }
+                                    },
+                                    series: [{
+                                        name: dta.month,
+                                        data: dta.data,
+                                        color: '#73879C'
+                                    }]
+                                });
+                            }
+                        },
+                    });
+                })
+                // Click OLT poor connections
+                $('#frmOLTpoor input:radio').change(function(){
+                    $('#frmOLTpoor .radio-inline').removeClass('radioText')
+                    $(this).parent().addClass('radioText')
+                    var id =$(this).val()
+                    $('#typeOLTpoor').val(id)
+                    $.ajax({
+                        url: "/region-OltPoorconn?id=" + id.trim()+"&month="+$('#month').val(),
+                        cache: false,
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                // top 10 Poor conn
+                                Highcharts.chart('bar-poor', {
+                                    chart: {
+                                        type: 'bar'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.categories
+                                    },
+                                    yAxis: {
+                                        min: 0,
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    legend: {
+                                        reversed: true
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            stacking: 'normal'
+                                        }
+                                    },
+                                    series: [{
+                                        name: dta.month,
+                                        data: dta.data,
+                                        color: '#9B59B6'
+                                    }]
+                                });
+                            }
+                        },
+                    });
+                })
+                // Click Inf errors
+                $('#frmInfToperr input:radio').change(function(){
+                    $('#frmInfToperr .radio-inline').removeClass('radioText')
+                    $(this).parent().addClass('radioText')
+                    var id =$(this).val()
+                    $('#typeInftoperr').val(id)
+                    $.ajax({
+                        url: "/region-InfTopErr?id=" + id.trim()+"&month="+$('#month').val(),
+                        cache: false,
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                // top 10 Inf
+                                Highcharts.chart('bar-inf', {
+                                    chart: {
+                                        type: 'column'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        type: 'category'
+                                    },
+                                    yAxis: {
+                                        min: 0,
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    tooltip : {
+                                        headerFormat: '<span style = "font-size:11px">{series.name}</span><br>',
+                                        pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
+                                    },
+                                    legend: {
+                                        reversed: true
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            stacking: 'normal'
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'Bras',
+                                        data: getJsonDrillParent(dta.dataBras),
+                                        color: '#832d1d'
+                                    }],
+                                    drilldown: {
+                                        drillUpButton: {
+                                            relativeTo: 'spacingBox',
+                                            position: {
+                                                y: 0,
+                                                x: 0
+                                            },
+                                            theme: {
+                                                fill: '#85d088',
+                                                'stroke-width': 1,
+                                                stroke: 'silver',
+                                                r: 0,
+                                                states: {
+                                                    hover: {
+                                                        fill: '#85d088',
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        series: getJsonDrillChildren(dta.data,dta.categories)
+                                    },
                                 });
                             }
                         },
@@ -1011,7 +1290,7 @@
                 $("#"+activeTab).fadeIn();
                 // for tab TOP N
                 if($(this).attr("rel") == "tabTop"){
-                    $('#monthPickerTop').show();
+                    $('#divTopN').show();
                     $('#monthTab1').hide()
                     $('.tab-slider--tabs').addClass('slide');
                     $(".tab-slider--nav li").removeClass("active");
@@ -1022,12 +1301,17 @@
                 // for tab Overview
                 else{
                     $('#monthTab1').show()
-                    $('#monthPickerTop').hide()
+                    $('#divTopN').hide()
                     $('.tab-slider--tabs').removeClass('slide');
                     $(".tab-slider--nav li").removeClass("active");
                     $(this).addClass("active");
                 }
             });
+
+            function getTopNByRegion(){
+                $('#month').val("")
+                callAjaxTopN("");
+            }
 
             function getSigLogByRegionStacked(sigIn,logOff){
                 var jsArray = []
@@ -1797,28 +2081,6 @@
                 return jsonArr
             }
 
-            function getDataHeatMapForDrilldownSiglog(dta,arrMonth,arrRegion){
-                var jsonArr = [];
-                for (var month =0,subcate=0 ; month < arrMonth.length; month++,subcate++) {
-                    for(var key=0;key<arrRegion.length;key++)
-                        for(var i=0;i<dta.length;i++)
-                            if(dta[i][0] == arrMonth[month] && dta[i][1] == arrRegion[key]){
-                                jsonArr.push([month+subcate,key,Number(dta[i][2].split('_')[0])])
-                                jsonArr.push([month+subcate+1,key,Number(dta[i][2].split('_')[1])])
-                            }
-                }
-                return jsonArr
-            }
-
-            function getCategoryGroup(cates){
-                var grpCates = []
-                for(var i=0;i<cates.length;i++){
-                    grpCates.push(cates[i]+'-Signin')
-                    grpCates.push(cates[i]+'-Logoff')
-                }
-                return grpCates
-            }
-
             function getDrillDownNotStacked2Level(dta,arrRegion){
                 var jsArray = []
                 for(var region=0;region<arrRegion.length;region++){
@@ -2036,8 +2298,14 @@
 
             // for page TOP N
             function callAjaxTopN(month){
+                var monthStr = month
+                if(month == "") monthStr = "Lastest 3 months"
+                var _typeError = $('#typeKibanaError').val()
+                var _typeService = $('#typeServiceStatus').val()
+                var _typeOLTpoor = $('#typeOLTpoor').val()
+                var _typeInftoperr = $('#typeInftoperr').val()
                 $.ajax({
-                    url: "/topN-json?month="+month,
+                    url: "/topN-json?month="+month+"&_typeError="+_typeError+"&_typeService="+_typeService+'&_typeOLTpoor='+_typeOLTpoor+'&_typeInftoperr='+_typeInftoperr,
                     cache: false,
                     beforeSend: function () {
                         $('#divTabTop').waitMe({
@@ -2077,7 +2345,7 @@
                                     }
                                 },
                                 tooltip : {
-                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>',
+                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
                                     pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
                                 },
                                 series: [{
@@ -2125,7 +2393,7 @@
                                     }
                                 },
                                 tooltip : {
-                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>',
+                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
                                     pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
                                 },
                                 legend: {
