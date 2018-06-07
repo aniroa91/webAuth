@@ -36,52 +36,56 @@ object BrasService extends AbstractService{
     BrasDAO.getBrasOutlierCurrent(day)
   }
 
-  def getProvinceOpsview(): Future[Seq[(String,String,String,Int)]]   ={
-    BrasDAO.getProvinceOpsview()
+  def getProvinceOpsview(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getProvinceOpsview(fromMonth,toMonth)
   }
 
-  def getProvinceContract(): Future[Seq[(String,String,String,Int,Int,Int)]]   ={
-    BrasDAO.getProvinceContract()
+  def getProvinceContract(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int,Int)]]   ={
+    BrasDAO.getProvinceContract(fromMonth,toMonth)
   }
 
-  def getProvinceKibana(): Future[Seq[(String,String,String,Int)]]   ={
-    BrasDAO.getProvinceKibana()
+  def getProvinceKibana(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getProvinceKibana(fromMonth,toMonth)
   }
 
-  def getProvinceSuyhao(): Future[Seq[(String,String,String,Int)]]   ={
-    BrasDAO.getProvinceSuyhao()
+  def getProvinceSuyhao(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getProvinceSuyhao(fromMonth,toMonth)
   }
 
   def getProvinceCount(month: String): Future[Seq[(String,String,Int,Int,Int,Int,Int,Int)]]   ={
     BrasDAO.getProvinceCount(month)
   }
 
-  def getProvinceOpsviewType(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]]   ={
+  def getProvinceOpsviewType(month: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
     BrasDAO.getProvinceOpsviewType(month)
+  }
+
+  def getBrasOpsviewType(month: String,id: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
+    BrasDAO.getBrasOpsviewType(month,id)
   }
 
   def getProvinceInfDownError(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]]   ={
     BrasDAO.getProvinceInfDownError(month)
   }
 
-  def getProvinceTotalInf(): Future[Seq[(String,String,Double)]]   ={
-    BrasDAO.getProvinceTotalInf()
+  def getProvinceTotalInf(fromMonth: String,toMonth: String): Future[Seq[(String,String,Double)]]   ={
+    BrasDAO.getProvinceTotalInf(fromMonth,toMonth)
   }
 
   def getProvinceSigLogoff(): Future[Seq[(String,String,Double,Double)]]   ={
     BrasDAO.getProvinceSigLogoff()
   }
 
-  def getTotalInfbyProvince(id: String): Future[Seq[(String,String,Double)]]   ={
-    BrasDAO.getTotalInfbyProvince(id)
+  def getTotalInfbyProvince(month: String,id: String,lstBrasId: Array[(String)]): Future[Seq[(String,String,Double)]]   ={
+    BrasDAO.getTotalInfbyProvince(month,id,lstBrasId)
   }
 
   def getSigLogconnbyProvince(id: String): Future[Seq[(String,String,Double,Double)]]   ={
     BrasDAO.getSigLogconnbyProvince(id)
   }
 
-  def getTotalInfbyBras(id: String): Future[Seq[(String,String,Double)]]   ={
-    BrasDAO.getTotalInfbyBras(id)
+  def getTotalInfbyBras(month: String,id: String,lstHost: Array[(String)]): Future[Seq[(String,String,Double)]]   ={
+    BrasDAO.getTotalInfbyBras(month,id,lstHost)
   }
 
   def getSigLogconnbyBras(id: String): Future[Seq[(String,String,Double,Double)]]   ={
@@ -100,8 +104,28 @@ object BrasService extends AbstractService{
     BrasDAO.getTopKibana(month)
   }
 
-  def getSigLogByRegion(month: String): Future[Seq[(String,String,Int,Int)]]   ={
+  def getSigLogByRegion(month: String): Future[Seq[(String,Int,Int)]]   ={
     BrasDAO.getSigLogByRegion(month)
+  }
+
+  def getSigLogByProvince(month: String, provinceCode: String): Future[Seq[(String,Int,Int)]]   ={
+    BrasDAO.getSigLogByProvince(month,provinceCode)
+  }
+
+  def getDistinctBrasbyProvince(month: String, provinceCode: String): Future[Seq[(String)]]   ={
+    BrasDAO.getDistinctBrasbyProvince(month,provinceCode)
+  }
+
+  def getDistinctHostbyBras(month: String, bras: String): Future[Seq[(String)]]   ={
+    BrasDAO.getDistinctHostbyBras(month,bras)
+  }
+
+  def getTop10HostId(month: String,lstHost: Array[(String)]): Future[Seq[(String)]]   ={
+    BrasDAO.getTop10HostId(month,lstHost)
+  }
+
+  def getSigLogByBras(month: String, bras: String): Future[Seq[(String,Int,Int)]]   ={
+    BrasDAO.getSigLogByBras(month,bras)
   }
 
   def getTopOpsview(month: String): Future[Seq[(String,Int)]]   ={
@@ -392,8 +416,12 @@ object BrasService extends AbstractService{
     BrasList.rejectLabel(id,time)
   }
 
-  def opViewKibana(id : String,time: String,oldTime: String): Future[Seq[(String,String,String,String)]] = {
-    BrasesCard.opViewKibana(id,time,oldTime)
+  def getOpsview(id : String,time: String,oldTime: String): Future[Seq[(String,String)]] = {
+    BrasesCard.getOpsview(id,time,oldTime)
+  }
+
+  def getKibana(id : String,time: String,oldTime: String): Future[Seq[(String,String)]] = {
+    BrasesCard.getKibana(id,time,oldTime)
   }
 
   def getNumLogSiginById(id : String,time: String): Future[Seq[(Int,Int)]] = {

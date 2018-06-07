@@ -91,9 +91,25 @@ object BrasesCard {
     //}finally dbConfig.db.close
   }
 
-  def opViewKibana(id : String,time: String,oldTime: String) : Future[Seq[(String,String,String,String)]] = {
-    //val strTime = time.substring(0,time.indexOf(".")+2)
-    //val strOld = oldTime.substring(0,oldTime.indexOf(".")+2)
+  def getKibana(id : String,time: String,oldTime: String) : Future[Seq[(String,String)]] = {
+    dbConfig.db.run(
+      sql"""select distinct case when tbK.error_name='' then tbK.facility else tbK.error_name end,tbK.severity
+            from public.dwh_kibana tbK
+            where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
+         """
+        .as[(String, String)])
+  }
+
+  def getOpsview(id : String,time: String,oldTime: String) : Future[Seq[(String,String)]] = {
+    dbConfig.db.run(
+      sql"""select distinct service_name,service_status
+            from public.dwh_opsview
+            where bras_id=$id and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
+         """
+        .as[(String, String)])
+  }
+
+  /*def opViewKibana(id : String,time: String,oldTime: String) : Future[Seq[(String,String,String,String)]] = {
     dbConfig.db.run(
       sql"""SELECT distinct case when tbK.error_name='' then tbK.facility else tbK.error_name end,tbK.severity,tbO.service_name,tbO.service_status
             FROM
@@ -107,7 +123,7 @@ object BrasesCard {
                 ) tbO on tbO.bras_id = tbK.bras_id and date_trunc('minute', tbO.date_time) between date_trunc('minute', tbK.date_time) - INTERVAL '3' MINUTE and date_trunc('minute', tbK.date_time)
          """
         .as[(String, String,String,String)])
-  }
+  }*/
 
   def getNumLogSiginById(id : String,time: String) : Future[Seq[(Int,Int)]] = {
     dbConfig.db.run(

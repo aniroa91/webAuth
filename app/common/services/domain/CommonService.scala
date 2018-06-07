@@ -38,6 +38,7 @@ import play.api.libs.json.JsObject
 import com.ftel.bigdata.utils.StringUtil
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
+import org.joda.time.Months;
 import java.time.format.DateTimeFormatter
 
 object CommonService extends AbstractService {
@@ -89,6 +90,35 @@ object CommonService extends AbstractService {
   def getCurrentDay(): String = {
     val date = new DateTime()
     date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
+  }
+
+  def getAllMonthfromRange(fromMonth: String,toMonth: String): Array[(String)] = {
+    val date1 = DateTimeUtil.create(toMonth, DateTimeUtil.YMD)
+    val date2 = DateTimeUtil.create(fromMonth, DateTimeUtil.YMD)
+    val numberOfMonths = Months.monthsBetween(date2, date1).getMonths()+1
+    (0 until numberOfMonths).map(date2.plusMonths(_).toString(DateTimeFormat.forPattern("yyyy-MM"))).toArray
+
+  }
+
+  def getRangeCurrentMonth(): String = {
+    val date = new DateTime()
+    val fromDate = date.minusMonths(3).toString(DateTimeFormat.forPattern("yyyy-MM"))
+    val toDate = date.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
+    fromDate+"/"+toDate
+  }
+
+  def getEndDate(endDate:String): String = {
+    val date1 = new DateTime()
+    val date2 = DateTimeUtil.create(endDate, DateTimeUtil.YMD)
+    val months = Months.monthsBetween(date2, date1).getMonths()
+    "-"+months+"m"
+  }
+
+  def getStartDate(startDate:String): String = {
+    val date1 = new DateTime()
+    val date2 = DateTimeUtil.create(startDate, DateTimeUtil.YMD)
+    val months = Months.monthsBetween(date2, date1).getMonths()
+    "-"+months+"m"
   }
 
   def get3MonthAgo(): String = {

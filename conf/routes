@@ -29,10 +29,12 @@ GET      /device                       controllers.DeviceController.overview
 GET      /noc                          controllers.DeviceController.dashboard
 GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
 GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")
-GET      /drillUpTotalInf              controllers.DeviceController.drillUpTotalInf(id: String ?= "")
-GET      /drilldownTotalInf            controllers.DeviceController.drilldownTotalInf(id: String ?= "")
-GET      /drillUpSigLogmonth           controllers.DeviceController.drillUpSigLogmonth(id: String ?= "")
-GET      /drilldownSigLogMonth         controllers.DeviceController.drilldownSigLogMonth(id: String ?= "")
+GET      /drilldownNoticeByStatus      controllers.DeviceController.drilldownNoticeByStatus(id: String ?= "",month: String ?= "")
+GET      /drillUpNoticeByStatus        controllers.DeviceController.drillUpNoticeByStatus(id: String ?= "",month: String ?= "")
+GET      /drillUpTotalInf              controllers.DeviceController.drillUpTotalInf(id: String ?= "",month: String ?= "")
+GET      /drilldownTotalInf            controllers.DeviceController.drilldownTotalInf(id: String ?= "",month: String ?= "")
+GET      /drillUpSigLogmonth           controllers.DeviceController.drillUpSigLogmonth(id: String ?= "",month: String ?= "")
+GET      /drilldownSigLogMonth         controllers.DeviceController.drilldownSigLogMonth(id: String ?= "",month: String ?= "")
 GET      /groupRegionByMonth           controllers.DeviceController.groupRegionByMonth(month: String ?= "",_typeNoc: String ?= "",_typeError: String ?= "")
 
 GET      /region-countType             controllers.DeviceController.getcountType(id: String ?= "",month: String ?= "")
@@ -41,13 +43,15 @@ GET      /topN-json                    controllers.DeviceController.topNJson(mon
 GET      /inf/rejectLabel              controllers.DeviceController.rejectLabel(host: String ?= "",module: String ?= "",time: String ?= "",bras: String ?= "")
 GET      /inf/confirmLabel             controllers.DeviceController.confirmLabel(host: String ?= "",module: String ?= "",time: String ?= "",bras: String ?= "")
 
+POST     /searchMonthOverview          controllers.DeviceController.getFormMonthPicker
+GET      /searchMonthOverview          controllers.DeviceController.overview
+
 GET      /searchBras                   controllers.DeviceController.search
 POST     /searchBras                   controllers.DeviceController.getFormBras
 GET      /bras                         controllers.BrasController.index
 GET      /brasInfo                     controllers.BrasDetailController.index
 GET      /device/realtime-bras         controllers.DeviceController.realtimeBras
 GET      /host-json                    controllers.DeviceController.getHostJson(id: String ?= "")
-GET      /bras-json                    controllers.DeviceController.getBrasJson(id: String ?= "")
 GET      /confirmLabel                 controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
 GET      /rejectLabel                  controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
 

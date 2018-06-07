@@ -126,7 +126,7 @@
 
                     <table class="data table table-bordered" id="tbUser" style="margin-bottom: 0px">
                         <thead>
-                            <tr style="color: white;background: #4980b5;font-size: 14px">
+                            <tr style="color: #ddd;font-size: 14px">
                                 <th style="width: 35%">Name</th>
                                 <th>Time</th>
                                 <th>Host-Module-Index</th>
@@ -176,7 +176,10 @@
                 <div class="tbScroll">
                     <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700">
                         <thead>
-                            <tr style="color: white;background: #4980b5;font-size: 14px">
+                            <tr style="color: white;background: #4980b5;font-size: 16px">
+                                <th colspan="7">List Of OLT Get Error</th>
+                            </tr>
+                            <tr style="font-size: 14px;color:#ddd">
                                 <th style="width: 27%">Host</th>
                                 <th>Module</th>
                                 <th>Signin</th>
@@ -556,14 +559,47 @@
                                         destroy: true
                                     });
                                     tbBras.rows().remove().draw();
-                                    if(dtBras.mapBras.length >0) {
-                                        for(var i=0;i< dtBras.mapBras.length;i++){
-                                            tbBras.row.add( [
-                                                dtBras.mapBras[i][0],
-                                                dtBras.mapBras[i][1],
-                                                dtBras.mapBras[i][2],
-                                                dtBras.mapBras[i][3]
-                                            ] ).draw( false );
+                                    if(dtBras.brasKibana.length >0 && dtBras.brasOpview.length >0) {
+                                        var sizeMap = dtBras.brasKibana.length
+                                        var isKibana = 1
+                                        if(dtBras.brasOpview.length > dtBras.brasKibana.length){
+                                            sizeMap = dtBras.brasOpview.length
+                                            isKibana = 0
+                                        }
+
+                                        for(var i=0;i< sizeMap;i++){
+                                            if(isKibana == 1){
+                                                if(i>=dtBras.brasOpview.length)
+                                                    tbBras.row.add( [
+                                                        dtBras.brasKibana[i][0],
+                                                        dtBras.brasKibana[i][1],
+                                                        null,
+                                                        null
+                                                    ] ).draw( false );
+                                                else
+                                                    tbBras.row.add( [
+                                                        dtBras.brasKibana[i][0],
+                                                        dtBras.brasKibana[i][1],
+                                                        dtBras.brasOpview[i][0],
+                                                        dtBras.brasOpview[i][1]
+                                                    ] ).draw( false );
+                                            }
+                                            else{
+                                                if(i>=dtBras.brasKibana.length)
+                                                    tbBras.row.add( [
+                                                        null,
+                                                        null,
+                                                        dtBras.brasOpview[i][0],
+                                                        dtBras.brasOpview[i][1]
+                                                    ] ).draw( false );
+                                                else
+                                                    tbBras.row.add( [
+                                                        dtBras.brasKibana[i][0],
+                                                        dtBras.brasKibana[i][1],
+                                                        dtBras.brasOpview[i][0],
+                                                        dtBras.brasOpview[i][1]
+                                                    ] ).draw( false );
+                                            }
                                         }
                                         $('#tbBras').find('.autoTooltip').each(function () {
                                             var title = $(this).text();
@@ -604,7 +640,13 @@
                                         $('#tbUser tbody').attr('style','background: #190e0e;color:'+color)
                                         // custom button group export
                                         if(!($('#tbUser i:eq(0)').hasClass('fa-download'))) {
-                                            $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
+                                            $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>');
+                                            if(sigLog[0][1] <= sigLog[0][2]){
+                                                $('.dt-buttons').prepend('<span class="titCsvBtn" style="background: #149c7f">List Of Client Signed In</span>');
+                                            }
+                                            else{
+                                                $('.dt-buttons').prepend('<span class="titCsvBtn" style="background: #d9534f">List Of Client Logged Off</span>');
+                                            }
                                             /*$('.buttons-excel').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
                                             $('.buttons-pdf').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')*/
                                         }
@@ -642,7 +684,7 @@
                                     }
                                 }
                                 else{
-                                    location.href = "/device";
+                                    location.href = "/noc";
                                 }
                             },
                             complete: function () {

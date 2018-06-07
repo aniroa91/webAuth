@@ -1,6 +1,7 @@
 package model.device
 
 case class RegionOverview(
+                         time: TimePicker,
                          opsviews: Array[(String,String,String,Int,String)],
                          kibana: Array[(String,String,String,Int,String)],
                          suyhao: Array[(String,String,String,Int,String)],
@@ -9,12 +10,16 @@ case class RegionOverview(
                          contracts: Array[(String,String,String,String,Int,Int,Int)],
                          opsviewType: Array[(String,String)],
                          infTypeError: InfTypeError,
-                         totalInf: Array[(String,String,Double)],
-                         sigLogMonth: Array[(String,String,String)]
+                         totalInf: Array[(String,String,Double)]
                          )
+case class TimePicker(
+                     fromDate: String,
+                     toDate: String,
+                     rangeMonth: Array[(String)]
+                     )
 case class SigLogRegion(
-                               signin: Array[(String,Int)],
-                               logoff: Array[(String,Int)]
+                               signin: Array[(String,Array[Int])],
+                               logoff: Array[(String,Array[Int])]
                              )
 case class NocCount(
                     alertCount: Array[(String,String,String,Int)],
