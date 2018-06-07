@@ -488,7 +488,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
           val sigLogRegion = rangeMonth.map(x => x -> Await.result(BrasService.getSigLogByRegion(x+"-01"), Duration.Inf).map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).asInstanceOf[Seq[(String,String,Int,Int)]].filter(x=> x._1 == id))
           Json.obj(
-            "categories" -> sigLogRegion.map(x=>x._1-> x._2.map(y=>y._2)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
+            "categories" -> sigLogRegion.map(x=>x._1-> x._2.groupBy(_._2).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> x._1)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
             "signin" -> sigLogRegion.map(x=>x._1-> x._2.groupBy(_._2).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> -x._2)),
             "logoff" -> sigLogRegion.map(x=>x._1-> x._2.groupBy(_._2).mapValues(_.map(_._4).sum).toSeq.sorted.map(x=> x._2))
           )
@@ -497,7 +497,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
           val sigLogProvince = rangeMonth.map(x => x -> Await.result(BrasService.getSigLogByProvince(x+"-01",LocationUtils.getCodeProvincebyName(id)), Duration.Inf).map(x=> (x._1,x._2,x._3)).asInstanceOf[Seq[(String,Int,Int)]])
           Json.obj(
-            "categories" -> sigLogProvince.map(x=>x._1-> x._2.map(y=>y._1)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
+            "categories" -> sigLogProvince.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> x._1)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
             "signin" -> sigLogProvince.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> -x._2)),
             "logoff" -> sigLogProvince.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> x._2))
           )
@@ -506,7 +506,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) =>{
           val sigLogBras = rangeMonth.map(x => x -> Await.result(BrasService.getSigLogByBras(x+"-01",id), Duration.Inf).map(x=> (x._1,x._2,x._3)).asInstanceOf[Seq[(String,Int,Int)]])
           Json.obj(
-            "categories" -> sigLogBras.map(x=>x._1-> x._2.map(y=>y._1)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
+            "categories" -> sigLogBras.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> x._1)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
             "signin" -> sigLogBras.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> -x._2)),
             "logoff" -> sigLogBras.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> x._2))
           )
@@ -534,7 +534,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         case id if(id.indexOf("Region")>=0) => {
           val sigLogRegion = rangeMonth.map(x => x -> Await.result(BrasService.getSigLogByRegion(x+"-01"), Duration.Inf).map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).asInstanceOf[Seq[(String,String,Int,Int)]].filter(x=> x._1 == id.split(":")(1)))
           Json.obj(
-            "categories" -> sigLogRegion.map(x=>x._1-> x._2.map(y=>y._2)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
+            "categories" -> sigLogRegion.map(x=>x._1-> x._2.groupBy(_._2).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> x._1)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
             "signin" -> sigLogRegion.map(x=>x._1-> x._2.groupBy(_._2).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> -x._2)),
             "logoff" -> sigLogRegion.map(x=>x._1-> x._2.groupBy(_._2).mapValues(_.map(_._4).sum).toSeq.sorted.map(x=> x._2))
           )
@@ -542,7 +542,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         case id if(id.indexOf("Province")>=0) => {
           val sigLogProvince = rangeMonth.map(x => x -> Await.result(BrasService.getSigLogByProvince(x+"-01",LocationUtils.getCodeProvincebyName(id.split(":")(1))), Duration.Inf).map(x=> (x._1,x._2,x._3)).asInstanceOf[Seq[(String,Int,Int)]])
           Json.obj(
-            "categories" -> sigLogProvince.map(x=>x._1-> x._2.map(y=>y._1)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
+            "categories" -> sigLogProvince.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> x._1)).filter(x=>x._1 == rangeMonth(rangeMonth.length-1)).map(x=>x._2),
             "signin" -> sigLogProvince.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> -x._2)),
             "logoff" -> sigLogProvince.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> x._2))
           )

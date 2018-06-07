@@ -734,7 +734,7 @@ object BrasDAO {
   def getKibanaBytimeES(bras: String,day: String): Array[(Int,Int)] ={
     val rs = client_kibana.execute(
       search(s"infra_dwh_kibana_*" / "docs")
-        query { must(termQuery("bras_id",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations(
         dateHistogramAggregation("hourly")
           .field("date_time")
@@ -768,7 +768,7 @@ object BrasDAO {
             .interval(DateHistogramInterval.HOUR)
             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
           ),
-        search(s"radius-streaming-*" / "con")
+        search(s"radius-streaming-*" / "docs")
           query { must(termQuery("type", "con"),termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           dateHistogramAggregation("hourly")

@@ -54,222 +54,214 @@
     <div class="right_col" role="main">
         @if(response != null){
             <div class="row top_tiles">
-                <div class="col-lg-12">
-                    <span class="title">Broken Cable</span>
-                </div>
-            </div>
-            <div class="row top_tiles">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="x_panel tile " style="height: 480px;padding: 0px;">
-                        <div class="x_content">
-                            <table class="data table table-bordered tbScroll" id="tbUserDown" style="width: 100%">
-                                <thead >
-                                    <tr>
-                                        <th style="width: 40%">Date time</th>
-                                        <th>Host</th>
-                                        <th>Module</th>
-                                        <th>User Down</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <th style="width: 28%">Total</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>@response.userDown.map(x=> x._4).sum</th>
-                                </tfoot>
-                                @if(response.userDown != null) {
-                                    <tbody >
-                                    @for(i <- 0 until response.userDown.length) {
-                                        <tr onclick="showSigLogChart(this,@i,'userDown',4)" class="aTag" name="@response.userDown(i)._1/@response.userDown(i)._2/@response.userDown(i)._3">
-                                            <th>@response.userDown(i)._1</th>
-                                            <th>@response.userDown(i)._2</th>
-                                            <th>@response.userDown(i)._3</th>
-                                            <td>@response.userDown(i)._4</td>
-                                        </tr>
-                                        @*<tr>
-                                            <td colspan="4" style="padding: 0px;">
-                                                <div class="collapse" id="userDown@i">
-                                                </div>
-                                            </td>
-                                            <td style="display: none"></td>
-                                            <td style="display: none"></td>
-                                            <td style="display: none"></td>
-                                        </tr>*@
-                                    }
-                                    </tbody>
-                                }
-                            </table>
+                <div class="col-xs-12">
+                    <div class="container">
+                        <div class="tab-slider--nav" style="padding: 5px 20px 0px 2px;margin-bottom: 10px;">
+                            <ul class="tab-slider--tabs">
+                                <li class="tab-slider--trigger active" rel="tabEvent">Anomaly Event</li>
+                                <li class="tab-slider--trigger" rel="tabBroken">Broken Cable</li>
+                            </ul>
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="x_panel tile " style="height: 480px;padding: 0px;">
-                        <div class="x_content">
-                            <table class="data table table-bordered tbScroll" id="tbInf" style="width: 100%">
-                                <thead >
-                                    <tr>
-                                        <th style="width: 40%">Date time</th>
-                                        <th>Host</th>
-                                        <th>Module</th>
-                                        <th>Inf Down</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <th>Total</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>@response.infDown.map(x=> x._4).sum</th>
-                                </tfoot>
-                                @if(response.infDown != null) {
-                                    <tbody >
-                                    @for(i <- 0 until response.infDown.length) {
-                                        <tr onclick="showSigLogChart(this,@i,'infDown',4)" class="aTag" name="@response.infDown(i)._1/@response.infDown(i)._2/@response.infDown(i)._3">
-                                            <th>@response.infDown(i)._1</th>
-                                            <th>@response.infDown(i)._2</th>
-                                            <th>@response.infDown(i)._3</th>
-                                            <th>@response.infDown(i)._4</th>
-                                        </tr>
-                                       @* <tr>
-                                            <td colspan="4" style="padding: 0px;">
-                                                <div class="collapse" id="infDown@i">
-                                                </div>
-                                            </td>
-                                            <td style="display: none"></td>
-                                            <td style="display: none"></td>
-                                            <td style="display: none"></td>
-                                        </tr>*@
-                                    }
-                                    </tbody>
-                                }
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="x_panel tile " style="height: 480px;padding: 0px;">
-                        <div class="x_content">
-                            <table class="data table table-bordered tbScroll" id="tbSpliter" style="width: 100%">
-                                <thead >
-                                    <tr>
-                                        <th>Date time</th>
-                                        <th>Host</th>
-                                        <th>Spliter</th>
-                                        <th>Signal</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <th>Total</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>@response.spliter.map(x=> x._4).sum</th>
-                                </tfoot>
-                                @if(response.spliter != null) {
-                                    <tbody >
-                                    @for(i <- 0 until response.spliter.length) {
-                                        <tr>
-                                            <th>@response.spliter(i)._1</th>
-                                            <th>@response.spliter(i)._2</th>
-                                            <th>@response.spliter(i)._3</th>
-                                            <th>@response.spliter(i)._4</th>
-                                        </tr>
-                                    }
-                                    </tbody>
-                                }
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row top_tiles">
-                <div class="col-lg-12">
-                    <span class="title">Anomaly Event</span>
+                        <div class="tab-slider--container">
+                            <div id="tabEvent" class="tab-slider--body">
+                                <div class="row top_tiles">
+                                    <div class="col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <input type="hidden" id="ids" value="@ids">
+                                                <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th>Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Module</th>
+                                                            <th>Sf Error</th>
+                                                            <th>Lofi Error</th>
+                                                            <th style="text-align: center">Outlier</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.sfLofi.map(x=> x._4).sum</th>
+                                                        <th>@response.sfLofi.map(x=> x._5).sum</th>
+                                                        <th></th>
+                                                    </tfoot>
+                                                    @for(i <- 0 until response.sfLofi.length) {
+                                                        <tr>
+                                                            <th>@response.sfLofi(i)._1</th>
+                                                            <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
+                                                            <th>@response.sfLofi(i)._3</th>
+                                                            <td>@response.sfLofi(i)._4</td>
+                                                            <th>@response.sfLofi(i)._5</th>
+                                                            <th style="text-align: center">
+                                                                <span class="brasHide">@response.sfLofi(i)._7</span>
+                                                                @if(response.sfLofi(i)._6) {
+                                                                    <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
+                                                                }else {
+                                                                    <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-info btn-xs"><i class="fa fa-check"></i></a>
+                                                                }
+                                                            </th>
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                </div>
-            </div>
-            <div class="row top_tiles">
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="x_panel tile " style="height: 480px;padding: 0px;">
-                        <div class="x_content">
-                            <input type="hidden" id="ids" value="@ids">
-                            <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
-                                <thead >
-                                    <tr>
-                                        <th>Date time</th>
-                                        <th>Host</th>
-                                        <th>Module</th>
-                                        <th>Sf Error</th>
-                                        <th>Lofi Error</th>
-                                        <th style="text-align: center">Outlier</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <th>Total</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>@response.sfLofi.map(x=> x._4).sum</th>
-                                    <th>@response.sfLofi.map(x=> x._5).sum</th>
-                                    <th></th>
-                                </tfoot>
-                                @for(i <- 0 until response.sfLofi.length) {
-                                    <tr>
-                                        <th>@response.sfLofi(i)._1</th>
-                                        <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
-                                        <th>@response.sfLofi(i)._3</th>
-                                        <td>@response.sfLofi(i)._4</td>
-                                        <th>@response.sfLofi(i)._5</th>
-                                        <th style="text-align: center">
-                                            <span class="brasHide">@response.sfLofi(i)._7</span>
-                                            @if(response.sfLofi(i)._6) {
-                                                <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
-                                            }else {
-                                                <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-info btn-xs"><i class="fa fa-check"></i></a>
-                                            }
-                                        </th>
-                                    </tr>
-                                }
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="x_panel tile " style="height: 480px;padding: 0px;">
-                        <div class="x_content">
-                            <table class="data table table-bordered tbScroll" id="tbIndex" style="width: 100%">
-                                <thead >
-                                    <tr>
-                                        <th>Date time</th>
-                                        <th>Host</th>
-                                        <th>Module</th>
-                                        <th>Index</th>
-                                        <th>Rouge Error</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <th>Total</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>@response.indexRouge.map(x=> x._5).sum</th>
-                                </tfoot>
-                                @for(i <- 0 until response.indexRouge.length) {
-                                    <tr onclick="showSigLogChart(this,@i,'indexRouge',5)" class="aTag" name="@response.indexRouge(i)._1/@response.indexRouge(i)._2/@response.indexRouge(i)._3">
-                                        <th>@response.indexRouge(i)._1</th>
-                                        <th>@response.indexRouge(i)._2</th>
-                                        <th>@response.indexRouge(i)._3</th>
-                                        <th>@response.indexRouge(i)._4</th>
-                                        <th>@response.indexRouge(i)._5</th>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="5" style="padding: 0px;">
-                                            <div class="collapse" id="indexRouge@i"></div>
-                                        </td>
-                                        <td style="display: none"></td>
-                                        <td style="display: none"></td>
-                                        <td style="display: none"></td>
-                                        <td style="display: none"></td>
-                                    </tr>
-                                }
-                            </table>
+                                </div>
+                            </div>
+                            <div id="tabBroken" class="tab-slider--body">
+                                <div class="row top_tiles">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbInf" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th style="width: 40%">Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Module</th>
+                                                            <th>Inf Down</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.infDown.map(x=> x._4).sum</th>
+                                                    </tfoot>
+                                                    @if(response.infDown != null) {
+                                                        <tbody >
+                                                        @for(i <- 0 until response.infDown.length) {
+                                                            <tr onclick="showSigLogChart(this,@i,'infDown',4)" class="aTag" name="@response.infDown(i)._1/@response.infDown(i)._2/@response.infDown(i)._3">
+                                                                <th>@response.infDown(i)._1</th>
+                                                                <th>@response.infDown(i)._2</th>
+                                                                <th>@response.infDown(i)._3</th>
+                                                                <th>@response.infDown(i)._4</th>
+                                                            </tr>
+                                                        }
+                                                        </tbody>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbUserDown" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th style="width: 40%">Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Module</th>
+                                                            <th>User Down</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th style="width: 28%">Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.userDown.map(x=> x._4).sum</th>
+                                                    </tfoot>
+                                                    @if(response.userDown != null) {
+                                                        <tbody >
+                                                        @for(i <- 0 until response.userDown.length) {
+                                                            <tr onclick="showSigLogChart(this,@i,'userDown',4)" class="aTag" name="@response.userDown(i)._1/@response.userDown(i)._2/@response.userDown(i)._3">
+                                                                <th>@response.userDown(i)._1</th>
+                                                                <th>@response.userDown(i)._2</th>
+                                                                <th>@response.userDown(i)._3</th>
+                                                                <td>@response.userDown(i)._4</td>
+                                                            </tr>
+                                                        }
+                                                        </tbody>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row top_tiles">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbIndex" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th>Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Module</th>
+                                                            <th>Index</th>
+                                                            <th>Rouge Error</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.indexRouge.map(x=> x._5).sum</th>
+                                                    </tfoot>
+                                                    @for(i <- 0 until response.indexRouge.length) {
+                                                        <tr onclick="showSigLogChart(this,@i,'indexRouge',5)" class="aTag" name="@response.indexRouge(i)._1/@response.indexRouge(i)._2/@response.indexRouge(i)._3">
+                                                            <th>@response.indexRouge(i)._1</th>
+                                                            <th>@response.indexRouge(i)._2</th>
+                                                            <th>@response.indexRouge(i)._3</th>
+                                                            <th>@response.indexRouge(i)._4</th>
+                                                            <th>@response.indexRouge(i)._5</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5" style="padding: 0px;">
+                                                                <div class="collapse" id="indexRouge@i"></div>
+                                                            </td>
+                                                            <td style="display: none"></td>
+                                                            <td style="display: none"></td>
+                                                            <td style="display: none"></td>
+                                                            <td style="display: none"></td>
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbSpliter" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th>Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Spliter</th>
+                                                            <th>Signal</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.spliter.map(x=> x._4).sum</th>
+                                                    </tfoot>
+                                                    @if(response.spliter != null) {
+                                                        <tbody >
+                                                        @for(i <- 0 until response.spliter.length) {
+                                                            <tr>
+                                                                <th>@response.spliter(i)._1</th>
+                                                                <th>@response.spliter(i)._2</th>
+                                                                <th>@response.spliter(i)._3</th>
+                                                                <th>@response.spliter(i)._4</th>
+                                                            </tr>
+                                                        }
+                                                        </tbody>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -323,7 +315,25 @@
     <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
     <script>
         $(document).ready(function(){
-
+            // table tab Event
+            var tbSf = $('#tbSf').DataTable( {
+                dom: 'Bfrtip',
+                "scrollY":        "650px",
+                "scrollCollapse": true,
+                "paging":         false,
+                "info":     false,
+                "searching":     true,
+                "sort":     false,
+                destroy: true,
+                buttons: [
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<i class="fa fa-download"> CSV</i>',
+                        titleAttr: 'CSV'
+                    }
+                ]
+            });
+            // table tab Broken
             var tbIndex = $('#tbIndex').DataTable( {
                 dom: 'Bfrtip',
                 "scrollY":        "350px",
@@ -341,34 +351,6 @@
                     }
                 ]
             });
-            var tbSf = $('#tbSf').DataTable( {
-                dom: 'Bfrtip',
-                "scrollY":        "350px",
-                "scrollCollapse": true,
-                "paging":         false,
-                "info":     false,
-                "searching":     true,
-                "sort":     false,
-                destroy: true,
-                buttons: [
-                    {
-                        extend:    'csvHtml5',
-                        text:      '<i class="fa fa-download"> CSV</i>',
-                        titleAttr: 'CSV'
-                    }
-                ]
-            });
-            // active host module outlier
-            $('#tbSf .aTag').each(function () {
-                var names = $(this).attr('name').trim();
-                var ids = $('#ids').val().trim()
-                if(ids == names){
-                    $(this).parent().addClass('aActive')
-                    $('#search').val(ids.split('/')[0])
-                    tbSf.search(ids.split('/')[0]).draw();
-                }
-            });
-
             var tbSpliter = $('#tbSpliter').DataTable( {
                 dom: 'Bfrtip',
                 "scrollY":        "350px",
@@ -420,13 +402,49 @@
                     }
                 ]
             });
-            // filter All tables
+
+            $(".tab-slider--body").hide();
+            $(".tab-slider--body:first").show();
+            $(".tab-slider--nav li").click(function() {
+                $('#search').val("")
+                $(".tab-slider--body").hide();
+                var activeTab = $(this).attr("rel");
+                $("#"+activeTab).fadeIn();
+                if($(this).attr("rel") == "tabBroken"){
+                    $('.tab-slider--tabs').addClass('slide');
+                    tbUserDown.search( $('#search').val() ).draw();
+                    tbInf.search( $('#search').val() ).draw();
+                    tbSpliter.search( $('#search').val() ).draw();
+                    tbIndex.search( $('#search').val() ).draw();
+                }else{
+                    $('.tab-slider--tabs').removeClass('slide');
+                    tbSf.search($('#search').val()).draw();
+                }
+                $(".tab-slider--nav li").removeClass("active");
+                $(this).addClass("active");
+            });
+
             $('#search').on('keyup', function () {
-                tbUserDown.search( this.value ).draw();
-                tbInf.search( this.value ).draw();
-                tbSpliter.search( this.value ).draw();
-                tbSf.search( this.value ).draw();
-                tbIndex.search( this.value ).draw();
+                var nameTab = $('.tab-slider--tabs').find('li.active').attr('rel')
+                if(nameTab == "tabBroken"){
+                    tbUserDown.search( this.value ).draw();
+                    tbInf.search( this.value ).draw();
+                    tbSpliter.search( this.value ).draw();
+                    tbIndex.search( this.value ).draw();
+                }
+                else
+                  tbSf.search( this.value ).draw();
+            });
+
+            // active host module outlier
+            $('#tbSf .aTag').each(function () {
+                var names = $(this).attr('name').trim();
+                var ids = $('#ids').val().trim()
+                if(ids == names){
+                    $(this).parent().addClass('aActive')
+                    $('#search').val(ids.split('/')[0])
+                    tbSf.search(ids.split('/')[0]).draw();
+                }
             });
         })
 
