@@ -592,8 +592,8 @@
                                                 <tr>
                                                     <th>Host Id</th>
                                                     <th>Module</th>
-                                                    <th>Cpe error</th>
-                                                    <th>Lostip error</th>
+                                                    <th>Sf</th>
+                                                    <th>Lofi</th>
                                                     <th>Total</th>
                                                 </tr>
                                             </thead>
@@ -1483,9 +1483,13 @@
                     },
                     plotOptions: {
                         series: {
-                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                inside: false,
+                                align: 'right'
+                            },
                             color: 'rgba(255,99,132,1)'
-                        }
+                        },
                     },
                     series: [{
                         name: 'Nerror',
@@ -1513,8 +1517,14 @@
                         reversed: true
                     },
                     plotOptions: {
+                        column: {
+                            dataLabels: {
+                                enabled: true,
+                                crop: false,
+                                overflow: 'none'
+                            }
+                        },
                         series: {
-                            stacking: 'normal',
                             color: '#f60'
                         }
                     },
