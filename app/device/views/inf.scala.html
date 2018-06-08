@@ -91,7 +91,7 @@
                                                     @for(i <- 0 until response.sfLofi.length) {
                                                         <tr>
                                                             <th>@response.sfLofi(i)._1</th>
-                                                            <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
+                                                            <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._1/@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
                                                             <th>@response.sfLofi(i)._3</th>
                                                             <td>@response.sfLofi(i)._4</td>
                                                             <th>@response.sfLofi(i)._5</th>
@@ -187,6 +187,40 @@
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                         <div class="x_panel tile " style="padding: 0px;">
                                             <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbSpliter" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th>Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Spliter</th>
+                                                            <th>Signal</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.spliter.map(x=> x._4).sum</th>
+                                                    </tfoot>
+                                                    @if(response.spliter != null) {
+                                                        <tbody >
+                                                        @for(i <- 0 until response.spliter.length) {
+                                                            <tr>
+                                                                <th>@response.spliter(i)._1</th>
+                                                                <th>@response.spliter(i)._2</th>
+                                                                <th>@response.spliter(i)._3</th>
+                                                                <th>@response.spliter(i)._4</th>
+                                                            </tr>
+                                                        }
+                                                        </tbody>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
                                                 <table class="data table table-bordered tbScroll" id="tbIndex" style="width: 100%">
                                                     <thead >
                                                         <tr>
@@ -226,40 +260,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <div class="x_panel tile " style="padding: 0px;">
-                                            <div class="x_content">
-                                                <table class="data table table-bordered tbScroll" id="tbSpliter" style="width: 100%">
-                                                    <thead >
-                                                        <tr>
-                                                            <th>Date time</th>
-                                                            <th>Host</th>
-                                                            <th>Spliter</th>
-                                                            <th>Signal</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tfoot>
-                                                        <th>Total</th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th>@response.spliter.map(x=> x._4).sum</th>
-                                                    </tfoot>
-                                                    @if(response.spliter != null) {
-                                                        <tbody >
-                                                        @for(i <- 0 until response.spliter.length) {
-                                                            <tr>
-                                                                <th>@response.spliter(i)._1</th>
-                                                                <th>@response.spliter(i)._2</th>
-                                                                <th>@response.spliter(i)._3</th>
-                                                                <th>@response.spliter(i)._4</th>
-                                                            </tr>
-                                                        }
-                                                        </tbody>
-                                                    }
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -438,7 +439,7 @@
 
             // active host module outlier
             $('#tbSf .aTag').each(function () {
-                var names = $(this).attr('name').trim();
+                var names = $(this).attr('name').trim().substring($(this).attr('name').trim().indexOf("/")+1);
                 var ids = $('#ids').val().trim()
                 if(ids == names){
                     $(this).parent().addClass('aActive')
