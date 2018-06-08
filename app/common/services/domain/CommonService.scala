@@ -241,6 +241,51 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def getSecondAggregationsAndSumInfError(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long,Long,Long,Long,Long,Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val key = x.getOrElse("key","0L").toString
+            val sum0 = x.getOrElse("sum0", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum1 = x.getOrElse("sum1", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum2 = x.getOrElse("sum2", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum3 = x.getOrElse("sum3", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum4 = x.getOrElse("sum4", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum5 = x.getOrElse("sum5", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            (key,sum0,sum1,sum2,sum3,sum4,sum5)
+          }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
+  def getSecondAggregationsAndSumContractSf(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long,Long,Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val key = x.getOrElse("key","0L").toString
+            val sum0 = x.getOrElse("sum0", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum1 = x.getOrElse("sum1", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum2 = x.getOrElse("sum2", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            (key,sum0,sum1,sum2)
+          }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
   def getPreviousDay(day: String, num: Int): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(num).toString(DateTimeUtil.YMD)

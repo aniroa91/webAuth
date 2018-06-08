@@ -789,7 +789,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           val sigLogModule = (siginByModule++logoffByModule).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toArray
           println("t00:"+ (System.currentTimeMillis() - t00))
           val t0 = System.currentTimeMillis()
-          val noOutlierModule = Await.result(HostService.getNoOutlierInfByHost(brasId,day), Duration.Inf)
+          val noOutlierModule = HostService.getNoOutlierInfByHost(brasId,day)
           println("t0:"+ (System.currentTimeMillis() - t0))
           val t1 = System.currentTimeMillis()
           /* get total error by hourly*/
@@ -809,13 +809,13 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           println("t4:"+ (System.currentTimeMillis() - t4))
           val t5 = System.currentTimeMillis()
           /* get tableIndex error by module and index */
-          val errModuleIndex = Await.result(HostService.getErrorTableModuleIndex(brasId,day), Duration.Inf)
-          val arrModule = errModuleIndex.map(x=>x._1).distinct.toArray
-          val arrIndex = errModuleIndex.map(x=>x._2).distinct.toArray
+          val errModuleIndex = HostService.getErrorTableModuleIndex(brasId,day)
+          val arrModule = errModuleIndex.map(x=>x._1).distinct
+          val arrIndex = errModuleIndex.map(x=>x._2).distinct
           println("t5:"+ (System.currentTimeMillis() - t5))
           val t6 = System.currentTimeMillis()
           // get table contract with sf>300
-          val sfContract = Await.result(HostService.getContractwithSf(brasId,day), Duration.Inf)
+          val sfContract = HostService.getContractwithSf(brasId,day)
           println("t6:"+ (System.currentTimeMillis() - t6))
           println("timeHost:"+ (System.currentTimeMillis() - t00))
           Ok(device.views.html.search(form,username,HostResponse(noOutlierModule,errHost,errorHourly,sigLogModule,arrSiglogModuleIndex,suyhaoModule,sigLogByHourly,splitterByHost,ErrModuleIndex(arrModule,arrIndex,errModuleIndex),sfContract),null,day,brasId,"I",routes.DeviceController.search))

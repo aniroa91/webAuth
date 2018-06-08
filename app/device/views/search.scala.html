@@ -95,7 +95,7 @@
             <div class="row top_tiles">
                 <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-2">
                     <div class="tile-stats" style="background-color: #f1b53d;display: inherit;padding: 14px;height: 138px">
-                        <div class="count ">@rsInfhost.noOutlierModule.sum</div>
+                        <div class="count ">@rsInfhost.noOutlierModule</div>
                         <div class="titLb">Outlier</div>
                     </div>
                 </div>
@@ -153,7 +153,7 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content fixed_height_320">
-                            <div id="heat_map" style="height: 250px;"></div>
+                            <div id="heat_mapInfTab" style="height: 250px;"></div>
                         </div>
                     </div>
                 </div>
@@ -285,6 +285,7 @@
                             <table class="data table table-bordered tbScroll" id="tbSplitter" style="width: 100%">
                                 <thead  style="background: #4980b5;color:#fff">
                                     <tr>
+                                        <th>Date Time</th>
                                         <th>Splitter</th>
                                         <th>Lost Signal</th>
                                     </tr>
@@ -292,8 +293,8 @@
                                 @if(rsInfhost.splitterByHost != null) {
                                     <tfoot>
                                         <tr>
-                                            <th>Total</th>
-                                            <th>@rsInfhost.splitterByHost.map(x=>x._2).sum</th>
+                                            <th colspan="2">Total</th>
+                                            <th>@rsInfhost.splitterByHost.map(x=>x._3).sum</th>
                                         </tr>
                                     </tfoot>
                                     <tbody >
@@ -301,6 +302,7 @@
                                         <tr>
                                             <td>@rsInfhost.splitterByHost(i)._1</td>
                                             <td>@rsInfhost.splitterByHost(i)._2</td>
+                                            <td>@rsInfhost.splitterByHost(i)._3</td>
                                         </tr>
                                     }
                                     </tbody>
@@ -969,7 +971,7 @@
                     }
                     // heat-map hourly error
                     @if(rsInfhost.errorHourly != null){
-                        Highcharts.chart('heat_map', {
+                        Highcharts.chart('heat_mapInfTab', {
                             chart: {
                                 type: 'heatmap',
                                 marginTop: 40,
@@ -1025,7 +1027,7 @@
                         });
                     }
                   // bubble chart module index
-                  @if(rsInfhost.infHostdaily != null){
+                  @if(rsInfhost.sigLogByModule != null){
                     Highcharts.chart('buble-module', {
                         chart: {
                             type: 'bubble',
@@ -1753,8 +1755,8 @@
                 var jsonArr = [];
                 for (var i =0 ; i < data.length; i++) {
                     for(var j=0;j<6;j++){
-                      if(Number(data[i][j])>0)
-                          jsonArr.push([Number(data[i][0]),j,Number(data[i][j])]);
+                      //if(Number(data[i][j])>0)
+                          jsonArr.push([Number(data[i][0]),j,Number(data[i][j+1])]);
                     }
                 }
                 return jsonArr

@@ -7,14 +7,14 @@ case class ErrModuleIndex(
                          )
 
 case class HostResponse(
-                         noOutlierModule: Seq[(Int)],
+                         noOutlierModule:Int,
                          infHostdaily: Seq[(String,Int,Int,Int,Int,Int,Int)],
                          errorHourly: Seq[(String,Int,Int,Int,Int,Int,Int)],
                          sigLogByModule: Array[(String,String)],
                          sigLogbyModuleIndex:Array[(String,String,Int,Int)],
                          suyhaoModule: Seq[(String,Double,Double,Double)],
                          sigLogByHourly: SigLogByTime,
-                         splitterByHost: Seq[(String,Int)],
+                         splitterByHost: Seq[(String,String,Int)],
                          errModuleIndex: ErrModuleIndex,
-                         sfContract: Seq[(String,Int,Int,Int,Int)]
+                         sfContract: Array[(String,Int,Int,Int,Int)]
                        )

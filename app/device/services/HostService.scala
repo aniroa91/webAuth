@@ -19,7 +19,7 @@ object HostService extends AbstractService{
     InfDAO.getInfHostDailyResponse(host,nowDay)
   }
 
-  def getNoOutlierInfByHost(host: String,nowDay: String): Future[Seq[(Int)]] = {
+  def getNoOutlierInfByHost(host: String,nowDay: String): Int = {
     InfDAO.getNoOutlierInfByHost(host,nowDay)
   }
 
@@ -43,15 +43,15 @@ object HostService extends AbstractService{
     InfDAO.getSiglogByHourly(host,nowDay)
   }
 
-  def getSplitterByHost(host: String,nowDay: String): Future[Seq[(String,Int)]] = {
+  def getSplitterByHost(host: String,nowDay: String): Future[Seq[(String,String,Int)]] = {
     InfDAO.getSplitterByHost(host,nowDay)
   }
 
-  def getErrorTableModuleIndex(host: String,nowDay: String): Future[Seq[(String,Int,Int)]] = {
+  def getErrorTableModuleIndex(host: String,nowDay: String): Array[(String,Int,Int)] = {
     InfDAO.getErrorTableModuleIndex(host,nowDay)
   }
 
-  def getContractwithSf(host: String,nowDay: String): Future[Seq[(String,Int,Int,Int,Int)]] = {
+  def getContractwithSf(host: String,nowDay: String): Array[(String,Int,Int,Int,Int)] = {
     InfDAO.getContractwithSf(host,nowDay)
   }
 
