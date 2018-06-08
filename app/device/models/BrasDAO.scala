@@ -14,19 +14,642 @@ import org.joda.time.format.DateTimeFormat
 import profile.services.internet.HistoryService.client
 import services.Configure
 import services.domain.CommonService
-import services.domain.CommonService.getAggregations
+import services.domain.CommonService.{formatUTC, getAggregations}
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
 import org.elasticsearch.search.sort.SortOrder
-import service.BrasService.client
+import service.BrasService.{client, getValueAsInt, getValueAsString}
 
 object BrasDAO {
 
   val client = Configure.client
   val client_kibana = Configure.client_kibana
-
+  val monthSize = CommonService.monthSize
+  val topN = CommonService.SIZE_DEFAULT
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
+
+  def getSpliterMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+    val dt = new DateTime();
+    val aDay = dt.minusHours(12);
+    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""select date_time,host,splitter,sum(lost_signal)
+            from dwh_inf_splitter
+            where date_time >= $aDayTime::TIMESTAMP AND lost_signal>0
+            group by date_time,host,splitter
+            order by date_time desc
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def confirmLabelInf(host: String,module: String,time: String,bras: String) = {
+    dbConfig.db.run(
+      sqlu"""UPDATE dwh_inf_module SET confirm = true
+            where host =$host and module=$module and bras_id=$bras and date_time=$time::TIMESTAMP
+                  """
+    )
+  }
+
+  def rejectLabelInf(host: String,module: String,time: String,bras: String) = {
+    dbConfig.db.run(
+      sqlu"""UPDATE dwh_inf_module SET confirm = false
+             where host =$host and module=$module and bras_id=$bras and date_time=$time::TIMESTAMP
+                  """
+    )
+  }
+
+  def getSigLogByRegion(month: String): Future[Seq[(String,Int,Int)]] = {
+    dbConfig.db.run(
+      sql"""select province,sum(signin) as signin, sum(logoff) as logoff
+              from dmt_overview_conn
+              where month = $month::TIMESTAMP
+              group by province
+                  """
+        .as[(String,Int,Int)])
+  }
+
+  def getSigLogByProvince(month: String,province: String): Future[Seq[(String,Int,Int)]] = {
+    dbConfig.db.run(
+      sql"""select bras_id,sum(signin) as signin, sum(logoff) as logoff
+              from dmt_overview_conn
+              where month = $month::TIMESTAMP and province = $province
+              group by bras_id
+                  """
+        .as[(String,Int,Int)])
+  }
+
+  def getDistinctBrasbyProvince(month: String,province: String): Future[Seq[(String)]] = {
+    dbConfig.db.run(
+      sql"""select bras_id
+            from dmt_overview_inf
+            where month = $month::TIMESTAMP and province = $province
+            group by bras_id
+                  """
+        .as[(String)])
+  }
+
+  def getDistinctHostbyBras(month: String,bras: String): Future[Seq[(String)]] = {
+    dbConfig.db.run(
+      sql"""select host
+            from dmt_overview_inf
+            where month = $month::TIMESTAMP and bras_id = $bras
+            group by host
+                  """
+        .as[(String)])
+  }
+
+  def getTop10HostId(month: String,lstHost: Array[(String)]): Future[Seq[(String)]] = {
+    val arrId = lstHost.map("'"+ _ + "'").mkString(",")
+    dbConfig.db.run(
+      sql"""select host
+            from dmt_overview_inf
+            where month = $month::TIMESTAMP and host IN (#$arrId)
+            group by host
+            order by sum(total_inf) desc
+            limit 10
+                  """
+        .as[(String)])
+  }
+
+  def getSigLogByBras(month: String,bras: String): Future[Seq[(String,Int,Int)]] = {
+    dbConfig.db.run(
+      sql"""select host,sum(signin) as signin, sum(logoff) as logoff
+              from dmt_overview_conn
+              where month = $month::TIMESTAMP and bras_id = $bras
+              group by host
+              order by sum(signin) desc
+              limit 10
+                  """
+        .as[(String,Int,Int)])
+  }
+
+  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Boolean,String)]] = {
+    val dt = new DateTime();
+    val aDay = dt.minusHours(12);
+    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""select date_time,host,module,sf_error,lofi_error,confirm,bras_id
+            from dwh_inf_module
+            where date_time >= $aDayTime::TIMESTAMP AND label =1
+            order by date_time desc
+                  """
+        .as[(String,String,String,Int,Int,Boolean,String)])
+  }
+
+  def getIndexRougeMudule(userInf_down: String): Future[Seq[(String,String,String,String,Int)]] = {
+    val dt = CommonService.getCurrentDay()
+    dbConfig.db.run(
+      sql"""select date_time,host,module,index,sum(rouge_error)
+            from dwh_inf_index
+            where date_time >= $dt::TIMESTAMP AND rouge_error >0
+            group by date_time,host,module,index
+            order by date_time desc
+                  """
+        .as[(String,String,String,String,Int)])
+  }
+
+  def getUserDownMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+    val dt = new DateTime();
+    val aDay = dt.minusHours(12);
+    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""select date_time,host,module,sum(user_down)
+            from dwh_inf_module
+            where date_time >= $aDayTime::TIMESTAMP AND user_down>0
+            group by date_time,host,module
+            order by date_time desc
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getInfDownMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+    val dt = new DateTime();
+    val aDay = dt.minusHours(12);
+    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    dbConfig.db.run(
+      sql"""select date_time,host,module,sum(inf_down)
+            from dwh_inf_module
+            where date_time >= $aDayTime::TIMESTAMP AND inf_down>0
+            group by date_time,host,module
+            order by date_time desc
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getProvinceOpsview(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]] = {
+    dbConfig.db.run(
+      sql"""select month,province,bras_id,sum(total_opsview) as total_opsview
+            from dmt_overview_noc
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            group by month,province,bras_id
+            order by month desc, province
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getProvinceContract(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int,Int)]] = {
+    dbConfig.db.run(
+      sql"""select month,province,host,sum(no_contract) as no_contract,sum(no_device) as no_device,sum(poor_conn) as poor_conn
+            from dmt_overview_device
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            group by month,province,host
+            order by month desc, province
+                  """
+        .as[(String,String,String,Int,Int,Int)])
+  }
+
+  def getProvinceKibana(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]] = {
+    dbConfig.db.run(
+      sql"""select month,province,bras_id,sum(total_kibana) as total_kibana
+            from dmt_overview_noc
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            group by month,province,bras_id
+            order by month desc, province
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getProvinceSigLogoff(): Future[Seq[(String,String,Double,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,province,sum(signin) as signin,sum(logoff) as logoff
+            from dmt_overview_conn
+            where month > $month::TIMESTAMP
+            group by month,province
+            order by month desc
+                  """
+        .as[(String,String,Double,Double)])
+  }
+
+  def getProvinceTotalInf(fromMonth: String,toMonth: String): Future[Seq[(String,String,Double)]] = {
+    dbConfig.db.run(
+      sql"""select month,province,sum(total_inf) as total_inf
+            from dmt_overview_inf
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            group by month,province
+            order by month desc
+                  """
+        .as[(String,String,Double)])
+  }
+
+  def getTotalInfbyProvince(month: String,id: String,lstBrasId: Array[(String)]): Future[Seq[(String,String,Double)]] = {
+    val lstBras = lstBrasId.map("'" + _ + "'").mkString(",")
+    val fromMonth = month.split("/")(0)+"-01"
+    val toMonth = month.split("/")(1)+"-01"
+
+    dbConfig.db.run(
+      sql"""select month, bras_id,sum(total_inf) as total_inf
+            from dmt_overview_inf
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP and province = $id and bras_id IN (#$lstBras)
+            group by month,bras_id
+            order by month desc
+                  """
+        .as[(String,String,Double)])
+  }
+
+  def getSigLogconnbyProvince(id: String): Future[Seq[(String,String,Double,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select month,bras_id,sum(signin) as signin,sum(logoff) as logoff
+            from dmt_overview_conn
+            where month > $month::TIMESTAMP and province = $id
+            group by month,bras_id
+            order by month desc
+            limit 30
+                  """
+        .as[(String,String,Double,Double)])
+  }
+
+  def getSigLogconnbyBras(id: String): Future[Seq[(String,String,Double,Double)]] = {
+    val month = CommonService.get3MonthAgo()+"-01"
+    dbConfig.db.run(
+      sql"""select tbO.month,tbO.host,sum(tbO.signin),sum(tbO.logoff)
+                                   from(
+                                      select row_number() OVER (PARTITION BY conn.month ORDER BY conn.signin desc) AS r,
+                                       conn.*
+                                       from (
+                                           select month,host,sum(signin) as signin,sum(logoff) as logoff
+                                           from dmt_overview_conn
+                                           where month > $month::TIMESTAMP and bras_id = $id
+                                           group by month,host
+                                           order by month desc
+                                       ) conn
+                                   ) tbO
+                                   where tbO.r<=10
+                                   group by tbO.month,tbO.host
+                                   order by tbO.month desc
+                                limit 30
+                  """
+        .as[(String,String,Double,Double)])
+  }
+
+  def getTotalInfbyBras(month: String,id: String,lstHost: Array[(String)]): Future[Seq[(String,String,Double)]] = {
+    val arrId = lstHost.map("'" + _ + "'").mkString(",")
+    val fromMonth = month.split("/")(0)+"-01"
+    val toMonth = month.split("/")(1)+"-01"
+    dbConfig.db.run(
+      sql"""select month, host,sum(total_inf) as total_inf
+            from dmt_overview_inf
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP and bras_id = $id and host IN(#$arrId)
+            group by month,host
+            order by month desc,sum(total_inf)  desc
+                  """
+        .as[(String,String,Double)])
+  }
+
+  def getProvinceSuyhao(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]] = {
+    dbConfig.db.run(
+      sql"""select month,province,host,sum(not_passed_suyhao) as not_passed_suyhao
+            from dmt_overview_suyhao
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            group by month,province,host
+            order by month desc, province
+                  """
+        .as[(String,String,String,Int)])
+  }
+
+  def getProvinceCount(month: String): Future[Seq[(String,String,Int,Int,Int,Int,Int,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select province,bras_id,sum(alert_count) as alert_count,sum(crit_count) as crit_count,sum(warning_count) as warning_count,
+                      sum(notice_count) as notice_count, sum(err_count) as err_count,sum(emerg_count) as emerg_count
+              from dmt_overview_noc
+              where month > $month::TIMESTAMP
+              group by province,bras_id
+              order by province
+                  """
+          .as[(String,String,Int,Int,Int,Int,Int,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select province,bras_id,sum(alert_count) as alert_count,sum(crit_count) as crit_count,sum(warning_count) as warning_count,
+                      sum(notice_count) as notice_count, sum(err_count) as err_count,sum(emerg_count) as emerg_count
+              from dmt_overview_noc
+              where month = $query::TIMESTAMP
+              group by province,bras_id
+              order by province
+                  """
+          .as[(String,String,Int,Int,Int,Int,Int,Int)])
+    }
+  }
+
+  def getBrasOpsviewType(month: String,province: String): Future[Seq[(String,Int,Int,Int,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select bras_id,sum(ok_opsview) as ok_opsview,sum(warn_opsview) as warn_opsview,sum(unknown_opsview) as unknown_opsview,
+                      sum(crit_opsview) as crit_opsview
+              from dmt_overview_noc
+              where month > $month::TIMESTAMP and province = $province
+              group by bras_id
+                  """
+          .as[(String,Int,Int,Int,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select bras_id,sum(ok_opsview) as ok_opsview,sum(warn_opsview) as warn_opsview,sum(unknown_opsview) as unknown_opsview,
+                      sum(crit_opsview) as crit_opsview
+              from dmt_overview_noc
+              where month = $query::TIMESTAMP and province = $province
+              group by bras_id
+                  """
+          .as[(String,Int,Int,Int,Int)])
+    }
+  }
+
+  def getProvinceOpsviewType(month: String): Future[Seq[(String,Int,Int,Int,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select province,sum(ok_opsview) as ok_opsview,sum(warn_opsview) as warn_opsview,sum(unknown_opsview) as unknown_opsview,
+                      sum(crit_opsview) as crit_opsview
+              from dmt_overview_noc
+              where month > $month::TIMESTAMP
+              group by province
+                  """
+          .as[(String,Int,Int,Int,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select province,sum(ok_opsview) as ok_opsview,sum(warn_opsview) as warn_opsview,sum(unknown_opsview) as unknown_opsview,
+                      sum(crit_opsview) as crit_opsview
+              from dmt_overview_noc
+              where month = $query::TIMESTAMP
+              group by province
+                  """
+          .as[(String,Int,Int,Int,Int)])
+    }
+  }
+
+  def getProvinceInfDownError(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select province,bras_id,sum(inf_down) as inf_down,sum(user_down) as user_down,sum(rouge_error) as rouge_error,
+                                   sum(lost_signal) as lost_signal
+                           from dmt_overview_inf
+                           where month > $month::TIMESTAMP
+                           group by province,bras_id
+              order by province,bras_id
+                  """
+          .as[(String,String,Int,Int,Int,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select province,bras_id,sum(inf_down) as inf_down,sum(user_down) as user_down,sum(rouge_error) as rouge_error,
+                                   sum(lost_signal) as lost_signal
+                           from dmt_overview_inf
+                           where month =  $query::TIMESTAMP
+                           group by province,bras_id
+              order by province,bras_id
+                  """
+          .as[(String,String,Int,Int,Int,Int)])
+    }
+  }
+
+  def getTopSignin(month: String): Future[Seq[(String,String,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select tbO.bras_id,tbO.host,sum(tbO.signin)
+                        from(
+                           select row_number() OVER (PARTITION BY conn.bras_id ORDER BY conn.signin desc) AS r,
+                            conn.*
+                            from (
+                                 select bras_id,host,sum(signin) as signin
+                                 from dmt_overview_conn
+                                 where month > $month::TIMESTAMP
+                                 group by bras_id,host
+                                 order by sum(signin) desc
+                            ) conn
+                        ) tbO
+                        where tbO.r<=10
+                        group by tbO.bras_id,tbO.host
+                        order by tbO.bras_id desc
+                     limit 100
+                  """
+          .as[(String,String,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select tbO.bras_id,tbO.host,sum(tbO.signin)
+                        from(
+                           select row_number() OVER (PARTITION BY conn.bras_id ORDER BY conn.signin desc) AS r,
+                            conn.*
+                            from (
+                                 select bras_id,host,sum(signin) as signin
+                                 from dmt_overview_conn
+                                 where month = $query::TIMESTAMP
+                                 group by bras_id,host
+                                 order by sum(signin) desc
+                            ) conn
+                        ) tbO
+                        where tbO.r<=10
+                        group by tbO.bras_id,tbO.host
+                        order by tbO.bras_id desc
+                     limit 100
+                  """
+          .as[(String,String,Int)])
+    }
+  }
+
+  def getTopLogoff(month: String): Future[Seq[(String,String,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select tbO.bras_id,tbO.host,sum(tbO.logoff)
+                        from(
+                           select row_number() OVER (PARTITION BY conn.bras_id ORDER BY conn.logoff desc) AS r,
+                            conn.*
+                            from (
+                                 select bras_id,host,sum(logoff) as logoff
+                                 from dmt_overview_conn
+                                 where month > $month::TIMESTAMP
+                                 group by bras_id,host
+                                 order by sum(logoff) desc
+                            ) conn
+                        ) tbO
+                        where tbO.r<=10
+                        group by tbO.bras_id,tbO.host
+                        order by tbO.bras_id desc
+                     limit 100
+                  """
+          .as[(String,String,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select tbO.bras_id,tbO.host,sum(tbO.logoff)
+                        from(
+                           select row_number() OVER (PARTITION BY conn.bras_id ORDER BY conn.logoff desc) AS r,
+                            conn.*
+                            from (
+                                 select bras_id,host,sum(logoff) as logoff
+                                 from dmt_overview_conn
+                                 where month = $query::TIMESTAMP
+                                 group by bras_id,host
+                                 order by sum(logoff) desc
+                            ) conn
+                        ) tbO
+                        where tbO.r<=10
+                        group by tbO.bras_id,tbO.host
+                        order by tbO.bras_id desc
+                     limit 100
+                  """
+          .as[(String,String,Int)])
+    }
+  }
+
+  def getTopKibana(month: String,typeError: String): Future[Seq[(String,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select bras_id,sum(#$typeError)
+            from dmt_overview_noc
+            where month > $month::TIMESTAMP
+            group by bras_id
+            order by sum(#$typeError) desc
+            limit 10
+                  """
+          .as[(String,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select bras_id,sum(#$typeError)
+            from dmt_overview_noc
+            where month = $query::TIMESTAMP
+            group by bras_id
+            order by sum(#$typeError) desc
+            limit 10
+                  """
+          .as[(String,Int)])
+    }
+  }
+
+  def getTopOpsview(month: String,typeOpsview: String): Future[Seq[(String,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select bras_id,sum(#$typeOpsview)
+            from dmt_overview_noc
+            where month > $month::TIMESTAMP
+            group by bras_id
+            order by sum(#$typeOpsview) desc
+            limit 10
+                  """
+          .as[(String,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select bras_id,sum(#$typeOpsview)
+            from dmt_overview_noc
+            where month = $query::TIMESTAMP
+            group by bras_id
+            order by sum(#$typeOpsview) desc
+            limit 10
+                  """
+          .as[(String,Int)])
+    }
+  }
+
+  def getTopInf(month: String,typeInferr: String): Future[Seq[(String,String,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select tbO.bras_id,tbO.host,sum(tbO.total_inf)
+                        from(
+                           select row_number() OVER (PARTITION BY inf.bras_id ORDER BY inf.total_inf desc) AS r,
+                            inf.*
+                            from (
+                                 select bras_id,host,sum(#$typeInferr) as total_inf
+                                 from dmt_overview_inf
+                                 where month > $month::TIMESTAMP
+                                 group by bras_id,host
+                                 order by sum(#$typeInferr) desc
+                            ) inf
+                        ) tbO
+                        where tbO.r<=20
+                        group by tbO.bras_id,tbO.host
+                        order by tbO.bras_id desc
+                     limit 200
+                  """
+          .as[(String,String,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select tbO.bras_id,tbO.host,sum(tbO.total_inf)
+                        from(
+                           select row_number() OVER (PARTITION BY inf.bras_id ORDER BY inf.total_inf desc) AS r,
+                            inf.*
+                            from (
+                                 select bras_id,host,sum(#$typeInferr) as total_inf
+                                 from dmt_overview_inf
+                                 where month = $query::TIMESTAMP
+                                 group by bras_id,host
+                                 order by sum(#$typeInferr) desc
+                            ) inf
+                        ) tbO
+                        where tbO.r<=20
+                        group by tbO.bras_id,tbO.host
+                        order by tbO.bras_id desc
+                     limit 200
+                  """
+          .as[(String,String,Int)])
+    }
+  }
+
+  def getTopnotSuyhao(month: String): Future[Seq[(String,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select host,sum(not_passed_suyhao)
+            from dmt_overview_suyhao
+            where month > $month::TIMESTAMP
+            group by host
+            order by sum(not_passed_suyhao) desc
+            limit 10
+                  """
+          .as[(String,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select host,sum(not_passed_suyhao)
+            from dmt_overview_suyhao
+            where month = $query::TIMESTAMP
+            group by host
+            order by sum(not_passed_suyhao) desc
+            limit 10
+                  """
+          .as[(String,Int)])
+    }
+  }
+
+  def getTopPoorconn(month: String,typeOLTpoor:String): Future[Seq[(String,Int)]] = {
+    if(month.equals("")) {
+      val month = CommonService.get3MonthAgo()+"-01"
+      dbConfig.db.run(
+        sql"""select host,sum(#$typeOLTpoor)
+            from dmt_overview_device
+            where month > $month::TIMESTAMP
+            group by host
+            order by sum(#$typeOLTpoor) desc
+            limit 10
+                  """
+          .as[(String,Int)])
+    } else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select host,sum(#$typeOLTpoor)
+            from dmt_overview_device
+            where month = $query::TIMESTAMP
+            group by host
+            order by sum(#$typeOLTpoor) desc
+            limit 10
+                  """
+          .as[(String,Int)])
+    }
+  }
 
   def getBrasOutlierCurrent(nowDay: String): Future[Seq[(String,String,Int,Int,String)]] = {
     //val sumDay = CommonService.getRangeDay(nowDay).split(",").length
@@ -52,10 +675,10 @@ object BrasDAO {
   def getSigLogCurrent(bras: String, day: String): (Int,Int) = {
     val multiRs = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("typeLog", "SignIn"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) },
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("typeLog", "LogOff"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type", "con"),termQuery("typeLog", "SignIn"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) },
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type", "con"),termQuery("typeLog", "LogOff"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
       )
     ).await
     val signin = multiRs.responses(0).totalHits.toInt
@@ -137,16 +760,16 @@ object BrasDAO {
   def getSigLogBytimeCurrent(bras: String, day: String): SigLogByTime = {
     val mulRes = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type", "con"),termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           dateHistogramAggregation("hourly")
             .field("timestamp")
             .interval(DateHistogramInterval.HOUR)
             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type", "con"),termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           dateHistogramAggregation("hourly")
             .field("timestamp")
@@ -160,41 +783,85 @@ object BrasDAO {
     SigLogByTime(arrSigin,arrLogoff)
   }
 
-  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly:Int): Future[Seq[(Int,Int)]] = {
-    val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly:Int): Array[(Int,Int)] = {
+    val response = client_kibana.execute(
+      search(s"infra_dwh_inf_host_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        size 10000
+    ).await
+    val jsonRs = response.hits.hits.map(x=> x.sourceAsMap)
+      .map(x=>(
+        CommonService.formatUTCToHour(getValueAsString(x,"date_time")),
+        getValueAsInt(x,"sf_error"),
+        getValueAsInt(x,"lofi_error")
+      ))
+    jsonRs.map(x=> (x._1,x._2+x._3)).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=>x._1.toInt -> x._2).toArray
+
+    /*dbConfig.db.run(
       sql"""select extract(hour from  date_time) as hourly, sum(sf_error)+sum(lofi_error) as sumError
             from dwh_inf_host
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by bras_id,extract(hour from  date_time)
             order by hourly
                   """
-        .as[(Int,Int)])
+        .as[(Int,Int)])*/
   }
 
-  def getInfhostResponse(bras: String,nowDay: String): Future[Seq[(String,Int,Int)]] = {
+  def getInfhostResponse(bras: String,nowDay: String): Array[(String,Long,Long)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_inf_host_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        aggregations(
+        termsAggregation("host")
+          .field("host.keyword")
+          .subaggs(
+            sumAgg("sum0","sf_error"),
+            sumAgg("sum1","lofi_error")
+          ) size 100
+        )
+    ).await
+    CommonService.getTermGroupMultiSums(rs, "host", "sum0","sum1")
+   /* dbConfig.db.run(
       sql"""select host, sum(sf_error) as cpe,sum(lofi_error) as lostip
             from dwh_inf_host
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by host
                   """
-        .as[(String,Int,Int)])
+        .as[(String,Int,Int)])*/
   }
 
-  def getInfModuleResponse(bras: String,nowDay: String): Future[Seq[(String,String,Int,Int,Int)]] = {
+  def getInfModuleResponse(bras: String,nowDay: String): Array[(String,String,Long,Long,Long)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_inf_module_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),not(termQuery("module.keyword","-1")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        aggregations(
+        termsAggregation("host")
+          .field("host.keyword")
+          .subAggregations(
+            termsAggregation("module")
+              .field("module.keyword")
+              .subaggs(
+                sumAgg("sum0","sf_error"),
+                sumAgg("sum1","lofi_error")
+              ) size 100
+        ))
+    ).await
+    val mapHostModule = CommonService.getSecondAggregationsAndSums(rs.aggregations.get("host"),"module")
+    val rsHostMol = mapHostModule.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1, x._2._1, x._2._2,x._2._3,x._2._2+x._2._3))
+    rsHostMol
+
+/*    dbConfig.db.run(
       sql"""select host, module,sum(sf_error) as cpe,sum(lofi_error) as lostip,sum(sf_error)+sum(lofi_error) as sumAll
             from dwh_inf_module
-            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and module <> '-1'
             group by host,module
                   """
-        .as[(String,String,Int,Int,Int)])
+        .as[(String,String,Int,Int,Int)])*/
   }
 
   def getOpsviewServiceNameResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {
@@ -245,8 +912,8 @@ object BrasDAO {
   def getLinecardhostCurrent(bras: String,day: String): Array[(String,String)] = {
     val multiRs = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type", "con"),termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -259,8 +926,8 @@ object BrasDAO {
                 )
             )
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type", "con"),termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),not(termQuery("card.lineId","-1")),not(termQuery("card.id","-1")),not(termQuery("card.port","-1")),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations (
           termsAggregation("linecard")
             .field("card.lineId")
@@ -311,7 +978,6 @@ object BrasDAO {
           .field("severity.keyword")
         )
     ).await
-
     CommonService.getAggregationsSiglog(rs.aggregations.get("severity"))
   }
 
@@ -334,7 +1000,6 @@ object BrasDAO {
           .field("error_type.keyword")
         )
     ).await
-
     CommonService.getAggregationsSiglog(rs.aggregations.get("error_type"))
   }
 
@@ -423,14 +1088,14 @@ object BrasDAO {
     }
     val multiRs = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type", "con"),termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
           aggregations (
           termsAggregation("olt")
             .field("card.olt")
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type", "con"),termQuery("nasName", bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
           aggregations (
           termsAggregation("olt")
             .field("card.olt")

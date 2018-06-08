@@ -38,10 +38,12 @@ import play.api.libs.json.JsObject
 import com.ftel.bigdata.utils.StringUtil
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
+import org.joda.time.Months;
 import java.time.format.DateTimeFormatter
 
 object CommonService extends AbstractService {
 
+  val monthSize = 20*3
   val SIZE_DEFAULT = 20
   val RANK_HOURLY = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"
   /**
@@ -90,6 +92,45 @@ object CommonService extends AbstractService {
     date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
   }
 
+  def getAllMonthfromRange(fromMonth: String,toMonth: String): Array[(String)] = {
+    val date1 = DateTimeUtil.create(toMonth, DateTimeUtil.YMD)
+    val date2 = DateTimeUtil.create(fromMonth, DateTimeUtil.YMD)
+    val numberOfMonths = Months.monthsBetween(date2, date1).getMonths()+1
+    (0 until numberOfMonths).map(date2.plusMonths(_).toString(DateTimeFormat.forPattern("yyyy-MM"))).toArray
+
+  }
+
+  def getRangeCurrentMonth(): String = {
+    val date = new DateTime()
+    val fromDate = date.minusMonths(3).toString(DateTimeFormat.forPattern("yyyy-MM"))
+    val toDate = date.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
+    fromDate+"/"+toDate
+  }
+
+  def getEndDate(endDate:String): String = {
+    val date1 = new DateTime()
+    val date2 = DateTimeUtil.create(endDate, DateTimeUtil.YMD)
+    val months = Months.monthsBetween(date2, date1).getMonths()
+    "-"+months+"m"
+  }
+
+  def getStartDate(startDate:String): String = {
+    val date1 = new DateTime()
+    val date2 = DateTimeUtil.create(startDate, DateTimeUtil.YMD)
+    val months = Months.monthsBetween(date2, date1).getMonths()
+    "-"+months+"m"
+  }
+
+  def get3MonthAgo(): String = {
+    val date = new DateTime()
+    date.minusMonths(3).toString(DateTimeFormat.forPattern("yyyy-MM"))
+  }
+
+  def getnumMonthAgo(num: Int): String = {
+    val date = new DateTime()
+    date.minusMonths(num).toString(DateTimeFormat.forPattern("yyyy-MM-01"))
+  }
+
   def getpreviousMinutes(times: Int): String = {
     val date = new DateTime()
     date.minusMinutes(times).toString()
@@ -117,6 +158,18 @@ object CommonService extends AbstractService {
       .map(x => x.asInstanceOf[Map[String, AnyRef]])
       .map(x => {
         val key = x.getOrElse("key", "0L").toString
+        val count = x.getOrElse("doc_count", 0L).toString().toLong
+        (key, count)
+      })
+      .toArray
+  }
+
+  def getAggregationsKeyString(aggr: Option[AnyRef]): Array[(String, Long)] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key_as_string", "0L").toString
         val count = x.getOrElse("doc_count", 0L).toString().toLong
         (key, count)
       })
@@ -162,6 +215,26 @@ object CommonService extends AbstractService {
             val keyCard = x.getOrElse("key","0L").toString
             val count = x.getOrElse("doc_count",0L).toString.toLong
             (keyCard,count)
+          }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
+  def getSecondAggregationsAndSums(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long, Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val key = x.getOrElse("key","0L").toString
+            val sum0 = x.getOrElse("sum0", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            val sum1 = x.getOrElse("sum1", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+            (key,sum0,sum1)
           }).toArray
         (key, map)
       })
@@ -482,6 +555,13 @@ object CommonService extends AbstractService {
    /* val date = DateTime(second,DateTimeUtil.TIMEZONE_HCM)
     date.getHours()*/
     1
+  }
+
+  def formatUTCToHour(date: String):Long = {
+    val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    val formatter = DateTimeFormat.forPattern(ES_5_DATETIME_FORMAT)
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.getHourOfDay()
   }
 
   def formatStringToMillisecond(date: String):Long = {

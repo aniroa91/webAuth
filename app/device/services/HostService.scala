@@ -19,6 +19,14 @@ object HostService extends AbstractService{
     InfDAO.getInfHostDailyResponse(host,nowDay)
   }
 
+  def getNoOutlierInfByHost(host: String,nowDay: String): Future[Seq[(Int)]] = {
+    InfDAO.getNoOutlierInfByHost(host,nowDay)
+  }
+
+  def getNoOutlierInfByBras(bras: String,nowDay: String): Future[Seq[(Int)]] = {
+    InfDAO.getNoOutlierInfByBras(bras,nowDay)
+  }
+
   def getSigLogbyModuleIndex(host: String,nowDay: String):  Array[((String,String),String)]= {
     InfDAO.getSigLogbyModuleIndex(host,nowDay)
   }

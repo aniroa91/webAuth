@@ -95,7 +95,7 @@
             <div class="row top_tiles">
                 <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-2">
                     <div class="tile-stats" style="background-color: #f1b53d;display: inherit;padding: 14px;height: 138px">
-                        <div class="count ">123,000</div>
+                        <div class="count ">@rsInfhost.noOutlierModule.sum</div>
                         <div class="titLb">Outlier</div>
                     </div>
                 </div>
@@ -328,7 +328,7 @@
                     <div class="tile-stats" style="background-color: #64b0f2;
                         display: inherit">
                         <div class="count ">@formatPattern(response.currentsInfo.noOutlier)</div>
-                        <div class="titLb">No Outlier of Bras</div>
+                        <div class="titLb">Outlier of Bras</div>
                     </div>
                 </div>
                 <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
@@ -348,8 +348,8 @@
                 <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="tile-stats" style="display: inherit;
                         background-color: #ff5d48">
-                        <div class="count">0</div>
-                        <div class="titLb">No Outlier of Hosts</div>
+                        <div class="count">@response.currentsInfo.noOutlierByhost</div>
+                        <div class="titLb">Outlier of Hosts</div>
                     </div>
                 </div>
             </div>
@@ -592,8 +592,8 @@
                                                 <tr>
                                                     <th>Host Id</th>
                                                     <th>Module</th>
-                                                    <th>Cpe error</th>
-                                                    <th>Lostip error</th>
+                                                    <th>Sf</th>
+                                                    <th>Lofi</th>
                                                     <th>Total</th>
                                                 </tr>
                                             </thead>
@@ -816,7 +816,7 @@
                         "sort":     false
                     });
                     $('#tbSf').DataTable( {
-                        "scrollY":        "200px",
+                        "scrollY":        "235px",
                         "scrollCollapse": true,
                         "paging":         false,
                         "info":     false,
@@ -824,7 +824,7 @@
                         "sort":     false
                     });
                     $('#tbSplitter').DataTable( {
-                        "scrollY":        "200px",
+                        "scrollY":        "300px",
                         "scrollCollapse": true,
                         "paging":         false,
                         "info":     false,
@@ -1470,7 +1470,7 @@
                         text: ''
                     },
                     xAxis: {
-                        categories: ['None', 'DDos', 'Mac move', 'Temperature']
+                        categories: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrErrorType.map(x=> x._1))))
                     },
                     yAxis: {
                         min: 0,
@@ -1483,9 +1483,13 @@
                     },
                     plotOptions: {
                         series: {
-                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                inside: false,
+                                align: 'right'
+                            },
                             color: 'rgba(255,99,132,1)'
-                        }
+                        },
                     },
                     series: [{
                         name: 'Nerror',
@@ -1513,8 +1517,14 @@
                         reversed: true
                     },
                     plotOptions: {
+                        column: {
+                            dataLabels: {
+                                enabled: true,
+                                crop: false,
+                                overflow: 'none'
+                            }
+                        },
                         series: {
-                            stacking: 'normal',
                             color: '#f60'
                         }
                     },
@@ -1554,12 +1564,12 @@
                             },
                         },
                         series: [{
-                            name: 'Cpe error',
-                            data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._2._1))))
+                            name: 'Sf',
+                            data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._2))))
                         },
                             {
-                                name: 'Lostip error',
-                                data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._2._2))))
+                                name: 'Lofi',
+                                data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._3))))
                             }]
                     });
                 }

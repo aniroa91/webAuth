@@ -41,11 +41,35 @@ object InfDAO {
         .as[(String,Int,Int,Int,Int,Int,Int)])
   }
 
+  def getNoOutlierInfByHost(host: String,nowDay: String): Future[Seq[(Int)]] = {
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select count(label)
+            from dwh_inf_module
+            where host= $host and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label =1
+            group by host
+                  """
+        .as[(Int)])
+  }
+
+  def getNoOutlierInfByBras(bras: String,nowDay: String): Future[Seq[(Int)]] = {
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select count(label)
+            from dwh_inf_module
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label =1
+            group by bras_id
+                  """
+        .as[(Int)])
+  }
+
   def getSuyhaobyModule(host: String,nowDay: String): Future[Seq[(String,Double,Double,Double)]] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select module, sum(passed_true),sum(passed_false),sum(rate)
+      sql"""select 'Module ' || module as module, sum(passed_true),sum(passed_false),sum(rate)
             from dmt_portpon_suyhao
             where host= $host and date >= $fromDay::TIMESTAMP and date < $nextDay::TIMESTAMP
             group by module
@@ -70,8 +94,8 @@ object InfDAO {
     // cable.ontId: module, card.indexId: index
     val mulRes = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("card.olt",host),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("card.olt",host),termQuery("typeLog.keyword", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations(
           termsAggregation("module")
             .field("cable.ontId")
@@ -80,8 +104,8 @@ object InfDAO {
                 .field("cable.indexId")
             )
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("card.olt",host),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("card.olt",host),termQuery("typeLog.keyword", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations(
           termsAggregation("module")
             .field("cable.ontId")
@@ -105,16 +129,16 @@ object InfDAO {
   def getSiglogByHourly(host: String,day: String): SigLogByTime = {
     val mulRes = client.execute(
       multi(
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("card.olt",host),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("card.olt",host),termQuery("typeLog.keyword", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations(
           dateHistogramAggregation("hourly")
             .field("timestamp")
             .interval(DateHistogramInterval.HOUR)
             .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
           ),
-        search(s"radius-streaming-*" / "con")
-          query { must(termQuery("card.olt",host),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
+        search(s"radius-streaming-*" / "docs")
+          query { must(termQuery("type.keyword", "con"),termQuery("card.olt",host),termQuery("typeLog.keyword", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
           aggregations(
           dateHistogramAggregation("hourly")
             .field("timestamp")
@@ -156,11 +180,11 @@ object InfDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
-      sql"""select module,index,sum(sf_error) as sf_error,0 as sigin,0 as logoff
+      sql"""select module,index,sum(sf_error) as sf_error,sum(sign_in) as sigin,sum(log_off) as logoff
             from dwh_inf_index
             where host= $host and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by module,index
-            having sum(sf_error)>0
+            having sum(sf_error)>300
                   """
         .as[(String,Int,Int,Int,Int)])
   }

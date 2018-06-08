@@ -46,7 +46,7 @@
     </div>
         <!-- /top navigation -->
         <!-- page content -->
-    <div class="right_col" role="main" style="background-image: url('../assets/images/bras-bg.jpg')">
+    <div class="right_col" role="main" style="background-image: url('../assets/images/bras-bg1.jpg')">
         <div class="row">
             <div class="alert alert-success" id="success-alert" style="display: none">
                 <button type="button" class="close" data-dismiss="alert">x</button>
@@ -126,7 +126,7 @@
 
                     <table class="data table table-bordered" id="tbUser" style="margin-bottom: 0px">
                         <thead>
-                            <tr style="color: white;background: #4980b5;font-size: 14px">
+                            <tr style="color: #ddd;font-size: 14px">
                                 <th style="width: 35%">Name</th>
                                 <th>Time</th>
                                 <th>Host-Module-Index</th>
@@ -168,7 +168,7 @@
                     <span style="font-size: 16px;font-weight: 600" id="lbHost"></span> <i class="fa fa-info-circle toolTipText" title="Data hosts of bras is loaded in 30 minutes ago."></i>
                 </div>
                 <div>
-                    <div id="host" style="height: 415px;background: #80bbbb"></div>
+                    <div id="host" style="height: 415px;background: #fff"></div>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
@@ -176,11 +176,16 @@
                 <div class="tbScroll">
                     <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700">
                         <thead>
-                            <tr style="color: white;background: #4980b5;font-size: 14px">
-                                <th style="width: 30%">Host</th>
+                            <tr style="color: white;background: #4980b5;font-size: 16px">
+                                <th colspan="7">List Of OLT Get Error</th>
+                            </tr>
+                            <tr style="font-size: 14px;color:#ddd">
+                                <th style="width: 27%">Host</th>
                                 <th>Module</th>
-                                <th>Cpe</th>
-                                <th>Lostip</th>
+                                <th>Signin</th>
+                                <th>Logoff</th>
+                                <th>Sf</th>
+                                <th>Lofi</th>
                                 <th>Total error</th>
                             </tr>
                         </thead>
@@ -247,59 +252,56 @@
                     verticalStartPosition: 'left',
                     visibleItems: 8
                 });
-
-                /*$("#btnCSV").click(function(){
-                    $("#tbHost").tableToCSV();
-                });
-*/
                 setInterval(function () {
                     $.ajax({
                         url: "/device/realtime-bras",
                         cache: false,
                         success: function (dta) {
-                            var oldestBras = $('.timeline__items .brasText:eq(0)').val().split('/');
-                            for(var i=0;i<dta.bras.length;i++) {
-                                if(dta.bras[i][1] == oldestBras[0] && dta.bras[i][0] == oldestBras[1]){
-                                    var html = ''
-                                    var button = ''
-                                    for(var j=i-1;j>=0;j--){
-                                        console.log(dta.bras[j]);
-                                        if(dta.bras[j][4] != 0 && dta.bras[j][4] != 1){
-                                            button = '<p class="disInline">'+
-                                                    '<span style="padding-top: 5px">'+
-                                                    '<a onclick="confirmOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-default a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
-                                                    '<span class="glyphicon glyphicon-ok" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Confirm</strong></span></a></span>'+
-                                                    '<span style="padding-top: 5px">'+
-                                                    '<a onclick="rejectOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-dark a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
-                                                    '<span class="glyphicon glyphicon-remove" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Reject</strong></span></a></span>'+
-                                                    '</p>'
+                            if(dta != "Error"){
+                                var oldestBras = $('.timeline__items .brasText:eq(0)').val().split('/');
+                                for(var i=0;i<dta.bras.length;i++) {
+                                    if(dta.bras[i][1] == oldestBras[0] && dta.bras[i][0] == oldestBras[1]){
+                                        var html = ''
+                                        var button = ''
+                                        for(var j=i-1;j>=0;j--){
+                                            console.log(dta.bras[j]);
+                                            if(dta.bras[j][4] != 0 && dta.bras[j][4] != 1){
+                                                button = '<p class="disInline">'+
+                                                        '<span style="padding-top: 5px">'+
+                                                        '<a onclick="confirmOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-default a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
+                                                        '<span class="glyphicon glyphicon-ok" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Confirm</strong></span></a></span>'+
+                                                        '<span style="padding-top: 5px">'+
+                                                        '<a onclick="rejectOutlier(this)" id="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'" class="btn btn-dark a-btn-slide-text" style="padding: 0px 8px;margin-bottom: 0px;font-size: 12px">'+
+                                                        '<span class="glyphicon glyphicon-remove" style="margin-right: 3px;" aria-hidden="true"></span><span><strong>Reject</strong></span></a></span>'+
+                                                        '</p>'
+                                            }
+                                            var classActive = 'activeBoxRed'
+                                            if(Number(dta.bras[j][2]) >= Number(dta.bras[j][3]))
+                                                classActive = 'activeBoxGreen'
+                                            html = '<div class="timeline__item">' +
+                                                    '<div class="timeline__content '+classActive+'">' +
+                                                    '<div class="timeline_box">'+
+                                                    '<input type="hidden" class="signin" value="'+dta.bras[j][2]+'">'+
+                                                    '<input type="hidden" class="logoff" value="'+dta.bras[j][3]+'">'+
+                                                    '<input type="hidden" class="brasText" value="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'">'+
+                                                    '<h2>Bras: ' + dta.bras[j][1] + '</h2>' +
+                                                    '<p>Time: ' + dta.bras[j][0] + '</p>' +
+                                                    '<p><span style="margin-right: 10px;">Signin: ' + dta.bras[j][2] + '</span><span>Logoff: ' + dta.bras[j][3] + '</span></p>' +
+                                                    '</div>' +button+'</div>' +
+                                                    '</div>';
+                                            $('.timeline__items').prepend(html);
                                         }
-                                        var classActive = 'activeBoxRed'
-                                        if(Number(dta.bras[j][2]) >= Number(dta.bras[j][3]))
-                                            classActive = 'activeBoxGreen'
-                                        html = '<div class="timeline__item">' +
-                                                '<div class="timeline__content '+classActive+'">' +
-                                                '<div class="timeline_box">'+
-                                                '<input type="hidden" class="signin" value="'+dta.bras[j][2]+'">'+
-                                                '<input type="hidden" class="logoff" value="'+dta.bras[j][3]+'">'+
-                                                '<input type="hidden" class="brasText" value="'+dta.bras[j][1]+'/'+dta.bras[j][0]+'">'+
-                                                '<h2>Bras: ' + dta.bras[j][1] + '</h2>' +
-                                                '<p>Time: ' + dta.bras[j][0] + '</p>' +
-                                                '<p><span style="margin-right: 10px;">Signin: ' + dta.bras[j][2] + '</span><span>Logoff: ' + dta.bras[j][3] + '</span></p>' +
-                                                '</div>' +button+'</div>' +
-                                                '</div>';
-                                        $('.timeline__items').prepend(html);
+                                        if(html != ''){
+                                            timeline(document.querySelectorAll('.timeline'), {
+                                                forceVerticalMode: 700,
+                                                mode: 'horizontal',
+                                                verticalStartPosition: 'left',
+                                                visibleItems: 8
+                                            });
+                                            activeOnclick();
+                                        }
+                                        break;
                                     }
-                                    if(html != ''){
-                                        timeline(document.querySelectorAll('.timeline'), {
-                                            forceVerticalMode: 700,
-                                            mode: 'horizontal',
-                                            verticalStartPosition: 'left',
-                                            visibleItems: 8
-                                        });
-                                        activeOnclick();
-                                    }
-                                    break;
                                 }
                             }
                         }
@@ -374,7 +376,7 @@
                     if(checkUnknowValue(dta.heatCard) >0 || checkUnknowValue(dta.heatLinecard)>0)
                         isCheckKnow = 1
                     var dtCard = getData(dta.dtaCard,isLog,isCheckKnow)
-                    if(dtCard.length >0) {
+                    //if(dtCard.length >0) {
                         $('#heat_map').attr('style','height:385px');
                         Highcharts.chart('heat_map', {
                             chart: {
@@ -414,7 +416,7 @@
 
                             tooltip: {
                                 formatter: function () {
-                                    return '<b>' + this.series.xAxis.categories[this.point.x] +'-'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                    return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
                                             this.point.value + '</b> ' + titUser;
                                 }
                             },
@@ -430,7 +432,7 @@
                             }]
 
                         });
-                    }
+                    //}
                 }
 
                 function drawChart(dta){
@@ -557,14 +559,47 @@
                                         destroy: true
                                     });
                                     tbBras.rows().remove().draw();
-                                    if(dtBras.mapBras.length >0) {
-                                        for(var i=0;i< dtBras.mapBras.length;i++){
-                                            tbBras.row.add( [
-                                                dtBras.mapBras[i][0],
-                                                dtBras.mapBras[i][1],
-                                                dtBras.mapBras[i][2],
-                                                dtBras.mapBras[i][3]
-                                            ] ).draw( false );
+                                    if(dtBras.brasKibana.length >0 && dtBras.brasOpview.length >0) {
+                                        var sizeMap = dtBras.brasKibana.length
+                                        var isKibana = 1
+                                        if(dtBras.brasOpview.length > dtBras.brasKibana.length){
+                                            sizeMap = dtBras.brasOpview.length
+                                            isKibana = 0
+                                        }
+
+                                        for(var i=0;i< sizeMap;i++){
+                                            if(isKibana == 1){
+                                                if(i>=dtBras.brasOpview.length)
+                                                    tbBras.row.add( [
+                                                        dtBras.brasKibana[i][0],
+                                                        dtBras.brasKibana[i][1],
+                                                        null,
+                                                        null
+                                                    ] ).draw( false );
+                                                else
+                                                    tbBras.row.add( [
+                                                        dtBras.brasKibana[i][0],
+                                                        dtBras.brasKibana[i][1],
+                                                        dtBras.brasOpview[i][0],
+                                                        dtBras.brasOpview[i][1]
+                                                    ] ).draw( false );
+                                            }
+                                            else{
+                                                if(i>=dtBras.brasKibana.length)
+                                                    tbBras.row.add( [
+                                                        null,
+                                                        null,
+                                                        dtBras.brasOpview[i][0],
+                                                        dtBras.brasOpview[i][1]
+                                                    ] ).draw( false );
+                                                else
+                                                    tbBras.row.add( [
+                                                        dtBras.brasKibana[i][0],
+                                                        dtBras.brasKibana[i][1],
+                                                        dtBras.brasOpview[i][0],
+                                                        dtBras.brasOpview[i][1]
+                                                    ] ).draw( false );
+                                            }
                                         }
                                         $('#tbBras').find('.autoTooltip').each(function () {
                                             var title = $(this).text();
@@ -605,13 +640,19 @@
                                         $('#tbUser tbody').attr('style','background: #190e0e;color:'+color)
                                         // custom button group export
                                         if(!($('#tbUser i:eq(0)').hasClass('fa-download'))) {
-                                            $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
+                                            $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>');
+                                            if(sigLog[0][1] <= sigLog[0][2]){
+                                                $('.dt-buttons').prepend('<span class="titCsvBtn" style="background: #149c7f">List Of Client Signed In</span>');
+                                            }
+                                            else{
+                                                $('.dt-buttons').prepend('<span class="titCsvBtn" style="background: #d9534f">List Of Client Logged Off</span>');
+                                            }
                                             /*$('.buttons-excel').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
                                             $('.buttons-pdf').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')*/
                                         }
                                     }
                                     else{
-                                        $('#tbUser tbody').html('<tr><td colspan="3" class="notResult">No matching records found</td></tr>');
+                                        $('#tbUser tbody').html('<tr><td colspan="3" class="notResult">No matching records found</td><td style="display: none"></td><td style="display: none"></td></tr>');
                                     }
                                     // draw chart heat map
                                     $('#heat-mapChart').show();
@@ -622,14 +663,14 @@
                                     drawChart(dtBras);
                                     // draw graph host and table
                                     drawHostBras(groupGraphost(dtBras.host, 'host'), brasId)
-                                    $('#lbHost').text("Hosts of " + brasId)
+                                    $('#lbHost').text("Hosts of: " + brasId)
                                     var html = getTableHost(dtBras.host);
                                     if(html == "") {
                                         $('#divHost').attr('style','height: 73px');
                                         $('.tbScroll').attr('style','height: auto');
                                         //$('#btnCSV').hide();
                                         $('#tbHost tbody').attr('style','background: transparent');
-                                        html = "<tr><td colspan='5' class='notResult'>No matching records found </td></tr>";
+                                        html = "<tr><td colspan='7' class='notResult'>No matching records found </td></tr>";
                                         $('#tbHost tbody').html('');
                                         $('#tbHost tbody').append(html);
                                     }
@@ -643,7 +684,7 @@
                                     }
                                 }
                                 else{
-                                    location.href = "/device";
+                                    location.href = "/noc";
                                 }
                             },
                             complete: function () {
@@ -712,9 +753,9 @@
                 function drawHostBras(data,idBras){
                     //console.log(Object.keys(data).length)
                     if(Object.keys(data).length == 0 )
-                        $('#host').attr('style','height:70px;background: #80bbbb');
+                        $('#host').attr('style','height:70px;background: #fff');
                     else
-                        $('#host').attr('style','height: 415px;background: #80bbbb');
+                        $('#host').attr('style','height: 415px;background: #fff');
                     $('#hostBras').show();
                     // Nodes HOST
                     /*var nodeHost1 = new vis.DataSet([
@@ -786,6 +827,13 @@
                                 }
                             }, 500);
                         }
+                        else if(id!= undefined && id.indexOf('/')>=0){
+                            var params = Number(id.split('/')[2])
+                            //var ids = $('#lbHost').text().split('/')[1].trim()+'/'+id.substring(0,id.lastIndexOf('/'))
+                            if(params == 1){
+                                window.location.href = '/inf?id='+id.substring(0,id.lastIndexOf('/'))
+                            }
+                        }
                     });
                 }
             });
@@ -815,8 +863,8 @@
 
             function confirmOutlier(element){
                 var strId = $(element).attr('id')
-                var id = strId.split("/")[0]
-                var time = strId.split("/")[1]
+                var id = strId.split("/")[0].trim()
+                var time = strId.split("/")[1].trim()
                 $.ajax({
                     url: "/confirmLabel?id="+id+"&time="+time,
                     success: function (data) {
@@ -851,11 +899,12 @@
                         $.each(dta,function(i,dt){
                             if(testhost == dt[0].host) sizeHost++;
                         })
-                        html+= '<td style="width:30%" rowspan="'+sizeHost+'">'+dt[0].host+'</td><td>'+dt[0].module+'</td>';
+                        html+= '<td style="width:30%" rowspan="'+sizeHost+'">'+dt[0].host+'</td><td style="width:16%;">'+dt[0].module+'</td>';
                     }
-                    html+= '<td>'+dt[1].cpe+'</td><td>'+dt[1].lostip+'</td>';
-                    var totalErr = Number(dt[1].cpe)+Number(dt[1].lostip);
-                    html+= '<td>'+totalErr+'</td>';
+                    html += '<td style="width:10%;">'+dt[1].signin+'</td><td style="width:10%;">'+dt[1].logoff+'</td>'
+                    html+= '<td style="width:10%;">'+dt[1].sf+'</td><td style="width:10%;">'+dt[1].lofi+'</td>';
+                    var totalErr = Number(dt[1].sf)+Number(dt[1].lofi);
+                    html+= '<td style="width:20%;">'+totalErr+'</td>';
                     html+= '</tr>';
                 });
                 return html;
@@ -868,7 +917,13 @@
                     if (!(key in generatedData)) {
                         generatedData[key] = [];
                     }
-                    generatedData[key].push(dt[0]);
+                    var jSon = []
+                    jSon.push({
+                        host:dt[0].host,
+                        module:dt[0].module,
+                        label:dt[1].label
+                    })
+                    generatedData[key].push(jSon);
                 });
                 return generatedData;
             }
@@ -924,7 +979,7 @@
                     for(var j=0;j<arrModule.length;j++){
                         jsonArr.push({
                             from:Object.keys(dtaHost)[i],
-                            to: Object.keys(dtaHost)[i]+"/"+arrModule[j].module
+                            to: Object.keys(dtaHost)[i]+"/"+arrModule[j][0].module+"/"+arrModule[j][0].label
                         });
                     }
                 }
@@ -937,22 +992,28 @@
                     id: 0,
                     title:idBras,
                     label: "Bras "+idBras.split('/')[0].split('-')[0],
-                    color: "#ff5d48"
+                    color: "#9B59B6"
                 });
                 for (var i = 0; i < Object.keys(dtaHost).length; i++) {
                     jsonArr.push({
                         id: Object.keys(dtaHost)[i],
                         label:"Host "+ Object.keys(dtaHost)[i],
-                        color: "#9B59B6"
+                        color: "#f5f10d"
                     });
                 }
                 for (var i = 0; i < Object.keys(dtaHost).length; i++) {
                     var arrModule = Object.values(dtaHost)[i];
                     for(var j=0;j<arrModule.length;j++){
+                        var colors = "#1ABB9C", title = "normal"
+                        if(arrModule[j][0].label == "1") {
+                            title = "outlier"
+                            colors = "#d9534f"
+                        }
                         jsonArr.push({
-                            id: Object.keys(dtaHost)[i]+"/"+arrModule[j].module,
-                            label:"Module "+arrModule[j].module,
-                            color: "#d8d8d8"
+                            id: Object.keys(dtaHost)[i]+"/"+arrModule[j][0].module+"/"+arrModule[j][0].label,
+                            label:"Module "+arrModule[j][0].module,
+                            color: colors,
+                            title: title
                         });
                     }
                 }

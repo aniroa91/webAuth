@@ -1,0 +1,571 @@
+@(email: String, response: model.device.InfResponse,ids: String)
+@import play.api.libs.json.Json
+@import services.domain.CommonService.formatPattern
+@import play.api.libs.json.Json
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Dashboard Admin </title>
+
+            <!-- Bootstrap -->
+        @common.views.html.common.css("Inf",2)
+    </head>
+    @common.views.html.common.top("Inf",2,"")
+        <!-- top navigation -->
+    <div class="top_nav">
+        <div class="nav_menu">
+            <nav>
+                <div class="nav toggle" style="margin-bottom: 10px">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                </div>
+                <div style="margin-top: 10px" class="col-md-3 col-sm-3 col-xs-12 form-group  top_search">
+
+
+                    <div class="input-group">
+                        <input type="text" class="form-control autocomplete" id="search" placeholder="Search host ..." style="border-radius:0">
+                        <div class="input-group-addon groupSearch" ><i class="fa fa-search"></i></div>
+                    </div>
+                </div>
+            </nav>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                    <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <img src="../assets/images/user.default.png" alt="">@email
+                        <span class=" fa fa-angle-down"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-usermenu pull-right">
+                        <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+        <!-- /top navigation -->
+        <!-- page content -->
+    <div class="right_col" role="main">
+        @if(response != null){
+            <div class="row top_tiles">
+                <div class="col-xs-12">
+                    <div class="container">
+                        <div class="tab-slider--nav" style="padding: 5px 20px 0px 2px;margin-bottom: 10px;">
+                            <ul class="tab-slider--tabs">
+                                <li class="tab-slider--trigger active" rel="tabEvent">Anomaly Event</li>
+                                <li class="tab-slider--trigger" rel="tabBroken">Broken Cable</li>
+                            </ul>
+                        </div>
+                        <div class="tab-slider--container">
+                            <div id="tabEvent" class="tab-slider--body">
+                                <div class="row top_tiles">
+                                    <div class="col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <input type="hidden" id="ids" value="@ids">
+                                                <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th>Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Module</th>
+                                                            <th>Sf Error</th>
+                                                            <th>Lofi Error</th>
+                                                            <th style="text-align: center">Outlier</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.sfLofi.map(x=> x._4).sum</th>
+                                                        <th>@response.sfLofi.map(x=> x._5).sum</th>
+                                                        <th></th>
+                                                    </tfoot>
+                                                    @for(i <- 0 until response.sfLofi.length) {
+                                                        <tr>
+                                                            <th>@response.sfLofi(i)._1</th>
+                                                            <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._1/@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
+                                                            <th>@response.sfLofi(i)._3</th>
+                                                            <td>@response.sfLofi(i)._4</td>
+                                                            <th>@response.sfLofi(i)._5</th>
+                                                            <th style="text-align: center">
+                                                                <span class="brasHide">@response.sfLofi(i)._7</span>
+                                                                @if(response.sfLofi(i)._6) {
+                                                                    <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
+                                                                }else {
+                                                                    <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-info btn-xs"><i class="fa fa-check"></i></a>
+                                                                }
+                                                            </th>
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div id="tabBroken" class="tab-slider--body">
+                                <div class="row top_tiles">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbInf" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th style="width: 40%">Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Module</th>
+                                                            <th>Inf Down</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.infDown.map(x=> x._4).sum</th>
+                                                    </tfoot>
+                                                    @if(response.infDown != null) {
+                                                        <tbody >
+                                                        @for(i <- 0 until response.infDown.length) {
+                                                            <tr onclick="showSigLogChart(this,@i,'infDown',4)" class="aTag" name="@response.infDown(i)._1/@response.infDown(i)._2/@response.infDown(i)._3">
+                                                                <th>@response.infDown(i)._1</th>
+                                                                <th>@response.infDown(i)._2</th>
+                                                                <th>@response.infDown(i)._3</th>
+                                                                <th>@response.infDown(i)._4</th>
+                                                            </tr>
+                                                        }
+                                                        </tbody>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbUserDown" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th style="width: 40%">Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Module</th>
+                                                            <th>User Down</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th style="width: 28%">Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.userDown.map(x=> x._4).sum</th>
+                                                    </tfoot>
+                                                    @if(response.userDown != null) {
+                                                        <tbody >
+                                                        @for(i <- 0 until response.userDown.length) {
+                                                            <tr onclick="showSigLogChart(this,@i,'userDown',4)" class="aTag" name="@response.userDown(i)._1/@response.userDown(i)._2/@response.userDown(i)._3">
+                                                                <th>@response.userDown(i)._1</th>
+                                                                <th>@response.userDown(i)._2</th>
+                                                                <th>@response.userDown(i)._3</th>
+                                                                <td>@response.userDown(i)._4</td>
+                                                            </tr>
+                                                        }
+                                                        </tbody>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row top_tiles">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbSpliter" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th>Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Spliter</th>
+                                                            <th>Signal</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.spliter.map(x=> x._4).sum</th>
+                                                    </tfoot>
+                                                    @if(response.spliter != null) {
+                                                        <tbody >
+                                                        @for(i <- 0 until response.spliter.length) {
+                                                            <tr>
+                                                                <th>@response.spliter(i)._1</th>
+                                                                <th>@response.spliter(i)._2</th>
+                                                                <th>@response.spliter(i)._3</th>
+                                                                <th>@response.spliter(i)._4</th>
+                                                            </tr>
+                                                        }
+                                                        </tbody>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x_panel tile " style="padding: 0px;">
+                                            <div class="x_content">
+                                                <table class="data table table-bordered tbScroll" id="tbIndex" style="width: 100%">
+                                                    <thead >
+                                                        <tr>
+                                                            <th>Date time</th>
+                                                            <th>Host</th>
+                                                            <th>Module</th>
+                                                            <th>Index</th>
+                                                            <th>Rouge Error</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <th>Total</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th>@response.indexRouge.map(x=> x._5).sum</th>
+                                                    </tfoot>
+                                                    @for(i <- 0 until response.indexRouge.length) {
+                                                        <tr onclick="showSigLogChart(this,@i,'indexRouge',5)" class="aTag" name="@response.indexRouge(i)._1/@response.indexRouge(i)._2/@response.indexRouge(i)._3">
+                                                            <th>@response.indexRouge(i)._1</th>
+                                                            <th>@response.indexRouge(i)._2</th>
+                                                            <th>@response.indexRouge(i)._3</th>
+                                                            <th>@response.indexRouge(i)._4</th>
+                                                            <th>@response.indexRouge(i)._5</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5" style="padding: 0px;">
+                                                                <div class="collapse" id="indexRouge@i"></div>
+                                                            </td>
+                                                            <td style="display: none"></td>
+                                                            <td style="display: none"></td>
+                                                            <td style="display: none"></td>
+                                                            <td style="display: none"></td>
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }else {
+            <div class="row"><h2 class="noData-title">Not enough data. sorry!</h2></div>
+        }
+    </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+    <footer>
+        <div class="pull-right">
+            Dashboard Admin 21/09/2017
+        </div>
+        <div class="clearfix"></div>
+    </footer>
+        <!-- /footer content -->
+    </div>
+    </div>
+
+        <!-- jQuery -->
+    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- Custom Theme Scripts -->
+    <script src="../assets/custom/js/custom.min.js"></script>
+
+        <!-- Counter number -->
+    <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
+        <!-- Autocomplete -->
+    <script src="../assets/javascripts/jquery-ui.js"></script>
+        <!-- Hight chart -->
+    <script src="../assets/javascripts/highcharts.js"></script>
+    <script src="../assets/javascripts/exporting.js"></script>
+        <!-- Datatable -->
+    <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="../assets/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="../assets/vendors/jszip/jszip.min.js"></script>
+    <script src="../assets/vendors/jszip/pdfmake.min.js"></script>
+    <script src="../assets/vendors/jszip/vfs_fonts.js"></script>
+
+    <script src="../assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="../assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            // table tab Event
+            var tbSf = $('#tbSf').DataTable( {
+                dom: 'Bfrtip',
+                "scrollY":        "650px",
+                "scrollCollapse": true,
+                "paging":         false,
+                "info":     false,
+                "searching":     true,
+                "sort":     false,
+                destroy: true,
+                buttons: [
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<i class="fa fa-download"> CSV</i>',
+                        titleAttr: 'CSV'
+                    }
+                ]
+            });
+            // table tab Broken
+            var tbIndex = $('#tbIndex').DataTable( {
+                dom: 'Bfrtip',
+                "scrollY":        "350px",
+                "scrollCollapse": true,
+                "paging":         false,
+                "info":     false,
+                "searching":     true,
+                "sort":     false,
+                destroy: true,
+                buttons: [
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<i class="fa fa-download"> CSV</i>',
+                        titleAttr: 'CSV'
+                    }
+                ]
+            });
+            var tbSpliter = $('#tbSpliter').DataTable( {
+                dom: 'Bfrtip',
+                "scrollY":        "350px",
+                "scrollCollapse": true,
+                "paging":         false,
+                "info":     false,
+                "searching":     true,
+                "sort":     false,
+                destroy: true,
+                buttons: [
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<i class="fa fa-download"> CSV</i>',
+                        titleAttr: 'CSV'
+                    }
+                ]
+            });
+            var tbUserDown = $('#tbUserDown').DataTable( {
+                dom: 'Bfrtip',
+                "scrollY":        "330px",
+                "scrollCollapse": true,
+                "paging":         false,
+                "info":     false,
+                "searching":     true,
+                "sort":     false,
+                destroy: true,
+                buttons: [
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<i class="fa fa-download"> CSV</i>',
+                        titleAttr: 'CSV'
+                    }
+                ]
+            });
+            var tbInf = $('#tbInf').DataTable( {
+                dom: 'Bfrtip',
+                "scrollY":        "330px",
+                "scrollCollapse": true,
+                "paging":         false,
+                "info":     false,
+                "searching":     true,
+                "sort":     false,
+                destroy: true,
+                buttons: [
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<i class="fa fa-download"> CSV</i>',
+                        titleAttr: 'CSV'
+                    }
+                ]
+            });
+
+            $(".tab-slider--body").hide();
+            $(".tab-slider--body:first").show();
+            $(".tab-slider--nav li").click(function() {
+                $('#search').val("")
+                $(".tab-slider--body").hide();
+                var activeTab = $(this).attr("rel");
+                $("#"+activeTab).fadeIn();
+                if($(this).attr("rel") == "tabBroken"){
+                    $('.tab-slider--tabs').addClass('slide');
+                    tbUserDown.search( $('#search').val() ).draw();
+                    tbInf.search( $('#search').val() ).draw();
+                    tbSpliter.search( $('#search').val() ).draw();
+                    tbIndex.search( $('#search').val() ).draw();
+                }else{
+                    $('.tab-slider--tabs').removeClass('slide');
+                    tbSf.search($('#search').val()).draw();
+                }
+                $(".tab-slider--nav li").removeClass("active");
+                $(this).addClass("active");
+            });
+
+            $('#search').on('keyup', function () {
+                var nameTab = $('.tab-slider--tabs').find('li.active').attr('rel')
+                if(nameTab == "tabBroken"){
+                    tbUserDown.search( this.value ).draw();
+                    tbInf.search( this.value ).draw();
+                    tbSpliter.search( this.value ).draw();
+                    tbIndex.search( this.value ).draw();
+                }
+                else
+                  tbSf.search( this.value ).draw();
+            });
+
+            // active host module outlier
+            $('#tbSf .aTag').each(function () {
+                var names = $(this).attr('name').trim().substring($(this).attr('name').trim().indexOf("/")+1);
+                var ids = $('#ids').val().trim()
+                if(ids == names){
+                    $(this).parent().addClass('aActive')
+                    $('#search').val(ids.split('/')[0])
+                    tbSf.search(ids.split('/')[0]).draw();
+                }
+            });
+        })
+
+        function showSigLogChart(el,_index,_type,totalCol){
+            var container = _type+'' + _index
+            var id = $(el).attr('name')
+            if($('#'+_type+''+_index).hasClass('in')){
+                $(el).removeClass('aActive')
+                $('#'+_type+''+_index).collapse('hide');
+            }
+            else {
+                var rows = ''
+                for(var i=0;i<totalCol-1;i++){
+                    rows+= '<td style="display: none"></td>'
+                }
+                var html = '<tr class="chartTr">' +
+                        '<td colspan="'+totalCol+'" style="padding: 0px;">' +
+                        '  <div class="collapse" id="'+_type+''+_index+'"></div>' +
+                        '</td>' + rows +
+                        '</tr>'
+                $('.chartTr').remove();
+                $('.aActive').removeClass('aActive')
+                if(_type == "sfLofi"){
+                    $(el).parent().after(html)
+                    $(el).parent().addClass('aActive')
+                } else{
+                    $(el).after(html)
+                    $(el).addClass('aActive')
+                }
+                $('#'+_type+'' + _index).collapse('show');
+                $.ajax({
+                    url: "/inf-json?id=" + id,
+                    cache: false,
+                    success: function (dta) {
+                        if(dta != "Error"){
+                            // Build the chart line day of month vector
+                            var category = dta.time;
+                            var logoff = dta.logoff;
+                            var signin = dta.signin;
+                            //console.log(category)
+                            Highcharts.chart(container, {
+                                chart: {
+                                    height: 200,
+                                    zoomType: 'xy'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: [{
+                                    categories: category
+                                }],
+                                yAxis: [{ // Secondary yAxis
+                                    gridLineWidth: 0,
+                                    title: {
+                                        text: 'Number of users',
+                                    }
+                                }],
+                                tooltip: {
+                                    shared: true
+                                },
+                                labels: {
+                                    items: [{
+                                        html: '',
+                                        style: {
+                                            left: '50px',
+                                            top: '18px',
+                                            color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                                        }
+                                    }]
+                                },
+
+                                series: [{
+                                    type: 'spline',
+                                    name: 'Sign In',
+                                    color: "#1ABB9C",
+                                    data: signin
+                                }, {
+                                    type: 'spline',
+                                    name: 'Log Off',
+                                    color: "#d9534f",
+                                    data: logoff
+                                }]
+                            });
+                        }
+                    },
+                });
+            }
+        }
+
+        function rejectOutlier(element){
+            var time = $(element).parent().parent().find("th:eq(0)").text().trim()
+            var host = $(element).parent().parent().find("th:eq(1)").text().trim()
+            var module = $(element).parent().parent().find("th:eq(2)").text().trim()
+            var bras = $(element).parent().parent().find("th:last .brasHide").text().trim()
+            $.ajax({
+                url: "/inf/rejectLabel?host="+host+'&module='+module+'&time='+time+'&bras='+bras,
+                success: function (data) {
+                    if(data!= "Error"){
+                        $(element).attr('disabled','disabled');
+                        $(element).prop('onclick', null);
+                    }
+                }
+            });
+        }
+
+        function confirmOutlier(element){
+            var time = $(element).parent().parent().find("th:eq(0)").text().trim()
+            var host = $(element).parent().parent().find("th:eq(1)").text().trim()
+            var module = $(element).parent().parent().find("th:eq(2)").text().trim()
+            var bras = $(element).parent().parent().find("th:last .brasHide").text().trim()
+            $.ajax({
+                url: "/inf/confirmLabel?host="+host+'&module='+module+'&time='+time+'&bras='+bras,
+                success: function (data) {
+                    if(data!= "Error"){
+                        $(element).attr('disabled','disabled');
+                        $(element).prop('onclick', null);
+                    }
+                }
+            });
+        }
+    </script>
+    </body>
+</html>

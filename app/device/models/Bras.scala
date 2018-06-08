@@ -98,7 +98,7 @@ object BrasList {
   def confirmLabel(id: String,time: String) = {
     dbConfig.db.run(
       sqlu"""UPDATE dwh_conn_bras_detail SET verified =1
-            where bras_id =$id and date_time>=$time::TIMESTAMP
+            where bras_id =$id and date_time=$time::TIMESTAMP
                   """
     )
   }
@@ -106,7 +106,7 @@ object BrasList {
   def rejectLabel(id: String,time: String) = {
     dbConfig.db.run(
       sqlu"""UPDATE dwh_conn_bras_detail SET verified =0
-            where bras_id =$id and date_time>=$time::TIMESTAMP
+            where bras_id =$id and date_time=$time::TIMESTAMP
                   """
     )
   }
