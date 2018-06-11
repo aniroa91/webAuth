@@ -8,8 +8,8 @@ case class ErrModuleIndex(
 
 case class HostResponse(
                          noOutlierModule:Int,
-                         infHostdaily: Seq[(String,Int,Int,Int,Int,Int,Int)],
-                         errorHourly: Seq[(String,Int,Int,Int,Int,Int,Int)],
+                         infHostdaily: Array[(String,Int,Int,Int,Int,Int,Int)],
+                         errorHourly: Array[(Int,Int,Int,Int,Int,Int,Int)],
                          sigLogByModule: Array[(String,String)],
                          sigLogbyModuleIndex:Array[(String,String,Int,Int)],
                          suyhaoModule: Seq[(String,Double,Double,Double)],

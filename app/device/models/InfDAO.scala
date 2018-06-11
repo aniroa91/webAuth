@@ -29,17 +29,40 @@ object InfDAO {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
-  def getInfHostDailyResponse(host: String,nowDay: String): Future[Seq[(String,Int,Int,Int,Int,Int,Int)]] = {
+  def getInfHostDailyResponse(host: String,nowDay: String): Array[(String,Int,Int,Int,Int,Int,Int)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+
+    val res = client_kibana.execute(
+      search(s"infra_dwh_inf_index_*" / "docs")
+        query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        aggregations (
+        dateHistogramAggregation("daily")
+          .field("date_time")
+          .interval(DateHistogramInterval.DAY)
+          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          .subaggs(
+            sumAgg("sum0","sf_error"),
+            sumAgg("sum1","lofi_error"),
+            sumAgg("sum2","user_down"),
+            sumAgg("sum3","inf_down"),
+            sumAgg("sum4","rouge_error"),
+            sumAgg("sum5","lost_signal")
+          )
+        )  size 1000
+    ).await
+
+    val arrHostDaily = CommonService.getAggregationsKeyStringAndMultiSum(res.aggregations.get("daily"))
+    arrHostDaily.map(x=> (CommonService.formatUTC(x._1),x._2,x._3,x._4,x._5,x._6,x._7))
+
+    /*dbConfig.db.run(
       sql"""select date_trunc('day' ,  date_time) as daily,sum(sf_error),sum(lofi_error),sum(user_down),sum(inf_down),sum(rouge_error),sum(lost_signal)
             from dwh_inf_index
             where host= $host and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by date_trunc('day' ,  date_time)
             order by daily
                   """
-        .as[(String,Int,Int,Int,Int,Int,Int)])
+        .as[(String,Int,Int,Int,Int,Int,Int)])*/
   }
 
   def getNoOutlierInfByHost(host: String,nowDay: String): Int = {
@@ -83,17 +106,37 @@ object InfDAO {
         .as[(String,Double,Double,Double)])
   }
 
-  def getErrorHostbyHourly(host: String,nowDay: String): Future[Seq[(String,Int,Int,Int,Int,Int,Int)]] = {
-    val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+  def getErrorHostbyHourly(host: String,nowDay: String): Array[(Int,Int,Int,Int,Int,Int,Int)] = {
+    val res = client_kibana.execute(
+      search(s"infra_dwh_inf_host_*" / "docs")
+        query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        aggregations (
+        dateHistogramAggregation("hourly")
+          .field("date_time")
+          .interval(DateHistogramInterval.HOUR)
+          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          .subaggs(
+            sumAgg("sum0","user_down"),
+            sumAgg("sum1","inf_down"),
+            sumAgg("sum2","sf_error"),
+            sumAgg("sum3","lofi_error"),
+            sumAgg("sum4","rouge_error"),
+            sumAgg("sum5","lost_signal")
+          )
+        )  size 1000
+    ).await
+    val arrHostHourly = CommonService.getAggregationsKeyStringAndMultiSum(res.aggregations.get("hourly")).map(x=> (CommonService.getHourFromES5(x._1),x._2,x._3,x._4,x._5,x._6,x._7))
+    val errorRes = arrHostHourly.groupBy(_._1).map{case (k,v) => k -> (v.map(x=> x._2).sum,v.map(x=> x._3).sum,v.map(x=> x._4).sum,v.map(x=> x._5).sum,v.map(x=> x._6).sum,v.map(x=> x._7).sum)}
+    errorRes.map(x=> (x._1,x._2._1,x._2._2,x._2._3,x._2._4,x._2._5,x._2._6)).toArray.sorted
+
+   /* dbConfig.db.run(
       sql"""select  extract(hour from  date_time) as hourly,sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error),sum(rouge_error),sum(lost_signal)
             from dwh_inf_host
             where host= $host and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by  extract(hour from  date_time)
             order by hourly
                   """
-        .as[(String,Int,Int,Int,Int,Int,Int)])
+        .as[(String,Int,Int,Int,Int,Int,Int)])*/
   }
 
   def getSigLogbyModuleIndex(host: String,day: String): Array[((String,String),String)] = {

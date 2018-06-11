@@ -775,7 +775,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         if(_typeS.equals("I")){
           val t00 = System.currentTimeMillis()
           // get errors by host tableIndex
-          val errHost = Await.result(HostService.getInfHostDailyResponse(brasId,day), Duration.Inf)
+          val errHost = HostService.getInfHostDailyResponse(brasId,day)
           /* get bubble chart sigin and logoff by host */
           val sigLogbyModuleIndex = HostService.getSigLogbyModuleIndex(brasId,day)
           for(i <- 0 until sigLogbyModuleIndex.length){
@@ -793,7 +793,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           println("t0:"+ (System.currentTimeMillis() - t0))
           val t1 = System.currentTimeMillis()
           /* get total error by hourly*/
-          val errorHourly = Await.result(HostService.getErrorHostbyHourly(brasId,day), Duration.Inf)
+          val errorHourly = HostService.getErrorHostbyHourly(brasId,day)
           println("t1:"+ (System.currentTimeMillis() - t1))
           val t2 = System.currentTimeMillis()
           /* get suyhao by module*/
