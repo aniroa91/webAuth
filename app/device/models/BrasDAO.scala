@@ -413,43 +413,41 @@ object BrasDAO {
     if(month.equals("")) {
       val month = CommonService.get3MonthAgo()+"-01"
       dbConfig.db.run(
-        sql"""select tbO.bras_id,tbO.host,sum(tbO.signin)
-                        from(
-                           select row_number() OVER (PARTITION BY conn.bras_id ORDER BY conn.signin desc) AS r,
-                            conn.*
-                            from (
-                                 select bras_id,host,sum(signin) as signin
-                                 from dmt_overview_conn
-                                 where month > $month::TIMESTAMP
-                                 group by bras_id,host
-                                 order by sum(signin) desc
-                            ) conn
-                        ) tbO
-                        where tbO.r<=10
-                        group by tbO.bras_id,tbO.host
-                        order by tbO.bras_id desc
-                     limit 100
+        sql"""select d.bras_id,d.host,d.signin from(
+                  select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.signin desc) AS r , c.*
+                  from(
+                       select b.bras_id, a.host, sum(signin) signin
+                       from dmt_overview_conn a,
+                            (select bras_id
+                             from dmt_overview_conn
+                             where month > $month::TIMESTAMP
+                             group by bras_id
+                             order by sum(signin) desc
+                             limit 10) b
+                        where a.bras_id = b.bras_id and month > $month::TIMESTAMP
+                        group by b.bras_id, a.host
+                        order by b.bras_id, a.host) c) d
+              where d.r <= 10
                   """
           .as[(String,String,Int)])
     } else{
       val query = month + "-01"
       dbConfig.db.run(
-        sql"""select tbO.bras_id,tbO.host,sum(tbO.signin)
-                        from(
-                           select row_number() OVER (PARTITION BY conn.bras_id ORDER BY conn.signin desc) AS r,
-                            conn.*
-                            from (
-                                 select bras_id,host,sum(signin) as signin
-                                 from dmt_overview_conn
-                                 where month = $query::TIMESTAMP
-                                 group by bras_id,host
-                                 order by sum(signin) desc
-                            ) conn
-                        ) tbO
-                        where tbO.r<=10
-                        group by tbO.bras_id,tbO.host
-                        order by tbO.bras_id desc
-                     limit 100
+        sql"""select d.bras_id,d.host,d.signin from(
+                  select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.signin desc) AS r , c.*
+                  from(
+                       select b.bras_id, a.host, sum(signin) signin
+                       from dmt_overview_conn a,
+                            (select bras_id
+                             from dmt_overview_conn
+                             where month = $query::TIMESTAMP
+                             group by bras_id
+                             order by sum(signin) desc
+                             limit 10) b
+                        where a.bras_id = b.bras_id and month = $query::TIMESTAMP
+                        group by b.bras_id, a.host
+                        order by b.bras_id, a.host) c) d
+              where d.r <= 10
                   """
           .as[(String,String,Int)])
     }
@@ -459,43 +457,41 @@ object BrasDAO {
     if(month.equals("")) {
       val month = CommonService.get3MonthAgo()+"-01"
       dbConfig.db.run(
-        sql"""select tbO.bras_id,tbO.host,sum(tbO.logoff)
-                        from(
-                           select row_number() OVER (PARTITION BY conn.bras_id ORDER BY conn.logoff desc) AS r,
-                            conn.*
-                            from (
-                                 select bras_id,host,sum(logoff) as logoff
-                                 from dmt_overview_conn
-                                 where month > $month::TIMESTAMP
-                                 group by bras_id,host
-                                 order by sum(logoff) desc
-                            ) conn
-                        ) tbO
-                        where tbO.r<=10
-                        group by tbO.bras_id,tbO.host
-                        order by tbO.bras_id desc
-                     limit 100
+        sql"""select d.bras_id,d.host,d.logoff from(
+                  select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.logoff desc) AS r , c.*
+                  from(
+                       select b.bras_id, a.host, sum(logoff) logoff
+                       from dmt_overview_conn a,
+                            (select bras_id
+                             from dmt_overview_conn
+                             where month > $month::TIMESTAMP
+                             group by bras_id
+                             order by sum(logoff) desc
+                             limit 10) b
+                        where a.bras_id = b.bras_id and month > $month::TIMESTAMP
+                        group by b.bras_id, a.host
+                        order by b.bras_id, a.host) c) d
+              where d.r <= 10
                   """
           .as[(String,String,Int)])
     } else{
       val query = month + "-01"
       dbConfig.db.run(
-        sql"""select tbO.bras_id,tbO.host,sum(tbO.logoff)
-                        from(
-                           select row_number() OVER (PARTITION BY conn.bras_id ORDER BY conn.logoff desc) AS r,
-                            conn.*
-                            from (
-                                 select bras_id,host,sum(logoff) as logoff
-                                 from dmt_overview_conn
-                                 where month = $query::TIMESTAMP
-                                 group by bras_id,host
-                                 order by sum(logoff) desc
-                            ) conn
-                        ) tbO
-                        where tbO.r<=10
-                        group by tbO.bras_id,tbO.host
-                        order by tbO.bras_id desc
-                     limit 100
+        sql"""select d.bras_id,d.host,d.logoff from(
+                  select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.logoff desc) AS r , c.*
+                  from(
+                       select b.bras_id, a.host, sum(logoff) logoff
+                       from dmt_overview_conn a,
+                            (select bras_id
+                             from dmt_overview_conn
+                             where month = $query::TIMESTAMP
+                             group by bras_id
+                             order by sum(logoff) desc
+                             limit 10) b
+                        where a.bras_id = b.bras_id and month = $query::TIMESTAMP
+                        group by b.bras_id, a.host
+                        order by b.bras_id, a.host) c) d
+              where d.r <= 10
                   """
           .as[(String,String,Int)])
     }
@@ -557,43 +553,41 @@ object BrasDAO {
     if(month.equals("")) {
       val month = CommonService.get3MonthAgo()+"-01"
       dbConfig.db.run(
-        sql"""select tbO.bras_id,tbO.host,sum(tbO.total_inf)
-                        from(
-                           select row_number() OVER (PARTITION BY inf.bras_id ORDER BY inf.total_inf desc) AS r,
-                            inf.*
-                            from (
-                                 select bras_id,host,sum(#$typeInferr) as total_inf
-                                 from dmt_overview_inf
-                                 where month > $month::TIMESTAMP
-                                 group by bras_id,host
-                                 order by sum(#$typeInferr) desc
-                            ) inf
-                        ) tbO
-                        where tbO.r<=20
-                        group by tbO.bras_id,tbO.host
-                        order by tbO.bras_id desc
-                     limit 200
+        sql"""select d.bras_id,d.host,d.total_inf from(
+                  select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.total_inf desc) AS r , c.*
+                  from(
+                       select b.bras_id, a.host, sum(#$typeInferr) as total_inf
+                       from dmt_overview_inf a,
+                            (select bras_id
+                             from dmt_overview_inf
+                             where month > $month::TIMESTAMP
+                             group by bras_id
+                             order by sum(#$typeInferr) desc
+                             limit 20) b
+                        where a.bras_id = b.bras_id and month > $month::TIMESTAMP
+                        group by b.bras_id, a.host
+                        order by b.bras_id, a.host) c) d
+              where d.r <= 20
                   """
           .as[(String,String,Int)])
     } else{
       val query = month + "-01"
       dbConfig.db.run(
-        sql"""select tbO.bras_id,tbO.host,sum(tbO.total_inf)
-                        from(
-                           select row_number() OVER (PARTITION BY inf.bras_id ORDER BY inf.total_inf desc) AS r,
-                            inf.*
-                            from (
-                                 select bras_id,host,sum(#$typeInferr) as total_inf
-                                 from dmt_overview_inf
-                                 where month = $query::TIMESTAMP
-                                 group by bras_id,host
-                                 order by sum(#$typeInferr) desc
-                            ) inf
-                        ) tbO
-                        where tbO.r<=20
-                        group by tbO.bras_id,tbO.host
-                        order by tbO.bras_id desc
-                     limit 200
+        sql"""select d.bras_id,d.host,d.total_inf from(
+                  select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.total_inf desc) AS r , c.*
+                  from(
+                       select b.bras_id, a.host, sum(#$typeInferr) as total_inf
+                       from dmt_overview_inf a,
+                            (select bras_id
+                             from dmt_overview_inf
+                             where month = $query::TIMESTAMP
+                             group by bras_id
+                             order by sum(#$typeInferr) desc
+                             limit 20) b
+                        where a.bras_id = b.bras_id and month = $query::TIMESTAMP
+                        group by b.bras_id, a.host
+                        order by b.bras_id, a.host) c) d
+              where d.r <= 20
                   """
           .as[(String,String,Int)])
     }
