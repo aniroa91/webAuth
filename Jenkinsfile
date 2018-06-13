@@ -3,8 +3,8 @@ pipeline {
     agent { node { label 'webapp03' } }
 
     environment {
-        HTTP_PROXY = 'http://210.245.31.16:80/'
-        HTTPS_PROXY = 'http://210.245.31.16:80/'
+        HTTP_PROXY = 'http://proxy.hcm.fpt.vn:80'
+        HTTPS_PROXY = 'http://proxy.hcm.fpt.vn:80'
         NO_PROXY = '172.0.0.1,*.local,172.27.11.0/24'
     }
 
