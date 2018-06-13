@@ -1,6 +1,6 @@
 pipeline {
 
-    agent { node { label 'master' } }
+    agent { node { label 'webapp03' } }
 
     stages {
         stage('Build') {
