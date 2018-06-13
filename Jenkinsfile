@@ -41,7 +41,6 @@ pipeline {
                     //sh "ssh root@10.0.1.201 'docker service update --image bigdata-registry.local:5043/${env.JOB_NAME}:${env.BUILD_NUMBER} ${env.JOB_NAME}'"
                 } 
             }
-        }
-        
+        }      
     }
 }
