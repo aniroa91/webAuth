@@ -2,9 +2,14 @@ pipeline {
 
     agent { node { label 'webapp03' } }
 
+    environment {
+        HTTP_PROXY = 'http://proxy.hcm.fpt.vn:80'
+    }
+
     stages {
         stage('Build') {
             steps {
+                sh 'printenv'
                 echo "Compiling..."
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt dist"
             }
