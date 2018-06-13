@@ -776,8 +776,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           val t00 = System.currentTimeMillis()
           // get errors by host tableIndex
           val errHost = HostService.getInfHostDailyResponse(brasId,day)
+          println("t00:"+ (System.currentTimeMillis() - t00))
+          val t01 = System.currentTimeMillis()
           /* get bubble chart sigin and logoff by host */
           val sigLogbyModuleIndex = HostService.getSigLogbyModuleIndex(brasId,day)
+          println("t010:"+ (System.currentTimeMillis() - t01))
           for(i <- 0 until sigLogbyModuleIndex.length){
             // check group both signin and logoff
             if(sigLogbyModuleIndex(i)._2.indexOf("_") >= 0){
@@ -787,7 +790,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           val siginByModule = arrSiglogModuleIndex.groupBy(_._1).mapValues(_.map(_._3).sum).toArray
           val logoffByModule = arrSiglogModuleIndex.groupBy(_._1).mapValues(_.map(_._4).sum).toArray
           val sigLogModule = (siginByModule++logoffByModule).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toArray
-          println("t00:"+ (System.currentTimeMillis() - t00))
+          println("t01:"+ (System.currentTimeMillis() - t01))
           val t0 = System.currentTimeMillis()
           val noOutlierModule = HostService.getNoOutlierInfByHost(brasId,day)
           println("t0:"+ (System.currentTimeMillis() - t0))
@@ -829,15 +832,6 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           }
           /* GET HISTORY DATA */
           if (!fromDay.equals(CommonService.getCurrentDay())) {
-            // number sigin and logoff
-            /*val siginLogoff = Await.result(BrasService.getSigLogResponse(brasId, fromDay, nextDay), Duration.Inf)
-            sigin = if (siginLogoff.length > 0) {
-              siginLogoff(0)._1 + sigin
-            } else sigin
-            logoff = if (siginLogoff.length > 0) {
-              siginLogoff(0)._2 + logoff
-            } else logoff
-            logger.info("t00: " + (System.currentTimeMillis() - t0))*/
             val t00 = System.currentTimeMillis()
             // number outlier
             val noOutlier = Await.result(BrasService.getNoOutlierResponse(brasId, day), Duration.Inf)
