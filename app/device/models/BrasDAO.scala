@@ -11,7 +11,6 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import slick.driver.PostgresDriver.api._
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import profile.services.internet.HistoryService.client
 import services.Configure
 import services.domain.CommonService
 import services.domain.CommonService.{formatUTC, getAggregations}

@@ -14,8 +14,6 @@ GET     /assets/*file                  controllers.Assets.versioned(path="/publi
 # Static resources (not managed by the Play framework)
 #GET     /extassets/*file            controllers.Assets.versioned(path="/home/dungvc/Desktop", file: Asset)
 
-GET     /extassets/*file               controllers.DnsController.getImage(file: String)
-
 #######################################################################
 
 ### LOGIN , LOGOUT
@@ -59,29 +57,5 @@ GET      /host-json                    controllers.DeviceController.getHostJson(
 GET      /confirmLabel                 controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
 GET      /rejectLabel                  controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
 
-
-#######################################################################
-### DNS
-GET      /dns                          controllers.DashboardController.index
-GET      /search/compare               controllers.CompareController.index(domains: String ?= "")
-GET      /search/subdomain             controllers.SubdomainController.index(domain: String ?= "")
-GET      /search                       controllers.ProfileController.index
-GET      /rank                         controllers.RankController.index
-GET      /report                       controllers.ReportController.index(day: String ?= "")
-
-#######################################################################
-### PROFILE
-GET     /paytv                         controllers.PaytvClientController.index
-GET     /profile                       controllers.ProfileContractController.index(day: String ?= "")
-
-### PROFILE INTERNET
-GET     /internet/history              profile.controllers.internet.HistoryController.index(date: String ?= "")
-GET     /internet/realtime             profile.controllers.internet.HistoryController.realtime
-GET     /internet/realtime-json        profile.controllers.internet.HistoryController.realtimeJson
-#GET    /internet/history              controllers.InternetHistoryController.index
-GET     /internet/compareCt            controllers.InternetHistoryController.compareContract
-GET     /internet/compareTime          profile.controllers.internet.CompareController.index
-GET     /internet/bras                 profile.controllers.internet.BrasController.index
-GET     /internet/brasJson             profile.controllers.internet.BrasController.json
 
 #######################################################################

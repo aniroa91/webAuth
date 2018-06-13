@@ -16,9 +16,9 @@
         <title>Dashboard Admin </title>
 
             <!-- Bootstrap -->
-        @common.views.html.common.css("BrasDetail",2)
+        @common.views.html.common.css("BrasDetail")
     </head>
-    @common.views.html.common.top("BrasDetail",2,if(bras != null) day+"&bras="+bras else "")
+    @common.views.html.common.top()
         <!-- top navigation -->
     <div class="top_nav">
         <div class="nav_menu">
@@ -34,8 +34,6 @@
                         <input type="hidden" id="date" name="date" value="@day">
                         <input type="text" style="height: 36px" class="form-control autocomplete search" required id="bras" name="bras" placeholder="Search bras..." value="@bras">
                     </form>
-
-                @*device.views.html.frmSearchBras(form, routes.DeviceController.search,bras,day,_typeS)*@
 
                 </div>
                 <div class="col-lg-2 col-sm-2 col-xs-12 radioBtn">
