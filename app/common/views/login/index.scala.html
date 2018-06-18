@@ -46,7 +46,7 @@
                     <div class="controls">
                         <div class="input-icon left">
                             <i class="fa fa-user"></i>
-                            <input class="m-wrap placeholder-no-fix" type="text" autocomplete="off" placeholder="Email"  name="email" onkeypress="this.submit();"/>
+                            <input class="m-wrap placeholder-no-fix submit_on_enter" type="text" autocomplete="off" placeholder="Email"  name="email"/>
                         </div>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                     <div class="controls">
                         <div class="input-icon left">
                             <i class="fa fa-lock"></i>
-                            <input class="m-wrap placeholder-no-fix" type="password" autocomplete="off" placeholder="Password" name="password" onkeypress="this.submit();"/>
+                            <input class="m-wrap placeholder-no-fix submit_on_enter" type="password" autocomplete="off" placeholder="Password" name="password"/>
                         </div>
                     </div>
                 </div>
@@ -149,6 +149,13 @@
 		jQuery(document).ready(function() {
             App.init();
             Login.init();
+            $('.submit_on_enter').keydown(function(event) {
+                // enter has keyCode = 13, change it if you want to use another button
+                if (event.keyCode == 13) {
+                    this.form.submit();
+                    return false;
+                }
+            });
         });
 	</script>
             <!-- END JAVASCRIPTS -->
