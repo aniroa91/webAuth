@@ -14,7 +14,7 @@ object BrasesCard {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
-  def getHostCard(strId: String): Future[Seq[(String,String,Int, Int,Int, Int,Int)]] = {
+  def getHostCard(strId: String): Future[Seq[(String,String,Int, Int,Int, Int,Int,Int,Int, Int,Int)]] = {
     val id = strId.split('/')(0)
     val time = strId.split('/')(1)
    // val strTime = time.substring(0,time.indexOf(".")+2)
@@ -29,13 +29,13 @@ object BrasesCard {
                          WHERE bras_id=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP
                          GROUP BY host,module,label
              ) as tb1
-             join (SELECT host,module,sum(sign_in),sum(log_off),sum(sf_error),sum(lofi_error)
+             join (SELECT host,module,sum(sign_in),sum(log_off),sum(sf_error),sum(lofi_error),sum(user_down),sum(inf_down),sum(rouge_error),sum(lost_signal)
                        from dwh_inf_module
                        WHERE bras_id=$id and date_time<=$time::TIMESTAMP and date_time>=$oldTime::TIMESTAMP
                        GROUP BY host,module) tb2
                 on tb1.host=tb2.host and tb1.module=tb2.module
                   """
-        .as[(String, String,Int, Int,Int, Int,Int)])
+        .as[(String, String,Int, Int,Int, Int,Int, Int,Int, Int,Int)])
   }
 
   def listNocOutlier: Future[Seq[(String,String)]] = {

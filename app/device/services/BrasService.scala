@@ -144,12 +144,12 @@ object BrasService extends AbstractService{
     BrasDAO.getTopPoorconn(month,_typeOLTpoor)
   }
 
-  def rejectLabelInf(host: String,module: String,time: String,bras: String) ={
-    BrasDAO.rejectLabelInf(host,module,time,bras)
+  def rejectLabelInf(host: String,module: String,time: String) ={
+    BrasDAO.rejectLabelInf(host,module,time)
   }
 
-  def confirmLabelInf(host: String,module: String,time: String,bras: String)={
-    BrasDAO.confirmLabelInf(host,module,time,bras)
+  def confirmLabelInf(host: String,module: String,time: String)={
+    BrasDAO.confirmLabelInf(host,module,time)
   }
 
   def getUserDownMudule(day: String): Future[Seq[(String,String,String,Int)]]   ={
@@ -160,7 +160,7 @@ object BrasService extends AbstractService{
     BrasDAO.getSpliterMudule(day)
   }
 
-  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Boolean,String)]]   ={
+  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int)]]   ={
     BrasDAO.getSflofiMudule(queries)
   }
 
@@ -226,6 +226,10 @@ object BrasService extends AbstractService{
     val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"),"card")
     mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 -> x._2._1) -> x._2._2)/*.filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")*/
+  }
+
+  def getErrorHistory(id: String): Future[Seq[(String,Int)]] = {
+    BrasDAO.getErrorHistory(id)
   }
 
   def getSigLogInfjson(id: String): (Array[(String, Int)], Array[(String, Int)]) = {
@@ -404,7 +408,7 @@ object BrasService extends AbstractService{
     BrasesCard.listBrasById(id)
   }
 
-  def getHostBras(id: String): Future[Seq[(String,String,Int, Int,Int, Int,Int)]] = {
+  def getHostBras(id: String): Future[Seq[(String,String,Int, Int,Int, Int,Int, Int,Int, Int,Int)]] = {
     BrasesCard.getHostCard(id)
   }
 

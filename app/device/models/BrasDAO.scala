@@ -42,20 +42,35 @@ object BrasDAO {
         .as[(String,String,String,Int)])
   }
 
-  def confirmLabelInf(host: String,module: String,time: String,bras: String) = {
+  def confirmLabelInf(host: String,module: String,time: String) = {
     dbConfig.db.run(
       sqlu"""UPDATE dwh_inf_module SET confirm = true
-            where host =$host and module=$module and bras_id=$bras and date_time=$time::TIMESTAMP
+            where host =$host and module=$module and date_time=$time::TIMESTAMP
                   """
     )
   }
 
-  def rejectLabelInf(host: String,module: String,time: String,bras: String) = {
+  def rejectLabelInf(host: String,module: String,time: String) = {
     dbConfig.db.run(
       sqlu"""UPDATE dwh_inf_module SET confirm = false
-             where host =$host and module=$module and bras_id=$bras and date_time=$time::TIMESTAMP
+             where host =$host and module=$module and date_time=$time::TIMESTAMP
                   """
     )
+  }
+
+  def getErrorHistory(id: String): Future[Seq[(String,Int)]] = {
+    val time = id.split("/")(0)
+    val host = id.split("/")(1)
+    val module = id.split("/")(2)
+    val nowDay = CommonService.getCurrentDay()
+    dbConfig.db.run(
+      sql"""select date_time,(sum(user_down)+sum(inf_down)+sum(sf_error)+sum(lofi_error)) errors
+            from dwh_inf_module
+            where host = $host and module = $module and date_time <$time::TIMESTAMP and date_time >= $nowDay::TIMESTAMP and label = 1
+            group by date_time
+            order by date_time desc
+                  """
+        .as[(String,Int)])
   }
 
   def getSigLogByRegion(month: String): Future[Seq[(String,Int,Int)]] = {
@@ -123,17 +138,18 @@ object BrasDAO {
         .as[(String,Int,Int)])
   }
 
-  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Boolean,String)]] = {
+  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int)]] = {
     val dt = new DateTime();
-    val aDay = dt.minusHours(12);
-    val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    val currentTime = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    val nowDay = CommonService.getCurrentDay()
     dbConfig.db.run(
-      sql"""select date_time,host,module,sf_error,lofi_error,confirm,bras_id
+      sql"""select date_time,host,module,sum(sf_error) sf_error,sum(lofi_error) lofi_error,sum(cast(confirm as int)) confirm,sum(user_down) user_down,sum(inf_down) inf_down
             from dwh_inf_module
-            where date_time >= $aDayTime::TIMESTAMP AND label =1
+            where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP AND label =1
+            group by date_time,host,module
             order by date_time desc
                   """
-        .as[(String,String,String,Int,Int,Boolean,String)])
+        .as[(String,String,String,Int,Int,Int,Int,Int)])
   }
 
   def getIndexRougeMudule(userInf_down: String): Future[Seq[(String,String,String,String,Int)]] = {

@@ -490,7 +490,7 @@ object CommonService extends AbstractService {
       Configure.LOGO_DEFAULT
     }
   }
-  
+
 
   def backgroupJob(f: => Unit, msg: String) {
     val thread = new Thread {

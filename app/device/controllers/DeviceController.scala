@@ -385,9 +385,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def confirmLabel(host: String,module: String,time: String,bras: String) = Action { implicit request =>
+  def confirmLabel(host: String,module: String,time: String) = Action { implicit request =>
     try{
-      val res =  Await.result(BrasService.confirmLabelInf(host,module,time,bras), Duration.Inf)
+      val res =  Await.result(BrasService.confirmLabelInf(host,module,time), Duration.Inf)
       Ok(Json.toJson(res))
     }
     catch{
@@ -395,9 +395,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def rejectLabel(host: String,module: String,time: String,bras: String) = Action { implicit request =>
+  def rejectLabel(host: String,module: String,time: String) = Action { implicit request =>
     try{
-      val res =  Await.result(BrasService.rejectLabelInf(host,module,time,bras), Duration.Inf)
+      val res =  Await.result(BrasService.rejectLabelInf(host,module,time), Duration.Inf)
       Ok(Json.toJson(res))
     }
     catch{
@@ -407,11 +407,22 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def getSigLogInfjson(id: String) = Action { implicit request =>
     try{
-      val res =  BrasService.getSigLogInfjson(id.trim())
+      val resSiglog = BrasService.getSigLogInfjson(id.trim())
+      val resError =  Await.result(BrasService.getErrorHistory(id.trim()),Duration.Inf)
+      resError.foreach(println)
+      val jsError = Json.obj(
+        "time" -> resError.map(x=>x._1.substring(0,x._1.indexOf("."))),
+        "error" -> resError.map({ x =>x._2})
+      )
+      val jsSiglog = Json.obj(
+        "time" -> resSiglog._2.map(x=>x._1),
+        "logoff" -> resSiglog._2.map({ t =>t._2}),
+        "signin" -> resSiglog._1.map({ t => t._2})
+      )
+
       val jsInf = Json.obj(
-        "time" -> res._2.map(x=>x._1),
-        "logoff" -> res._2.map({ t =>t._2}),
-        "signin" -> res._1.map({ t => t._2})
+        "jsSiglog" -> jsSiglog,
+        "jsError" -> jsError
       )
       Ok(Json.toJson(jsInf))
     }
@@ -938,7 +949,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   def getHostJson(id: String) = Action { implicit request =>
-    //try{
+    try{
       val t0 = System.currentTimeMillis()
       val rsHost = Await.result(BrasService.getHostBras(id), Duration.Inf)
     //logger.info("success 0")
@@ -953,7 +964,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
               "logoff" -> iter._4,
               "sf" -> iter._5,
               "lofi" -> iter._6,
-              "label" -> iter._7
+              "label" -> iter._7,
+              "user_down" -> iter._8,
+              "inf_down" -> iter._9,
+              "rouge_error" -> iter._10,
+              "lost_signal" -> iter._11
             )
       )
       logger.info("tRsHost: " + (System.currentTimeMillis() - t0))
@@ -995,8 +1010,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "host" -> re,
         "sigLog" -> sigLog,
         "time" -> brasChart.map({ t => CommonService.formatUTC(t._1.toString)}),
-        "logoff" -> brasChart.map({ t =>t._2}),
-        "signin" -> brasChart.map({ t => t._3}),
+        "logoff" -> brasChart.map({ t => (CommonService.formatUTC(t._1),t._2)}),
+        "signin" -> brasChart.map({ t => (CommonService.formatUTC(t._1),t._3)}),
         "users" -> brasChart.map({ t => t._4}),
         "heatCard" -> heatCard,
         "heatLinecard" -> heatLinecard,
@@ -1007,10 +1022,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       )
       println("time:"+ (System.currentTimeMillis() -t0))
       Ok(Json.toJson(jsBras))
-   /* }
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
   }
 
   /*def getBrasJson(id: String) = Action { implicit request =>

@@ -75,6 +75,8 @@
                                                             <th>Date time</th>
                                                             <th>Host</th>
                                                             <th>Module</th>
+                                                            <th>User Down</th>
+                                                            <th>Inf Down</th>
                                                             <th>Sf Error</th>
                                                             <th>Lofi Error</th>
                                                             <th style="text-align: center">Outlier</th>
@@ -84,6 +86,8 @@
                                                         <th>Total</th>
                                                         <th></th>
                                                         <th></th>
+                                                        <th>@response.sfLofi.map(x=> x._7).sum</th>
+                                                        <th>@response.sfLofi.map(x=> x._8).sum</th>
                                                         <th>@response.sfLofi.map(x=> x._4).sum</th>
                                                         <th>@response.sfLofi.map(x=> x._5).sum</th>
                                                         <th></th>
@@ -91,16 +95,17 @@
                                                     @for(i <- 0 until response.sfLofi.length) {
                                                         <tr>
                                                             <th>@response.sfLofi(i)._1</th>
-                                                            <th onclick="showSigLogChart(this,@i,'sfLofi',6)" class="aTag" name="@response.sfLofi(i)._1/@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
+                                                            <th onclick="showSigLogChart(this,@i,'sfLofi',8)" class="aTag" name="@response.sfLofi(i)._1/@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
                                                             <th>@response.sfLofi(i)._3</th>
+                                                            <th>@response.sfLofi(i)._7</th>
+                                                            <th>@response.sfLofi(i)._8</th>
                                                             <td>@response.sfLofi(i)._4</td>
                                                             <th>@response.sfLofi(i)._5</th>
                                                             <th style="text-align: center">
-                                                                <span class="brasHide">@response.sfLofi(i)._7</span>
-                                                                @if(response.sfLofi(i)._6) {
+                                                                @if(response.sfLofi(i)._6 > 0) {
                                                                     <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
                                                                 }else {
-                                                                    <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-info btn-xs"><i class="fa fa-check"></i></a>
+                                                                    <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-success btn-xs"><i class="fa fa-check"></i></a>
                                                                 }
                                                             </th>
                                                         </tr>
@@ -450,7 +455,8 @@
         })
 
         function showSigLogChart(el,_index,_type,totalCol){
-            var container = _type+'' + _index
+            var containerSiglog = 'siglog_'+_type+'' + _index
+            var containerError = 'error_'+_type+'' + _index
             var id = $(el).attr('name')
             if($('#'+_type+''+_index).hasClass('in')){
                 $(el).removeClass('aActive')
@@ -463,7 +469,7 @@
                 }
                 var html = '<tr class="chartTr">' +
                         '<td colspan="'+totalCol+'" style="padding: 0px;">' +
-                        '  <div class="collapse" id="'+_type+''+_index+'"></div>' +
+                        '<div class="col-lg-12 collapse" id="'+_type+''+_index+'">  <div class="col-lg-6" id="'+containerSiglog+'"></div> <div class="col-lg-6" id="'+containerError+'"></div> </div>' +
                         '</td>' + rows +
                         '</tr>'
                 $('.chartTr').remove();
@@ -481,12 +487,59 @@
                     cache: false,
                     success: function (dta) {
                         if(dta != "Error"){
+                            // Chart line history host module
+                            if(dta.jsError.time.length >0){
+                                $('#'+containerSiglog).removeClass('col-lg-12').addClass('col-lg-6')
+                                Highcharts.chart(containerError, {
+                                    chart: {
+                                        height: 200,
+                                        zoomType: 'xy'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: [{
+                                        categories: dta.jsError.time
+                                    }],
+                                    yAxis: [{ // Secondary yAxis
+                                        gridLineWidth: 0,
+                                        title: {
+                                            text: 'Number of errors',
+                                            style: {
+                                                color: "#832d1d"
+                                            }
+                                        }
+                                    }],
+                                    tooltip: {
+                                        shared: true
+                                    },
+                                    labels: {
+                                        items: [{
+                                            html: '',
+                                            style: {
+                                                left: '50px',
+                                                top: '18px',
+                                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                                            }
+                                        }]
+                                    },
+
+                                    series: [{
+                                        type: 'spline',
+                                        name: 'Errors',
+                                        color: "#832d1d",
+                                        data: dta.jsError.error
+                                    }]
+                                });
+                            }
+                            else
+                                $('#'+containerSiglog).removeClass('col-lg-6').addClass('col-lg-12')
                             // Build the chart line day of month vector
-                            var category = dta.time;
-                            var logoff = dta.logoff;
-                            var signin = dta.signin;
+                            var category = dta.jsSiglog.time;
+                            var logoff = dta.jsSiglog.logoff;
+                            var signin = dta.jsSiglog.signin;
                             //console.log(category)
-                            Highcharts.chart(container, {
+                            Highcharts.chart(containerSiglog, {
                                 chart: {
                                     height: 200,
                                     zoomType: 'xy'
@@ -555,9 +608,8 @@
             var time = $(element).parent().parent().find("th:eq(0)").text().trim()
             var host = $(element).parent().parent().find("th:eq(1)").text().trim()
             var module = $(element).parent().parent().find("th:eq(2)").text().trim()
-            var bras = $(element).parent().parent().find("th:last .brasHide").text().trim()
             $.ajax({
-                url: "/inf/confirmLabel?host="+host+'&module='+module+'&time='+time+'&bras='+bras,
+                url: "/inf/confirmLabel?host="+host+'&module='+module+'&time='+time,
                 success: function (data) {
                     if(data!= "Error"){
                         $(element).attr('disabled','disabled');

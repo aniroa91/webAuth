@@ -163,7 +163,7 @@
         </div>
         <br>
         <div class="row" id="hostBras" style="display: none">
-            <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
+            <div class="col-lg-5 col-sm-5 col-md-5 col-xs-12">
                 <div class="card-header">
                     <span style="font-size: 16px;font-weight: 600" id="lbHost"></span> <i class="fa fa-info-circle toolTipText" title="Data hosts of bras is loaded in 30 minutes ago."></i>
                 </div>
@@ -171,21 +171,25 @@
                     <div id="host" style="height: 415px;background: #fff"></div>
                 </div>
             </div>
-            <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
+            <div class="col-lg-7 col-sm-7 col-md-7 col-xs-12">
                @* <a id="btnCSV" class="btn btn-success"><i class="fa fa-download" style="margin-right: 2px"></i><span>CSV</span></a>*@
                 <div class="tbScroll">
                     <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 16px">
-                                <th colspan="7">List Of OLT Get Error</th>
+                                <th colspan="11">List Of OLT Get Error</th>
                             </tr>
                             <tr style="font-size: 14px;color:#ddd">
-                                <th style="width: 27%">Host</th>
+                                <th style="width: 15%">Host</th>
                                 <th>Module</th>
                                 <th>Signin</th>
                                 <th>Logoff</th>
                                 <th>Sf</th>
                                 <th>Lofi</th>
+                                <th>User down</th>
+                                <th>Inf down</th>
+                                <th>Rouge error</th>
+                                <th>Lost signal</th>
                                 <th>Total error</th>
                             </tr>
                         </thead>
@@ -435,7 +439,20 @@
                     //}
                 }
 
-                function drawChart(dta){
+                function highlightSeries(series,time){
+                    var rs = []
+                    for(var i=0;i<series.length;i++){
+                        if(series[i][0] == time)
+                            rs.push({
+                                y: series[i][1],
+                                color: '#9B59B6'
+                            })
+                        else rs.push(series[i][1])
+                    }
+                    return rs
+                }
+
+                function drawChart(dta,times){
                     // Build the chart line day of month vector
                     var category = dta.time;
                     var logoff = dta.logoff;
@@ -493,13 +510,13 @@
                             name: 'Sign In',
                             yAxis: 0,
                             color: "#1ABB9C",
-                            data: signin
+                            data: highlightSeries(signin,times)
                         }, {
                             type: 'column',
                             name: 'Log Off',
                             yAxis: 0,
                             color: "#d9534f",
-                            data: logoff
+                            data: highlightSeries(logoff,times)
                         }, {
                             type: 'spline',
                             name: 'Actives user',
@@ -532,6 +549,7 @@
                         $(this).parent().removeClass('activeBoxGreen');
                         $(this).parent().addClass('activeBox');
                         var brasId = $(this).find('.brasText').val();
+                        var times = brasId.split('/')[1]
                         $.ajax({
                             url: "/host-json?id=" + brasId,
                             cache: false,
@@ -660,7 +678,7 @@
                                         drawHeatMapChart(dtBras);
                                     // draw chart line
                                     $('#line-chart').show();
-                                    drawChart(dtBras);
+                                    drawChart(dtBras,times);
                                     // draw graph host and table
                                     drawHostBras(groupGraphost(dtBras.host, 'host'), brasId)
                                     $('#lbHost').text("Hosts of: " + brasId)
@@ -670,7 +688,7 @@
                                         $('.tbScroll').attr('style','height: auto');
                                         //$('#btnCSV').hide();
                                         $('#tbHost tbody').attr('style','background: transparent');
-                                        html = "<tr><td colspan='7' class='notResult'>No matching records found </td></tr>";
+                                        html = "<tr><td colspan='11' class='notResult'>No matching records found </td></tr>";
                                         $('#tbHost tbody').html('');
                                         $('#tbHost tbody').append(html);
                                     }
@@ -899,12 +917,14 @@
                         $.each(dta,function(i,dt){
                             if(testhost == dt[0].host) sizeHost++;
                         })
-                        html+= '<td style="width:30%" rowspan="'+sizeHost+'">'+dt[0].host+'</td><td style="width:16%;">'+dt[0].module+'</td>';
+                        html+= '<td style="width:17%" rowspan="'+sizeHost+'">'+dt[0].host+'</td><td style="width:8%;">'+dt[0].module+'</td>';
                     }
-                    html += '<td style="width:10%;">'+dt[1].signin+'</td><td style="width:10%;">'+dt[1].logoff+'</td>'
-                    html+= '<td style="width:10%;">'+dt[1].sf+'</td><td style="width:10%;">'+dt[1].lofi+'</td>';
-                    var totalErr = Number(dt[1].sf)+Number(dt[1].lofi);
-                    html+= '<td style="width:20%;">'+totalErr+'</td>';
+                    html += '<td style="width: 7%">'+dt[1].signin+'</td><td style="width:6%;">'+dt[1].logoff+'</td>'
+                    html += '<td style="width:4%;">'+dt[1].sf+'</td><td style="width:8%;">'+dt[1].lofi+'</td>';
+                    html += '<td>'+dt[1].user_down+'</td><td>'+dt[1].inf_down+'</td>';
+                    html += '<td>'+dt[1].rouge_error+'</td><td>'+dt[1].lost_signal+'</td>';
+                    var totalErr = Number(dt[1].sf)+Number(dt[1].lofi)+Number(dt[1].user_down)+Number(dt[1].inf_down)+Number(dt[1].rouge_error)+Number(dt[1].lost_signal);
+                    html+= '<td style="width:10%;">'+totalErr+'</td>';
                     html+= '</tr>';
                 });
                 return html;
