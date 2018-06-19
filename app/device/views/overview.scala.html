@@ -181,7 +181,7 @@
                                             <input type="hidden" id="isProvinceStt">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total Notices By Status</h2>
+                                                    font-size: 24px"> Total Notices By Status (Bras)</h2>
                                                 <a class="btn btn-warning" id="backNoticeStt" onclick="backNoticeStatus()" style="display: none;float: right"></a>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -196,7 +196,7 @@
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total Device Errors By Severity</h2>
+                                                    font-size: 24px"> Total Device Errors By Severity (Bras)</h2>
 
                                                 <div class="clearfix"></div>
                                             </div>
@@ -496,9 +496,11 @@
                 $('#startMonth').datepicker({
                     autoclose: true,
                     minViewMode: 1,
-                    endDate: '@getEndDate(response.time.toDate+"-01")',
+                    startDate: '@getStartDate(response.time.startMonth+"-01")',
+                    endDate: '@getEndDate(response.time.endMonth+"-01")',
                     format: 'yyyy-mm'
                 }).on('changeDate', function(selected){
+                    //get month choosed
                     var startDate = new Date(selected.date.valueOf());
                     var yr = startDate.getFullYear();
                     var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
@@ -508,8 +510,8 @@
                 $('#endMonth').datepicker({
                     autoclose: true,
                     minViewMode: 1,
-                    endDate:'-1m',
-                    startDate: '@getStartDate(response.time.fromDate+"-01")',
+                    endDate:'@getEndDate(response.time.endMonth+"-01")',
+                    startDate: '@getStartDate(response.time.startMonth+"-01")',
                     format: 'yyyy-mm'
                 }).on('changeDate', function(selected){
                     var startDate = new Date(selected.date.valueOf());
@@ -517,6 +519,21 @@
                     var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
                     var newDate = yr + '-' + month;
                     $("#startMonth").data('datepicker').setEndDate(newDate);
+               /*     // get month min
+                    var threeMonthAgo = new Date(startDate.setMonth(startDate.getMonth()-2))
+                    var yThreeAgo = threeMonthAgo.getFullYear();
+                    var monthThreeAgo = threeMonthAgo.getMonth() < 9 ? ('0' + Number(threeMonthAgo.getMonth()+1)) : (Number(threeMonthAgo.getMonth()+1));
+                    var dateThreeAgo = yThreeAgo + '-' + monthThreeAgo;
+                    var choosedDate = new Date(dateThreeAgo)
+                    var currentDate = new Date($('#startMonth').val())
+                    if(choosedDate.getTime()- currentDate.getTime() <= 0){
+                        //$("#startMonth").data('datepicker').setStartDate($('#startMonth').val());
+                    }
+                    else{
+                        //$("#startMonth").data('datepicker').setStartDate(dateThreeAgo);
+                        //$('#startMonth').val(dateThreeAgo)
+                        $("#startMonth").data('datepicker')._setDate(dateThreeAgo)
+                    }*/
                 });
                 $(".tab-slider--body").hide();
                 $(".tab-slider--body:first").show();
@@ -1316,9 +1333,9 @@
             function getSigLogByRegionStacked(sigIn,logOff){
                 var jsArray = []
                 var colors = [
-                    '#9B59B6',
-                    '#0000cc',
                     '#E74C3C',
+                    '#0000cc',
+                    '#9B59B6',
                     '#f1b53d',
                     '#73879C',
                     '#1ABB9C',

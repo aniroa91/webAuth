@@ -17,6 +17,7 @@ import services.domain.CommonService.{formatUTC, getAggregations}
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
+import model.device.InfDAO.client_kibana
 import org.elasticsearch.search.sort.SortOrder
 import service.BrasService.{client, getValueAsInt, getValueAsString}
 
@@ -660,6 +661,24 @@ object BrasDAO {
     }
   }
 
+  def get3MonthLastest(): Future[Seq[(String)]] = {
+    dbConfig.db.run(
+      sql"""select distinct month
+            from dmt_overview_noc
+            order by month desc
+            limit 3
+                  """
+        .as[(String)])
+  }
+
+  def getMinMaxMonth(): Future[Seq[(String,String)]] = {
+    dbConfig.db.run(
+      sql"""select min(month),max(month)
+            from dmt_overview_noc
+                  """
+        .as[(String,String)])
+  }
+
   def getBrasOutlierCurrent(nowDay: String): Future[Seq[(String,String,Int,Int,String)]] = {
     //val sumDay = CommonService.getRangeDay(nowDay).split(",").length
     dbConfig.db.run(
@@ -690,8 +709,8 @@ object BrasDAO {
           query { must(termQuery("type", "con"),termQuery("typeLog", "LogOff"),termQuery("nasName",bras.toLowerCase),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
       )
     ).await
-    val signin = multiRs.responses(0).totalHits.toInt
-    val logoff = multiRs.responses(1).totalHits.toInt
+    val signin = multiRs.responses(0).totalHits
+    val logoff = multiRs.responses(1).totalHits
     (signin,logoff)
   }
 
@@ -712,20 +731,30 @@ object BrasDAO {
       search(s"monitor-radius-$nowDay" / "docs")
         query { must(termQuery("bras_id", bras),termQuery("label","outlier")) }
     ).await
-    response.totalHits.toInt
+    response.totalHits
   }
 
-  def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int): Future[Seq[(Int,Int)]] = {
-    val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+  def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int): Array[(Int,Int)] = {
+    val res = client_kibana.execute(
+      search(s"infra_dwh_opsview_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        aggregations (
+        dateHistogramAggregation("hourly")
+          .field("date_time")
+          .interval(DateHistogramInterval.HOUR)
+          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+        )  size 1000
+    ).await
+    CommonService.getAggregationsKeyString(res.aggregations.get("hourly")).map(x=> (CommonService.getHourFromES5(x._1),x._2))
+      .groupBy(_._1).mapValues(_.map(x=>x._2.toInt).sum).toArray.sorted
+   /* dbConfig.db.run(
       sql"""select extract(hour from  date_time) as hourly, count(service_name)
             from dwh_opsview
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
             group by bras_id,extract(hour from  date_time)
             order by hourly
                   """
-        .as[(Int,Int)])
+        .as[(Int,Int)])*/
   }
 
   def getKibanaBytimeResponse(bras: String,nowDay: String,hourly:Int): Future[Seq[(Int,Int)]] = {
@@ -842,8 +871,6 @@ object BrasDAO {
   }
 
   def getInfModuleResponse(bras: String,nowDay: String): Array[(String,String,Long,Long,Long)] = {
-    val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     val rs = client_kibana.execute(
       search(s"infra_dwh_inf_module_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),not(termQuery("module.keyword","-1")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
@@ -895,15 +922,31 @@ object BrasDAO {
         .as[(String,Int)])
   }
 
-  def getOpServByStatusResponse(bras: String,nowDay: String): Future[Seq[(String,String,Int)]] = {
+  def getOpServByStatusResponse(bras: String,nowDay: String): Array[(String,String,Int)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
-      sql"""select service_name,service_status,count(*) from dwh_opsview
-             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
-             group by service_name,service_status
+    val response = client_kibana.execute(
+      search(s"infra_dwh_opsview_*" / "docs")
+        query { must( termQuery("bras_id.keyword", bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(fromDay)).lt(CommonService.formatYYmmddToUTC(nextDay)))}
+        aggregations (
+        termsAggregation("service_name")
+          .field("service_name.keyword")
+          .subAggregations(
+            termsAggregation("service_status")
+              .field("service_status.keyword")
+          )
+        ) size 1000
+    ).await
+    val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("service_name"),"service_status")
+    mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1, x._2._1, x._2._2.toInt))
+   /* dbConfig.db.run(
+      sql"""select service_name,service_status,count(*)
+            from dwh_opsview
+            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by service_name,service_status
                   """
-        .as[(String,String,Int)])
+        .as[(String,String,Int)])*/
   }
 
   def getLinecardhostResponse(bras: String,nowDay: String): Future[Seq[(String,Int,Int)]] = {
@@ -1090,11 +1133,6 @@ object BrasDAO {
   }
 
   def getSigLogByHost(bras: String,nowDay: String): SigLogByHost = {
-    val arrDay = CommonService.getRangeDay(nowDay).split(",")
-    var streamingIndex = s"radius-streaming-"+arrDay(0)
-    for(i <- 1 until arrDay.length) {
-      streamingIndex += s",radius-streaming-"+arrDay(i)
-    }
     val multiRs = client.execute(
       multi(
         search(s"radius-streaming-*" / "docs")

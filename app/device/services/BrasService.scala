@@ -16,22 +16,14 @@ import com.ftel.bigdata.utils.DateTimeUtil
 
 object BrasService extends AbstractService{
 
-  /*def getBrasOutlierCurrent(day: String):Array[BrasOutlier]  ={
-    val response = client.execute(
-      search(s"monitor-radius-$day" / "docs")
-        query { must(termQuery("label","outlier")) }
-        sortBy { fieldSort("date_time") order SortOrder.DESC } size 100
-    ).await
-    val brasOutlier = response.hits.hits.map(x => x.sourceAsMap)
-      .map(x => BrasOutlier(
-        getValueAsString(x, "date_time"),
-        getValueAsString(x, "bras_id"),
-        getValueAsInt(x,"signIn"),
-        getValueAsInt(x,"logOff")
-       )
-      )
-    brasOutlier.asInstanceOf[Array[BrasOutlier]]
-  }*/
+  def getMinMaxMonth(): Future[Seq[(String,String)]] = {
+    BrasDAO.getMinMaxMonth()
+  }
+
+  def get3MonthLastest(): Future[Seq[(String)]] = {
+    BrasDAO.get3MonthLastest()
+  }
+
   def getBrasOutlierCurrent(day: String): Future[Seq[(String,String,Int,Int,String)]] ={
     BrasDAO.getBrasOutlierCurrent(day)
   }
@@ -310,7 +302,7 @@ object BrasService extends AbstractService{
     BrasDAO.getNoOutlierCurrent(bras,nowDay)
   }
 
-  def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int):Future[Seq[(Int,Int)]] = {
+  def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int): Array[(Int,Int)] = {
     BrasDAO.getOpviewBytimeResponse(bras,nowDay,hourly)
   }
 
@@ -344,7 +336,7 @@ object BrasService extends AbstractService{
     BrasDAO.getOpsviewServiceSttResponse(bras,nowDay)
   }
 
-  def getOpServByStatusResponse(bras: String,nowDay: String):Future[Seq[(String,String,Int)]] = {
+  def getOpServByStatusResponse(bras: String,nowDay: String): Array[(String,String,Int)] = {
     BrasDAO.getOpServByStatusResponse(bras,nowDay)
   }
 

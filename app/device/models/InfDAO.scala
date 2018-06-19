@@ -81,16 +81,23 @@ object InfDAO {
         .as[(Int)])*/
   }
 
-  def getNoOutlierInfByBras(bras: String,nowDay: String): Future[Seq[(Int)]] = {
+  def getNoOutlierInfByBras(bras: String,nowDay: String): Int = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    dbConfig.db.run(
+
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_inf_module_*" / "docs")
+        query { must(termQuery("bras_id.keyword",bras),termQuery("label",1),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        size 1000
+    ).await
+    rs.totalHits
+    /*dbConfig.db.run(
       sql"""select count(label)
             from dwh_inf_module
             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label =1
             group by bras_id
                   """
-        .as[(Int)])
+        .as[(Int)])*/
   }
 
   def getSuyhaobyModule(host: String,nowDay: String): Future[Seq[(String,Double,Double,Double)]] = {

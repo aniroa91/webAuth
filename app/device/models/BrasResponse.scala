@@ -13,6 +13,8 @@ case class RegionOverview(
                          totalInf: Array[(String,String,Double)]
                          )
 case class TimePicker(
+                     startMonth: String,
+                     endMonth: String,
                      fromDate: String,
                      toDate: String,
                      rangeMonth: Array[(String)]

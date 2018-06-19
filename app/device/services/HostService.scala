@@ -23,7 +23,7 @@ object HostService extends AbstractService{
     InfDAO.getNoOutlierInfByHost(host,nowDay)
   }
 
-  def getNoOutlierInfByBras(bras: String,nowDay: String): Future[Seq[(Int)]] = {
+  def getNoOutlierInfByBras(bras: String,nowDay: String): Int = {
     InfDAO.getNoOutlierInfByBras(bras,nowDay)
   }
 
