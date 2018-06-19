@@ -483,7 +483,8 @@
                 $('#monthPickerTop').datepicker({
                     autoclose: true,
                     minViewMode: 1,
-                    endDate: '-1m',
+                    startDate: '@getStartDate(response.time.startMonth+"-01")',
+                    endDate: '@getEndDate(response.time.endMonth+"-01")',
                     format: 'yyyy-mm'
                 }).on('changeDate', function(selected){
                     var startDate = new Date(selected.date.valueOf());
