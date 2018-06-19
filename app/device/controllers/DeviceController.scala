@@ -727,7 +727,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val spliter = Await.result(BrasService.getSpliterMudule("*"),Duration.Inf)
       val sfLofi = Await.result(BrasService.getSflofiMudule("*"),Duration.Inf)
       val indexRouge = Await.result(BrasService.getIndexRougeMudule("*"),Duration.Inf)
-      Ok(device.views.html.inf(username,InfResponse(userDown,infDown,spliter,sfLofi,indexRouge),id))
+      val totalOutlier = Await.result(BrasService.getTotalOutlier(), Duration.Inf).sum
+      Ok(device.views.html.inf(username,InfResponse(userDown,infDown,spliter,sfLofi,indexRouge,totalOutlier),id))
     }
     catch{
       case e: Exception => Ok(device.views.html.inf(username,null,id))

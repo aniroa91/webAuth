@@ -139,6 +139,18 @@ object BrasDAO {
         .as[(String,Int,Int)])
   }
 
+  def getTotalOutlier(): Future[Seq[(Int)]] = {
+    val dt = new DateTime();
+    val currentTime = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    val nowDay = CommonService.getCurrentDay()
+    dbConfig.db.run(
+      sql"""select count(*)
+            from dwh_inf_module
+            where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP AND label =1
+                  """
+        .as[(Int)])
+  }
+
   def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int)]] = {
     val dt = new DateTime();
     val currentTime = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))

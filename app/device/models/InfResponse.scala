@@ -5,5 +5,6 @@ case class InfResponse(
                         infDown: Seq[(String,String,String,Int)],
                         spliter: Seq[(String,String,String,Int)],
                         sfLofi:  Seq[(String,String,String,Int,Int,Int,Int,Int)],
-                        indexRouge: Seq[(String,String,String,String,Int)]
+                        indexRouge: Seq[(String,String,String,String,Int)],
+                        totalOutlier: Int
                        )

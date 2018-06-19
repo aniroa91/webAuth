@@ -156,6 +156,10 @@ object BrasService extends AbstractService{
     BrasDAO.getSflofiMudule(queries)
   }
 
+  def getTotalOutlier(): Future[Seq[(Int)]] = {
+    BrasDAO.getTotalOutlier()
+  }
+
   def getIndexRougeMudule(day: String): Future[Seq[(String,String,String,String,Int)]]   ={
     BrasDAO.getIndexRougeMudule(day)
   }
