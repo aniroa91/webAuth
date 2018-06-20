@@ -966,13 +966,14 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
               "logoff" -> iter._4,
               "sf" -> iter._5,
               "lofi" -> iter._6,
-              "label" -> iter._7,
-              "user_down" -> iter._8,
-              "inf_down" -> iter._9,
-              "rouge_error" -> iter._10,
-              "lost_signal" -> iter._11
+              "user_down" -> iter._7,
+              "inf_down" -> iter._8,
+              "rouge_error" -> iter._9,
+              "lost_signal" -> iter._10,
+              "label" -> iter._11
             )
       )
+
       logger.info("tRsHost: " + (System.currentTimeMillis() - t0))
       val t1 = System.currentTimeMillis()
       val idBras = id.split('/')(0)
