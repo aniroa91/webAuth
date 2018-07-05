@@ -27,6 +27,7 @@ GET      /device                       controllers.DeviceController.overview
 GET      /noc                          controllers.DeviceController.dashboard
 GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
 GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")
+GET      /inf/getHostMonitor           controllers.DeviceController.getHostMonitor(host: String ?= "")
 GET      /drilldownNoticeByStatus      controllers.DeviceController.drilldownNoticeByStatus(id: String ?= "",month: String ?= "")
 GET      /drillUpNoticeByStatus        controllers.DeviceController.drillUpNoticeByStatus(id: String ?= "",month: String ?= "")
 GET      /drillUpTotalInf              controllers.DeviceController.drillUpTotalInf(id: String ?= "",month: String ?= "")

@@ -24,6 +24,10 @@ object BrasService extends AbstractService{
     BrasDAO.get3MonthLastest()
   }
 
+  def getHostMonitor(id: String): Future[Seq[(String,String,String)]] ={
+    BrasDAO.getHostMonitor(id)
+  }
+
   def getBrasOutlierCurrent(day: String): Future[Seq[(String,String,Int,Int,String)]] ={
     BrasDAO.getBrasOutlierCurrent(day)
   }
@@ -152,7 +156,7 @@ object BrasService extends AbstractService{
     BrasDAO.getSpliterMudule(day)
   }
 
-  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int)]]   ={
+  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int,Int,String)]]   ={
     BrasDAO.getSflofiMudule(queries)
   }
 

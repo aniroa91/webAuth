@@ -29,6 +29,16 @@ object BrasDAO {
   val topN = CommonService.SIZE_DEFAULT
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
+  def getHostMonitor(id: String): Future[Seq[(String,String,String)]] = {
+    dbConfig.db.run(
+      sql"""select module,splitter,index
+            from dwh_user_info
+            where host= $id and module is not null and splitter is not null and index is not null
+            group by module,splitter,index
+                  """
+        .as[(String,String,String)])
+  }
+
   def getSpliterMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
     val dt = new DateTime();
     val aDay = dt.minusHours(12);
@@ -44,16 +54,20 @@ object BrasDAO {
   }
 
   def confirmLabelInf(host: String,module: String,time: String) = {
+    val dt = new DateTime();
+    val nowDate  = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     dbConfig.db.run(
-      sqlu"""UPDATE dwh_inf_module SET confirm = true
+      sqlu"""UPDATE dwh_inf_module SET confirm = true, confirm_date_time = $nowDate::TIMESTAMP
             where host =$host and module=$module and date_time=$time::TIMESTAMP
                   """
     )
   }
 
   def rejectLabelInf(host: String,module: String,time: String) = {
+    val dt = new DateTime();
+    val nowDate  = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     dbConfig.db.run(
-      sqlu"""UPDATE dwh_inf_module SET confirm = false
+      sqlu"""UPDATE dwh_inf_module SET confirm = false, confirm_date_time = $nowDate::TIMESTAMP
              where host =$host and module=$module and date_time=$time::TIMESTAMP
                   """
     )
@@ -151,18 +165,37 @@ object BrasDAO {
         .as[(Int)])
   }
 
-  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int)]] = {
+  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int,Int,String)]] = {
     val dt = new DateTime();
     val currentTime = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     val nowDay = CommonService.getCurrentDay()
     dbConfig.db.run(
+      sql"""select tb.date_time,tb.host,tb.module,sum(tb.sf_error),sum(tb.lofi_error),sum(tb.confirm),sum(tb.user_down),sum(tb.inf_down),sum(tb.rouge_error), string_agg(tb.splitter,', ')
+            from (
+                  select A.*,B.splitter
+                  from
+                       (select date_time,host,module,sum(sf_error) sf_error,sum(lofi_error) lofi_error,sum(cast(confirm as int)) confirm,sum(user_down) user_down,sum(inf_down) inf_down,sum(rouge_error) rouge_error
+                        from dwh_inf_module
+                        where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP AND label =1
+                        group by date_time,host,module
+                        order by date_time desc) A
+                   left join
+                   (select distinct x.host, x.splitter, x.module, y.date_time from dwh_user_info x, dwh_inf_splitter y where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP and x.host = y.host and x.splitter = y.splitter) B
+                   on A.host = B.host and A.module = B.module and B.date_time between A.date_time - interval '15 minutes' and A.date_time
+            ) tb
+            group by tb.date_time,tb.host,tb.module
+            order by tb.date_time desc
+                  """
+        .as[(String,String,String,Int,Int,Int,Int,Int,Int,String)])
+
+    /*dbConfig.db.run(
       sql"""select date_time,host,module,sum(sf_error) sf_error,sum(lofi_error) lofi_error,sum(cast(confirm as int)) confirm,sum(user_down) user_down,sum(inf_down) inf_down
             from dwh_inf_module
             where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP AND label =1
             group by date_time,host,module
             order by date_time desc
                   """
-        .as[(String,String,String,Int,Int,Int,Int,Int)])
+        .as[(String,String,String,Int,Int,Int,Int,Int)])*/
   }
 
   def getIndexRougeMudule(userInf_down: String): Future[Seq[(String,String,String,String,Int)]] = {

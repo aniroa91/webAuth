@@ -167,9 +167,10 @@
 
                                 <div class="col-lg-12">
                                     <div id="divallMonth">
+                                        <a href="/device" class="btn btn-info"><i class="fa fa-refresh" aria-hidden="true"></i></a>
                                         <input type="hidden" id="monthGroup" value="">
                                         @for(i <- 0 until response.time.rangeMonth.length ){
-                                            <a onclick="groupRegionByMonth(this)" type="button" class="btn btnDefault">@response.time.rangeMonth(i)</a>
+                                            <a onclick="groupRegionByMonth(this)" type="button" class="btn btnDefault month">@response.time.rangeMonth(i)</a>
                                         }
                                     </div>
                                 </div>
@@ -1372,8 +1373,8 @@
             function groupRegionByMonth(el){
                 var newDate = $(el).text()
                 $('#monthGroup').val(newDate)
-                $('#divallMonth a').removeClass('btn-success')
-                $('#divallMonth a').addClass('btnDefault')
+                $('#divallMonth a.month').removeClass('btn-success')
+                $('#divallMonth a.month').addClass('btnDefault')
                 $(el).removeClass('btnDefault')
                 $(el).addClass('btn-success')
                 $.ajax({

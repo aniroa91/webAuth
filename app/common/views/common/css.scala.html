@@ -22,6 +22,17 @@
     <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
 
     <style type="text/css">
+            .titLb{
+                position: relative;
+                margin: 0 0 0 10px;
+                z-index: 5;
+                padding: 0;
+                font-size: 24px;
+            }
+            .boxCss{
+                text-align: center;
+                color: white;
+            }
             .top_nav .navbar-right {
                 width: auto;
             }
@@ -112,74 +123,77 @@
                 background-color: #5bc0de;
                 border-color: #46b8da;
             }
-            .tab-slider--nav {
-                width: 100%;
-                float: left;
-                margin-bottom: 20px;
+            .panel-primary{
+                border-color: transparent;
             }
-
-            .tab-slider--tabs {
-                display: block;
-                float: left;
-                margin: 0;
-                padding: 0;
-                list-style: none;
-                position: relative;
-                border-radius: 35px;
-                overflow: hidden;
-                background: #fff;
-                height: 35px;
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-            }
-            .tab-slider--tabs:after {
-                content: "";
-                width: 50%;
-                background: #345F90;
-                height: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-                -webkit-transition: all 250ms ease-in-out;
-                transition: all 250ms ease-in-out;
-                border-radius: 35px;
-            }
-            .tab-slider--tabs.slide:after {
-                left: 50%;
-            }
-
-            .tab-slider--trigger {
-                font-size: 12px;
-                line-height: 1;
-                font-weight: bold;
-                color: #345F90;
-                text-transform: uppercase;
-                text-align: center;
-                padding: 11px 20px;
-                position: relative;
-                z-index: 2;
-                cursor: pointer;
-                display: inline-block;
-                -webkit-transition: color 250ms ease-in-out;
-                transition: color 250ms ease-in-out;
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-            }
-            .tab-slider--trigger.active {
+            .with-nav-tabs.panel-primary .nav-tabs > li > a,
+            .with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
+            .with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
                 color: #fff;
             }
-
-            .tab-slider--body {
-                margin-bottom: 20px;
+            .with-nav-tabs.panel-primary .nav-tabs > .open > a,
+            .with-nav-tabs.panel-primary .nav-tabs > .open > a:hover,
+            .with-nav-tabs.panel-primary .nav-tabs > .open > a:focus,
+            .with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
+            .with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
+                color: #fff;
+                background-color: #3071a9;
+                border-color: transparent;
+            }
+            .with-nav-tabs.panel-primary .nav-tabs > li.active > a,
+            .with-nav-tabs.panel-primary .nav-tabs > li.active > a:hover,
+            .with-nav-tabs.panel-primary .nav-tabs > li.active > a:focus {
+                color: #428bca;
+                background-color: #fff;
+                border-color: #428bca;
+                border-bottom-color: transparent;
+            }
+            .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu {
+                background-color: #428bca;
+                border-color: #3071a9;
+            }
+            .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a {
+                color: #fff;
+            }
+            .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a:hover,
+            .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a:focus {
+                background-color: #3071a9;
+            }
+            .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a,
+            .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:hover,
+            .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:focus {
+                background-color: #4a9fe9;
             }
             .tfoot{
                 color: #d9534f;
                 font-weight: 700;
                 font-size: 20px;
+            }
+            .ui-autocomplete {
+                position: absolute;
+                z-index: 1000;
+                cursor: pointer;
+                max-height: 200px;
+                overflow: auto;
+                left:1440px;
+                padding: 0;
+                margin-top: 2px;
+                list-style: none;
+                background-color: #ffffff;
+                border: 1px solid #ccc;
+                -webkit-border-radius: 5px;
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            }
+            .ui-autocomplete > li {
+                padding: 3px 20px;
+            }
+            .ui-autocomplete > li.ui-state-focus {
+                background-color: #26B99A;
+                color: white;
             }
     </style>
 }

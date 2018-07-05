@@ -30,7 +30,7 @@
 
 
                     <div class="input-group">
-                        <input type="text" class="form-control autocomplete" id="search" placeholder="Search host ..." style="border-radius:0">
+                        <input type="text" class="form-control" id="search" placeholder="Search host ..." style="border-radius:0">
                         <div class="input-group-addon groupSearch" ><i class="fa fa-search"></i></div>
                     </div>
                 </div>
@@ -56,229 +56,272 @@
             <div class="row top_tiles">
                 <div class="col-xs-12">
                     <div class="container">
-                        <div class="tab-slider--nav" style="padding: 5px 20px 0px 2px;margin-bottom: 10px;">
-                            <ul class="tab-slider--tabs">
-                                <li class="tab-slider--trigger active" rel="tabEvent">Anomaly Event</li>
-                                <li class="tab-slider--trigger" rel="tabBroken">Broken Cable</li>
-                            </ul>
-                        </div>
-                        <div class="tab-slider--container">
-                            <div id="tabEvent" class="tab-slider--body">
-                                <div class="row top_tiles">
-                                    <div class="col-xs-12">
-                                        <div class="x_panel tile " style="padding: 0px;">
-                                            <div class="x_content">
-                                                <input type="hidden" id="ids" value="@ids">
-                                                <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
-                                                    <thead >
-                                                        <tr>
-                                                            <th>Date time</th>
-                                                            <th>Host</th>
-                                                            <th>Module</th>
-                                                            <th>User Down</th>
-                                                            <th>Inf Down</th>
-                                                            <th>Sf Error</th>
-                                                            <th>Lofi Error</th>
-                                                            <th style="text-align: center">Outlier</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tfoot>
-                                                        <th class="tfoot">TOTAL OUTLIER</th>
-                                                        <th style="border-right: transparent"></th>
-                                                        <th style="border-right: transparent"></th>
-                                                        <th style="border-right: transparent"></th>
-                                                        <th style="border-right: transparent"></th>
-                                                        <th style="border-right: transparent"></th>
-                                                        <th style="border-right: transparent"></th>
-                                                        <th class="tfoot" style="text-align: center">@response.totalOutlier</th>
-                                                    </tfoot>
-                                                    <tfoot>
-                                                        <th>Total</th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th>@response.sfLofi.map(x=> x._7).sum</th>
-                                                        <th>@response.sfLofi.map(x=> x._8).sum</th>
-                                                        <th>@response.sfLofi.map(x=> x._4).sum</th>
-                                                        <th>@response.sfLofi.map(x=> x._5).sum</th>
-                                                        <th></th>
-                                                    </tfoot>
-                                                    @for(i <- 0 until response.sfLofi.length) {
-                                                        <tr>
-                                                            <th>@response.sfLofi(i)._1</th>
-                                                            <th onclick="showSigLogChart(this,@i,'sfLofi',8)" class="aTag" name="@response.sfLofi(i)._1/@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
-                                                            <th>@response.sfLofi(i)._3</th>
-                                                            <th>@response.sfLofi(i)._7</th>
-                                                            <th>@response.sfLofi(i)._8</th>
-                                                            <td>@response.sfLofi(i)._4</td>
-                                                            <th>@response.sfLofi(i)._5</th>
-                                                            <th style="text-align: center">
-                                                                @if(response.sfLofi(i)._6 > 0) {
-                                                                    <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
-                                                                }else {
-                                                                    <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-success btn-xs"><i class="fa fa-check"></i></a>
+                        <div class="panel with-nav-tabs panel-primary">
+                            <div class="panel-heading">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a class="tabEvent" style="cursor: pointer">Anomaly Event</a></li>
+                                    <li><a class="tabBroken" style="cursor: pointer">Broken Cable</a></li>
+                                    <li><a class="tabHost" style="cursor: pointer">Host Monitor</a></li>
+                                </ul>
+                            </div>
+                            <div class="panel-body">
+                                <div class="tab-content">
+                                    <div class="tab-pane fade in active" id="tabEvent">
+                                        <div class="row top_tiles">
+                                            <div class="col-xs-12">
+                                                <div class="x_panel tile " style="padding: 0px;">
+                                                    <div class="x_content">
+                                                        <input type="hidden" id="ids" value="@ids">
+                                                        <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
+                                                            <thead >
+                                                                <tr>
+                                                                    <th>Date time</th>
+                                                                    <th>Host</th>
+                                                                    <th>Module</th>
+                                                                    <th>User Down</th>
+                                                                    <th>Inf Down</th>
+                                                                    <th>Sf Error</th>
+                                                                    <th>Lofi Error</th>
+                                                                    <th>Rouge Error</th>
+                                                                    <th>Lost Signal</th>
+                                                                    <th style="text-align: center">Outlier</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tfoot>
+                                                                <th class="tfoot">TOTAL OUTLIER</th>
+                                                                <th style="border-right: transparent"></th>
+                                                                <th style="border-right: transparent"></th>
+                                                                <th style="border-right: transparent"></th>
+                                                                <th style="border-right: transparent"></th>
+                                                                <th style="border-right: transparent"></th>
+                                                                <th style="border-right: transparent"></th>
+                                                                <th style="border-right: transparent"></th>
+                                                                <th style="border-right: transparent"></th>
+                                                                <th class="tfoot" style="text-align: center">@response.totalOutlier</th>
+                                                            </tfoot>
+                                                            <tfoot>
+                                                                <th>Total</th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>@response.sfLofi.map(x=> x._7).sum</th>
+                                                                <th>@response.sfLofi.map(x=> x._8).sum</th>
+                                                                <th>@response.sfLofi.map(x=> x._4).sum</th>
+                                                                <th>@response.sfLofi.map(x=> x._5).sum</th>
+                                                                <th>@response.sfLofi.map(x=> x._9).sum</th>
+                                                                <th></th>
+                                                                <th></th>
+                                                            </tfoot>
+                                                            @for(i <- 0 until response.sfLofi.length) {
+                                                                <tr>
+                                                                    <th>@response.sfLofi(i)._1</th>
+                                                                    <th onclick="showSigLogChart(this,@i,'sfLofi',10)" class="aTag" name="@response.sfLofi(i)._1/@response.sfLofi(i)._2/@response.sfLofi(i)._3">@response.sfLofi(i)._2</th>
+                                                                    <th>@response.sfLofi(i)._3</th>
+                                                                    <td>@response.sfLofi(i)._7</td>
+                                                                    <td>@response.sfLofi(i)._8</td>
+                                                                    <td>@response.sfLofi(i)._4</td>
+                                                                    <td>@response.sfLofi(i)._5</td>
+                                                                    <td>@response.sfLofi(i)._9</td>
+                                                                    <td>@response.sfLofi(i)._10</td>
+                                                                    <th style="text-align: center">
+                                                                    @if(email == "inf") {
+                                                                        @if(response.sfLofi(i)._6 > 0) {
+                                                                            <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
+                                                                        } else {
+                                                                            <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-success btn-xs"><i class="fa fa-check"></i></a>
+                                                                        }
+                                                                    }
+                                                                    </th>
+                                                                </tr>
+                                                            }
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tabBroken">
+                                        <div class="row top_tiles">
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="x_panel tile " style="padding: 0px;">
+                                                    <div class="x_content">
+                                                        <table class="data table table-bordered tbScroll" id="tbInf" style="width: 100%">
+                                                            <thead >
+                                                                <tr>
+                                                                    <th style="width: 40%">Date time</th>
+                                                                    <th>Host</th>
+                                                                    <th>Module</th>
+                                                                    <th>Inf Down</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tfoot>
+                                                                <th>Total</th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>@response.infDown.map(x=> x._4).sum</th>
+                                                            </tfoot>
+                                                            @if(response.infDown != null) {
+                                                                <tbody >
+                                                                @for(i <- 0 until response.infDown.length) {
+                                                                    <tr onclick="showSigLogChart(this,@i,'infDown',4)" class="aTag" name="@response.infDown(i)._1/@response.infDown(i)._2/@response.infDown(i)._3">
+                                                                        <th>@response.infDown(i)._1</th>
+                                                                        <th>@response.infDown(i)._2</th>
+                                                                        <th>@response.infDown(i)._3</th>
+                                                                        <th>@response.infDown(i)._4</th>
+                                                                    </tr>
                                                                 }
-                                                            </th>
-                                                        </tr>
-                                                    }
-                                                </table>
+                                                                </tbody>
+                                                            }
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="x_panel tile " style="padding: 0px;">
+                                                    <div class="x_content">
+                                                        <table class="data table table-bordered tbScroll" id="tbUserDown" style="width: 100%">
+                                                            <thead >
+                                                                <tr>
+                                                                    <th style="width: 40%">Date time</th>
+                                                                    <th>Host</th>
+                                                                    <th>Module</th>
+                                                                    <th>User Down</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tfoot>
+                                                                <th style="width: 28%">Total</th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>@response.userDown.map(x=> x._4).sum</th>
+                                                            </tfoot>
+                                                            @if(response.userDown != null) {
+                                                                <tbody >
+                                                                @for(i <- 0 until response.userDown.length) {
+                                                                    <tr onclick="showSigLogChart(this,@i,'userDown',4)" class="aTag" name="@response.userDown(i)._1/@response.userDown(i)._2/@response.userDown(i)._3">
+                                                                        <th>@response.userDown(i)._1</th>
+                                                                        <th>@response.userDown(i)._2</th>
+                                                                        <th>@response.userDown(i)._3</th>
+                                                                        <td>@response.userDown(i)._4</td>
+                                                                    </tr>
+                                                                }
+                                                                </tbody>
+                                                            }
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                        <div class="row top_tiles">
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="x_panel tile " style="padding: 0px;">
+                                                    <div class="x_content">
+                                                        <table class="data table table-bordered tbScroll" id="tbSpliter" style="width: 100%">
+                                                            <thead >
+                                                                <tr>
+                                                                    <th>Date time</th>
+                                                                    <th>Host</th>
+                                                                    <th>Spliter</th>
+                                                                    <th>Signal</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tfoot>
+                                                                <th>Total</th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>@response.spliter.map(x=> x._4).sum</th>
+                                                            </tfoot>
+                                                            @if(response.spliter != null) {
+                                                                <tbody >
+                                                                @for(i <- 0 until response.spliter.length) {
+                                                                    <tr>
+                                                                        <th>@response.spliter(i)._1</th>
+                                                                        <th>@response.spliter(i)._2</th>
+                                                                        <th>@response.spliter(i)._3</th>
+                                                                        <th>@response.spliter(i)._4</th>
+                                                                    </tr>
+                                                                }
+                                                                </tbody>
+                                                            }
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="x_panel tile " style="padding: 0px;">
+                                                    <div class="x_content">
+                                                        <table class="data table table-bordered tbScroll" id="tbIndex" style="width: 100%">
+                                                            <thead >
+                                                                <tr>
+                                                                    <th>Date time</th>
+                                                                    <th>Host</th>
+                                                                    <th>Module</th>
+                                                                    <th>Index</th>
+                                                                    <th>Rouge Error</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tfoot>
+                                                                <th>Total</th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th>@response.indexRouge.map(x=> x._5).sum</th>
+                                                            </tfoot>
+                                                            @for(i <- 0 until response.indexRouge.length) {
+                                                                <tr onclick="showSigLogChart(this,@i,'indexRouge',5)" class="aTag" name="@response.indexRouge(i)._1/@response.indexRouge(i)._2/@response.indexRouge(i)._3">
+                                                                    <th>@response.indexRouge(i)._1</th>
+                                                                    <th>@response.indexRouge(i)._2</th>
+                                                                    <th>@response.indexRouge(i)._3</th>
+                                                                    <th>@response.indexRouge(i)._4</th>
+                                                                    <th>@response.indexRouge(i)._5</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="5" style="padding: 0px;">
+                                                                        <div class="collapse" id="indexRouge@i"></div>
+                                                                    </td>
+                                                                    <td style="display: none"></td>
+                                                                    <td style="display: none"></td>
+                                                                    <td style="display: none"></td>
+                                                                    <td style="display: none"></td>
+                                                                </tr>
+                                                            }
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                </div>
-                            </div>
-                            <div id="tabBroken" class="tab-slider--body">
-                                <div class="row top_tiles">
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <div class="x_panel tile " style="padding: 0px;">
-                                            <div class="x_content">
-                                                <table class="data table table-bordered tbScroll" id="tbInf" style="width: 100%">
-                                                    <thead >
-                                                        <tr>
-                                                            <th style="width: 40%">Date time</th>
-                                                            <th>Host</th>
-                                                            <th>Module</th>
-                                                            <th>Inf Down</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tfoot>
-                                                        <th>Total</th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th>@response.infDown.map(x=> x._4).sum</th>
-                                                    </tfoot>
-                                                    @if(response.infDown != null) {
-                                                        <tbody >
-                                                        @for(i <- 0 until response.infDown.length) {
-                                                            <tr onclick="showSigLogChart(this,@i,'infDown',4)" class="aTag" name="@response.infDown(i)._1/@response.infDown(i)._2/@response.infDown(i)._3">
-                                                                <th>@response.infDown(i)._1</th>
-                                                                <th>@response.infDown(i)._2</th>
-                                                                <th>@response.infDown(i)._3</th>
-                                                                <th>@response.infDown(i)._4</th>
-                                                            </tr>
-                                                        }
-                                                        </tbody>
-                                                    }
-                                                </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tabHost">
+                                        <div class="row top_tiles" id="divTotal" style="display: none">
+                                            <div class="boxCss animated col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                                <div class="tile-stats" style="background-color: #1ABB9C;display: inherit">
+                                                    <div class="count" id="totalModule"></div>
+                                                    <div class="titLb">Total modules</div>
+                                                </div>
+                                            </div>
+                                            <div class="boxCss animated col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                                <div class="tile-stats" style="background-color: #f1b53d;display: inherit">
+                                                    <div class="count" id="totalSplitter"></div>
+                                                    <div class="titLb">Total splitters</div>
+                                                </div>
+                                            </div>
+                                            <div class="boxCss animated col-lg-4 col-md-4 col-sm-4 col-xs-12" >
+                                                <div class="tile-stats" style="display: inherit;background-color: #5A738E">
+                                                    <div class="count" id="totalClient"></div>
+                                                    <div class="titLb">Total Clients</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row top_tiles">
+                                            <div class="col-xs-12">
+                                                <div id="host" style="max-height: 600px;background: #fff"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <div class="x_panel tile " style="padding: 0px;">
-                                            <div class="x_content">
-                                                <table class="data table table-bordered tbScroll" id="tbUserDown" style="width: 100%">
-                                                    <thead >
-                                                        <tr>
-                                                            <th style="width: 40%">Date time</th>
-                                                            <th>Host</th>
-                                                            <th>Module</th>
-                                                            <th>User Down</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tfoot>
-                                                        <th style="width: 28%">Total</th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th>@response.userDown.map(x=> x._4).sum</th>
-                                                    </tfoot>
-                                                    @if(response.userDown != null) {
-                                                        <tbody >
-                                                        @for(i <- 0 until response.userDown.length) {
-                                                            <tr onclick="showSigLogChart(this,@i,'userDown',4)" class="aTag" name="@response.userDown(i)._1/@response.userDown(i)._2/@response.userDown(i)._3">
-                                                                <th>@response.userDown(i)._1</th>
-                                                                <th>@response.userDown(i)._2</th>
-                                                                <th>@response.userDown(i)._3</th>
-                                                                <td>@response.userDown(i)._4</td>
-                                                            </tr>
-                                                        }
-                                                        </tbody>
-                                                    }
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row top_tiles">
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <div class="x_panel tile " style="padding: 0px;">
-                                            <div class="x_content">
-                                                <table class="data table table-bordered tbScroll" id="tbSpliter" style="width: 100%">
-                                                    <thead >
-                                                        <tr>
-                                                            <th>Date time</th>
-                                                            <th>Host</th>
-                                                            <th>Spliter</th>
-                                                            <th>Signal</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tfoot>
-                                                        <th>Total</th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th>@response.spliter.map(x=> x._4).sum</th>
-                                                    </tfoot>
-                                                    @if(response.spliter != null) {
-                                                        <tbody >
-                                                        @for(i <- 0 until response.spliter.length) {
-                                                            <tr>
-                                                                <th>@response.spliter(i)._1</th>
-                                                                <th>@response.spliter(i)._2</th>
-                                                                <th>@response.spliter(i)._3</th>
-                                                                <th>@response.spliter(i)._4</th>
-                                                            </tr>
-                                                        }
-                                                        </tbody>
-                                                    }
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <div class="x_panel tile " style="padding: 0px;">
-                                            <div class="x_content">
-                                                <table class="data table table-bordered tbScroll" id="tbIndex" style="width: 100%">
-                                                    <thead >
-                                                        <tr>
-                                                            <th>Date time</th>
-                                                            <th>Host</th>
-                                                            <th>Module</th>
-                                                            <th>Index</th>
-                                                            <th>Rouge Error</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tfoot>
-                                                        <th>Total</th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th>@response.indexRouge.map(x=> x._5).sum</th>
-                                                    </tfoot>
-                                                    @for(i <- 0 until response.indexRouge.length) {
-                                                        <tr onclick="showSigLogChart(this,@i,'indexRouge',5)" class="aTag" name="@response.indexRouge(i)._1/@response.indexRouge(i)._2/@response.indexRouge(i)._3">
-                                                            <th>@response.indexRouge(i)._1</th>
-                                                            <th>@response.indexRouge(i)._2</th>
-                                                            <th>@response.indexRouge(i)._3</th>
-                                                            <th>@response.indexRouge(i)._4</th>
-                                                            <th>@response.indexRouge(i)._5</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="5" style="padding: 0px;">
-                                                                <div class="collapse" id="indexRouge@i"></div>
-                                                            </td>
-                                                            <td style="display: none"></td>
-                                                            <td style="display: none"></td>
-                                                            <td style="display: none"></td>
-                                                            <td style="display: none"></td>
-                                                        </tr>
-                                                    }
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -419,36 +462,65 @@
                 ]
             });
 
-            $(".tab-slider--body").hide();
-            $(".tab-slider--body:first").show();
-            $(".tab-slider--nav li").click(function() {
+            $('.nav-tabs li').click(function () {
+                $('.nav-tabs li').removeClass('in').removeClass('active')
+                var tab = $(this).find('a').attr('class')
                 $('#search').val("")
-                $(".tab-slider--body").hide();
-                var activeTab = $(this).attr("rel");
-                $("#"+activeTab).fadeIn();
-                if($(this).attr("rel") == "tabBroken"){
-                    $('.tab-slider--tabs').addClass('slide');
+                $('.'+tab).parent().addClass("in").addClass("active")
+                $('.tab-pane').removeClass("in").removeClass("active")
+                $('#search').removeClass("autocomplete")
+                if(tab == "tabBroken"){
+                    $('#'+tab).addClass("in").addClass("active")
                     tbUserDown.search( $('#search').val() ).draw();
                     tbInf.search( $('#search').val() ).draw();
                     tbSpliter.search( $('#search').val() ).draw();
                     tbIndex.search( $('#search').val() ).draw();
-                }else{
-                    $('.tab-slider--tabs').removeClass('slide');
+                }
+                else if(tab == "tabEvent"){
+                    $('#'+tab).addClass("in").addClass("active")
                     tbSf.search($('#search').val()).draw();
                 }
-                $(".tab-slider--nav li").removeClass("active");
-                $(this).addClass("active");
-            });
+                else{
+                    $('#search').addClass("autocomplete")
+                    $('#'+tab).addClass("in").addClass("active")
+                    // for search tab host
+                    jQuery.get('../assets/host_inf.csv', function (data) {
+                        $(".autocomplete").autocomplete({
+                            source: data.split('\n'),
+                            select: function (event, ui) {
+                                var host = ui.item.value
+                                $.ajax({
+                                    url: "/inf/getHostMonitor?host="+host,
+                                    cache: false,
+                                    success: function (dta) {
+                                        if(dta != "Error"){
+                                            $('.boxCss').removeClass("flipInY")
+                                            $('#divTotal').show()
+                                            var nf = new Intl.NumberFormat()
+                                            $('.boxCss').addClass("flipInY")
+                                            $('#totalClient').text( nf.format(dta.totalClient))
+                                            $('#totalSplitter').text(dta.totalSpliter)
+                                            $('#totalModule').text(dta.totalModule)
+                                            drawHost(dta,host)
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
+            })
 
+            // for search DataTable
             $('#search').on('keyup', function () {
-                var nameTab = $('.tab-slider--tabs').find('li.active').attr('rel')
+                var nameTab = $('.nav-tabs li.active').find('a').attr('class')
                 if(nameTab == "tabBroken"){
                     tbUserDown.search( this.value ).draw();
                     tbInf.search( this.value ).draw();
                     tbSpliter.search( this.value ).draw();
                     tbIndex.search( this.value ).draw();
                 }
-                else
+                else if(nameTab == "tabEvent")
                   tbSf.search( this.value ).draw();
             });
 
@@ -463,6 +535,218 @@
                 }
             });
         })
+
+        function getEdgeHost(dta){
+            var jsonArr = [];
+            for (var i = 0; i < dta.length; i++) {
+                jsonArr.push({
+                    from: 0,
+                    to: dta[i]
+                });
+            }
+            return jsonArr
+        }
+
+        function getNodeHost(dta,idhost){
+            var jsonArr = [];
+            jsonArr.push({
+                id: 0,
+                label: "Host "+idhost,
+                color: "#1ABB9C"
+            });
+            for (var i = 0; i < dta.length; i++) {
+                jsonArr.push({
+                    id: dta[i],
+                    label:"Module "+dta[i],
+                    color: "#9B59B6"
+                });
+            }
+            return jsonArr
+        }
+
+        function drawHost(data,idHost){
+            //console.log(Object.keys(data).length)
+            if(data.host.length == 0 )
+                $('#host').attr('style','height:70px;background: #fff');
+            else
+                $('#host').attr('style','height: 600px;background: #fff');
+            // Nodes HOST
+            /*var nodeHost1 = new vis.DataSet([
+                {id: 0, label: 'Root',color:'#9B59B6'},
+                {id: 1, label: 'Host1',color:'#1ABB9C'},
+                {id: 2, label: 'Host2',color:'#1ABB9C'},
+                {id: 11,label: 'Module1'},
+                {id: 12,label: 'Module2'},
+                {id: 111,label: 'Splitter1'},
+                {id: 112,label: 'Splitter2'}
+            ]);*/
+            // console.log(getNodeHost(data,idBras))
+            var nodeHost = new vis.DataSet(getNodeHost(data.module,idHost))
+            //console.log(nodeHost)
+            // create an array with edges to represent the network
+            /*var edgeHost1 = new vis.DataSet([
+                {from: 0, to: 1},
+                {from: 0, to: 2},
+                {from: 1, to: 11},
+                {from: 1, to: 12},
+                {from: 11, to: 111},
+                {from: 11, to: 112}
+            ]);*/
+            var edgeHost = new vis.DataSet(getEdgeHost(data.module))
+            //console.log(edgeHost)
+            // Find contained in document
+            var divHost = document.getElementById('host');
+            //Define data object and the options of the network
+            var arrHost = {
+                nodes: nodeHost,
+                edges: edgeHost
+            };
+            var optionsHost = {
+                autoResize: true,
+                height: '100%',
+                width: '100%'
+            };
+            //Define the network object to be rendered.
+            var host = new vis.Network(divHost, arrHost, optionsHost);
+            host.on("click", function (params) {
+                var id = params['nodes']['0'];
+                var numConnects = host.getConnectedEdges(id).length
+                // click host
+                if(id!= undefined && id==0) {
+                    $('#host').attr('style','height: 600px;background: #fff');
+                    drawHost(data,idHost)
+                }
+                // click module
+                else if(id!= undefined && id.indexOf('/')< 0 && id !=0){
+                    $('#host').attr('style', 'height: 800px;background: #fff')
+                    if(numConnects <=1) {
+                        addNodeEdgesLevel1(id, data, nodeHost, edgeHost)
+                    }
+                    else{
+                        removeNodeEdgeLevel12(id, data, nodeHost, edgeHost,host)
+                    }
+                }
+                // click splitter
+                else if(id!= undefined && id.indexOf('/')>= 0){
+                    $('#host').attr('style','height: 800px;background: #fff');
+                    if(numConnects <= 1) {
+                        addNodeEdgesLevel2(id, data, nodeHost, edgeHost)
+                    }
+                    else{
+                        removeNodeEdgeLevel2(id, data, nodeHost, edgeHost)
+                    }
+                }
+            });
+        }
+
+        /* add node edge vis js */
+        function addNodeEdgesLevel2(id, data,nodeHost,edgeHost){
+            var idModule = id.substring(0,id.indexOf("/"))
+            var idSpliter = id.substring(id.indexOf("/")+1,id.length)
+            // add node Index
+            var arrIndex = new Array()
+            for(var i=0;i<data.host.length;i++){
+                if(data.host[i][0] == idModule && data.host[i][1] == idSpliter){
+                    arrIndex.push(data.host[i][2])
+                }
+            }
+            var indexs = [];
+            $.each(arrIndex, function(i, el){
+                if($.inArray(el, indexs) === -1) indexs.push(el);
+            });
+
+            for(var j=0;j<indexs.length;j++){
+                nodeHost.add({
+                    id: id+'/'+indexs[j],
+                    label: 'Index '+indexs[j],
+                    color: '#3276b1'
+                });
+                // update edge
+                edgeHost.add([{
+                    id: 'idx'+id+'/'+indexs[j],
+                    from: id,
+                    to: id+'/'+indexs[j]
+                }]);
+            }
+        }
+
+        function addNodeEdgesLevel1(idModule, data,nodeHost,edgeHost){
+            // add node splitter
+            var arrSpliter = new Array()
+            for(var i=0;i<data.host.length;i++){
+                if(data.host[i][0] == idModule){
+                    arrSpliter.push(data.host[i][1])
+                }
+            }
+            var spliters = [];
+            $.each(arrSpliter, function(i, el){
+                if($.inArray(el, spliters) === -1) spliters.push(el);
+            });
+
+            for(var j=0;j<spliters.length;j++){
+                nodeHost.add({
+                    id: idModule+'/'+spliters[j],
+                    label: spliters[j],
+                    color: '#f60'
+                });
+                // update edge
+                edgeHost.add([{
+                    id: 'spl-'+idModule+'/'+spliters[j],
+                    from: idModule,
+                    to: idModule+'/'+spliters[j]
+                }]);
+            }
+        }
+
+        /* remove node edge vis js*/
+        function removeNodeEdgeLevel2(id, data,nodeHost,edgeHost){
+            var idModule = id.substring(0,id.indexOf("/"))
+            var idSpliter = id.substring(id.indexOf("/")+1,id.length)
+            // remove node Index
+            var arrIndex = new Array()
+            for(var i=0;i<data.host.length;i++){
+                if(data.host[i][0] == idModule && data.host[i][1] == idSpliter){
+                    arrIndex.push(data.host[i][2])
+                }
+            }
+            var indexs = [];
+            $.each(arrIndex, function(i, el){
+                if($.inArray(el, indexs) === -1) indexs.push(el);
+            });
+
+            for(var j=0;j<indexs.length;j++){
+                // remove node
+                nodeHost.remove(id+'/'+indexs[j]);
+                // remove edge
+                edgeHost.remove('idx'+id+'/'+indexs[j]);
+            }
+        }
+
+        function removeNodeEdgeLevel12(idModule, data,nodeHost,edgeHost,host){
+            // remove node Splitter
+            var arrSpliter = new Array()
+            for(var i=0;i<data.host.length;i++){
+                if(data.host[i][0] == idModule){
+                    arrSpliter.push(data.host[i][1])
+                }
+            }
+            var spliters = [];
+            $.each(arrSpliter, function(i, el){
+                if($.inArray(el, spliters) === -1) spliters.push(el);
+            });
+
+            for(var j=0;j<spliters.length;j++){
+                // remove node Index if exists
+                var numConnects = host.getConnectedEdges(idModule+'/'+spliters[j]).length
+                if(numConnects >1){
+                    removeNodeEdgeLevel2(idModule+'/'+spliters[j],data,nodeHost,edgeHost)
+                }
+                // remove node
+                nodeHost.remove(idModule+'/'+spliters[j]);
+                // remove edge
+                edgeHost.remove('splt-'+idModule+'/'+spliters[j]);
+            }
+        }
 
         function showSigLogChart(el,_index,_type,totalCol){
             var containerSiglog = 'siglog_'+_type+'' + _index

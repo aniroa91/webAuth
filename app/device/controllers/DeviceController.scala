@@ -432,6 +432,23 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
+  def getHostMonitor(host: String) = Action { implicit request =>
+    try{
+      val rsHost =  Await.result(BrasService.getHostMonitor(host),Duration.Inf)
+      val jsInf = Json.obj(
+        "host" -> rsHost,
+        "module" -> rsHost.map(x=> x._1).distinct,
+        "totalClient"-> rsHost.map(x=> x._3.toInt).sum,
+        "totalSpliter"-> rsHost.map(x=> x._2).distinct.length,
+        "totalModule"-> rsHost.map(x=> x._1).distinct.length
+      )
+      Ok(Json.toJson(jsInf))
+    }
+    catch{
+      case e: Exception => Ok("error")
+    }
+  }
+
   def groupRegionByMonth(month: String,_typeNoc: String,_typeError: String) = Action { implicit request =>
     try{
       // get Opsview Types
