@@ -30,7 +30,7 @@
 
 
                     <div class="input-group">
-                        <input type="text" class="form-control" id="search" placeholder="Search host ..." style="border-radius:0">
+                        <input type="text" class="form-control autocomplete" id="search" placeholder="Search host ..." style="border-radius:0">
                         <div class="input-group-addon groupSearch" ><i class="fa fa-search"></i></div>
                     </div>
                 </div>
@@ -481,8 +481,8 @@
                 $('#search').val("")
                 $('.'+tab).parent().addClass("in").addClass("active")
                 $('.tab-pane').removeClass("in").removeClass("active")
-                $('#search').removeClass("autocomplete")
                 if(tab == "tabBroken"){
+                    $(".autocomplete").autocomplete({disabled: true})
                     $('#'+tab).addClass("in").addClass("active")
                     tbUserDown.search( $('#search').val() ).draw();
                     tbInf.search( $('#search').val() ).draw();
@@ -490,15 +490,16 @@
                     tbIndex.search( $('#search').val() ).draw();
                 }
                 else if(tab == "tabEvent"){
+                    $(".autocomplete").autocomplete({disabled: true})
                     $('#'+tab).addClass("in").addClass("active")
                     tbSf.search($('#search').val()).draw();
                 }
                 else{
-                    $('#search').addClass("autocomplete")
                     $('#'+tab).addClass("in").addClass("active")
                     // for search tab host
                     jQuery.get('../assets/host_inf.csv', function (data) {
                         $(".autocomplete").autocomplete({
+                            disabled: false,
                             source: data.split('\n'),
                             select: function (event, ui) {
                                 var host = ui.item.value
