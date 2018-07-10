@@ -167,10 +167,10 @@
 
                                 <div class="col-lg-12">
                                     <div id="divallMonth">
-                                        <a href="/device" class="btn btn-info"><i class="fa fa-refresh" aria-hidden="true"></i></a>
-                                        <input type="hidden" id="monthGroup" value="">
+                                        <input type="hidden" id="monthGroup" value="@response.time.fromDate/@response.time.toDate">
+                                        <a onclick="groupRegionByMonth(this,0)" type="button" class="btn btnDefault month"><i class="fa fa-refresh" aria-hidden="true"></i></a>
                                         @for(i <- 0 until response.time.rangeMonth.length ){
-                                            <a onclick="groupRegionByMonth(this)" type="button" class="btn btnDefault month">@response.time.rangeMonth(i)</a>
+                                            <a onclick="groupRegionByMonth(this,1)" type="button" class="btn btnDefault month">@response.time.rangeMonth(i)</a>
                                         }
                                     </div>
                                 </div>
@@ -1370,15 +1370,16 @@
                 return jsArray
             }
 
-            function groupRegionByMonth(el){
-                var newDate = $(el).text()
+            function groupRegionByMonth(el,_type){
+                var newDate = $('#startMonth').val()+"/"+$('#endMonth').val()
+                if(_type == 1) newDate = $(el).text()
                 $('#monthGroup').val(newDate)
                 $('#divallMonth a.month').removeClass('btn-success')
                 $('#divallMonth a.month').addClass('btnDefault')
                 $(el).removeClass('btnDefault')
                 $(el).addClass('btn-success')
                 $.ajax({
-                    url: "/groupRegionByMonth?month=" + $(el).text()+"&_typeNoc="+$('#typeNocCount').val()+"&_typeError="+$('#typeInfError').val(),
+                    url: "/groupRegionByMonth?month=" + newDate+"&_typeNoc="+$('#typeNocCount').val()+"&_typeError="+$('#typeInfError').val(),
                     cache: false,
                     success: function (dta) {
                         if(dta != "Error"){

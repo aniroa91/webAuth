@@ -324,28 +324,42 @@
             </div>
 
             <div class="row top_tiles">
-                <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-12">
                     <div class="tile-stats" style="background-color: #64b0f2;
                         display: inherit">
                         <div class="count ">@formatPattern(response.currentsInfo.noOutlier)</div>
                         <div class="titLb">Outlier of Bras</div>
                     </div>
                 </div>
-                <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-12">
                     <div class="tile-stats" style="background-color: #f1b53d;
                         display: inherit">
                         <div class="count ">@formatPattern(response.currentsInfo.siginLogoff._1)</div>
                         <div class="titLb">Signin</div>
                     </div>
                 </div>
-                <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12" >
+                <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-12">
                     <div class="tile-stats" style="display: inherit;
-                        background-color: #3db9dc">
+                        background-color: #345F90">
                         <div class="count ">@formatPattern(response.currentsInfo.siginLogoff._2)</div>
                         <div class="titLb">Logoff</div>
                     </div>
                 </div>
-                <div class="boxCss animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <div class="tile-stats" style="background-color: #832d1d;
+                        display: inherit">
+                        <div class="count ">@formatPattern(response.currentsInfo.siginLogoffClients._1)</div>
+                        <div class="titLb">Signin Clients</div>
+                    </div>
+                </div>
+                <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-12" >
+                    <div class="tile-stats" style="display: inherit;
+                        background-color: #73879C">
+                        <div class="count ">@formatPattern(response.currentsInfo.siginLogoffClients._2)</div>
+                        <div class="titLb">Logoff Clients</div>
+                    </div>
+                </div>
+                <div class="boxCss animated flipInY col-lg-2 col-md-2 col-sm-2 col-xs-12">
                     <div class="tile-stats" style="display: inherit;
                         background-color: #ff5d48">
                         <div class="count">@response.currentsInfo.noOutlierByhost</div>

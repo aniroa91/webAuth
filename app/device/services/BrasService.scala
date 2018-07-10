@@ -172,21 +172,19 @@ object BrasService extends AbstractService{
     BrasDAO.getInfDownMudule(day)
   }
 
-  /*def getBrasOutlierJson(day: String): Array[(String,String,Int,Int)] ={
+  def getSiglogContract(host: String): Array[(String,String,String)] = {
+    val dt = new DateTime()
+    val currentDate = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val nowDay = DateTime.parse(CommonService.getCurrentDay()+" 00:00:00", formatter).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val response = client.execute(
-      search(s"monitor-radius-$day" / "docs")
-        query { must(termQuery("label","outlier")) }
-        sortBy { fieldSort("date_time") order SortOrder.DESC } size 100
+      search(s"radius-streaming-*" / "docs")
+        query { must(termQuery("type", "con"), termQuery("card.olt", host),rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lte(CommonService.formatStringToUTC(currentDate)))}
+        sortBy{ fieldSort("timestamp") order SortOrder.DESC} size 1000
     ).await
-    val brasOutlier = response.hits.hits.map(x => x.sourceAsMap)
-      .map(x =>
-        ( getValueAsString(x, "bras_id"),
-          formatUTC(getValueAsString(x, "date_time")),
-          getValueAsInt(x,"signIn"),
-        getValueAsInt(x,"logOff"))
-      )
-    brasOutlier
-  }*/
+    response.hits.hits.map(x=> x.sourceAsMap).map(x=> (getValueAsString(x,"name"),getValueAsString(x,"typeLog"),getValueAsString(x,"timestamp")))
+
+  }
 
   def getUserLogOff(bras: String,time: String,typeLog: String): Array[(String,String,String)] = {
     val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
@@ -221,7 +219,7 @@ object BrasService extends AbstractService{
               termsAggregation("card")
                 .field("card.id")
             )
-          ) size 0
+          ) size 100
     ).await
     val mapHeat = CommonService.getSecondAggregations(response.aggregations.get("linecard"),"card")
     mapHeat.flatMap(x => x._2.map(y => x._1 -> y))
@@ -299,8 +297,13 @@ object BrasService extends AbstractService{
   def getSigLogResponse(bras: String,fromDay: String,nextDay: String):Future[Seq[(Int,Int)]] = {
     BrasDAO.getSigLogResponse(bras,fromDay,nextDay)
   }
+
   def getSigLogCurrent(bras: String,nowDay: String):(Int,Int) = {
     BrasDAO.getSigLogCurrent(bras,nowDay)
+  }
+
+  def getSiglogClients(bras: String,nowDay: String): (Int,Int) = {
+    BrasDAO.getSiglogClients(bras,nowDay)
   }
 
   def getNoOutlierResponse(bras: String,nowDay: String):Future[Seq[(Int)]] = {

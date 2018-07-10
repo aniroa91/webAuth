@@ -49,6 +49,12 @@ object CommonService extends AbstractService {
    * Service for Get Information about day
    */
 
+  def getSigLogByNameContract(name: String, arr: Array[(String,String,String)]): String = {
+    val rs = arr.filter(x=> x._1 == name.toLowerCase)
+    val status = rs.groupBy(_._1).mapValues(_.max).map(_._2).toList.sortBy(_._2).toArray
+    return if(status.length>0) status(0)._2 else "none"
+  }
+
   def getLongValueByKey(arr: Array[(String,Long)], key:String):Int = {
     var value = 0;
     breakable{for(i <- 0 until arr.length){
@@ -122,7 +128,7 @@ object CommonService extends AbstractService {
 
   def get3MonthAgo(): String = {
     val date = new DateTime()
-    date.minusMonths(3).toString(DateTimeFormat.forPattern("yyyy-MM"))
+    date.minusMonths(4).toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
   def getnumMonthAgo(num: Int): String = {

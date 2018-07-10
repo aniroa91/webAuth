@@ -293,20 +293,32 @@
                                     </div>
                                     <div class="tab-pane fade" id="tabHost">
                                         <div class="row top_tiles" id="divTotal" style="display: none">
-                                            <div class="boxCss animated col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <div class="boxCss animated col-lg-3 col-md-3 col-sm-3 col-xs-12" style="width: 20%">
                                                 <div class="tile-stats" style="background-color: #1ABB9C;display: inherit">
+                                                    <div class="count" id="totalSignin"></div>
+                                                    <div class="titLb">Total Signin</div>
+                                                </div>
+                                            </div>
+                                            <div class="boxCss animated col-lg-2 col-md-2 col-sm-2 col-xs-12" style="width: 20%">
+                                                <div class="tile-stats" style="background-color: #dc5a78;display: inherit">
+                                                    <div class="count" id="totalLogoff"></div>
+                                                    <div class="titLb">Total Logoff</div>
+                                                </div>
+                                            </div>
+                                            <div class="boxCss animated col-lg-2 col-md-2 col-sm-2 col-xs-12" style="width: 20%">
+                                                <div class="tile-stats" style="background-color: #73879C;display: inherit">
                                                     <div class="count" id="totalModule"></div>
                                                     <div class="titLb">Total modules</div>
                                                 </div>
                                             </div>
-                                            <div class="boxCss animated col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <div class="boxCss animated col-lg-2 col-md-2 col-sm-2 col-xs-12" style="width: 20%">
                                                 <div class="tile-stats" style="background-color: #f1b53d;display: inherit">
                                                     <div class="count" id="totalSplitter"></div>
                                                     <div class="titLb">Total splitters</div>
                                                 </div>
                                             </div>
-                                            <div class="boxCss animated col-lg-4 col-md-4 col-sm-4 col-xs-12" >
-                                                <div class="tile-stats" style="display: inherit;background-color: #5A738E">
+                                            <div class="boxCss animated col-lg-3 col-md-3 col-sm-3 col-xs-12" style="width: 20%">
+                                                <div class="tile-stats" style="display: inherit;background-color: #3498DB">
                                                     <div class="count" id="totalClient"></div>
                                                     <div class="titLb">Total Clients</div>
                                                 </div>
@@ -358,6 +370,7 @@
         <!-- Hight chart -->
     <script src="../assets/javascripts/highcharts.js"></script>
     <script src="../assets/javascripts/exporting.js"></script>
+    <script src="../assets/javascripts/waitMe.js"></script>
         <!-- Datatable -->
     <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -492,6 +505,15 @@
                                 $.ajax({
                                     url: "/inf/getHostMonitor?host="+host,
                                     cache: false,
+                                    beforeSend: function () {
+                                        $('#tabHost').waitMe({
+                                            effect: 'roundBounce',
+                                            text: 'Please wait...',
+                                            bg: 'rgba(255,255,255,0.7)',
+                                            color: '#000',
+                                            textPos: 'vertical'
+                                        });
+                                    },
                                     success: function (dta) {
                                         if(dta != "Error"){
                                             $('.boxCss').removeClass("flipInY")
@@ -501,8 +523,13 @@
                                             $('#totalClient').text( nf.format(dta.totalClient))
                                             $('#totalSplitter').text(dta.totalSpliter)
                                             $('#totalModule').text(dta.totalModule)
+                                            $('#totalSignin').text(dta.totalSignin)
+                                            $('#totalLogoff').text(dta.totalLogoff)
                                             drawHost(dta,host)
                                         }
+                                    },
+                                    complete: function () {
+                                        $('#tabHost').waitMe("hide");
                                     }
                                 });
                             }
@@ -552,7 +579,7 @@
             jsonArr.push({
                 id: 0,
                 label: "Host "+idhost,
-                color: "#1ABB9C"
+                color: "#f1b53d"
             });
             for (var i = 0; i < dta.length; i++) {
                 jsonArr.push({
@@ -647,7 +674,7 @@
             var arrIndex = new Array()
             for(var i=0;i<data.host.length;i++){
                 if(data.host[i][0] == idModule && data.host[i][1] == idSpliter){
-                    arrIndex.push(data.host[i][2])
+                    arrIndex.push(data.host[i][2]+"/"+data.host[i][3])
                 }
             }
             var indexs = [];
@@ -656,16 +683,26 @@
             });
 
             for(var j=0;j<indexs.length;j++){
+                var contracts = indexs[j].split("/")[0]
+                var status = indexs[j].split("/")[1]
+                var color = "#73879C"
+                if(status == "SignIn"){
+                    color = "#1ABB9C"
+                }
+                else if(status == "LogOff"){
+                    color =  "red"
+                }
                 nodeHost.add({
-                    id: id+'/'+indexs[j],
-                    label: 'Index '+indexs[j],
-                    color: '#3276b1'
+                    id: id+'/'+contracts,
+                    label: contracts,
+                    title: "Status: "+status,
+                    color: color
                 });
                 // update edge
                 edgeHost.add([{
-                    id: 'idx'+id+'/'+indexs[j],
+                    id: 'idx'+id+'/'+contracts,
                     from: id,
-                    to: id+'/'+indexs[j]
+                    to: id+'/'+contracts
                 }]);
             }
         }

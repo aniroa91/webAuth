@@ -102,7 +102,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val signIn = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> -x._2).toArray)
       val logoff = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> x._2).toArray)
       // get Total Device Errors By Severity
-      val mapCount = Await.result(BrasService.getProvinceCount(""), Duration.Inf)
+      val mapCount = Await.result(BrasService.getProvinceCount(fromMonth+"/"+toMonth), Duration.Inf)
       val alertCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
       val critCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
       val warningCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
@@ -114,7 +114,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val mapContract = Await.result(BrasService.getProvinceContract(fromMonth,toMonth), Duration.Inf)
       val contracts = mapContract.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
       // get Total Notices By Status
-      val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(""), Duration.Inf)
+      val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(fromMonth+"/"+toMonth), Duration.Inf)
       val opsviewType = mapOpsviewType.map(x=> (LocationUtils.getRegion(x._1),x._2,x._3,x._4,x._5)).toArray
       val ok_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
       val warning_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.toArray
@@ -122,7 +122,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val crit_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._5).sum).toSeq.sorted.toArray
       val heatmapOpsview = (ok_opsview++warning_opsview++unknown_opsview++crit_opsview).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toSeq.sorted.toArray
       // get Total INF Errors By Type
-      val mapInfType = Await.result(BrasService.getProvinceInfDownError(""), Duration.Inf)
+      val mapInfType = Await.result(BrasService.getProvinceInfDownError(fromMonth+"/"+toMonth), Duration.Inf)
       val infDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
       val userDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
       val rougeError = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
@@ -139,8 +139,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def getcountType(id: String,month: String) = Action { implicit request =>
     try{
+      val monthRange = if(month.indexOf("/")>=0) month.split("/")(0)+"-01/"+month.split("/")(1)+"-01" else month
       // get NOC count by Region
-      val mapCount = Await.result(BrasService.getProvinceCount(month), Duration.Inf)
+      val mapCount = Await.result(BrasService.getProvinceCount(monthRange), Duration.Inf)
       val alertCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
       val critCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
       val warningCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
@@ -201,7 +202,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def geterrorType(id: String,month: String) = Action { implicit request =>
     try{
-      val mapInfType = Await.result(BrasService.getProvinceInfDownError(month), Duration.Inf)
+      val monthRange = if(month.indexOf("/")>=0) month.split("/")(0)+"-01/"+month.split("/")(1)+"-01" else month
+      val mapInfType = Await.result(BrasService.getProvinceInfDownError(monthRange), Duration.Inf)
       val infDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
       val userDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
       val rougeError = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
@@ -434,14 +436,20 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def getHostMonitor(host: String) = Action { implicit request =>
     try{
+      //val t02 = System.currentTimeMillis()
       val rsHost =  Await.result(BrasService.getHostMonitor(host),Duration.Inf)
+      val rsGraph = BrasService.getSiglogContract(host)
+      val sigLog = rsHost.map(x=> (x._1,x._2,x._3,CommonService.getSigLogByNameContract(x._3,rsGraph)))
       val jsInf = Json.obj(
-        "host" -> rsHost,
+        "host" -> sigLog,
         "module" -> rsHost.map(x=> x._1).distinct,
-        "totalClient"-> rsHost.map(x=> x._3.toInt).sum,
+        "totalClient"-> rsHost.map(x=> x._3).distinct.length,
         "totalSpliter"-> rsHost.map(x=> x._2).distinct.length,
-        "totalModule"-> rsHost.map(x=> x._1).distinct.length
+        "totalModule"-> rsHost.map(x=> x._1).distinct.length,
+        "totalSignin" -> sigLog.filter(x=> x._4 == "SignIn").length,
+        "totalLogoff" -> sigLog.filter(x=> x._4 == "LogOff").length
       )
+      //println("time: "+(System.currentTimeMillis() - t02))
       Ok(Json.toJson(jsInf))
     }
     catch{
@@ -451,8 +459,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def groupRegionByMonth(month: String,_typeNoc: String,_typeError: String) = Action { implicit request =>
     try{
+      val monthRange = if(month.indexOf("/")>=0) month.split("/")(0)+"-01/"+month.split("/")(1)+"-01" else month
       // get Opsview Types
-      val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(month), Duration.Inf)
+      val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(monthRange), Duration.Inf)
       val opsviewType = mapOpsviewType.map(x=> (LocationUtils.getRegion(x._1.trim),x._2,x._3,x._4,x._5)).toArray
       val ok_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
       val warning_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.toArray
@@ -464,7 +473,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "categories" -> heatmapOpsview.map(x=>x._1)
       )
       // get NOC count by Region
-      val mapCount = Await.result(BrasService.getProvinceCount(month), Duration.Inf)
+      val mapCount = Await.result(BrasService.getProvinceCount(monthRange), Duration.Inf)
 
       val typeCount = _typeNoc match {
         case "AlertCount" => mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
@@ -481,7 +490,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "categories" -> typeCount.map(x=> x._1).toSeq.distinct.sorted
       )
       // get Inf down, user down,lost signal,rouge error by Region
-      val mapInfType = Await.result(BrasService.getProvinceInfDownError(month), Duration.Inf)
+      val mapInfType = Await.result(BrasService.getProvinceInfDownError(monthRange), Duration.Inf)
       val typeInferr = _typeError match {
         case "InfDown" => mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
         case "UseDown" => mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._4)).toArray
@@ -670,9 +679,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def drillUpNoticeByStatus(id: String,month: String) = Action { implicit request  =>
     try{
+      val monthRange = if(month.indexOf("/")>=0) month.split("/")(0)+"-01/"+month.split("/")(1)+"-01" else month
       val rs = id match {
         case id if(id.equals("*")) => {
-          val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(month), Duration.Inf)
+          val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(monthRange), Duration.Inf)
           val opsviewType = mapOpsviewType.map(x=> (LocationUtils.getRegion(x._1),x._2,x._3,x._4,x._5)).toArray
           val ok_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
           val warning_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.toArray
@@ -681,7 +691,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           (ok_opsview++warning_opsview++unknown_opsview++crit_opsview).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toSeq.sorted
         }
         case id if(id.indexOf("Region")>=0) => {
-          val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1),LocationUtils.getRegion(x._1.trim),x._2,x._3,x._4,x._5)).asInstanceOf[Seq[(String,String,Int,Int,Int,Int)]].filter(x=> x._2==id.split(":")(1))
+          val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(monthRange), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1),LocationUtils.getRegion(x._1.trim),x._2,x._3,x._4,x._5)).asInstanceOf[Seq[(String,String,Int,Int,Int,Int)]].filter(x=> x._2==id.split(":")(1))
           val opsviewType = mapOpsviewType.map(x=> (x._1,x._3,x._4,x._5,x._6)).toArray
           val ok_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
           val warning_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.toArray
@@ -703,10 +713,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def drilldownNoticeByStatus(id: String,month: String) = Action {implicit  request =>
     try{
+      val monthRange = if(month.indexOf("/")>=0) month.split("/")(0)+"-01/"+month.split("/")(1)+"-01" else month
       val rs = id match {
         // get status notice by Region
         case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
-          val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1),LocationUtils.getRegion(x._1.trim),x._2,x._3,x._4,x._5)).asInstanceOf[Seq[(String,String,Int,Int,Int,Int)]].filter(x=> x._2==id)
+          val mapOpsviewType = Await.result(BrasService.getProvinceOpsviewType(monthRange), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1),LocationUtils.getRegion(x._1.trim),x._2,x._3,x._4,x._5)).asInstanceOf[Seq[(String,String,Int,Int,Int,Int)]].filter(x=> x._2==id)
           val opsviewType = mapOpsviewType.map(x=> (x._1,x._3,x._4,x._5,x._6)).toArray
           val ok_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
           val warning_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.toArray
@@ -717,7 +728,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         }
         // get status notice by Province
         case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
-          val opsviewType = Await.result(BrasService.getBrasOpsviewType(month,LocationUtils.getCodeProvincebyName(id)), Duration.Inf).toArray
+          val opsviewType = Await.result(BrasService.getBrasOpsviewType(monthRange,LocationUtils.getCodeProvincebyName(id)), Duration.Inf).toArray
           val ok_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.toArray
           val warning_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.toArray
           val unknown_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
@@ -873,6 +884,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           // number sigin and logoff
           val t01 = System.currentTimeMillis()
           val sigLog = BrasService.getSigLogCurrent(brasId, day)
+          val sigLogClients = BrasService.getSiglogClients(brasId,day)
           logger.info("tSigLog: " + (System.currentTimeMillis() - t01))
           // SIGNIN LOGOFF BY TIME
           val t03 = System.currentTimeMillis()
@@ -955,7 +967,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           logger.info("tSiglogByhost: " + (System.currentTimeMillis() - t10))
 
           logger.info("timeAll: " + (System.currentTimeMillis() - timeStart))
-          Ok(device.views.html.search(form, username,null ,BrasResponse(BrasInfor(noOutlierByhost,numOutlier, (sigLog._1, sigLog._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
+          Ok(device.views.html.search(form, username,null ,BrasResponse(BrasInfor(noOutlierByhost,numOutlier, (sigLog._1, sigLog._2),(sigLogClients._1,sigLogClients._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
             infErrorBytime, infHostBytime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost, KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost), day, brasId,_typeS,routes.DeviceController.search))
         }
       }

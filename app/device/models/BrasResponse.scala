@@ -41,8 +41,9 @@ case class InfTypeError(
 case class BrasInfor(
                     noOutlierByhost: Int,
                     noOutlier: Int,
-                    siginLogoff:(Int,Int)
-                    )
+                    siginLogoff:(Int,Int),
+                    siginLogoffClients:(Int,Int)
+                   )
 
 case class KibanaOpviewByTime(
                        countK: Array[(Int,Int)],
