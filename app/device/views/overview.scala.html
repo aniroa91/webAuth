@@ -959,10 +959,17 @@
                     title:{
                         text: ''
                     },
-                    tooltip: {
+                    /*tooltip: {
                         shared: true
+                    },*/
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.name + '</b><br/><b>' + this.point.name + '</b><br/>'
+                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b><br/>Total clients: '+Highcharts.numberFormat(Math.abs(this.point.k), 0);
+                        }
                     },
-                    series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted))),2),
+                    series: getDrildownStackBarForsuyhao(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted)))),
                     drilldown:{
                         drillUpButton:{
                             relativeTo: 'spacingBox',
@@ -973,7 +980,7 @@
                                 y:-10
                             }
                         },
-                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted))),'normal')}
+                        series: getDrillDown2LevelForSuyhao(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted))))}
                 });
                 // Bar Logoff and Signin
                 var categoriesSigLog = ["Vung 1","Vung 2","Vung 3","Vung 4","Vung 5","Vung 6","Vung 7"]
@@ -1022,11 +1029,11 @@
                     tooltip: {
                         formatter: function () {
                             return '<b>' + this.series.name + '</b><br/><b>Region: ' + this.point.category + '</b><br/>'
-                                    +'Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
+                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b><br/>Total clients: '+Highcharts.numberFormat(Math.abs(this.point.k), 0);
                         }
                     },
 
-                    series: getSigLogByRegionStacked(@Html(Json.stringify(Json.toJson(response.sigLogRegion.signin))),@Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff))))
+                    series: getSigLogByRegionStacked(@Html(Json.stringify(Json.toJson(response.sigLogRegion.signin))),@Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff))),@Html(Json.stringify(Json.toJson(response.sigLogRegion.signin_clients))),@Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff_clients))),0)
                     /*[{
                         name: 'Signin',
                         color:'#669999',
@@ -1332,7 +1339,7 @@
                 callAjaxTopN("");
             }
 
-            function getSigLogByRegionStacked(sigIn,logOff){
+            function getSigLogByRegionStacked(sigIn,logOff,signinClients,logoffClients,sizeCates){
                 var jsArray = []
                 var colors = [
                     '#E74C3C',
@@ -1357,17 +1364,30 @@
                     jsArray.push({
                         name: ' Signin <br/>'+sigIn[i][0],
                         color:colors[i],
-                        data: sigIn[i][1]
+                        data: addParamClients(sigIn[i][1],signinClients[i][1],sizeCates)
                     })
                 }
                 for(var i=0;i< logOff.length;i++){
                     jsArray.push({
                         name: ' Logoff<br/>'+logOff[i][0],
                         color:colors[i],
-                        data: logOff[i][1]
+                        data: addParamClients(logOff[i][1],logoffClients[i][1],sizeCates)
                     })
                 }
                 return jsArray
+            }
+
+            function addParamClients(dta,clients,sizeCates){
+                var rs = []
+                var sizeArr = dta.length
+                if(sizeCates >0) sizeArr= sizeCates
+                for(var i=0;i<sizeArr;i++){
+                    rs.push({
+                        y: dta[i],
+                        k: clients[i]
+                    })
+                }
+                return rs
             }
 
             function groupRegionByMonth(el,_type){
@@ -2001,11 +2021,11 @@
                                 tooltip: {
                                     formatter: function () {
                                         return '<b>' + this.series.name + '</b><br/><b>' + this.point.category + '</b><br/>'
-                                                +'Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
+                                                +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b><br/>Total clients: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0);
                                     }
                                 },
 
-                                series: getSigLogByRegionStacked(dta.signin,dta.logoff)
+                                series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0].length)
 
                             });
                         }
@@ -2078,11 +2098,11 @@
                                 tooltip: {
                                     formatter: function () {
                                         return '<b>' + this.series.name + '</b><br/><b>' + this.point.category + '</b><br/>'
-                                                +'Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
+                                                +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b><br/>Total clients: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0);
                                     }
                                 },
 
-                                series: getSigLogByRegionStacked(dta.signin,dta.logoff)
+                                series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0].length)
 
                             });
                         }
@@ -2175,6 +2195,85 @@
                     })
                 }
                 return rs
+            }
+
+            function getDrillDown2LevelForSuyhao(dta,arrRegion,arrMonth){
+                var jsArray = []
+                for(var region=0;region< arrRegion.length;region++ ){
+                    for(var month=0;month< arrMonth.length;month++){
+                        // get array provinces and bras by month&region
+                        var arrProvinceBras = [], dtaRegion = []
+                        for(var i=0;i< dta.length;i++){
+                            if (arrMonth[month] == dta[i][0] && arrRegion[region] == dta[i][2]){
+                                arrProvinceBras.push({
+                                    province:dta[i][1],
+                                    bras: dta[i][4],
+                                    value:dta[i][3],
+                                    clients: dta[i][5]
+                                })
+                            }
+                        }
+                        // set array data by province
+                        var nameOld = arrProvinceBras[0].province, sumOld= 0,sumClientsSuyhao=0,
+                                isMoreProv =0,dtaProvince = []
+                        for(var k=0;k<arrProvinceBras.length;k++){
+                            if(k==(arrProvinceBras.length -1) || nameOld != arrProvinceBras[k].province){
+                                if(k==(arrProvinceBras.length -1)) sumOld += arrProvinceBras[k].value
+                                dtaRegion.push({
+                                    name: nameOld,
+                                    y: sumOld,
+                                    k: sumClientsSuyhao,
+                                    drilldown:nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                                })
+                                // set series province& bras
+                                //console.log(sortObjectsArray(dtaProvince,'y').slice(0,10))
+                                var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,9)
+                                jsArray.push({
+                                    id: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                                    name: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                                    data: top10Prov
+                                })
+                                dtaProvince = []
+                                nameOld = arrProvinceBras[k].province
+                                sumOld = arrProvinceBras[k].value
+                                sumClientsSuyhao = arrProvinceBras[k].clients
+                                isMoreProv =1
+                            }
+                            else{
+                                sumOld += Number(arrProvinceBras[k].value)
+                                sumClientsSuyhao += Number(arrProvinceBras[k].clients)
+                            }
+                            dtaProvince.push({
+                                name: arrProvinceBras[k].bras,
+                                y:Number(arrProvinceBras[k].value),
+                                k:Number(arrProvinceBras[k].clients)
+                            })
+                        }
+                        if(isMoreProv ==0){
+                            dtaRegion.push({
+                                name: nameOld,
+                                y: Number(sumOld),
+                                k: Number(sumClientsSuyhao),
+                                drilldown:nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                            })
+                            // set series province& bras
+                            jsArray.push({
+                                id: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                                name: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                                data: sortObjectsArray(dtaProvince,'name').slice(0,9)
+                            })
+                        }
+
+                        // set series regions& province
+                        jsArray.push({
+                            id: arrRegion[region]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                            name: arrRegion[region]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                            data: dtaRegion
+                        })
+                    }
+
+                }
+                return jsArray
             }
 
             function getDrillDown2Level(dta,arrRegion,arrMonth,_type){
@@ -2366,11 +2465,11 @@
                                 },
                                 tooltip : {
                                     headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
-                                    pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
+                                    pointFormat: '<b>{point.name}: {point.y}</b><br/>Total signin clients: {point.k}'
                                 },
                                 series: [{
                                     name: 'Bras',
-                                    data: getJsonDrillParent(dta.topSignin.dataBras),
+                                    data: getJsonDrillParenthaveClients(dta.topSignin.dataBras,dta.topSignin.dataClients),
                                     color: '#1ABB9C'
                                 }],
                                 drilldown: {
@@ -2414,7 +2513,7 @@
                                 },
                                 tooltip : {
                                     headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
-                                    pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
+                                    pointFormat: '<b>{point.name}: {point.y}</b><br/>Total logoff clients: {point.k}'
                                 },
                                 legend: {
                                     reversed: true
@@ -2426,7 +2525,7 @@
                                 },
                                 series: [{
                                     name: 'Bras',
-                                    data: getJsonDrillParent(dta.topLogoff.dataBras),
+                                    data: getJsonDrillParenthaveClients(dta.topLogoff.dataBras,dta.topLogoff.dataClients),
                                     color: '#d9534f'
                                 }],
                                 drilldown: {
@@ -2639,6 +2738,19 @@
                 });
             }
 
+            function getJsonDrillParenthaveClients(dta,dataClients){
+                var rs = []
+                for(var i=0;i<dta.length;i++){
+                    rs.push({
+                        name: dta[i][0],
+                        y: dta[i][1],
+                        k: dataClients[i][1],
+                        drilldown: dta[i][0]
+                    })
+                }
+                return rs
+            }
+
             function getJsonDrillParent(dta){
                 var rs = []
                 for(var i=0;i<dta.length;i++){
@@ -2657,7 +2769,11 @@
                     var arrDta = []
                     for(var j=0;j<dta.length;j++){
                         if(arrKey[i] == dta[j][0]){
-                            arrDta.push([dta[j][1],dta[j][2]])
+                            arrDta.push({
+                                name: dta[j][1],
+                                y: dta[j][2],
+                                k :dta[j][3]
+                            })
                         }
                     }
                     rs.push({
@@ -2669,11 +2785,99 @@
                 return rs
             }
 
+            function getDrildownStackBarForsuyhao(dta,arrKey,arrMonth){
+                var jsArray = []
+                var colors = [
+                    '#9B59B6',
+                    '#3498DB',
+                    '#d9534f',
+                    '#f1b53d',
+                    '#E74C3C',
+                    '#73879C',
+                    '#1ABB9C',
+                    '#832d1d',
+                    '#0000cc',
+                    '#09006d',
+                    '#cccccc',
+                    '#669999',
+                    '#f2ccff',
+                    '#e6e600',
+                    '#132639',
+                    '#99cc00',
+                    '#466d6d',
+                    '#ffc6b3',
+                    '#666633',
+                    '#ffff00'];
+                for(var month=0;month< arrMonth.length;month++ ){
+                    var arrData = []
+                    for(var key=0;key<arrKey.length;key++ ) {
+                        var sumVl =0
+                        var sumClients = 0
+                        for (var i = 0; i < dta.length; i++) {
+                            if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][2]){
+                                sumVl += dta[i][3]
+                                sumClients += dta[i][5]
+                            }
+                        }
+                        arrData.push({
+                            name: arrKey[key],
+                            y: sumVl,
+                            k: sumClients,
+                            drilldown: arrKey[key]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                        })
+                    }
+                    var color = colors[month]
+                    jsArray.push({
+                        name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                        data: arrData,
+                        color: color
+                    })
+                }
+                return jsArray
+            }
+
             function getDrildownStackBar(dta,arrKey,arrMonth,_type){
                 var jsArray = []
-                var colors1 = ['#d9534f', '#73879C', '#1ABB9C']
-                var colors2 = ['#f1b53d','#832d1d','#73879C']
-                var colors3 = ['#9B59B6', '#73879C', '#d9534f']
+                var colors0 = [
+                    '#d9534f',
+                    '#73879C',
+                    '#1ABB9C',
+                    '#f1b53d',
+                    '#E74C3C',
+                    '#73879C',
+                    '#832d1d',
+                    '#0000cc',
+                    '#09006d',
+                    '#cccccc',
+                    '#669999',
+                    '#f2ccff',
+                    '#e6e600',
+                    '#132639',
+                    '#99cc00',
+                    '#466d6d',
+                    '#ffc6b3',
+                    '#666633',
+                    '#ffff00'];
+                var colors1 = [
+                    '#d9534f',
+                    '#f1b53d',
+                    '#73879C',
+                    '#ffff00',
+                    '#1ABB9C',
+                    '#E74C3C',
+                    '#832d1d',
+                    '#e6e600',
+                    '#09006d',
+                    '#cccccc',
+                    '#669999',
+                    '#f2ccff',
+                    '#0000cc',
+                    '#132639',
+                    '#99cc00',
+                    '#466d6d',
+                    '#ffc6b3',
+                    '#666633',
+                    '#ffff00'];
                 for(var month=0;month< arrMonth.length;month++ ){
                     var arrData = []
                     for(var key=0;key<arrKey.length;key++ ) {
@@ -2689,9 +2893,8 @@
                             drilldown: arrKey[key]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
                         })
                     }
-                    var color = colors1[month]
-                    if(_type == 1) color = colors2[month]
-                    else if(_type == 2) color = colors3[month]
+                    var color = colors0[month]
+                    if(_type == 1) color = colors1[month]
                     jsArray.push({
                         name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
                         data: arrData,

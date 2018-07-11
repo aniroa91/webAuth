@@ -4,7 +4,7 @@ case class RegionOverview(
                          time: TimePicker,
                          opsviews: Array[(String,String,String,Int,String)],
                          kibana: Array[(String,String,String,Int,String)],
-                         suyhao: Array[(String,String,String,Int,String)],
+                         suyhao: Array[(String,String,String,Int,String,Int)],
                          sigLogRegion: SigLogRegion,
                          nocCount : NocCount,
                          contracts: Array[(String,String,String,String,Int,Int,Int)],
@@ -21,7 +21,9 @@ case class TimePicker(
                      )
 case class SigLogRegion(
                                signin: Array[(String,Array[Int])],
-                               logoff: Array[(String,Array[Int])]
+                               logoff: Array[(String,Array[Int])],
+                               signin_clients: Array[(String,Array[Int])],
+                               logoff_clients: Array[(String,Array[Int])]
                              )
 case class NocCount(
                     alertCount: Array[(String,String,String,Int)],

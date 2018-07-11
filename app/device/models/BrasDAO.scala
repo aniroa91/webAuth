@@ -88,24 +88,24 @@ object BrasDAO {
         .as[(String,Int)])
   }
 
-  def getSigLogByRegion(month: String): Future[Seq[(String,Int,Int)]] = {
+  def getSigLogByRegion(month: String): Future[Seq[(String,Int,Int,Int,Int)]] = {
     dbConfig.db.run(
-      sql"""select province,sum(signin) as signin, sum(logoff) as logoff
+      sql"""select province,sum(signin) as signin, sum(logoff) as logoff,sum(signin_clients) as signin_clients, sum(logoff_clients) as logoff_clients
               from dmt_overview_conn
               where month = $month::TIMESTAMP
               group by province
                   """
-        .as[(String,Int,Int)])
+        .as[(String,Int,Int,Int,Int)])
   }
 
-  def getSigLogByProvince(month: String,province: String): Future[Seq[(String,Int,Int)]] = {
+  def getSigLogByProvince(month: String,province: String): Future[Seq[(String,Int,Int,Int,Int)]] = {
     dbConfig.db.run(
-      sql"""select bras_id,sum(signin) as signin, sum(logoff) as logoff
+      sql"""select bras_id,sum(signin) as signin, sum(logoff) as logoff,sum(signin_clients) as signin_clients, sum(logoff_clients) as logoff_clients
               from dmt_overview_conn
               where month = $month::TIMESTAMP and province = $province
               group by bras_id
                   """
-        .as[(String,Int,Int)])
+        .as[(String,Int,Int,Int,Int)])
   }
 
   def getDistinctBrasbyProvince(month: String,province: String): Future[Seq[(String)]] = {
@@ -141,16 +141,16 @@ object BrasDAO {
         .as[(String)])
   }
 
-  def getSigLogByBras(month: String,bras: String): Future[Seq[(String,Int,Int)]] = {
+  def getSigLogByBras(month: String,bras: String): Future[Seq[(String,Int,Int,Int,Int)]] = {
     dbConfig.db.run(
-      sql"""select host,sum(signin) as signin, sum(logoff) as logoff
+      sql"""select host,sum(signin) as signin, sum(logoff) as logoff, sum(signin_clients) as signin_clients, sum(logoff_clients) as logoff_clients
               from dmt_overview_conn
               where month = $month::TIMESTAMP and bras_id = $bras
               group by host
               order by sum(signin) desc
               limit 10
                   """
-        .as[(String,Int,Int)])
+        .as[(String,Int,Int,Int,Int)])
   }
 
   def getTotalOutlier(): Future[Seq[(Int)]] = {
@@ -359,15 +359,15 @@ object BrasDAO {
         .as[(String,String,Double)])
   }
 
-  def getProvinceSuyhao(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]] = {
+  def getProvinceSuyhao(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int)]] = {
     dbConfig.db.run(
-      sql"""select month,province,host,sum(not_passed_suyhao) as not_passed_suyhao
+      sql"""select month,province,host,sum(not_passed_suyhao) as not_passed_suyhao,sum(not_passed_suyhao_clients) as not_passed_suyhao_clients
             from dmt_overview_suyhao
             where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
             group by month,province,host
             order by month desc, province
                   """
-        .as[(String,String,String,Int)])
+        .as[(String,String,String,Int,Int)])
   }
 
   def getProvinceCount(month: String): Future[Seq[(String,String,Int,Int,Int,Int,Int,Int)]] = {
@@ -474,14 +474,15 @@ object BrasDAO {
     }
   }
 
-  def getTopSignin(month: String): Future[Seq[(String,String,Int)]] = {
+  def getTopSignin(month: String): Future[Seq[(String,String,Int,Int)]] = {
     if(month.equals("")) {
       val month = CommonService.get3MonthAgo()+"-01"
+      println(month)
       dbConfig.db.run(
-        sql"""select d.bras_id,d.host,d.signin from(
+        sql"""select d.bras_id,d.host,d.signin,d.signin_clients from(
                   select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.signin desc) AS r , c.*
                   from(
-                       select b.bras_id, a.host, sum(signin) signin
+                       select b.bras_id, a.host, sum(signin) signin,sum(signin_clients) signin_clients
                        from dmt_overview_conn a,
                             (select bras_id
                              from dmt_overview_conn
@@ -494,14 +495,14 @@ object BrasDAO {
                         order by b.bras_id, a.host) c) d
               where d.r <= 10
                   """
-          .as[(String,String,Int)])
+          .as[(String,String,Int,Int)])
     } else{
       val query = month + "-01"
       dbConfig.db.run(
-        sql"""select d.bras_id,d.host,d.signin from(
+        sql"""select d.bras_id,d.host,d.signin,d.signin_clients from(
                   select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.signin desc) AS r , c.*
                   from(
-                       select b.bras_id, a.host, sum(signin) signin
+                       select b.bras_id, a.host, sum(signin) signin,sum(signin_clients) signin_clients
                        from dmt_overview_conn a,
                             (select bras_id
                              from dmt_overview_conn
@@ -514,18 +515,18 @@ object BrasDAO {
                         order by b.bras_id, a.host) c) d
               where d.r <= 10
                   """
-          .as[(String,String,Int)])
+          .as[(String,String,Int,Int)])
     }
   }
 
-  def getTopLogoff(month: String): Future[Seq[(String,String,Int)]] = {
+  def getTopLogoff(month: String): Future[Seq[(String,String,Int,Int)]] = {
     if(month.equals("")) {
       val month = CommonService.get3MonthAgo()+"-01"
       dbConfig.db.run(
-        sql"""select d.bras_id,d.host,d.logoff from(
+        sql"""select d.bras_id,d.host,d.logoff,d.logoff_clients from(
                   select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.logoff desc) AS r , c.*
                   from(
-                       select b.bras_id, a.host, sum(logoff) logoff
+                       select b.bras_id, a.host, sum(logoff) logoff,sum(logoff_clients) logoff_clients
                        from dmt_overview_conn a,
                             (select bras_id
                              from dmt_overview_conn
@@ -538,14 +539,14 @@ object BrasDAO {
                         order by b.bras_id, a.host) c) d
               where d.r <= 10
                   """
-          .as[(String,String,Int)])
+          .as[(String,String,Int,Int)])
     } else{
       val query = month + "-01"
       dbConfig.db.run(
-        sql"""select d.bras_id,d.host,d.logoff from(
+        sql"""select d.bras_id,d.host,d.logoff,d.logoff_clients from(
                   select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.logoff desc) AS r , c.*
                   from(
-                       select b.bras_id, a.host, sum(logoff) logoff
+                       select b.bras_id, a.host, sum(logoff) logoff,sum(logoff_clients) logoff_clients
                        from dmt_overview_conn a,
                             (select bras_id
                              from dmt_overview_conn
@@ -558,7 +559,7 @@ object BrasDAO {
                         order by b.bras_id, a.host) c) d
               where d.r <= 10
                   """
-          .as[(String,String,Int)])
+          .as[(String,String,Int,Int)])
     }
   }
 

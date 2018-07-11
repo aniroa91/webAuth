@@ -44,7 +44,7 @@ object BrasService extends AbstractService{
     BrasDAO.getProvinceKibana(fromMonth,toMonth)
   }
 
-  def getProvinceSuyhao(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]]   ={
+  def getProvinceSuyhao(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int)]]   ={
     BrasDAO.getProvinceSuyhao(fromMonth,toMonth)
   }
 
@@ -88,11 +88,11 @@ object BrasService extends AbstractService{
     BrasDAO.getSigLogconnbyBras(id)
   }
 
-  def getTopSignin(month: String): Future[Seq[(String,String,Int)]]   ={
+  def getTopSignin(month: String): Future[Seq[(String,String,Int,Int)]]   ={
     BrasDAO.getTopSignin(month)
   }
 
-  def getTopLogoff(month: String): Future[Seq[(String,String,Int)]]   ={
+  def getTopLogoff(month: String): Future[Seq[(String,String,Int,Int)]]   ={
     BrasDAO.getTopLogoff(month)
   }
 
@@ -100,11 +100,11 @@ object BrasService extends AbstractService{
     BrasDAO.getTopKibana(month,_typeError)
   }
 
-  def getSigLogByRegion(month: String): Future[Seq[(String,Int,Int)]]   ={
+  def getSigLogByRegion(month: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
     BrasDAO.getSigLogByRegion(month)
   }
 
-  def getSigLogByProvince(month: String, provinceCode: String): Future[Seq[(String,Int,Int)]]   ={
+  def getSigLogByProvince(month: String, provinceCode: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
     BrasDAO.getSigLogByProvince(month,provinceCode)
   }
 
@@ -120,7 +120,7 @@ object BrasService extends AbstractService{
     BrasDAO.getTop10HostId(month,lstHost)
   }
 
-  def getSigLogByBras(month: String, bras: String): Future[Seq[(String,Int,Int)]]   ={
+  def getSigLogByBras(month: String, bras: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
     BrasDAO.getSigLogByBras(month,bras)
   }
 
