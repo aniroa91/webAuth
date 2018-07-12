@@ -104,8 +104,8 @@ object BrasService extends AbstractService{
     BrasDAO.getSigLogByRegion(month)
   }
 
-  def getSigLogByProvince(month: String, provinceCode: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
-    BrasDAO.getSigLogByProvince(month,provinceCode)
+  def getSigLogByProvince(month: String, provinceCode: String, lastMonth: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
+    BrasDAO.getSigLogByProvince(month,provinceCode,lastMonth)
   }
 
   def getDistinctBrasbyProvince(month: String, provinceCode: String): Future[Seq[(String)]]   ={
@@ -120,8 +120,8 @@ object BrasService extends AbstractService{
     BrasDAO.getTop10HostId(month,lstHost)
   }
 
-  def getSigLogByBras(month: String, bras: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
-    BrasDAO.getSigLogByBras(month,bras)
+  def getSigLogByBras(month: String, bras: String, lastMonth: String): Future[Seq[(String,Int,Int,Int,Int)]]   ={
+    BrasDAO.getSigLogByBras(month,bras,lastMonth)
   }
 
   def getTopOpsview(month: String,_typeService: String): Future[Seq[(String,Int)]]   ={
@@ -132,7 +132,7 @@ object BrasService extends AbstractService{
     BrasDAO.getTopInf(month,_typeInferr)
   }
 
-  def getTopnotSuyhao(month: String): Future[Seq[(String,Int)]]   ={
+  def getTopnotSuyhao(month: String): Future[Seq[(String,Int,Int)]]   ={
     BrasDAO.getTopnotSuyhao(month)
   }
 

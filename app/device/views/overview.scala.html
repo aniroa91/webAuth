@@ -1339,7 +1339,7 @@
                 callAjaxTopN("");
             }
 
-            function getSigLogByRegionStacked(sigIn,logOff,signinClients,logoffClients,sizeCates){
+            function getSigLogByRegionStacked(sigIn,logOff,signinClients,logoffClients,cates){
                 var jsArray = []
                 var colors = [
                     '#E74C3C',
@@ -1363,37 +1363,57 @@
                 for(var i=0;i< sigIn.length;i++){
                     jsArray.push({
                         name: ' Signin <br/>'+sigIn[i][0],
-                        color:colors[i],
-                        data: addParamClients(sigIn[i][1],signinClients[i][1],sizeCates)
+                        color: colors[i],
+                        data: addParamClients(sigIn[i][1],signinClients[i][1],cates)
                     })
                 }
                 for(var i=0;i< logOff.length;i++){
                     jsArray.push({
                         name: ' Logoff<br/>'+logOff[i][0],
-                        color:colors[i],
-                        data: addParamClients(logOff[i][1],logoffClients[i][1],sizeCates)
+                        color: colors[i],
+                        data: addParamClients(logOff[i][1],logoffClients[i][1],cates)
                     })
                 }
                 return jsArray
             }
 
-            function addParamClients(dta,clients,sizeCates){
+            function addParamClients(dta,clients,cates){
                 var rs = []
-                var sizeArr = dta.length
-                if(sizeCates >0) sizeArr= sizeCates
-                for(var i=0;i<sizeArr;i++){
-                    rs.push({
-                        y: dta[i],
-                        k: clients[i]
-                    })
+                if(cates == 0){
+                    for(var k=0;k<dta.length;k++){
+                        rs.push({
+                            y: dta[k],
+                            k: clients[k]
+                        })
+                    }
+                }
+                else{
+                    for(var i=0;i<cates.length;i++){
+                        var isCate = 0
+                        for(var k=0;k<dta.length;k++){
+                            if(dta[k][0] == cates[i]){
+                                rs.push({
+                                    y: dta[k][1],
+                                    k: clients[k][1]
+                                })
+                                isCate += 1
+                                break
+                            }
+                        }
+                        if(isCate ==0){
+                            rs.push({
+                                y: 0,
+                                k: 0
+                            })
+                        }
+                    }
                 }
                 return rs
             }
 
             function groupRegionByMonth(el,_type){
-                var newDate = $('#startMonth').val()+"/"+$('#endMonth').val()
+                var newDate = $('#monthGroup').val()
                 if(_type == 1) newDate = $(el).text()
-                $('#monthGroup').val(newDate)
                 $('#divallMonth a.month').removeClass('btn-success')
                 $('#divallMonth a.month').addClass('btnDefault')
                 $(el).removeClass('btnDefault')
@@ -1591,7 +1611,7 @@
                     id = "*"
                 }
                 $.ajax({
-                    url: "/drillUpTotalInf?id="+id+"&month="+$('#startMonth').val()+"/"+$('#endMonth').val(),
+                    url: "/drillUpTotalInf?id="+id+"&month="+$('#monthGroup').val(),
                     cache: false,
                     success: function (dta) {
                         if (dta != "Error") {
@@ -1860,7 +1880,7 @@
 
             function callDrilldownTotalInf(id){
                 $.ajax({
-                    url: "/drilldownTotalInf?id=" + id+"&month="+$('#startMonth').val()+"/"+$('#endMonth').val(),
+                    url: "/drilldownTotalInf?id=" + id+"&month="+$('#monthGroup').val(),
                     cache: false,
                     success: function (dta) {
                         if(dta != "Error"){
@@ -1972,7 +1992,7 @@
                     id = "*"
                 }
                 $.ajax({
-                    url: "/drillUpSigLogmonth?id="+id+"&month="+$('#startMonth').val()+"/"+$('#endMonth').val(),
+                    url: "/drillUpSigLogmonth?id="+id+"&month="+$('#monthGroup').val(),
                     cache: false,
                     success: function (dta) {
                         if (dta != "Error") {
@@ -2025,7 +2045,7 @@
                                     }
                                 },
 
-                                series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0].length)
+                                series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0])
 
                             });
                         }
@@ -2035,7 +2055,7 @@
 
             function callDrilldownSigLog(id){
                 $.ajax({
-                    url: "/drilldownSigLogMonth?id=" + id+"&month="+$('#startMonth').val()+"/"+$('#endMonth').val(),
+                    url: "/drilldownSigLogMonth?id=" + id+"&month="+$('#monthGroup').val(),
                     cache: false,
                     success: function (dta) {
                         if(dta != "Error"){
@@ -2102,7 +2122,7 @@
                                     }
                                 },
 
-                                series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0].length)
+                                series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0])
 
                             });
                         }
@@ -2227,7 +2247,8 @@
                                 })
                                 // set series province& bras
                                 //console.log(sortObjectsArray(dtaProvince,'y').slice(0,10))
-                                var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,9)
+                                //var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,10)
+                                var top10Prov  = getTop10HostbyProvince(dtaProvince,dta,nameOld,arrMonth.length)
                                 jsArray.push({
                                     id: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
                                     name: nameOld+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
@@ -2383,6 +2404,50 @@
 
                 }
                 return jsArray
+            }
+
+            function getTop10HostbyProvince(arrProvince,dta,province,sizeMonth){
+                var rs =[], rsProvince = [], host = []
+                for(var i=0;i<dta.length;i++){
+                    if(province == dta[i][1]) host.push(dta[i][4])
+                }
+                var arrCounts = countTimesArr(host)
+                for(var i=0;i< arrCounts.length;i++){
+                    if(sizeMonth == arrCounts[i][1])
+                        rsProvince.push(arrCounts[i][0])
+                }
+                //console.log(rsProvince.slice(0,10))
+                for(var k=0;k<rsProvince.slice(rsProvince.length-10,rsProvince.length).length;k++){
+                    for(var j=0;j< arrProvince.length;j++){
+                        if(rsProvince.slice(0,10)[k] == arrProvince[j].name)
+                            rs.push({
+                                name: arrProvince[j].name,
+                                y:Number(arrProvince[j].y),
+                                k:Number(arrProvince[j].k)
+                            })
+                    }
+                }
+                return rs
+            }
+
+            function countTimesArr(arr) {
+                var a = [], b = [], prev,rs = [];
+                arr.sort();
+                for ( var i = 0; i < arr.length; i++ ) {
+                    if ( arr[i] !== prev ) {
+                        a.push(arr[i]);
+                        b.push(1);
+                    } else {
+                        b[b.length-1]++;
+                    }
+                    prev = arr[i];
+                }
+                // set results
+                for(var i=0;i<a.length;i++){
+                    rs.push([a[i],b[i]])
+                }
+
+                return rs;
             }
 
             // order by array objects
@@ -2688,6 +2753,12 @@
                                 legend: {
                                     reversed: true
                                 },
+                                tooltip: {
+                                    formatter: function () {
+                                        return '<b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>'+this.series.name+'<br><b>Total: ' +
+                                                Highcharts.numberFormat(this.point.y,0) + '</b> <br/> Total clients: '+ Highcharts.numberFormat(this.point.k,0);
+                                    }
+                                },
                                 plotOptions: {
                                     series: {
                                         stacking: 'normal'
@@ -2695,7 +2766,7 @@
                                 },
                                 series: [{
                                     name: dta.month,
-                                    data: dta.topSuyhao.data,
+                                    data: addTitleClients(dta.topSuyhao.data),
                                     color: '#4980b5'
                                 }]
                             });
@@ -2780,6 +2851,17 @@
                         id: arrKey[i],
                         name:'Hosts of bras: '+arrKey[i],
                         data: arrDta
+                    })
+                }
+                return rs
+            }
+
+            function addTitleClients(dta){
+                var rs = []
+                for(var i=0;i<dta.length;i++){
+                    rs.push({
+                        y: dta[i][0],
+                        k: dta[i][1]
                     })
                 }
                 return rs
