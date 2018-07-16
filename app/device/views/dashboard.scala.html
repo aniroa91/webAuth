@@ -117,8 +117,8 @@
                     <table class="data table table-bordered" id="tbBras" style="margin-bottom: 0px">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 14px">
-                                <th colspan="2">Kibana</th>
-                                <th colspan="2">Opsview</th>
+                                <th colspan="2">Kibana <i class="fa fa-info-circle toolTipText" title="Data is loaded in 30 minutes"></i></th>
+                                <th colspan="2">Opsview <i class="fa fa-info-circle toolTipText" title="Data is loaded in 30 minutes"></i></th>
                             </tr>
                             <tr style="color: cornsilk">
                                 <th colspan="1" style="width: 35%">Error Name</th>
@@ -666,10 +666,10 @@
                                         if(!($('#tbUser i:eq(0)').hasClass('fa-download'))) {
                                             $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>');
                                             if(sigLog[0][1] <= sigLog[0][2]){
-                                                $('.dt-buttons').prepend('<span class="titCsvBtn" style="background: #149c7f">List Of Client Signed In</span>');
+                                                $('.dt-buttons').prepend('<span class="titCsvBtn" title="Data is loaded in a minute" style="background: #149c7f">List Of Client Signed In</span>');
                                             }
                                             else{
-                                                $('.dt-buttons').prepend('<span class="titCsvBtn" style="background: #d9534f">List Of Client Logged Off</span>');
+                                                $('.dt-buttons').prepend('<span class="titCsvBtn" title="Data is loaded in a minute" style="background: #d9534f">List Of Client Logged Off</span>');
                                             }
                                             /*$('.buttons-excel').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
                                             $('.buttons-pdf').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')*/
