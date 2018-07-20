@@ -427,7 +427,7 @@
                         success: function (dta) {
                             if(dta != "Error"){
                                 //console.log(dta.data)
-                                exportToCsv('export-inf.csv', addHeaderToArray(dta.data))
+                                exportToCsv('export-inf-'+newDate+'.csv', addHeaderToArray(dta.data))
                             }
                             else{
                                 $('#modal').show()
