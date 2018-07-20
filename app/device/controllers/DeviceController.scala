@@ -23,7 +23,8 @@ import scala.util.control.Breaks._
 import play.api.Logger
 import device.utils.LocationUtils
 import com.ftel.bigdata.utils.FileUtil
-
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileSystemView
 import java.io._
 
 /**
@@ -461,17 +462,20 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   def exportCSV(date: String) = Action { implicit request =>
-    try{
+    //try{
       //println(date)
-      import javafx.stage.FileChooser
-      import javax.swing.JFileChooser
-      import javax.swing.filechooser.FileSystemView
+
       var status = "Ok"
       val t01 = System.currentTimeMillis()
+    logger.info("start")
       val jfc = new JFileChooser(FileSystemView.getFileSystemView.getHomeDirectory)
+    logger.info("jfc")
       jfc.setDialogTitle("Choose a directory to save your file: ")
       jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+    logger.info(s"$jfc")
       val returnValue = jfc.showSaveDialog(null)
+    logger.info(s"show: $returnValue")
+    logger.info("approve:"+JFileChooser.APPROVE_OPTION)
       if (returnValue == JFileChooser.APPROVE_OPTION) {
         if (jfc.getSelectedFile.isDirectory) {
           //println("You selected the directory: " + jfc.getSelectedFile)
@@ -495,10 +499,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       }
       else status = "None"
       Ok(status)
-    }
+   /* }
     catch{
       case e: Exception => Ok("Error")
-    }
+    }*/
   }
 
   def groupRegionByMonth(month: String,_typeNoc: String,_typeError: String) = Action { implicit request =>
