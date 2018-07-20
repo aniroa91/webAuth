@@ -468,12 +468,14 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       var status = "Ok"
       val t01 = System.currentTimeMillis()
     logger.info("start")
-      val jfc = new JFileChooser(FileSystemView.getFileSystemView.getHomeDirectory)
+    import javax.swing.JFrame
+    val frame = new JFrame
+      val jfc = new JFileChooser()
     logger.info("jfc")
-      jfc.setDialogTitle("Choose a directory to save your file: ")
-      jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+      //jfc.setDialogTitle("Choose a directory to save your file: ")
+      //jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
     logger.info(s"$jfc")
-      val returnValue = jfc.showSaveDialog(jfc)
+      val returnValue = jfc.showSaveDialog(frame)
     logger.info(s"show: $returnValue")
     logger.info("approve:"+JFileChooser.APPROVE_OPTION)
       if (returnValue == JFileChooser.APPROVE_OPTION) {
