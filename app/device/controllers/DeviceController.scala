@@ -473,7 +473,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       jfc.setDialogTitle("Choose a directory to save your file: ")
       jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
     logger.info(s"$jfc")
-      val returnValue = jfc.showSaveDialog(null)
+      val returnValue = jfc.showSaveDialog(jfc)
     logger.info(s"show: $returnValue")
     logger.info("approve:"+JFileChooser.APPROVE_OPTION)
       if (returnValue == JFileChooser.APPROVE_OPTION) {
