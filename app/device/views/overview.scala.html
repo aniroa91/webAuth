@@ -512,7 +512,7 @@
                     //get month choosed
                     var startDate = new Date(selected.date.valueOf());
                     var yr = startDate.getFullYear();
-                    var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
+                    var month = startDate.getMonth() < 10 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
                     var newDate = yr + '-' + month;
                     $("#endMonth").data('datepicker').setStartDate(newDate);
                 });
@@ -525,7 +525,7 @@
                 }).on('changeDate', function(selected){
                     var startDate = new Date(selected.date.valueOf());
                     var yr = startDate.getFullYear();
-                    var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
+                    var month = startDate.getMonth() < 10 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
                     var newDate = yr + '-' + month;
                     $("#startMonth").data('datepicker').setEndDate(newDate);
                /*     // get month min

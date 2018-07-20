@@ -2,7 +2,6 @@ package controllers
 
 import javax.inject.Inject
 import javax.inject.Singleton
-
 import play.api.mvc._
 import com.google.common.util.concurrent.AbstractService
 import model.device.{NocCount, _}
@@ -15,24 +14,24 @@ import service.{BrasService, HostService}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import controllers.Secured
-
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import play.api.libs.json.Json
 import services.domain.CommonService
 import services.domain.CommonService.formatYYYYmmddHHmmss
-
 import scala.util.control.Breaks._
 import play.api.Logger
 import device.utils.LocationUtils
 import com.ftel.bigdata.utils.FileUtil
+
+import java.io._
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
   */
 case class BrasOutlier(csrfToken: String,_typeS: String,bras: String,date: String)
-
+case class Test(group: String, message: String, age: Int)
 case class MonthPicker(csrfToken: String,startMonth: String,endMonth: String)
 
 @Singleton
@@ -461,6 +460,47 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
+  def exportCSV(date: String) = Action { implicit request =>
+    try{
+      //println(date)
+      import javafx.stage.FileChooser
+      import javax.swing.JFileChooser
+      import javax.swing.filechooser.FileSystemView
+      var status = "Ok"
+      val t01 = System.currentTimeMillis()
+      val jfc = new JFileChooser(FileSystemView.getFileSystemView.getHomeDirectory)
+      jfc.setDialogTitle("Choose a directory to save your file: ")
+      jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+      val returnValue = jfc.showSaveDialog(null)
+      if (returnValue == JFileChooser.APPROVE_OPTION) {
+        if (jfc.getSelectedFile.isDirectory) {
+          //println("You selected the directory: " + jfc.getSelectedFile)
+          val sfLofi = Await.result(BrasService.getSflofiMudule(date), Duration.Inf)
+            .map(x => (x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9)).toArray
+          logger.info("timSf: " + (System.currentTimeMillis() - t01))
+          val data = Array(("Date Time", "Module", "Host", "User Down", "Inf Down", "Sf Error", "Lofi Error", "Rouge Error", "Lost Signal")) ++: sfLofi
+          val file = jfc.getSelectedFile + "/inf.csv"
+
+          val writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))
+          for (x <- data) {
+            val rows = x.toString().substring(x.toString().indexOf("(")+1,x.toString().indexOf(")"))
+            writer.write(rows + "\n")
+          }
+          writer.close()
+          logger.info("timeCSV: " + (System.currentTimeMillis() - t01))
+        }
+        else{
+          status = "None"
+        }
+      }
+      else status = "None"
+      Ok(status)
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
   def groupRegionByMonth(month: String,_typeNoc: String,_typeError: String) = Action { implicit request =>
     try{
       val monthRange = if(month.indexOf("/")>=0) month.split("/")(0)+"-01/"+month.split("/")(1)+"-01" else month
@@ -766,12 +806,25 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def inf(id: String) =  withAuth { username => implicit request =>
     try {
+      val t01 = System.currentTimeMillis()
       val infDown = Await.result(BrasService.getInfDownMudule("*"),Duration.Inf)
+      logger.info("t01: " + (System.currentTimeMillis() - t01))
+      val t02 = System.currentTimeMillis()
       val userDown = Await.result(BrasService.getUserDownMudule("*"),Duration.Inf)
+      logger.info("t02: " + (System.currentTimeMillis() - t02))
+      val t03 = System.currentTimeMillis()
       val spliter = Await.result(BrasService.getSpliterMudule("*"),Duration.Inf)
+      logger.info("t03: " + (System.currentTimeMillis() - t03))
+      val t04 = System.currentTimeMillis()
       val sfLofi = Await.result(BrasService.getSflofiMudule("*"),Duration.Inf)
-      val indexRouge = Await.result(BrasService.getIndexRougeMudule("*"),Duration.Inf)
+      logger.info("t04: " + (System.currentTimeMillis() - t04))
+      val t05 = System.currentTimeMillis()
+      val indexRouge = BrasService.getIndexRougeMudule("*")
+      logger.info("t05: " + (System.currentTimeMillis() - t05))
+      val t06 = System.currentTimeMillis()
       val totalOutlier = Await.result(BrasService.getTotalOutlier(), Duration.Inf).sum
+      logger.info("t06: " + (System.currentTimeMillis() - t06))
+      logger.info("time: " + (System.currentTimeMillis() - t01))
       Ok(device.views.html.inf(username,InfResponse(userDown,infDown,spliter,sfLofi,indexRouge,totalOutlier),id))
     }
     catch{

@@ -70,8 +70,9 @@
                                         <div class="row top_tiles">
                                             <div class="col-xs-12">
                                                 <div class="x_panel tile " style="padding: 0px;">
-                                                    <div class="x_content">
+                                                    <div class="x_content" id="divSf">
                                                         <input type="hidden" id="ids" value="@ids">
+                                                        <input type="text" id="hiddenField" style="display: none"/>
                                                         <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
                                                             <thead >
                                                                 <tr>
@@ -338,6 +339,18 @@
                     </div>
                 </div>
             </div>
+            <div class="modal" tabindex="-1" role="dialog" id="modal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="margin-top: 145px">
+                        <div class="modal-body">
+                            <p id="message"></p>
+                        </div>
+                        <div class="modal-footer" style="padding:6px 10px 2px 10px;">
+                            <button type="button" class="btn btn-primary" onclick="hideModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         }else {
             <div class="row"><h2 class="noData-title">Not enough data. sorry!</h2></div>
@@ -388,6 +401,49 @@
     <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
     <script>
         $(document).ready(function(){
+            $( "#hiddenField" ).datepicker({
+                showOn: "button",
+                dateFormat: "yyyy-mm-dd",
+                maxDate: 0,
+                buttonText: "<i class=\"fa fa-download\"></i> CSV",
+                onSelect: function () {
+                    var startDate = new Date($(this).datepicker('getDate'));
+                    var yr = startDate.getFullYear();
+                    var month = startDate.getMonth() < 10 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
+                    var day = startDate.getDate() < 10 ? ('0' + Number(startDate.getDate())) : (Number(startDate.getDate()));
+                    var newDate = yr + '-' + month + '-'+day;
+                    $.ajax({
+                        url: "/inf/exportCSV?date=" + newDate,
+                        cache: false,
+                        beforeSend: function () {
+                            $('#divSf').waitMe({
+                                effect: 'roundBounce',
+                                text: 'Please wait...',
+                                bg: 'rgba(255,255,255,0.7)',
+                                color: '#000',
+                                textPos: 'vertical'
+                            });
+                        },
+                        success: function (dta) {
+                            if(dta == "Ok"){
+                                $('#message').text("Export your file successfully!")
+                                $('#message').addClass("success")
+                                $('#message').removeClass("error")
+                                $('#modal').show()
+                            }
+                            else{
+                                $('#message').removeClass("success")
+                                $('#message').addClass("error")
+                                $('#message').text("Please choose a directory to save your file...")
+                                $('#modal').show()
+                            }
+                        },
+                        complete: function () {
+                            $('#divSf').waitMe("hide");
+                        }
+                    });
+                }
+            });
             // table tab Event
             var tbSf = $('#tbSf').DataTable( {
                 dom: 'Bfrtip',
@@ -400,6 +456,7 @@
                 destroy: true,
                 buttons: [
                     {
+                        enabled: false,
                         extend:    'csvHtml5',
                         text:      '<i class="fa fa-download"> CSV</i>',
                         titleAttr: 'CSV'
@@ -599,6 +656,10 @@
                 }
             });
         })
+
+        function hideModal() {
+            $('#modal').hide()
+        }
 
         function getEdgeHost(dta){
             var jsonArr = [];

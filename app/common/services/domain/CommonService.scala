@@ -207,6 +207,39 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def getMultiAggregationsAndSum(aggr: Option[AnyRef],secondField: String,threeField: String,fourField: String):  Array[(String, Array[(String, Array[(String, Array[(String, Long)])])])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key_as_string", "0L").toString
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val keySecond = x.getOrElse("key","0L").toString
+            val map = x.getOrElse(s"$threeField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+              .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+              .map(x=> x.asInstanceOf[Map[String,AnyRef]])
+              .map(x=> {
+                val keyThree = x.getOrElse("key","0L").toString
+                val map = x.getOrElse(s"$fourField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+                  .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+                  .map(x => x.asInstanceOf[Map[String,AnyRef]])
+                  .map(x => {
+                    val keyFour = x.getOrElse("key","0L").toString
+                    val sum = x.getOrElse("sum", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Double].toLong
+                    (keyFour,sum)
+                  }).toArray
+                (keyThree,map)
+              }).toArray
+            (keySecond,map)
+          }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
   def getSecondAggregations(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long)])] = {
     aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]

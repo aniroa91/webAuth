@@ -178,8 +178,9 @@ object BrasDAO {
 
   def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int,Int,String)]] = {
     val dt = new DateTime();
-    val currentTime = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-    val nowDay = CommonService.getCurrentDay()
+    var currentTime = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+    if(!queries.equals("*")) currentTime = CommonService.getNextDay(queries)
+    val nowDay = if(queries.equals("*")) CommonService.getCurrentDay() else queries
     dbConfig.db.run(
       sql"""select tb.date_time,tb.host,tb.module,sum(tb.sf_error),sum(tb.lofi_error),sum(tb.confirm),sum(tb.user_down),sum(tb.inf_down),sum(tb.rouge_error), string_agg(tb.splitter,', ')
             from (
@@ -187,7 +188,7 @@ object BrasDAO {
                   from
                        (select date_time,host,module,sum(sf_error) sf_error,sum(lofi_error) lofi_error,sum(cast(confirm as int)) confirm,sum(user_down) user_down,sum(inf_down) inf_down,sum(rouge_error) rouge_error
                         from dwh_inf_module
-                        where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP AND label =1
+                        where date_time >= $nowDay::TIMESTAMP and date_time < $currentTime::TIMESTAMP AND label =1
                         group by date_time,host,module
                         order by date_time desc) A
                    left join
@@ -209,16 +210,51 @@ object BrasDAO {
         .as[(String,String,String,Int,Int,Int,Int,Int)])*/
   }
 
-  def getIndexRougeMudule(userInf_down: String): Future[Seq[(String,String,String,String,Int)]] = {
+  def getIndexRougeMudule(userInf_down: String): Array[(String,String,String,String,Int)] = {
     val dt = CommonService.getCurrentDay()
-    dbConfig.db.run(
+
+    val rs = client_kibana.execute(
+      search(s"infra_dwh_inf_index_*" / "docs")
+        query { must(rangeQuery("rouge_error").gt(0),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(dt))) }
+        aggregations (
+        termsAggregation("date_time")
+          .field("date_time")
+          .subAggregations(
+            termsAggregation("host")
+              .field("host.keyword")
+              .subAggregations(
+                termsAggregation("module")
+                  .field("module.keyword")
+                  .subAggregations(
+                    termsAggregation("index")
+                      .field("index")
+                      .subaggs(
+                        sumAgg("sum","rouge_error")
+                      ) size 100
+                  )
+            )
+         )
+      )
+    ).await
+
+    val mapRouge = CommonService.getMultiAggregationsAndSum(rs.aggregations.get("date_time"),"host","module","index")
+
+    mapRouge.flatMap(x => x._2.map(y => x._1 -> y))
+      .map(x => (x._1 , x._2._1,x._2._2))
+      .flatMap(x => x._3.map(y => (x._1,x._2) -> y))
+      .map(x => (x._1._1,x._1._2 ,  x._2._1, x._2._2))
+      .flatMap(x => x._4.map(y => (x._1,x._2,x._3) -> y))
+      .map(x => (CommonService.formatUTC(x._1._1), x._1._2, x._1._3 , x._2._1, x._2._2.toInt))
+      .sortWith((x,y)=> x._1>y._1)
+
+   /* dbConfig.db.run(
       sql"""select date_time,host,module,index,sum(rouge_error)
             from dwh_inf_index
             where date_time >= $dt::TIMESTAMP AND rouge_error >0
             group by date_time,host,module,index
             order by date_time desc
                   """
-        .as[(String,String,String,String,Int)])
+        .as[(String,String,String,String,Int)])*/
   }
 
   def getUserDownMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
