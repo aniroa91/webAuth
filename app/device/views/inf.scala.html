@@ -425,8 +425,8 @@
                             });
                         },
                         success: function (dta) {
-                            if(dta == "Ok"){
-                                $('#message').text("Export your file successfully!")
+                            if(dta != "Error"){
+                                $('#message').html("Export your file successfully with path: <br><span style='color:#26B99A'>"+dta+"</span>")
                                 $('#message').addClass("success")
                                 $('#message').removeClass("error")
                                 $('#modal').show()

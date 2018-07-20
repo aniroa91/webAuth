@@ -6,7 +6,6 @@ pipeline {
         HTTP_PROXY = 'http://proxy.hcm.fpt.vn:80'
         HTTPS_PROXY = 'http://proxy.hcm.fpt.vn:80'
         NO_PROXY = '172.0.0.1,*.local,172.27.11.0/24'
-        DISPLAY=:1
     }
 
     stages {
