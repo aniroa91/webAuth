@@ -467,42 +467,13 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       var status = "Ok"
       val t01 = System.currentTimeMillis()
       val sfLofi = Await.result(BrasService.getSflofiMudule(date), Duration.Inf)
-        .map(x => (x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9)).toArray
+        .map(x => (x._1, x._2, x._3, x._7, x._8, x._4, x._5, x._9, x._10)).toArray
       logger.info("timSf: " + (System.currentTimeMillis() - t01))
-      val data = Array(("Date Time", "Module", "Host", "User Down", "Inf Down", "Sf Error", "Lofi Error", "Rouge Error", "Lost Signal")) ++: sfLofi
-      val file = "/home/elonmush/Desktop/inf.csv"
-      val writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))
-      for (x <- data) {
-        val rows = x.toString().substring(x.toString().indexOf("(")+1,x.toString().indexOf(")"))
-        writer.write(rows + "\n")
-      }
-      writer.close()
-      logger.info("timeCSV: " + (System.currentTimeMillis() - t01))
-      /*val jfc = new JFileChooser(FileSystemView.getFileSystemView.getHomeDirectory)
-      jfc.setDialogTitle("Choose a directory to save your file: ")
-      jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-      val returnValue = jfc.showSaveDialog(null)
-      if (returnValue == JFileChooser.APPROVE_OPTION) {
-        if (jfc.getSelectedFile.isDirectory) {
-          //println("You selected the directory: " + jfc.getSelectedFile)
-          val sfLofi = Await.result(BrasService.getSflofiMudule(date), Duration.Inf)
-            .map(x => (x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9)).toArray
-          logger.info("timSf: " + (System.currentTimeMillis() - t01))
-          val data = Array(("Date Time", "Module", "Host", "User Down", "Inf Down", "Sf Error", "Lofi Error", "Rouge Error", "Lost Signal")) ++: sfLofi
-          val file = FileSystemView.getFileSystemView.getHomeDirectory + "/inf.csv"
-          val writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))
-          for (x <- data) {
-            val rows = x.toString().substring(x.toString().indexOf("(")+1,x.toString().indexOf(")"))
-            writer.write(rows + "\n")
-          }
-          writer.close()
-          logger.info("timeCSV: " + (System.currentTimeMillis() - t01))
-        }
-        else{
-          status = "None"
-        }
-      }*/
-      Ok(file)
+      //val data = Array(("Date Time", "Module", "Host", "User Down", "Inf Down", "Sf Error", "Lofi Error", "Rouge Error", "Lost Signal")) ++: sfLofi
+      val rs = Json.obj(
+        "data" -> sfLofi
+      )
+      Ok(Json.toJson(rs))
     }
     catch{
       case e: Exception => Ok("Error")
