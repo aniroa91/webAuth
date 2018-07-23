@@ -124,7 +124,7 @@
                                                                     <td>@response.sfLofi(i)._9</td>
                                                                     <td>@response.sfLofi(i)._10</td>
                                                                     <th style="text-align: center">
-                                                                    @if(email == "inf") {
+                                                                    @if(email == "inf" || email == "admin") {
                                                                         @if(response.sfLofi(i)._6 > 0) {
                                                                             <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
                                                                         } else {
