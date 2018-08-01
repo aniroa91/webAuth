@@ -34,12 +34,14 @@ import java.io._
 case class BrasOutlier(csrfToken: String,_typeS: String,bras: String,date: String)
 case class Test(group: String, message: String, age: Int)
 case class MonthPicker(csrfToken: String,startMonth: String,endMonth: String)
+case class DayPicker( csrfToken: String, day: String)
 
 @Singleton
 class DeviceController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with Secured{
 
   private var searching = controllers.BrasOutlier("","","","")
   private var searchOverview = controllers.MonthPicker("","","")
+  private var searchDaily = controllers.DayPicker("","")
   val logger: Logger = Logger(this.getClass())
   val formOverview = Form(
     mapping(
@@ -47,6 +49,12 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       "startMonth" -> text,
       "endMonth" -> text
     )(MonthPicker.apply)(MonthPicker.unapply)
+  )
+  val formDaily = Form(
+    mapping(
+      "csrfToken" -> text,
+      "day" -> text
+    )(DayPicker.apply)(DayPicker.unapply)
   )
   val form = Form(
     mapping(
@@ -77,10 +85,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   // index page Dashboard Device
   def overview =  withAuth { username => implicit request =>
-    try {
+   // try {
       //val minMaxMonth = CommonService.getRangeCurrentMonth()
       val minMaxMonth = Await.result(BrasService.getMinMaxMonth(), Duration.Inf)
       val threeMonth = Await.result(BrasService.get3MonthLastest(),Duration.Inf)
+      println(minMaxMonth)
       val fromMonth = if(searchOverview.startMonth != "") searchOverview.startMonth+"-01" else threeMonth(threeMonth.length-1)
       val toMonth = if(searchOverview.endMonth != "") searchOverview.endMonth+"-01" else threeMonth(0)
       val rangeMonth = CommonService.getAllMonthfromRange(fromMonth,toMonth)
@@ -133,9 +142,40 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       searchOverview = controllers.MonthPicker("","","")
 
       Ok(device.views.html.overview(username,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),nocCount,contracts,heatmapOpsview,infTypeError,totalInf)))
-    }
+   /* }
     catch{
       case e: Exception => Ok(device.views.html.overview(username,null))
+    }*/
+  }
+
+  // This will be the action that handles our form post
+  def getFormDayPicker = withAuth { username => implicit request: Request[AnyContent] =>
+
+    val errorFunction = { formWithErrors: Form[controllers.DayPicker] =>
+      println("error")
+      Ok(device.views.html.daily(null,CommonService.getCurrentDay(), username))
+    }
+
+    val successFunction = { data: controllers.DayPicker =>
+      println("done")
+      searchDaily = controllers.DayPicker(csrfToken = data.csrfToken, day = data.day)
+      Redirect(routes.DeviceController.getDaily).flashing("info" -> "Daily searching!")
+    }
+
+    val formValidationResult = formDaily.bindFromRequest
+    formValidationResult.fold(errorFunction, successFunction)
+  }
+  def getDaily =  withAuth { username => implicit request =>
+    try{
+      val day = if(searchDaily.day == null || searchDaily.day.equals("")) CommonService.getCurrentDay() else searchDaily.day
+      println(day)
+      val rs = BrasService.getSigLogdaily(day, "")
+      val logoff = rs._2.map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) , x._2)).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._2).sum)
+      logoff.foreach(println)
+      Ok(device.views.html.daily(null, day, username))
+    }
+    catch{
+      case e : Exception => Ok(device.views.html.daily(null, CommonService.getCurrentDay(), username))
     }
   }
 

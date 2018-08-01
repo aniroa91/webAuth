@@ -1,0 +1,196 @@
+@(response: String, day: String, email: String)(implicit request: RequestHeader)
+@import play.api.libs.json.Json
+@import services.domain.CommonService.formatPattern
+@import play.api.libs.json.Json
+@import services.domain.CommonService.getEndDate
+@import services.domain.CommonService.getStartDate
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Dashboard Admin </title>
+
+            <!-- Bootstrap -->
+        @common.views.html.common.css("Overview")
+    </head>
+    @common.views.html.common.top()
+        <!-- top navigation -->
+    <div class="top_nav">
+        <div class="nav_menu">
+            <nav>
+                <div class="nav toggle" style="margin-bottom: 10px">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                </div>
+            </nav>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <img src="../assets/images/user.default.png" alt="">@email
+                        <span class=" fa fa-angle-down"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-usermenu pull-right">
+                        <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                    </ul>
+                </li>
+                <li class="form-group pull-right" style="padding-top: 10px;right: 10px">
+                    <div class="input-group date" id="monthPicker" style="margin-bottom: 5px;width: 200px">
+                        <form action="/daily" method="POST" id="ctSearch">
+                            <div class="input-group">
+                                @helper.CSRF.formField
+                                <input type="text" id="day" name="day" class="form-control" value="@day" readonly="true" style="cursor: pointer;background-color: white" >
+                                <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+        <!-- /top navigation -->
+        <!-- page content -->
+    <div class="right_col" role="main">
+        @if(response == null){
+            <div class="row top_tiles">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    <div class="x_panel tile">
+                        <input type="hidden" id="regionSigLog">
+                        <input type="hidden" id="isRegionSigLog">
+                        <input type="hidden" id="isProvinceSigLog">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;
+                                font-size: 24px"> Total SignIn & LogOff Daily</h2>
+                            <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần ra/vào mạng của người dùng, đi kèm là số lượng người dùng tương ứng, theo từng tháng và vị trí địa lý"></i>
+                            <a class="btn btn-warning" id="backSigLog" onclick="backSigLogDaily()" style="display: none;float: right"></a>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div id="region-siglog-bar" style="height: 350px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+
+                </div>
+            </div>
+        }else{
+            <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
+        }
+    </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+    <footer>
+        <div class="pull-right">
+            Dashboard Admin 21/09/2017
+        </div>
+        <div class="clearfix"></div>
+    </footer>
+        <!-- /footer content -->
+    </div>
+    </div>
+
+        <!-- jQuery -->
+    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- Custom Theme Scripts -->
+    <script src="../assets/custom/js/custom.min.js"></script>
+
+        <!-- Counter number -->
+    <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
+        <!-- Autocomplete -->
+    <script src="../assets/javascripts/jquery-ui.js"></script>
+    <script src="../assets/javascripts/waitMe.js"></script>
+        <!-- Hight chart -->
+    <script src="../assets/javascripts/highcharts.js"></script>
+    <script src="../assets/javascripts/exporting.js"></script>
+    <script src="../assets/javascripts/heatmap.js"></script>
+    <script src="../assets/javascripts/drilldown.js"></script>
+        <!--  Datepicker -->
+    <script src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                $('#day').datepicker({
+                    autoclose: true,
+                    minViewMode: 0,
+                    endDate: '+0d',
+                    format: 'yyyy-mm-dd'
+                }).on('changeDate', function (selected) {
+                    $('#ctSearch').submit()
+                });
+
+                // Bar Logoff and Signin
+                var categoriesSigLog = ["Vung 1","Vung 2","Vung 3","Vung 4","Vung 5","Vung 6","Vung 7"]
+                var sigLogDaily = Highcharts.chart('region-siglog-bar', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    xAxis: [{
+                        categories: categoriesSigLog,
+                        reversed: false,
+                    }, { // mirror axis on right side
+                        opposite: true,
+                        reversed: false,
+                        categories: categoriesSigLog,
+                        linkedTo: 0,
+                    }],
+                    yAxis: {
+                        title: {
+                            text: null
+                        },
+                        labels: {
+                            formatter: function () {
+                                return Math.abs(this.value);
+                            }
+                        },
+                    },
+
+                    plotOptions: {
+                        series: {
+                            events: {
+                                click: function (event) {
+                                    callDrilldownSigLog(event.point.category)
+                                }
+                            },
+                            cursor: 'pointer',
+                            stacking: 'normal'
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.name + '</b><br/><b>' + this.point.category + '</b><br/>'
+                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
+                        }
+                    },
+
+                    series: [{
+                        name: 'Signin',
+                        color:'#669999',
+                        data: [-10,-22,-11,-22,-44,-22,-44]
+                    }, {
+                        name: 'Logoff',
+                        color:'#832d1d',
+                        data: [10,22,11,22,44,22,44]
+                    }]
+                });
+            });
+    </script>
+    </body>
+</html>

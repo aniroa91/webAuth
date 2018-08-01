@@ -13,6 +13,7 @@ import org.joda.time.format.DateTimeFormat
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
+import device.utils.LocationUtils
 
 object BrasService extends AbstractService{
 
@@ -184,6 +185,30 @@ object BrasService extends AbstractService{
     ).await
     response.hits.hits.map(x=> x.sourceAsMap).map(x=> (getValueAsString(x,"name"),getValueAsString(x,"typeLog"),getValueAsString(x,"timestamp")))
 
+  }
+
+  def getSigLogdaily(day: String, queries: String) = {
+    val multiRs = client.execute(
+      multi(
+        search(s"radius-streaming-${day}" / "docs")
+          query (s"type:con AND typeLog:LogOff $queries")
+          aggregations (
+          termsAggregation("bras")
+            .field("nasName") size 1000
+          ) size 1000,
+        search(s"radius-streaming-${day}" / "docs")
+          query (s"type:con AND typeLog:SignIn $queries")
+          aggregations (
+          termsAggregation("bras")
+            .field("nasName") size 1000
+          ) size 1000
+      )
+    ).await
+    val rsLogoff = CommonService.getAggregationsSiglog(multiRs.responses(0).aggregations.get("bras")).filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4)
+    val rsSignin = CommonService.getAggregationsSiglog(multiRs.responses(1).aggregations.get("bras")).filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4)
+    (rsSignin, rsLogoff)
+    //println(rsLogoff.map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) , x._2)).filter(x=> x._1 == "Vung 4").map(x=> x._2).sum)
+   // rsLogoff.map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) , x._2)).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._2).sum)
   }
 
   def getUserLogOff(bras: String,time: String,typeLog: String): Array[(String,String,String)] = {

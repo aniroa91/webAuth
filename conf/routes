@@ -24,6 +24,8 @@ GET      /logout                       controllers.LoginController.logout
 #######################################################################
 ### DEVICE
 GET      /device                       controllers.DeviceController.overview
+GET      /daily                        controllers.DeviceController.getDaily
+POST     /daily                        controllers.DeviceController.getFormDayPicker
 GET      /noc                          controllers.DeviceController.dashboard
 GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
 GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")
