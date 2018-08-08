@@ -341,6 +341,69 @@ object BrasDAO {
         .as[(String,String,Double)])
   }
 
+  // for daily data
+  def getInfErrorsDaily(day: String, _type: String) = {
+    val nextDay = CommonService.getNextDay(day)
+    dbConfig.db.run(
+      sql"""select bras_id,host, sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error), sum(rouge_error), sum(lost_signal)
+            from dwh_inf_host
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by bras_id,host
+            """
+        .as[(String, String, Double, Double, Double, Double,Double, Double)]
+    )
+  }
+
+  def getServiceNoticeDaily(day: String): Future[Seq[(String, Double, Double,Double, Double)]] ={
+    val nextDay = CommonService.getNextDay(day)
+    dbConfig.db.run(
+      sql"""select bras_id, sum(warn_opsview),sum(unknown_opsview),sum(ok_opsview),sum(crit_opsview)
+            from dwh_opsview_status
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by bras_id
+            """
+        .as[(String, Double, Double,Double, Double)]
+    )
+  }
+
+  def getErrorHostdaily(bras: String, day: String) = {
+    val nextDay = CommonService.getNextDay(day)
+    if(bras.equals("*")){
+      dbConfig.db.run(
+        sql"""select extract(hour from  date_time) as hourly, sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error),sum(rouge_error),sum(lost_signal)
+            from dwh_inf_host
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by hourly
+            order by hourly
+            """
+          .as[(String, Double, Double,Double, Double,Double,Double)]
+      )
+    }
+    else{
+      dbConfig.db.run(
+        sql"""select extract(hour from  date_time) as hourly, sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error),sum(rouge_error),sum(lost_signal)
+            from dwh_inf_host
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and bras_id = $bras
+            group by hourly
+            order by hourly
+            """
+          .as[(String, Double, Double,Double, Double,Double,Double)]
+      )
+    }
+  }
+
+  def getDeviceErrorsDaily(day: String): Future[Seq[(String, Double, Double,Double, Double,Double,Double)]] ={
+    val nextDay = CommonService.getNextDay(day)
+    dbConfig.db.run(
+      sql"""select bras_id, sum(alert_count),sum(crit_count),sum(emerg_count),sum(err_count),sum(notice_count),sum(warning_count)
+            from dwh_kibana_agg
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            group by bras_id
+            """
+         .as[(String, Double, Double,Double, Double,Double,Double)]
+    )
+  }
+
   def getTotalInfbyProvince(month: String,id: String,lstBrasId: Array[(String)]): Future[Seq[(String,String,Double)]] = {
     val lstBras = lstBrasId.map("'" + _ + "'").mkString(",")
     val fromMonth = month.split("/")(0)+"-01"
@@ -524,7 +587,6 @@ object BrasDAO {
   def getTopSignin(month: String): Future[Seq[(String,String,Int,Int)]] = {
     if(month.equals("")) {
       val month = CommonService.get3MonthAgo()+"-01"
-      println(month)
       dbConfig.db.run(
         sql"""select d.bras_id,d.host,d.signin,d.signin_clients from(
                   select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.signin desc) AS r , c.*
@@ -853,18 +915,34 @@ object BrasDAO {
   }
 
   def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int): Array[(Int,Int)] = {
-    val res = client_kibana.execute(
-      search(s"infra_dwh_opsview_*" / "docs")
-        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
-        aggregations (
-        dateHistogramAggregation("hourly")
-          .field("date_time")
-          .interval(DateHistogramInterval.HOUR)
-          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
-        )  size 1000
-    ).await
-    CommonService.getAggregationsKeyString(res.aggregations.get("hourly")).map(x=> (CommonService.getHourFromES5(x._1),x._2))
-      .groupBy(_._1).mapValues(_.map(x=>x._2.toInt).sum).toArray.sorted
+    if(bras.equals("*")){
+      val res = client_kibana.execute(
+        search(s"infra_dwh_opsview_*" / "docs")
+          query { must(rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay)).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay)))) }
+          aggregations (
+          dateHistogramAggregation("hourly")
+            .field("date_time")
+            .interval(DateHistogramInterval.HOUR)
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          )  size 1000
+      ).await
+      CommonService.getAggregationsKeyString(res.aggregations.get("hourly")).map(x=> (CommonService.getHourFromES5(x._1),x._2))
+        .groupBy(_._1).mapValues(_.map(x=>x._2.toInt).sum).toArray.sorted
+    }
+    else {
+      val res = client_kibana.execute(
+        search(s"infra_dwh_opsview_*" / "docs")
+          query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+          aggregations (
+          dateHistogramAggregation("hourly")
+            .field("date_time")
+            .interval(DateHistogramInterval.HOUR)
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          )  size 1000
+      ).await
+      CommonService.getAggregationsKeyString(res.aggregations.get("hourly")).map(x=> (CommonService.getHourFromES5(x._1),x._2))
+        .groupBy(_._1).mapValues(_.map(x=>x._2.toInt).sum).toArray.sorted
+    }
    /* dbConfig.db.run(
       sql"""select extract(hour from  date_time) as hourly, count(service_name)
             from dwh_opsview
@@ -887,18 +965,38 @@ object BrasDAO {
                   """
         .as[(Int,Int)])
   }
+
   def getKibanaBytimeES(bras: String,day: String): Array[(Int,Int)] ={
-    val rs = client_kibana.execute(
-      search(s"infra_dwh_kibana_*" / "docs")
-        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
-        aggregations(
-        dateHistogramAggregation("hourly")
-          .field("date_time")
-          .interval(DateHistogramInterval.HOUR)
-          .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
-        )
-    ).await
-    CommonService.getAggregationsSiglog(rs.aggregations.get("hourly")).map(x=> (CommonService.getHoursFromMiliseconds(x._1.toLong)->x._2.toInt))
+    if(bras.equals("*")) {
+      val rs = client_kibana.execute(
+        search(s"infra_dwh_kibana_*" / "docs")
+          query {
+          must(rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day)).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day))))
+        }
+          aggregations (
+          dateHistogramAggregation("hourly")
+            .field("date_time")
+            .interval(DateHistogramInterval.HOUR)
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          )
+      ).await
+      CommonService.getAggregationsSiglog(rs.aggregations.get("hourly")).map(x => (CommonService.getHoursFromMiliseconds(x._1.toLong) -> x._2.toInt))
+    }
+    else{
+      val rs = client_kibana.execute(
+        search(s"infra_dwh_kibana_*" / "docs")
+          query {
+          must(termQuery("bras_id.keyword", bras), rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1)))))
+        }
+          aggregations (
+          dateHistogramAggregation("hourly")
+            .field("date_time")
+            .interval(DateHistogramInterval.HOUR)
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          )
+      ).await
+      CommonService.getAggregationsSiglog(rs.aggregations.get("hourly")).map(x => (CommonService.getHoursFromMiliseconds(x._1.toLong) -> x._2.toInt))
+    }
   }
 
   def getSigLogBytimeResponse(bras: String,nowDay: String,hourly:Int): Future[Seq[(Int,Int,Int)]] = {
@@ -913,30 +1011,40 @@ object BrasDAO {
                   """
         .as[(Int,Int,Int)])
   }
+
   def getSigLogBytimeCurrent(bras: String, day: String): SigLogByTime = {
-    val mulRes = client.execute(
-      multi(
-        search(s"radius-streaming-*" / "docs")
-          query { must(termQuery("type", "con"),termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "SignIn"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
-          aggregations (
-          dateHistogramAggregation("hourly")
-            .field("timestamp")
-            .interval(DateHistogramInterval.HOUR)
-            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
-          ),
-        search(s"radius-streaming-*" / "docs")
-          query { must(termQuery("type", "con"),termQuery("nasName",bras.toLowerCase),termQuery("typeLog", "LogOff"),rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
-          aggregations (
-          dateHistogramAggregation("hourly")
-            .field("timestamp")
-            .interval(DateHistogramInterval.HOUR)
-            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
-          )
-      )
-    ).await
-    val arrSigin = CommonService.getAggregationsSiglog(mulRes.responses(0).aggregations.get("hourly")).map(x=> CommonService.getHoursFromMiliseconds(x._1.toLong)-> x._2).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sortBy(_._1).map(x=>x._2).toArray
-    val arrLogoff = CommonService.getAggregationsSiglog(mulRes.responses(1).aggregations.get("hourly")).map(x=> CommonService.getHoursFromMiliseconds(x._1.toLong)-> x._2).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sortBy(_._1).map(x=>x._2).toArray
-    SigLogByTime(arrSigin,arrLogoff)
+    try {
+      val mulRes = client.execute(
+        multi(
+          search(s"radius-streaming-*" / "docs")
+            query {
+            must(termQuery("type", "con"), termQuery("nasName", bras.toLowerCase), termQuery("typeLog", "SignIn"), rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1)))))
+          }
+            aggregations (
+            dateHistogramAggregation("hourly")
+              .field("timestamp")
+              .interval(DateHistogramInterval.HOUR)
+              .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+            ),
+          search(s"radius-streaming-*" / "docs")
+            query {
+            must(termQuery("type", "con"), termQuery("nasName", bras.toLowerCase), termQuery("typeLog", "LogOff"), rangeQuery("timestamp").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1)))))
+          }
+            aggregations (
+            dateHistogramAggregation("hourly")
+              .field("timestamp")
+              .interval(DateHistogramInterval.HOUR)
+              .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+            )
+        )
+      ).await
+      val arrSigin = CommonService.getAggregationsSiglog(mulRes.responses(0).aggregations.get("hourly")).map(x => CommonService.getHoursFromMiliseconds(x._1.toLong) -> x._2).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sortBy(_._1).map(x => x._2).toArray
+      val arrLogoff = CommonService.getAggregationsSiglog(mulRes.responses(1).aggregations.get("hourly")).map(x => CommonService.getHoursFromMiliseconds(x._1.toLong) -> x._2).groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sortBy(_._1).map(x => x._2).toArray
+      SigLogByTime(arrSigin, arrLogoff)
+    }
+    catch{
+      case e: Exception => SigLogByTime(Array[(Long)](), Array[(Long)]())
+    }
   }
 
   def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly:Int): Array[(Int,Int)] = {

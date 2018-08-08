@@ -32,11 +32,11 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
       val username = request.session.get("username").get.toString
       username match {
         case "inf" =>
-          Redirect("/device")
+          Redirect("/daily")
         case "noc" =>
-          Redirect("/device")
+          Redirect("/daily")
         case "admin" =>
-          Redirect("/device")
+          Redirect("/daily")
       }
     }
     else
@@ -49,11 +49,11 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
       user =>{
         user._1 match {
           case "inf" =>
-            Redirect("/device").withSession(Security.username -> user._1)
+            Redirect("/daily").withSession(Security.username -> user._1)
           case "noc" =>
-            Redirect("/device").withSession(Security.username -> user._1)
+            Redirect("/daily").withSession(Security.username -> user._1)
           case "admin" =>
-            Redirect("/device").withSession(Security.username -> user._1)
+            Redirect("/daily").withSession(Security.username -> user._1)
         }
       }
     )

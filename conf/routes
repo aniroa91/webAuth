@@ -24,8 +24,15 @@ GET      /logout                       controllers.LoginController.logout
 #######################################################################
 ### DEVICE
 GET      /device                       controllers.DeviceController.overview
+
 GET      /daily                        controllers.DeviceController.getDaily
 POST     /daily                        controllers.DeviceController.getFormDayPicker
+GET      /drilldownSigLogDaily         controllers.DeviceController.drilldownSigLogDaily(id: String ?= "",day: String ?= "")
+GET      /drilldownErrorDevice         controllers.DeviceController.drilldownErrorDevice(id: String ?= "",day: String ?= "",err: String ?= "")
+GET      /getServNoticeByType          controllers.DeviceController.getServNoticeByType(noti: String ?= "",day: String ?= "")
+GET      /drilldownInferrorDaily       controllers.DeviceController.drilldownInfErrorsDaily(id: String ?= "",day: String ?= "",err: String ?= "")
+GET      /getDailyByBrasLocation       controllers.DeviceController.getDailyByBrasLocation(id: String ?= "",day: String ?= "")
+
 GET      /noc                          controllers.DeviceController.dashboard
 GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
 GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")

@@ -279,6 +279,19 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def getAggregationsAndCountDistinct(aggr: Option[AnyRef]):  Array[(String, Long, Long)] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val count = x.getOrElse("doc_count",0L).toString.toLong
+        val countDist = x.getOrElse("name", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]].get("value").getOrElse("0").asInstanceOf[Int].toLong
+        (key, count,countDist)
+      })
+      .toArray
+  }
+
   def getSecondAggregationsAndSumInfError(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long,Long,Long,Long,Long,Long)])] = {
     aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]

@@ -82,6 +82,20 @@ case class BrasOutlier(
                       signin: Int,
                       logOff: Int
                       )
+case class SigLogClientsDaily(
+                             signin: Array[(Int, Long, Long)],
+                             logoff: Array[(Int, Long, Long)]
+                             )
+
+case class DailyResponse(
+                        siglogRegion:  (Array[(String, Long, Long)], Array[(String, Long, Long)]),
+                        errorsDevice:  Array[(String, Double)],
+                        noticeOpsview: Array[(String, String,String, Double)],
+                        kibanaOpsview:  (Array[(Int, Int)], Array[(Int, Int)]),
+                        sigLogByHourly:  SigLogClientsDaily,
+                        rsErrorsInf:   Array[(String, Double)],
+                        rsErrorHostDaily: Array[(String, Double, Double, Double, Double,Double,Double)]
+                        )
 
 case class BrasResponse(
                             currentsInfo: BrasInfor,

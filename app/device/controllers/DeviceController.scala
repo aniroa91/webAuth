@@ -85,11 +85,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   // index page Dashboard Device
   def overview =  withAuth { username => implicit request =>
-   // try {
+    try {
       //val minMaxMonth = CommonService.getRangeCurrentMonth()
       val minMaxMonth = Await.result(BrasService.getMinMaxMonth(), Duration.Inf)
       val threeMonth = Await.result(BrasService.get3MonthLastest(),Duration.Inf)
-      println(minMaxMonth)
       val fromMonth = if(searchOverview.startMonth != "") searchOverview.startMonth+"-01" else threeMonth(threeMonth.length-1)
       val toMonth = if(searchOverview.endMonth != "") searchOverview.endMonth+"-01" else threeMonth(0)
       val rangeMonth = CommonService.getAllMonthfromRange(fromMonth,toMonth)
@@ -142,10 +141,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       searchOverview = controllers.MonthPicker("","","")
 
       Ok(device.views.html.overview(username,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),nocCount,contracts,heatmapOpsview,infTypeError,totalInf)))
-   /* }
+    }
     catch{
       case e: Exception => Ok(device.views.html.overview(username,null))
-    }*/
+    }
   }
 
   // This will be the action that handles our form post
@@ -165,17 +164,204 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     val formValidationResult = formDaily.bindFromRequest
     formValidationResult.fold(errorFunction, successFunction)
   }
+
   def getDaily =  withAuth { username => implicit request =>
-    try{
+    //try{
+      val t0 = System.currentTimeMillis()
       val day = if(searchDaily.day == null || searchDaily.day.equals("")) CommonService.getCurrentDay() else searchDaily.day
-      println(day)
-      val rs = BrasService.getSigLogdaily(day, "")
-      val logoff = rs._2.map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) , x._2)).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._2).sum)
-      logoff.foreach(println)
-      Ok(device.views.html.daily(null, day, username))
-    }
+      val rsSiglog        = BrasService.getSigLogRegionDaily(day, "")
+      println("t0:"+(System.currentTimeMillis() -t0))
+      val t1 = System.currentTimeMillis()
+      val rsErrorsDevice  = BrasService.getDeviceErrorsRegionDaily(day).map(x=> x._1 -> (x._2+x._3+x._4+x._5+x._6+x._7))
+      println("t1:"+(System.currentTimeMillis() -t1))
+      val t2 = System.currentTimeMillis()
+      val rsNoticeOpsview = BrasService.getServiceNoticeRegionDaily(day, "*")
+      println("t2:"+(System.currentTimeMillis() -t2))
+      val t3 = System.currentTimeMillis()
+      val rsErrorsInf     = BrasService.getInfErrorsDaily(day, "*").groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sorted
+      println("t3:"+(System.currentTimeMillis() -t3))
+      val t4 = System.currentTimeMillis()
+      val arrOpsview      = BrasService.getOpviewBytimeResponse("*", day, 0)
+      val opviewBytime    = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrOpsview, x)).toArray
+      val arrKibana       = BrasService.getKibanaBytimeES("*", day).groupBy(_._1).mapValues(_.map(_._2).sum).toArray
+      val kibanaBytime    = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana, x)).toArray
+      println("t4:"+(System.currentTimeMillis() -t4))
+      val t5 = System.currentTimeMillis()
+      val rsLogsigBytime  = BrasService.getSigLogByDaily("*", day)
+      println("t5:"+(System.currentTimeMillis() -t5))
+      val rsErrorHostDaily = Await.result(BrasService.getErrorHostdaily("*",day), Duration.Inf).toArray
+      println("tAll:"+(System.currentTimeMillis() -t0))
+      Ok(device.views.html.daily(DailyResponse((rsSiglog._1, rsSiglog._2), rsErrorsDevice, rsNoticeOpsview,(kibanaBytime, opviewBytime), rsLogsigBytime, rsErrorsInf, rsErrorHostDaily), day, username))
+    /*}
     catch{
       case e : Exception => Ok(device.views.html.daily(null, CommonService.getCurrentDay(), username))
+    }*/
+  }
+
+  def getDailyByBrasLocation(id: String, day: String) = Action { implicit request =>
+    try{
+      val bras_id = if(id.equals("All")) "*" else id
+      val daystr  = if(id.equals("All")) day else day+"/"+day
+      // SigLog by time
+      val rsLogsigBytime  = BrasService.getSigLogByDaily(bras_id, day)
+      val jsonSigLog = Json.obj(
+        "signin"  -> rsLogsigBytime.signin.map(x=> x._2),
+        "logoff" -> rsLogsigBytime.logoff.map(x=> x._2),
+        "signin_clients"  -> rsLogsigBytime.signin.map(x=> x._3),
+        "logoff_clients" -> rsLogsigBytime.logoff.map(x=> x._3)
+      )
+      // Kibana opsview by time
+      val arrOpsview      = BrasService.getOpviewBytimeResponse(bras_id, daystr, 0)
+      val opviewBytime    = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrOpsview, x)).toArray
+      val arrKibana       = BrasService.getKibanaBytimeES(bras_id, daystr).groupBy(_._1).mapValues(_.map(_._2).sum).toArray
+      val kibanaBytime    = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana, x)).toArray
+      val kibaOps = Json.obj(
+        "kibana"  -> kibanaBytime,
+        "opsview" -> opviewBytime
+      )
+      // Total errors hourly
+      val rsErrorHost = Await.result(BrasService.getErrorHostdaily(bras_id,day), Duration.Inf).toArray
+      val rs = Json.obj(
+        "kibanaOpsview" -> kibaOps,
+        "errorHourly"   -> rsErrorHost,
+        "sigLogBytime"  -> jsonSigLog
+      )
+      Ok(Json.toJson(rs))
+    }
+    catch {
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def drilldownInfErrorsDaily(id: String,day: String, err: String) = Action {implicit  request =>
+    try{
+      val rs = id match {
+        // get inf by Region
+        case id if(id.equals("*")) => {
+          BrasService.getInfErrorsDaily(day, err).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sorted
+        }
+        // get inf by Region
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
+          BrasService.getInfErrorsDaily(day, err).filter(x=> x._1 == id).groupBy(x=> x._2).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sorted
+        }
+        // get inf by Province
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
+          BrasService.getInfErrorsDaily(day, err).filter(x=> x._2 == id).groupBy(x=> x._3).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sortWith((x, y)=> x._2>y._2).slice(0,10)
+        }
+        // get inf by Bras
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) =>{
+          BrasService.getInfErrorsDaily(day, err).filter(x=> x._3 == id).groupBy(x=> x._4).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sortWith((x, y)=> x._2>y._2).slice(0,10)
+        }
+      }
+      Ok(Json.toJson(Json.obj("data" -> rs)))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getServNoticeByType(noti: String,day: String) = Action { implicit request =>
+    try{
+      val rs = BrasService.getServiceNoticeRegionDaily(day, noti)
+      val json = Json.obj(
+        "data"  -> rs,
+        "cates" -> rs.map(x=> x._1).distinct.toSeq.sorted
+      )
+      Ok(Json.toJson(json))
+    }
+    catch {
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def drilldownErrorDevice(id: String,day: String, err: String) = Action {implicit  request =>
+    try{
+      val rs = id match {
+        // get inf by Region
+        case id if(id.equals("*")) => {
+          val errors = BrasService.getDeviceErrorsRegionDaily(day)
+          val data = if(err.equals("*")) errors.map(x=> x._1 -> (x._2+x._3+x._4+x._5+x._6+x._7)) else if(err.equals("alert")) errors.map(x=> x._1 -> x._2) else if(err.equals("crit")) errors.map(x=> x._1 -> x._3)
+                     else if(err.equals("emerg")) errors.map(x=> x._1 -> x._4) else if(err.equals("err")) errors.map(x=> x._1 -> x._5) else if(err.equals("notice")) errors.map(x=> x._1 -> x._6)
+                     else if(err.equals("warning")) errors.map(x=> x._1 -> x._7)
+          Json.obj(
+            "data"   -> data.asInstanceOf[Array[(String, Double)]]
+          )
+        }
+        // get inf by Region
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
+          val errors = BrasService.getDeviceErrorsProvinceDaily(day, id)
+          val data = if(err.equals("*")) errors.map(x=> x._1 -> (x._2+x._3+x._4+x._5+x._6+x._7)) else if(err.equals("alert")) errors.map(x=> x._1 -> x._2) else if(err.equals("crit")) errors.map(x=> x._1 -> x._3)
+                     else if(err.equals("emerg")) errors.map(x=> x._1 -> x._4) else if(err.equals("err")) errors.map(x=> x._1 -> x._5) else if(err.equals("notice")) errors.map(x=> x._1 -> x._6)
+                     else if(err.equals("warning")) errors.map(x=> x._1 -> x._7)
+
+          Json.obj(
+            "data"   -> data.asInstanceOf[Array[(String, Double)]]
+          )
+        }
+        // get inf by Province
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
+          val errors = BrasService.getDeviceErrorsBrasDaily(day, id)
+          val data = if(err.equals("*")) errors.map(x=> x._1 -> (x._2+x._3+x._4+x._5+x._6+x._7)) else if(err.equals("alert")) errors.map(x=> x._1 -> x._2) else if(err.equals("crit")) errors.map(x=> x._1 -> x._3)
+                     else if(err.equals("emerg")) errors.map(x=> x._1 -> x._4) else if(err.equals("err")) errors.map(x=> x._1 -> x._5) else if(err.equals("notice")) errors.map(x=> x._1 -> x._6)
+                     else if(err.equals("warning")) errors.map(x=> x._1 -> x._7)
+
+          Json.obj(
+            "data"   -> data.asInstanceOf[Array[(String, Double)]]
+          )
+        }
+      }
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def drilldownSigLogDaily(id: String,day: String) = Action {implicit  request =>
+    try{
+      val rs = id match {
+        // get inf by Region
+        case id if(id.equals("*")) => {
+          val sigLog = BrasService.getSigLogRegionDaily(day, "")
+          Json.obj(
+            "cates"   -> sigLog._1.map(x=> x._1),
+            "logoff"  -> sigLog._1,
+            "signin"  -> sigLog._2
+          )
+        }
+        // get inf by Region
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
+          val sigLog = BrasService.getSigLogProvinceDaily(day, id)
+          Json.obj(
+            "cates"   -> sigLog._1.map(x=> x._1),
+            "logoff"  -> sigLog._1,
+            "signin"  -> sigLog._2
+          )
+        }
+        // get inf by Province
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
+          val provinceName = LocationUtils.getCodeProvincebyName(id)
+          val sigLog = BrasService.getSigLogBrasDaily(day, provinceName)
+          Json.obj(
+            "cates"   -> sigLog._1.map(x=> x._1),
+            "logoff"  -> sigLog._1,
+            "signin"  -> sigLog._2
+          )
+        }
+        // get inf by Bras
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) =>{
+          val sigLog = BrasService.getSigLogHostDaily(day, id)
+          Json.obj(
+            "cates"   -> sigLog._1.map(x=> x._1),
+            "logoff"  -> sigLog._1,
+            "signin"  -> sigLog._2
+          )
+        }
+      }
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
     }
   }
 

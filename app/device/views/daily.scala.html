@@ -1,4 +1,4 @@
-@(response: String, day: String, email: String)(implicit request: RequestHeader)
+@(response: model.device.DailyResponse, day: String, email: String)(implicit request: RequestHeader)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatPattern
 @import play.api.libs.json.Json
@@ -18,7 +18,7 @@
         <title>Dashboard Admin </title>
 
             <!-- Bootstrap -->
-        @common.views.html.common.css("Overview")
+        @common.views.html.common.css("Daily")
     </head>
     @common.views.html.common.top()
         <!-- top navigation -->
@@ -31,12 +31,12 @@
             </nav>
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <a href="javascript:;" class="user-profile" data-toggle="dropdown" aria-expanded="false">
                         <img src="../assets/images/user.default.png" alt="">@email
                         <span class=" fa fa-angle-down"></span>
                     </a>
-                    <ul class="dropdown-menu dropdown-usermenu pull-right">
-                        <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                    <ul class="dropdown-menu dropdown-usermenu pull-right" style="top: auto!important;">
+                        <li><a style="font-size: 20px" href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                     </ul>
                 </li>
                 <li class="form-group pull-right" style="padding-top: 10px;right: 10px">
@@ -58,7 +58,7 @@
         <!-- /top navigation -->
         <!-- page content -->
     <div class="right_col" role="main">
-        @if(response == null){
+        @if(response != null){
             <div class="row top_tiles">
                 <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                     <div class="x_panel tile">
@@ -68,17 +68,225 @@
                         <div class="x_title">
                             <h2 style="font-weight: 500;
                                 font-size: 24px"> Total SignIn & LogOff Daily</h2>
-                            <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần ra/vào mạng của người dùng, đi kèm là số lượng người dùng tương ứng, theo từng tháng và vị trí địa lý"></i>
-                            <a class="btn btn-warning" id="backSigLog" onclick="backSigLogDaily()" style="display: none;float: right"></a>
+                            <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần ra/vào mạng của người dùng, đi kèm là số lượng người dùng tương ứng, theo ngày và vị trí địa lý"></i>
+                            <a class="btn btn-success" id="backSigLog" style="display: none;float: right"></a>
                             <div class="clearfix"></div>
                         </div>
-                        <div class="x_content">
-                            <div id="region-siglog-bar" style="height: 350px;"></div>
+                        <div class="x_content" style="text-align: center">
+                            @if(response.siglogRegion._1.length >0 || response.siglogRegion._2.length >0) {
+                                <div id="region-siglog-bar" style="height: 375px;"></div>
+                            }else{
+                                <span style="font-size: 13px">Not find data on @day</span>
+                            }
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    <div class="x_panel tile">
+                        <input type="hidden" id="regionDeviceErr">
+                        <input type="hidden" id="isRegionDeviceErr">
+                        <input type="hidden" id="isProvinceDeviceErr">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;font-size: 24px"> Device Errors By Location</h2>
+                            <a class="btn btn-success" id="backDeviceErr" style="display: none;float: right"></a>
+                            <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi trên thiết bị BRAS theo ngày và vị trí địa lý"></i>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="text-align: center">
+                            @if(response.errorsDevice.length >0){
+                                <div id="tree-map" style="height: 350px;"></div>
+                                <form id="frmDeviceErr" style="text-align: center">
+                                    <input type="hidden" id="typeDeviceErr" value="*">
+                                    <label class="radio-inline radioText">
+                                        <input type="radio" value="*" name="optradio" checked>All
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="alert" name="optradio">AlertCount
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="crit" name="optradio">CritCount
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="warning" name="optradio">WarningCount
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="notice" name="optradio">NoticeCount
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="err" name="optradio">ErrCount
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="emerg" name="optradio">EmergCount
+                                    </label>
+                                </form>
+                            }else{
+                                <span style="font-size: 13px">Not find data on @day</span>
+                            }
+                        </div>
+                     </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    <div class="x_panel tile">
+                        <input type="hidden" id="regionServiceNotice">
+                        <input type="hidden" id="isRegionServiceNotice">
+                        <input type="hidden" id="isProvinceServiceNotice">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;font-size: 24px"> Service Monitor Notices</h2>
+                            <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần thay đổi trạng thái của các service quản lý thiết bị BRAS (hệ thống Opsview) theo ngày và vị trí địa lý"></i>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="text-align: center">
+                        @if(response.noticeOpsview.length >0){
+                            <div id="bar-service" style="height: 350px;"></div>
+                            <form id="frmServNotice" style="text-align: center">
+                                <label class="radio-inline radioText">
+                                    <input type="radio" value="*" name="optradio" checked>All
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="warn" name="optradio">Warning
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="unknown" name="optradio">Unknown
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="ok" name="optradio">Ok
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="crit" name="optradio">Crit
+                                </label>
+                            </form>
+                        }else{
+                            <span style="font-size: 13px">Not find data on @day</span>
+                        }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    <div class="x_panel tile">
+                        <input type="hidden" id="regionInfErr">
+                        <input type="hidden" id="isRegionInfErr">
+                        <input type="hidden" id="isProvinceInfErr">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;font-size: 24px"> Inf Errors By Location</h2>
+                            <a class="btn btn-success" id="backDeviceErr" style="display: none;float: right"></a>
+                            <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi tại thiết bị Access theo ngày và vị trí địa lý"></i>
+                            <a class="btn btn-success" id="backInfErr" style="display: none;float: right"></a>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="text-align: center">
+                        @if(response.rsErrorsInf.length >0 ) {
+                            <div id="region-inf" style="height: 350px;"></div>
+                            <form id="frmInfErrordaily" style="text-align: center">
+                                <input type="hidden" id="typeInfErr" value="*">
+                                <label class="radio-inline radioText">
+                                    <input type="radio" value="*" name="optradio" checked>All
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="user_down" name="optradio">UserDown
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="inf_down" name="optradio">InfDown
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="sf_error" name="optradio">SfError
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="lofi_error" name="optradio">LofiError
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="rouge_error" name="optradio">RougeError
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="lost_signal" name="optradio">LostSignal
+                                </label>
+                            </form>
+                        }else{
+                            <span style="font-size: 13px">Not find data on @day</span>
+                        }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="col-xs-12" style="margin-bottom: 10px">
+                @if(response.noticeOpsview.length >0) {
+                    <span class="hvr-pulse titDropdown">Bras:</span>
+                    <ul class="slBras">
+                        <li>All</li>
+                        @for(region <- response.noticeOpsview.map(x => x._1).distinct.sorted) {
+                            <li data-dropdown-text="@region">
+                                <ul>
+                                @for(province <- response.noticeOpsview.filter(x => x._1 == region).map(x => x._2).distinct.sorted) {
+                                    <li data-dropdown-text="@province">
+                                        <ul>
+                                        @for(bras <- response.noticeOpsview.filter(x => x._1 == region && x._2 == province).map(x => x._3)) {
+                                            <li>@bras</li>
+                                        }
+                                        </ul>
+                                    </li>
+                                }
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                }
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel tile">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;
+                                font-size: 24px">  Signin & Logoff By Time</h2>
 
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="text-align: center">
+                        @if(response.sigLogByHourly.signin.length >0 || response.sigLogByHourly.logoff.length >0) {
+                            <div id="col-lineSigLog" style="height: 250px;"></div>
+                        }else{
+                            <span style="font-size: 13px">Not find data on @day</span>
+                        }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="col-xs-12">
+                    <div class="x_panel tile">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;font-size: 24px"> Total Error By Hourly</h2>
+
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="text-align: center">
+                        @if(response.rsErrorHostDaily.length >0) {
+                            <div id="heat_mapInfTab" style="height: 250px"></div>
+                        }else{
+                            <span style="font-size: 13px">Not find data on @day</span>
+                        }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
+                <div class="col-xs-12">
+                    <div class="x_panel tile">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;font-size: 24px"> Nerror (kibana & opview) By Time</h2>
+
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="text-align: center">
+                        @if(response.kibanaOpsview._1.length > 0 || response.kibanaOpsview._1.length >0) {
+                            <div id="int-col-hourly" style="height: 250px;"></div>
+                        }else{
+                            <span style="font-size: 13px">Not find data on @day</span>
+                        }
+                        </div>
+                    </div>
                 </div>
             </div>
         }else{
@@ -111,86 +319,832 @@
         <!-- Autocomplete -->
     <script src="../assets/javascripts/jquery-ui.js"></script>
     <script src="../assets/javascripts/waitMe.js"></script>
+    <script src="../assets/javascripts/jquery.dropdown.js"></script>
         <!-- Hight chart -->
     <script src="../assets/javascripts/highcharts.js"></script>
     <script src="../assets/javascripts/exporting.js"></script>
     <script src="../assets/javascripts/heatmap.js"></script>
+    <script src="../assets/javascripts/treemap.js"></script>
+    <script src="../assets/javascripts/funnel.js"></script>
     <script src="../assets/javascripts/drilldown.js"></script>
         <!--  Datepicker -->
     <script src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
+                $('.slBras').dropdown();
                 $('#day').datepicker({
                     autoclose: true,
                     minViewMode: 0,
                     endDate: '+0d',
                     format: 'yyyy-mm-dd'
-                }).on('changeDate', function (selected) {
+                }).on('changeDate', function () {
                     $('#ctSearch').submit()
                 });
+                @if(response != null){
 
-                // Bar Logoff and Signin
-                var categoriesSigLog = ["Vung 1","Vung 2","Vung 3","Vung 4","Vung 5","Vung 6","Vung 7"]
-                var sigLogDaily = Highcharts.chart('region-siglog-bar', {
-                    chart: {
-                        type: 'bar'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    subtitle: {
-                        text: ''
-                    },
-                    xAxis: [{
-                        categories: categoriesSigLog,
-                        reversed: false,
-                    }, { // mirror axis on right side
-                        opposite: true,
-                        reversed: false,
-                        categories: categoriesSigLog,
-                        linkedTo: 0,
-                    }],
-                    yAxis: {
-                        title: {
-                            text: null
-                        },
-                        labels: {
-                            formatter: function () {
-                                return Math.abs(this.value);
-                            }
-                        },
-                    },
+                    @if(response.rsErrorHostDaily.length >0){
+                        var heat_mapInfTab = Highcharts.chart('heat_mapInfTab', {
+                            chart: {
+                                type: 'heatmap',
+                                marginTop: 40,
+                                marginBottom: 80,
+                                plotBorderWidth: 1
+                            },
 
-                    plotOptions: {
-                        series: {
-                            events: {
-                                click: function (event) {
-                                    callDrilldownSigLog(event.point.category)
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
+                            },
+
+                            yAxis: {
+                                categories: ['user_down', 'inf_down', 'sf_error', 'lofi_error', 'rouge_error', 'lost_signal'],
+                                title: null
+                            },
+
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                y: 10,
+                                x:40
+                            },
+
+                            colorAxis: {
+                                min: 0,
+                                minColor: '#FFFFFF',
+                                maxColor: '#d9534f'
+                            },
+
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br> has <b>' +
+                                            this.point.value + ' <b>' + this.series.yAxis.categories[this.point.y] + '</b>';
                                 }
                             },
-                            cursor: 'pointer',
-                            stacking: 'normal'
-                        }
-                    },
 
-                    tooltip: {
-                        formatter: function () {
-                            return '<b>' + this.series.name + '</b><br/><b>' + this.point.category + '</b><br/>'
-                                    +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
-                        }
-                    },
+                            series: [{
+                                name: 'Errors',
+                                borderWidth: 1,
+                                data: getErrorHourlyHeatmap(@Html(Json.stringify(Json.toJson(response.rsErrorHostDaily)))),
+                                dataLabels: {
+                                    enabled: true,
+                                    color: '#000000'
+                                }
+                            }]
 
-                    series: [{
-                        name: 'Signin',
-                        color:'#669999',
-                        data: [-10,-22,-11,-22,-44,-22,-44]
-                    }, {
-                        name: 'Logoff',
-                        color:'#832d1d',
-                        data: [10,22,11,22,44,22,44]
-                    }]
-                });
+                        });
+                    }
+                    @if(response.rsErrorsInf.length >0 ){
+                        var errors_inf = Highcharts.chart('region-inf', {
+                            chart: {
+                                type: 'funnel'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            colors: [
+                                '#9B59B6',
+                                '#f1b53d',
+                                '#E74C3C',
+                                '#73879C',
+                                '#1ABB9C',
+                                '#832d1d',
+                                '#0000cc',
+                                '#dc5a78',
+                                '#f2ccff',
+                                '#09006d',
+                                '#cccccc',
+                                '#669999',
+                                '#e6e600',
+                                '#132639',
+                                '#99cc00',
+                                '#466d6d',
+                                '#ffc6b3',
+                                '#666633',
+                                '#ffff00',
+                                '#3498DB',],
+                            plotOptions: {
+                                series: {
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b> ({point.y:,.0f})',
+                                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+                                        softConnector: true
+                                    },
+                                    center: ['40%', '50%'],
+                                    neckWidth: '30%',
+                                    neckHeight: '25%',
+                                    width: '80%',
+                                    cursor: 'pointer',
+                                    events: {
+                                        click: function (event) {
+                                            callDrillDownInfErrors(event.point.name, 'drilldown')
+                                        }
+                                    }
+                                }
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            series: [{
+                                name: 'Errors',
+                                data: @Html(Json.stringify(Json.toJson(response.rsErrorsInf)))
+                            }]
+                        });
+                    }
+                    @if(response.sigLogByHourly.signin.length >0 || response.sigLogByHourly.logoff.length >0){
+                        var line_siglog = Highcharts.chart('col-lineSigLog', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            plotOptions: {
+                                column: {
+                                    colorByPoint: true
+                                }
+                            },
+                            colors: [
+                                '#09006d', '#d9534f','#9B59B6','#f1b53d'
+                            ],
+                            xAxis: {
+                                categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
+                            },
+                            yAxis: {
+                                title: {
+                                    text: "Values"
+                                }
+
+                            },
+                            tooltip: {
+                                crosshairs: true,
+                                shared: true
+                            },
+                            plotOptions: {
+                                spline: {
+                                    marker: {
+                                        radius: 4,
+                                        lineColor: '#666666',
+                                        lineWidth: 1
+                                    }
+                                }
+                            },
+                            series: [{
+                                type: 'spline',
+                                name: 'Signin',
+                                data: @Html(Json.stringify(Json.toJson(response.sigLogByHourly.signin.map(x=> x._2))))
+                            },
+                                {
+                                    type: 'spline',
+                                    name: 'Logoff',
+                                    data: @Html(Json.stringify(Json.toJson(response.sigLogByHourly.logoff.map(x=> x._2))))
+                                },
+                                {
+                                    type: 'column',
+                                    name: 'Signin Clients',
+                                    data: @Html(Json.stringify(Json.toJson(response.sigLogByHourly.signin.map(x=> x._3))))
+                                },
+                                {
+                                    type: 'column',
+                                    name: 'Logoff Clients',
+                                    data: @Html(Json.stringify(Json.toJson(response.sigLogByHourly.logoff.map(x=> x._3))))
+                                }
+                            ]
+                        });
+                    }
+                    @if(response.kibanaOpsview._1.length > 0 || response.kibanaOpsview._1.length >0){
+                        var kiba_opsv_hourly = Highcharts.chart('int-col-hourly', {
+                            chart: {
+                                zoomType: 'xy'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: [{
+                                categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"],
+                                crosshair: true,
+                                title: {
+                                    text: '',
+                                }
+                            }],
+                            yAxis: [{ // Primary yAxis
+                                labels: {
+                                    format: '{value}',
+                                    style: {
+                                        color: "#5A738E"
+                                    }
+                                },
+                                title: {
+                                    text: 'Kibana (errors)',
+                                    style: {
+                                        color: "#5A738E"
+                                    }
+                                }
+                            }, { // Secondary yAxis
+                                title: {
+                                    text: 'Opview (errors)',
+                                    style: {
+                                        color: "#d9534f"
+                                    }
+                                },
+                                labels: {
+                                    format: '{value}',
+                                    style: {
+                                        color: "#d9534f"
+                                    }
+                                },
+                                opposite: true
+                            }],
+                            tooltip: {
+                                shared: true
+                            },
+
+                            series: [
+                                {
+                                    type: 'column',
+                                    name: 'Nerror',
+                                    yAxis: 0,
+                                    color: "#5A738E",
+                                    data: @Html(Json.stringify(Json.toJson(response.kibanaOpsview._1.map(x=> x._2))))
+                                }, {
+                                    name: 'Ntime',
+                                    type: 'spline',
+                                    yAxis: 1,
+                                    color: "#d9534f",
+                                    data: @Html(Json.stringify(Json.toJson(response.kibanaOpsview._2.map(x=> x._2))))
+
+                                }]
+                        });
+                    }
+                    @if(response.siglogRegion._1.length >0 || response.siglogRegion._2.length >0){
+                        // Bar Logoff and Signin
+                        var categoriesSigLog = @Html(Json.stringify(Json.toJson(response.siglogRegion._1.map(x=> x._1))))
+                        var chartSigLogDaily = Highcharts.chart('region-siglog-bar', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: [{
+                                categories: categoriesSigLog,
+                                reversed: false,
+                            }, { // mirror axis on right side
+                                opposite: true,
+                                reversed: false,
+                                categories: categoriesSigLog,
+                                linkedTo: 0,
+                            }],
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                labels: {
+                                    formatter: function () {
+                                        return Math.abs(this.value);
+                                    }
+                                },
+                            },
+
+                            plotOptions: {
+                                series: {
+                                    events: {
+                                        click: function (event) {
+                                            callDrilldownSigLog(event.point.category,'drilldown')
+                                        }
+                                    },
+                                    cursor: 'pointer',
+                                    stacking: 'normal'
+                                }
+                            },
+
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.series.name + '</b><br/><b>' + this.point.category + '</b><br/>'
+                                            + '<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0) + '</b><br/>Total clients: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0);
+                                }
+                            },
+
+                            series: [{
+                                name: 'Signin',
+                                color: '#669999',
+                                data:  addParamClients(@Html(Json.stringify(Json.toJson(response.siglogRegion._2))))
+                            }, {
+                                name: 'Logoff',
+                                color: '#832d1d',
+                                data: addParamClients(@Html(Json.stringify(Json.toJson(response.siglogRegion._1))))
+                            }]
+                        });
+                   }
+                    @if(response.errorsDevice.length >0){
+                        var treemapError = Highcharts.chart('tree-map', {
+                            colorAxis: {
+                                minColor: '#FFFFFF',
+                                maxColor: Highcharts.getOptions().colors[8]
+                            },
+                            plotOptions: {
+                                series: {
+                                    events: {
+                                        click: function (event) {
+                                            if (event.point.node.childrenTotal == 0) {
+                                                callDrilldownErrorDevice(event.point.name, 'drilldown')
+                                            }
+                                        }
+                                    },
+                                    cursor: 'pointer'
+                                }
+                            },
+                            series: [{
+                                type: "treemap",
+                                layoutAlgorithm: 'strip',
+                                color: "#f1b53d",
+                                data: getJsonTreemap(@Html(Json.stringify(Json.toJson(response.errorsDevice))))
+                                /*[{
+                                    name: 'A',
+                                    value: 6
+                                }, {
+                                    name: 'B',
+                                    value: 6
+                                }, {
+                                    name: 'C',
+                                    value: 4
+                                }, {
+                                    name: 'D',
+                                    value: 3
+                                }, {
+                                    name: 'E',
+                                    value: 2
+                                }, {
+                                    name: 'F',
+                                    value: 2
+                                }, {
+                                    name: 'G',
+                                    value: 1
+                                }]*/
+                            }],
+                            title: {
+                                text: ''
+                            }
+                        });
+                    }
+                    @if(response.noticeOpsview.length > 0){
+                        var bar_notice = Highcharts.chart('bar-service', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                type:'category'
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: ''
+                                }
+                            },
+                            colors: ['#1ABB9C'],
+                            legend: {
+                                reversed: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal'
+                                }
+                            },
+                            series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.noticeOpsview))),@Html(Json.stringify(Json.toJson(response.noticeOpsview.map(x=> x._1).toSeq.distinct.sorted)))),
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        align: "right",
+                                        verticalAlign: "top",
+                                        x: 10,
+                                        y: -10
+                                    }
+                                },
+                                series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.noticeOpsview))),@Html(Json.stringify(Json.toJson(response.noticeOpsview.map(x=> x._1).toSeq.distinct.sorted))))
+                            }
+                        });
+                    }
+
+                    function getJsonTreemap(dta){
+                        var jsonArr = [];
+                        for (var i = 0; i < dta.length; i++) {
+                            jsonArr.push({
+                                name: dta[i][0],
+                                value: Number(dta[i][1]),
+                                colorValue: Number(dta[i][1]),
+                            });
+                        }
+                        return jsonArr
+                    }
+
+                    // Select box Bras Location
+                    $('.dropdown-child').click(function () {
+                        var brasId = $(this).find('.dropdown-text').text()
+                        console.log(brasId)
+                        $.ajax({
+                            url: "/getDailyByBrasLocation?id=" + brasId+"&day="+$('#day').val(),
+                            cache: false,
+                            success: function (dta) {
+                                if(dta != "Error"){
+                                    line_siglog.series[0].setData(dta.sigLogBytime.signin)
+                                    line_siglog.series[1].setData(dta.sigLogBytime.logoff)
+                                    line_siglog.series[2].setData(dta.sigLogBytime.signin_clients)
+                                    line_siglog.series[3].setData(dta.sigLogBytime.logoff_clients)
+                                    kiba_opsv_hourly.series[0].setData(dta.kibanaOpsview.kibana)
+                                    kiba_opsv_hourly.series[1].setData(dta.kibanaOpsview.opsview)
+                                    heat_mapInfTab.series[0].setData(getErrorHourlyHeatmap(dta.errorHourly),true,true,false)
+                                }
+                            }
+                        })
+                    })
+
+                    // for Device Errors By Location
+                    function callDrilldownErrorDevice(cates, _type) {
+                        $.ajax({
+                            url: "/drilldownErrorDevice?id=" + cates+"&day="+$('#day').val()+"&err="+$('#typeDeviceErr').val(),
+                            cache: false,
+                            success: function (dta) {
+                                if(dta != "Error"){
+                                    // Apply for button back
+                                    if(_type == 'drilldown') {
+                                        $('#regionSigLogDeviceErr').val(cates)
+                                        if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                            $('#backDeviceErr').text("Back to region")
+                                            $('#isRegionDeviceErr').val(cates)
+                                        }
+                                        else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                            $('#backDeviceErr').text("Back to province")
+                                            $('#isProvinceDeviceErr').val(cates)
+                                        }
+                                        $('#backDeviceErr').show()
+                                    }
+                                    else{
+                                        if($('#backDeviceErr').text() == "Back to province"){
+                                            $('#backDeviceErr').show()
+                                            $('#backDeviceErr').text('Back to region')
+                                        }
+                                        else {
+                                            $('#backDeviceErr').hide()
+                                        }
+                                    }
+                                    treemapError.series[0].setData(getJsonTreemap(dta.data))
+                                }
+                            }
+                        })
+                    }
+                    $('#backDeviceErr').click(function () {
+                        var id = "*"
+                        if($('#backDeviceErr').text() == "Back to bras"){
+                            id = $('#isProvinceDeviceErr').val()
+                        }
+                        else if($('#backDeviceErr').text() == "Back to province"){
+                            id = $('#isRegionDeviceErr').val()
+                        }
+                        callDrilldownErrorDevice(id,'back')
+                    })
+                    // Click radio button choose Device Errors
+                    $('#frmDeviceErr input:radio').change(function(){
+                        $('#frmDeviceErr .radio-inline').removeClass('radioText')
+                        $(this).parent().addClass('radioText')
+                        var id =$(this).val()
+                        $('#typeDeviceErr').val(id)
+                        callDrilldownErrorDevice('*','back')
+                    })
+                    // Click radio button choose Service notices
+                    $('#frmServNotice input:radio').change(function(){
+                        $('#frmServNotice .radio-inline').removeClass('radioText')
+                        $(this).parent().addClass('radioText')
+                        $.ajax({
+                            url: "/getServNoticeByType?noti=" + $(this).val()+"&day="+$('#day').val(),
+                            cache: false,
+                            success: function (dta) {
+                                if(dta != "Error"){
+                                    Highcharts.chart('bar-service', {
+                                        chart: {
+                                            type: 'bar'
+                                        },
+                                        title: {
+                                            text: ''
+                                        },
+                                        xAxis: {
+                                            type:'category'
+                                        },
+                                        yAxis: {
+                                            min: 0,
+                                            title: {
+                                                text: ''
+                                            }
+                                        },
+                                        colors: ['#1ABB9C'],
+                                        legend: {
+                                            reversed: true
+                                        },
+                                        plotOptions: {
+                                            series: {
+                                                stacking: 'normal'
+                                            }
+                                        },
+                                        series: getDrildownStackBar(dta.data, dta.cates),
+                                        drilldown: {
+                                            drillUpButton: {
+                                                relativeTo: 'spacingBox',
+                                                position: {
+                                                    align: "right",
+                                                    verticalAlign: "top",
+                                                    x: 10,
+                                                    y: -10
+                                                }
+                                            },
+                                            series: getDrillDown2Level(dta.data, dta.cates)
+                                        }
+                                    });
+                                    //bar_notice.series[0].setData(getDrildownStackBar(dta.data, dta.cates))
+                                    //bar_notice.options.drilldown.series[0] = getDrillDown2Level(dta.data, dta.cates)
+                                }
+                            }
+                        })
+                    })
+                    // Click radio button choose Service notices
+                    $('#frmInfErrordaily input:radio').change(function(){
+                        $('#frmInfErrordaily .radio-inline').removeClass('radioText')
+                        $(this).parent().addClass('radioText')
+                        $('#typeInfErr').val($(this).val())
+                        $('#backInfErr').text("")
+                        callDrillDownInfErrors('*', 'back')
+                    })
+                    //for Total SignIn & LogOff Daily
+                    function callDrilldownSigLog(cates, _type){
+                        $.ajax({
+                            url: "/drilldownSigLogDaily?id=" + cates+"&day="+$('#day').val(),
+                            cache: false,
+                            success: function (dta) {
+                                if(dta != "Error"){
+                                    // Apply for button back
+                                    if(_type == 'drilldown') {
+                                        $('#regionSigLog').val(cates)
+                                        if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                            $('#backSigLog').text("Back to region")
+                                            $('#isRegionSigLog').val(cates)
+                                        }
+                                        else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                            $('#backSigLog').text("Back to province")
+                                            $('#isProvinceSigLog').val(cates)
+                                        }
+                                        else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
+                                            $('#backSigLog').text("Back to bras")
+                                        }
+                                        $('#backSigLog').show()
+                                    }
+                                    else{
+                                        if($('#backSigLog').text() == "Back to bras"){
+                                            $('#backSigLog').show()
+                                            $('#backSigLog').text('Back to province')
+                                        }
+                                        else if($('#backSigLog').text() == "Back to province"){
+                                            $('#backSigLog').show()
+                                            $('#backSigLog').text('Back to region')
+                                        }
+                                        else {
+                                            $('#backSigLog').hide()
+                                        }
+                                    }
+                                    chartSigLogDaily.xAxis[0].update({categories: dta.cates});
+                                    chartSigLogDaily.xAxis[1].update({categories: dta.cates});
+                                    chartSigLogDaily.series[0].setData(addParamClients(dta.signin))
+                                    chartSigLogDaily.series[1].setData(addParamClients(dta.logoff))
+                                }
+                            }
+                        })
+                    }
+                    $('#backSigLog').click(function () {
+                        var id = "*"
+                        if($('#backSigLog').text() == "Back to bras"){
+                            id = $('#isProvinceSigLog').val()
+                        }
+                        else if($('#backSigLog').text() == "Back to province"){
+                            id = $('#isRegionSigLog').val()
+                        }
+                        callDrilldownSigLog(id,'back')
+                    })
+                    // for inf errors funnel charts
+                    function callDrillDownInfErrors(cates, _type) {
+                        $.ajax({
+                            url: "/drilldownInferrorDaily?id=" + cates+"&day="+$('#day').val()+"&err="+$('#typeInfErr').val(),
+                            cache: false,
+                            success: function (dta) {
+                                if(dta != "Error" && dta.data.length >0){
+                                    // Apply for button back
+                                    if(_type == 'drilldown') {
+                                        $('#regionInfErr').val(cates)
+                                        if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                            $('#backInfErr').text("Back to region")
+                                            $('#isRegionInfErr').val(cates)
+                                        }
+                                        else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                            $('#backInfErr').text("Back to province")
+                                            $('#isProvinceInfErr').val(cates)
+                                        }
+                                        else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
+                                            $('#backInfErr').text("Back to bras")
+                                        }
+                                        $('#backInfErr').show()
+                                    }
+                                    else{
+                                        if($('#backInfErr').text() == "Back to bras"){
+                                            $('#backInfErr').show()
+                                            $('#backInfErr').text('Back to province')
+                                        }
+                                        else if($('#backInfErr').text() == "Back to province"){
+                                            $('#backInfErr').show()
+                                            $('#backInfErr').text('Back to region')
+                                        }
+                                        else {
+                                            $('#backInfErr').hide()
+                                        }
+                                    }
+                                    errors_inf.series[0].setData(dta.data)
+                                }
+                            }
+                        })
+                    }
+                    $('#backInfErr').click(function () {
+                        var id = "*"
+                        if($('#backInfErr').text() == "Back to bras"){
+                            id = $('#isProvinceInfErr').val()
+                        }
+                        else if($('#backInfErr').text() == "Back to province"){
+                            id = $('#isRegionInfErr').val()
+                        }
+                        callDrillDownInfErrors(id,'back')
+                    })
+                }
             });
+
+            function getDrillDown2Level(dta, arrRegion) {
+                var jsArray = []
+                for(var region=0;region< arrRegion.length;region++ ){
+                    // get array provinces and bras by month&region
+                    var arrProvinceBras = [], dtaRegion = []
+                    for(var i=0;i< dta.length;i++){
+                        if (arrRegion[region] == dta[i][0]){
+                            arrProvinceBras.push({
+                                province:dta[i][1],
+                                bras: dta[i][2],
+                                value:dta[i][3]
+                            })
+                        }
+                    }
+                    // set array data by province
+                    var nameOld = arrProvinceBras[0].province, sumOld= 0,
+                            isMoreProv =0,dtaProvince = [],sumPoorconn =0,
+                            sumNodevice =0
+                    for(var k=0;k<arrProvinceBras.length;k++){
+                        if(k==(arrProvinceBras.length -1) || nameOld != arrProvinceBras[k].province){
+                            if(k==(arrProvinceBras.length -1)) sumOld += arrProvinceBras[k].value
+                            dtaRegion.push({
+                                name: nameOld,
+                                y: sumOld,
+                                drilldown:nameOld
+                            })
+                            // set series province& bras
+                            //console.log(sortObjectsArray(dtaProvince,'y').slice(0,10))
+                            var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,9)
+                            jsArray.push({
+                                id: nameOld,
+                                name: nameOld,
+                                data: top10Prov
+                            })
+                            dtaProvince = []
+                            nameOld = arrProvinceBras[k].province
+                            sumOld = arrProvinceBras[k].value
+                            sumNodevice = 0
+                            sumPoorconn = 0
+                            isMoreProv =1
+                        }
+                        else{
+                            sumOld += Number(arrProvinceBras[k].value)
+                            sumNodevice += Number(arrProvinceBras[k].noDevice)
+                            sumPoorconn += Number(arrProvinceBras[k].poorconn)
+                        }
+                        dtaProvince.push({
+                            name: arrProvinceBras[k].bras,
+                            y:Number(arrProvinceBras[k].value),
+                            z:'No device: '+Number(arrProvinceBras[k].noDevice),
+                            k:'Poor conn: '+Number(arrProvinceBras[k].poorconn)
+                        })
+                    }
+                    if(isMoreProv ==0){
+                        dtaRegion.push({
+                            name: nameOld,
+                            y: Number(sumOld),
+                            drilldown:nameOld
+                        })
+                        // set series province& bras
+                        jsArray.push({
+                            id: nameOld,
+                            name: nameOld,
+                            data: sortObjectsArray(dtaProvince,'name').slice(0,9)
+                        })
+                    }
+
+                    // set series regions& province
+                    jsArray.push({
+                        id: arrRegion[region],
+                        name: arrRegion[region],
+                        data: dtaRegion
+                    })
+                }
+                return jsArray
+            }
+
+            function getDrildownStackBar(dta,arrKey){
+                var jsArray = [], data= []
+                for(var key=0;key<arrKey.length;key++ ) {
+                    var sumVl = 0
+                    for (var i = 0; i < dta.length; i++) {
+                        if (arrKey[key] == dta[i][0]){
+                            sumVl += dta[i][3]
+                        }
+                    }
+                    data.push({
+                        name: arrKey[key],
+                        y: sumVl,
+                        drilldown: arrKey[key]
+                    })
+                }
+                jsArray.push({
+                    name: 'Region',
+                    data: data
+                })
+                return jsArray
+            }
+
+            function addParamClients(dta) {
+                var rs = []
+                for(var i=0; i< dta.length; i++){
+                    rs.push({
+                        y: dta[i][1],
+                        k: dta[i][2]
+                    })
+                }
+                return rs
+            }
+
+            function getErrorHourlyHeatmap(data){
+                var jsonArr = [];
+                for (var i =0 ; i < data.length; i++) {
+                    for(var j=0;j<6;j++){
+                        //if(Number(data[i][j])>0)
+                        jsonArr.push([Number(data[i][0]),j,Number(data[i][j+1])]);
+                    }
+                }
+                return jsonArr
+            }
+
+            // order by array objects
+            function sortObjectsArray(objectsArray, sortKey)
+            {
+                // Quick Sort:
+                var retVal;
+
+                if (1 < objectsArray.length)
+                {
+                    var pivotIndex = Math.floor((objectsArray.length - 1) / 2);  // middle index
+                    var pivotItem = objectsArray[pivotIndex];                    // value in the middle index
+                    var less = [], more = [];
+
+                    objectsArray.splice(pivotIndex, 1);                          // remove the item in the pivot position
+                    objectsArray.forEach(function(value, index, array)
+                    {
+                        value[sortKey] >= pivotItem[sortKey] ?                   // compare the 'sortKey' proiperty
+                                less.push(value) :
+                                more.push(value) ;
+                    });
+
+                    retVal = sortObjectsArray(less, sortKey).concat([pivotItem], sortObjectsArray(more, sortKey));
+                }
+                else
+                {
+                    retVal = objectsArray;
+                }
+
+                return retVal;
+            }
     </script>
     </body>
 </html>

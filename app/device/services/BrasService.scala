@@ -4,7 +4,7 @@ import model.device._
 import services.domain.{AbstractService, CommonService}
 import com.sksamuel.elastic4s.http.ElasticDsl._
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import org.elasticsearch.search.sort.SortOrder
 import services.domain.CommonService.formatUTC
 import org.joda.time.DateTime
@@ -14,6 +14,8 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInter
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
 import device.utils.LocationUtils
+
+import scala.concurrent.duration.Duration
 
 object BrasService extends AbstractService{
 
@@ -173,6 +175,42 @@ object BrasService extends AbstractService{
     BrasDAO.getInfDownMudule(day)
   }
 
+  def getSigLogByDaily(bras: String, day: String): SigLogClientsDaily = {
+    try {
+      val brasId = if(bras.equals("*")) bras else bras.toLowerCase
+      val mulRes = client.execute(
+        multi(
+          search(s"radius-streaming-${day}" / "docs") query (s"type:con AND typeLog:SignIn AND nasName:$brasId")
+            aggregations (
+            dateHistogramAggregation("hourly")
+              .field("timestamp")
+              .interval(DateHistogramInterval.HOUR)
+              .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+              subAggregations(
+                cardinalityAgg("name","name")
+              )
+            ),
+          search(s"radius-streaming-${day}" / "docs") query (s"type:con AND typeLog:LogOff AND nasName:$brasId")
+            aggregations (
+            dateHistogramAggregation("hourly")
+              .field("timestamp")
+              .interval(DateHistogramInterval.HOUR)
+              .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+              subAggregations(
+                cardinalityAgg("name","name")
+              )
+            )
+        )
+      ).await
+      val arrSigin = CommonService.getAggregationsAndCountDistinct(mulRes.responses(0).aggregations.get("hourly")).map(x => (CommonService.getHoursFromMiliseconds(x._1.toLong), x._2, x._3))
+      val arrLogoff = CommonService.getAggregationsAndCountDistinct(mulRes.responses(1).aggregations.get("hourly")).map(x => (CommonService.getHoursFromMiliseconds(x._1.toLong), x._2, x._3))
+      SigLogClientsDaily(arrSigin, arrLogoff)
+    }
+    catch{
+      case e: Exception => SigLogClientsDaily(Array[(Int, Long, Long)](), Array[(Int, Long, Long)]())
+    }
+  }
+
   def getSiglogContract(host: String): Array[(String,String,String)] = {
     val dt = new DateTime()
     val currentDate = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
@@ -187,28 +225,200 @@ object BrasService extends AbstractService{
 
   }
 
-  def getSigLogdaily(day: String, queries: String) = {
-    val multiRs = client.execute(
-      multi(
-        search(s"radius-streaming-${day}" / "docs")
-          query (s"type:con AND typeLog:LogOff $queries")
+  /*def getKibanaDailyES(bras: String, day: String) = {
+    try {
+      val rs = client_kibana.execute(
+        search(s"infra_dwh_kibana_2018-07-31" / "docs") query (s"bras_id.keyword:$bras")
           aggregations (
-          termsAggregation("bras")
-            .field("nasName") size 1000
-          ) size 1000,
-        search(s"radius-streaming-${day}" / "docs")
-          query (s"type:con AND typeLog:SignIn $queries")
+          dateHistogramAggregation("hourly")
+            .field("date_time")
+            .interval(DateHistogramInterval.HOUR)
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+          )
+      ).await
+      CommonService.getAggregationsSiglog(rs.aggregations.get("hourly")).map(x => (CommonService.getHoursFromMiliseconds(x._1.toLong) -> x._2.toInt))
+
+    }
+    catch {
+      case e: Exception => Array[(Int, Int)]()
+    }
+  }
+
+  def getOpviewDailyES(bras: String, day: String) = {
+    try {
+      val res = client_kibana.execute(
+        search(s"infra_dwh_opsview_2018-07-31" / "docs") query (s"bras_id.keyword:$bras")
           aggregations (
-          termsAggregation("bras")
-            .field("nasName") size 1000
+          dateHistogramAggregation("hourly")
+            .field("date_time")
+            .interval(DateHistogramInterval.HOUR)
+            .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
           ) size 1000
-      )
-    ).await
-    val rsLogoff = CommonService.getAggregationsSiglog(multiRs.responses(0).aggregations.get("bras")).filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4)
-    val rsSignin = CommonService.getAggregationsSiglog(multiRs.responses(1).aggregations.get("bras")).filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4)
-    (rsSignin, rsLogoff)
-    //println(rsLogoff.map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) , x._2)).filter(x=> x._1 == "Vung 4").map(x=> x._2).sum)
-   // rsLogoff.map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) , x._2)).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._2).sum)
+      ).await
+      CommonService.getAggregationsKeyString(res.aggregations.get("hourly")).map(x => (CommonService.getHourFromES5(x._1), x._2))
+        .groupBy(_._1).mapValues(_.map(x => x._2.toInt).sum).toArray.sorted
+    }
+    catch {
+      case e: Exception => Array[(Int, Int)]()
+    }
+  }*/
+
+  //for daily inf errors
+  def getInfErrorsDaily(day: String, _type: String) = {
+    val rs = Await.result(BrasDAO.getInfErrorsDaily(day, _type), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+    val mapErrs = _type match {
+      case _type if(_type.equals("*")) => {
+        rs.map(x=> (x._1, x._2,(x._3+x._4+x._5+x._6+x._7+x._8))).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2, x._3)).toArray.sorted
+      }
+      case _type if(_type.equals("user_down")) => {
+        rs.map(x=> (x._1, x._2, x._3)).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2, x._3)).toArray.sorted
+      }
+      case _type if(_type.equals("inf_down")) => {
+        rs.map(x=> (x._1, x._2, x._4)).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2, x._3)).toArray.sorted
+      }
+      case _type if(_type.equals("sf_error")) => {
+        rs.map(x=> (x._1, x._2, x._5)).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2, x._3)).toArray.sorted
+      }
+      case _type if(_type.equals("lofi_error")) => {
+        rs.map(x=> (x._1, x._2, x._6)).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2, x._3)).toArray.sorted
+      }
+      case _type if(_type.equals("rouge_error")) => {
+        rs.map(x=> (x._1, x._2, x._7)).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2, x._3)).toArray.sorted
+      }
+      case _type if(_type.equals("lost_signal")) => {
+        rs.map(x=> (x._1, x._2, x._8)).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2, x._3)).toArray.sorted
+      }
+    }
+    mapErrs
+  }
+
+  //for daily notice service
+  def getServiceNoticeRegionDaily(day: String, _type: String) ={
+    val rs = Await.result(BrasDAO.getServiceNoticeDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+    val mapRs = _type match {
+      case _type if(_type.equals("*")) => {
+         rs.map(x=> x._1 -> (x._2+x._3+x._4+x._5)).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2)).toArray.sorted
+      }
+      case _type if(_type.equals("warn")) => {
+        rs.map(x=> x._1 -> x._2).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2)).toArray.sorted
+      }
+      case _type if(_type.equals("unknown")) => {
+        rs.map(x=> x._1 -> x._3).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2)).toArray.sorted
+      }
+      case _type if(_type.equals("ok")) => {
+        rs.map(x=> x._1 -> x._4).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2)).toArray.sorted
+      }
+      case _type if(_type.equals("crit")) => {
+        rs.map(x=> x._1 -> x._5).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2)).toArray.sorted
+      }
+    }
+    mapRs
+  }
+
+  def getErrorHostdaily(id: String,day: String) = {
+    BrasDAO.getErrorHostdaily(id, day)
+  }
+
+  // for daily device errors
+  def getDeviceErrorsRegionDaily(day: String): Array[(String, Double, Double,Double, Double,Double,Double)] ={
+    val rs = Await.result(BrasDAO.getDeviceErrorsDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+    val mapRegion = rs.map(x=> (LocationUtils.getRegion(x._1.substring(0,3)), x._2, x._3, x._4, x._5, x._6, x._7))
+      .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=>x._2).sum, x._2.map(x=>x._3).sum, x._2.map(x=>x._4).sum, x._2.map(x=>x._5).sum, x._2.map(x=>x._6).sum, x._2.map(x=>x._7).sum)).toArray.sorted
+    mapRegion
+  }
+
+  def getDeviceErrorsProvinceDaily(day: String, regionCode: String): Array[(String, Double, Double,Double, Double,Double,Double)] ={
+    val rs = Await.result(BrasDAO.getDeviceErrorsDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+    val mapProvince = rs.map(x=> (LocationUtils.getRegion(x._1.substring(0,3)),x._1, x._2, x._3, x._4, x._5, x._6, x._7)).filter(x=> x._1 == regionCode)
+        .map(x=> (LocationUtils.getNameProvincebyCode(x._2.substring(0,3)), x._3, x._4, x._5, x._6, x._7,x._8))
+      .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=>x._2).sum, x._2.map(x=>x._3).sum, x._2.map(x=>x._4).sum, x._2.map(x=>x._5).sum, x._2.map(x=>x._6).sum, x._2.map(x=>x._7).sum)).toArray.sorted
+    mapProvince
+  }
+
+  def getDeviceErrorsBrasDaily(day: String, provinceCode: String): Array[(String, Double, Double,Double, Double,Double,Double)] ={
+    val rs = Await.result(BrasDAO.getDeviceErrorsDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+    val mapBras = rs.map(x=> (LocationUtils.getNameProvincebyCode(x._1.substring(0,3)),x._1,x._2, x._3, x._4, x._5, x._6, x._7)).filter(x=> x._1 == provinceCode)
+        .map(x=> (x._2,x._3,x._4,x._5,x._6,x._7,x._8)).toArray
+      .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=>x._2).sum, x._2.map(x=>x._3).sum, x._2.map(x=>x._4).sum, x._2.map(x=>x._5).sum, x._2.map(x=>x._6).sum, x._2.map(x=>x._7).sum)).toArray.sorted
+    mapBras
+  }
+
+  // for daily siglog
+  def getSigLogdaily(day: String, queries: String) = {
+    try {
+      val aggField = if (queries.equals("")) "nasName" else "card.olt"
+      val queryString = if (queries.equals("")) "" else s"AND nasName:$queries"
+      val multiRs = client.execute(
+        multi(
+          search(s"radius-streaming-${day}" / "docs")
+            query (s"type:con AND typeLog:LogOff $queryString")
+            aggregations (
+            termsAggregation("bras")
+              .field(s"$aggField") size 1000
+              subAggregations (
+              cardinalityAgg("name", "name")
+              )
+            ),
+          search(s"radius-streaming-${day}" / "docs")
+            query (s"type:con AND typeLog:SignIn $queryString")
+            aggregations (
+            termsAggregation("bras")
+              .field(s"$aggField") size 1000
+              subAggregations (
+              cardinalityAgg("name", "name")
+              )
+            )
+        )
+      ).await
+      val rsLogoff = CommonService.getAggregationsAndCountDistinct(multiRs.responses(0).aggregations.get("bras"))
+      val rsSignin = CommonService.getAggregationsAndCountDistinct(multiRs.responses(1).aggregations.get("bras"))
+      (rsLogoff, rsSignin)
+    }
+    catch {
+      case e: Exception => (Array[(String,Long, Long)](), Array[(String,Long, Long)]())
+    }
+  }
+
+  def getSigLogRegionDaily(day: String, queries: String) = {
+    val rs = getSigLogdaily(day, queries)
+    val logoff = rs._1.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) , x._2, x._3))
+      .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum)).toArray.sorted
+    val signin = rs._2.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) , x._2, x._3))
+      .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum)).map(x=> (x._1, -x._2, x._3)).toArray.sorted
+    (logoff, signin)
+  }
+
+  def getSigLogProvinceDaily(day: String, regionCode: String) = {
+    val rs = getSigLogdaily(day, "")
+    val logoff = rs._1.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase), x._1 , x._2, x._3)).filter(x=> x._1 == regionCode ).map(x=> (LocationUtils.getNameProvincebyCode(x._2.substring(0,3).toUpperCase), x._3, x._4))
+        .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum)).toArray.sorted
+    val signin = rs._2.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> (LocationUtils.getRegion(x._1.substring(0,3).toUpperCase) ,x._1, x._2, x._3)).filter(x=> x._1 == regionCode ).map(x=> (LocationUtils.getNameProvincebyCode(x._2.substring(0,3).toUpperCase), x._3, x._4))
+        .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum)).map(x=> (x._1, -x._2, x._3)).toArray.sorted
+    (logoff, signin)
+  }
+
+  def getSigLogBrasDaily(day: String, provinceCode: String) = {
+    val rs = getSigLogdaily(day, "")
+    val logoff = rs._1.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> ( x._1 , x._2, x._3)).filter(x=> x._1.substring(0,3) == provinceCode.toLowerCase() ).map(x=> (x._1, x._2, x._3))
+      .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum)).toArray.sorted
+    val signin = rs._2.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> ( x._1, x._2, x._3)).filter(x=> x._1.substring(0,3) == provinceCode.toLowerCase() ).map(x=> (x._1, x._2, x._3))
+      .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum)).map(x=> (x._1, -x._2, x._3)).toArray.sorted
+    (logoff, signin)
+  }
+
+  def getSigLogHostDaily(day: String, queries: String) = {
+    val rs = getSigLogdaily(day, queries)
+    val logoff = rs._1.map(x=> (x._1, x._2, x._3)).groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum))
+    val signin = rs._2.map(x=> (x._1 , x._2, x._3)).groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum))
+    val top = signin.toArray.sortWith((x, y) => x._2> y._2).filter(x=> x._1 != "").filter(x=> x._1 != "N/A").map(x=> x._1)
+    val topHost = logoff.filter(x=> top.indexOf(x._1)>=0).map(x=> x._1).slice(0,10)
+
+    //topHost.foreach(println)
+    val topLogoff = topHost.map(x=> (x, logoff.filter(y=> y._1 == x).map(y=> (y._2, y._3)).toArray))
+      .flatMap(x=> x._2.map(y=> x._1 -> y)).map(x=> (x._1, x._2._1, x._2._2))
+    val topSignin = topHost.map(x=> (x, signin.filter(y=> y._1 == x).map(y=> (-y._2, y._3)).toArray))
+      .flatMap(x=> x._2.map(y=> x._1 -> y)).map(x=> (x._1, x._2._1, x._2._2))
+    (topLogoff, topSignin)
   }
 
   def getUserLogOff(bras: String,time: String,typeLog: String): Array[(String,String,String)] = {
