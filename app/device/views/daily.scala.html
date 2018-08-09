@@ -60,7 +60,23 @@
     <div class="right_col" role="main">
         @if(response != null){
             <div class="row top_tiles">
-                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
+                    <div class="x_panel tile">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;
+                                font-size: 24px"> Total Outliers Bras Device</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="text-align: center">
+                        @if(response.brasOutlier.length >0) {
+                            <div id="bras-outlier" style="height: 375px;"></div>
+                        }else{
+                            <span style="font-size: 13px">Not find data on @day</span>
+                        }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                     <div class="x_panel tile">
                         <input type="hidden" id="regionSigLog">
                         <input type="hidden" id="isRegionSigLog">
@@ -81,7 +97,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
                     <div class="x_panel tile">
                         <input type="hidden" id="regionDeviceErr">
                         <input type="hidden" id="isRegionDeviceErr">
@@ -127,7 +143,26 @@
                 </div>
             </div>
             <div class="row top_tiles">
-                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
+                    <div class="x_panel tile">
+                        <div class="x_title">
+                            <h2 style="font-weight: 500;
+                                font-size: 24px"> Total Outliers Access Device</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" style="text-align: center">
+                            <input type="hidden" id="cateInfOutlier">
+                            <input type="hidden" id="textInfOutlier">
+                            <input type="hidden" id="isProvinceInfOutlier">
+                        @if(response.infOutlier.length >0) {
+                            <div id="inf-outlier" style="height: 375px;"></div>
+                        }else{
+                            <span style="font-size: 13px">Not find data on @day</span>
+                        }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                     <div class="x_panel tile">
                         <input type="hidden" id="regionServiceNotice">
                         <input type="hidden" id="isRegionServiceNotice">
@@ -163,14 +198,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
                     <div class="x_panel tile">
                         <input type="hidden" id="regionInfErr">
                         <input type="hidden" id="isRegionInfErr">
                         <input type="hidden" id="isProvinceInfErr">
                         <div class="x_title">
                             <h2 style="font-weight: 500;font-size: 24px"> Inf Errors By Location</h2>
-                            <a class="btn btn-success" id="backDeviceErr" style="display: none;float: right"></a>
                             <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi tại thiết bị Access theo ngày và vị trí địa lý"></i>
                             <a class="btn btn-success" id="backInfErr" style="display: none;float: right"></a>
                             <div class="clearfix"></div>
@@ -342,6 +376,154 @@
                 });
                 @if(response != null){
 
+                    @if(response.brasOutlier.length >0){
+                        var heat_bras_outlier = Highcharts.chart('bras-outlier', {
+                            chart: {
+                                type: 'heatmap',
+                                marginTop: 10,
+                                marginBottom: 60,
+                                plotBorderWidth: 1
+                            },
+
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: ["Outliers"]
+                            },
+
+                            yAxis: {
+                                categories: @Html(Json.stringify(Json.toJson(response.brasOutlier.map(x=> x._1).distinct.sorted))),
+                                title: null,
+                                labels: {
+                                    style: {
+                                        'min-width': '125px'
+                                    },
+                                    useHTML : true
+                                }
+                            },
+
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                y: 20,
+                                x: 50
+                            },
+
+                            colorAxis: {
+                                min: 0,
+                                minColor: '#FFFFFF',
+                                maxColor: '#d9534f'
+                            },
+
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                            this.point.value + ' outliers</b> ';
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    events: {
+                                        click: function (event) {
+                                            callDrilldownBrasOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
+                                        }
+                                    },
+                                    dataLabels:{
+                                        formatter:function(){
+                                            var nf = new Intl.NumberFormat();
+                                            return nf.format(this.point.value);
+                                        }
+                                    },
+                                    cursor: 'pointer'
+                                }
+                            },
+                            series: [{
+                                name: 'Outliers',
+                                borderWidth: 1,
+                                data: getHeatmapBrasOutlier(@Html(Json.stringify(Json.toJson(response.brasOutlier))), @Html(Json.stringify(Json.toJson(response.brasOutlier.map(x=> x._1).distinct.sorted)))),
+                                dataLabels: {
+                                    enabled: true,
+                                    color: '#000000'
+                                }
+                            }]
+
+                        });
+                    }
+                    @if(response.infOutlier.length >0){
+                        var heat_inf_outlier = Highcharts.chart('inf-outlier', {
+                            chart: {
+                                type: 'heatmap',
+                                marginTop: 10,
+                                marginBottom: 60,
+                                plotBorderWidth: 1
+                            },
+
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: ["Outliers"]
+                            },
+
+                            yAxis: {
+                                categories: @Html(Json.stringify(Json.toJson(response.infOutlier.map(x=> x._1).distinct.sorted))),
+                                title: null,
+                                labels: {
+                                    style: {
+                                        'min-width': '125px'
+                                    },
+                                    useHTML : true
+                                }
+                            },
+
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                y: 20,
+                                x: 50
+                            },
+
+                            colorAxis: {
+                                min: 0,
+                                minColor: '#FFFFFF',
+                                maxColor: '#d9534f'
+                            },
+
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                            this.point.value + ' outliers</b> ';
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    events: {
+                                        click: function (event) {
+                                            callDrilldownInfOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
+                                        }
+                                    },
+                                    dataLabels:{
+                                        formatter:function(){
+                                            var nf = new Intl.NumberFormat();
+                                            return nf.format(this.point.value);
+                                        }
+                                    },
+                                    cursor: 'pointer'
+                                }
+                            },
+                            series: [{
+                                name: 'Outliers',
+                                borderWidth: 1,
+                                data: getHeatmapBrasOutlier(@Html(Json.stringify(Json.toJson(response.infOutlier))), @Html(Json.stringify(Json.toJson(response.infOutlier.map(x=> x._1).distinct.sorted)))),
+                                dataLabels: {
+                                    enabled: true,
+                                    color: '#000000'
+                                }
+                            }]
+
+                        });
+                    }
                     @if(response.rsErrorHostDaily.length >0){
                         var heat_mapInfTab = Highcharts.chart('heat_mapInfTab', {
                             chart: {
@@ -992,6 +1174,250 @@
                         }
                         callDrillDownInfErrors(id,'back')
                     })
+                    // drilldown heat map Bras Outliers
+                    function callDrilldownBrasOutlier(cates, _type){
+                        $.ajax({
+                            url: "/drilldownBrasOutlier?id=" + cates+"&day="+$('#day').val(),
+                            cache: false,
+                            success: function (dta) {
+                                if(dta != "Error"){
+                                    var isDrilldown = 0
+                                    var vlMarTop = 40
+                                    if(cates == "*") vlMarTop = 10
+                                    Highcharts.chart('bras-outlier', {
+                                        chart: {
+                                            type: 'heatmap',
+                                            marginTop: vlMarTop,
+                                            marginBottom: 60,
+                                            plotBorderWidth: 1
+                                        },
+
+                                        title: {
+                                            text: ''
+                                        },
+                                        xAxis: {
+                                            categories: ["Outliers"]
+                                        },
+
+                                        yAxis: {
+                                            categories: dta.key,
+                                            title: null,
+                                            labels: {
+                                                style: {
+                                                    'min-width': '125px'
+                                                },
+                                                useHTML : true
+                                            }
+                                        },
+
+                                        legend: {
+                                            align: 'center',
+                                            verticalAlign: 'bottom',
+                                            y: 20,
+                                            x: 40
+                                        },
+
+                                        colorAxis: {
+                                            min: 0,
+                                            minColor: '#FFFFFF',
+                                            maxColor: '#d9534f'
+                                        },
+
+                                        tooltip: {
+                                            formatter: function () {
+                                                return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                        this.point.value + ' outliers</b> ';
+                                            }
+                                        },
+                                        plotOptions: {
+                                            series: {
+                                                events: {
+                                                    click: function (event) {
+                                                        if(isDrilldown == 0)
+                                                          callDrilldownBrasOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
+                                                    }
+                                                },
+                                                dataLabels:{
+                                                    formatter:function(){
+                                                        var nf = new Intl.NumberFormat();
+                                                        return nf.format(this.point.value);
+                                                    }
+                                                },
+                                                cursor: 'pointer'
+                                            }
+                                        },
+                                        exporting: {
+                                            buttons: [{
+                                                text: 'Back to province',
+                                                onclick: function () {
+                                                    callDrilldownBrasOutlier('*','back')
+                                                },
+                                                theme: {
+                                                    fill: '#1ABB9C',
+                                                    'stroke-width': 1,
+                                                    stroke: '#169F85',
+                                                    color:'#fff',
+                                                    states: {
+                                                        hover: {
+                                                            fill: '#1ABB9C'
+                                                        }
+                                                    }
+                                                }
+                                            }]
+                                        },
+                                        series: [{
+                                            name: 'Outliers',
+                                            borderWidth: 1,
+                                            data: getHeatmapBrasOutlier(dta.data, dta.key),
+                                            dataLabels: {
+                                                enabled: true,
+                                                color: '#000000'
+                                            }
+                                        }]
+
+                                    });
+                                    // Apply for button back
+                                    if(_type == 'drilldown') {
+                                        isDrilldown =1
+                                        $('#bras-outlier .highcharts-button').show()
+                                        $('.highcharts-contextbutton').hide()
+                                    }
+                                    else{
+                                        $('#bras-outlier .highcharts-button').hide()
+                                    }
+                                    //heat_bras_outlier.yAxis[0].update({categories: dta.key})
+                                    //heat_bras_outlier.series[0].setData(getHeatmapBrasOutlier(dta.data, dta.key))
+                                }
+                            }
+                        })
+                    }
+                    //drilldown heat map Inf Outliers
+                    function callDrilldownInfOutlier(cates, _type){
+                        $.ajax({
+                            url: "/drilldownInfOutlier?id=" + cates+"&day="+$('#day').val(),
+                            cache: false,
+                            success: function (dta) {
+                                if(dta != "Error" && dta.data.length >0){
+                                    $('#cateInfOutlier').val(cates)
+                                    var vlMarTop = 40
+                                    if(cates == "*") vlMarTop = 10
+                                    Highcharts.chart('inf-outlier', {
+                                        chart: {
+                                            type: 'heatmap',
+                                            marginTop: vlMarTop,
+                                            marginBottom: 60,
+                                            plotBorderWidth: 1
+                                        },
+
+                                        title: {
+                                            text: ''
+                                        },
+                                        xAxis: {
+                                            categories: ["Outliers"]
+                                        },
+
+                                        yAxis: {
+                                            categories: dta.key,
+                                            title: null,
+                                            labels: {
+                                                style: {
+                                                    'min-width': '125px'
+                                                },
+                                                useHTML : true
+                                            }
+                                        },
+
+                                        legend: {
+                                            align: 'center',
+                                            verticalAlign: 'bottom',
+                                            y: 20,
+                                            x: 40
+                                        },
+
+                                        colorAxis: {
+                                            min: 0,
+                                            minColor: '#FFFFFF',
+                                            maxColor: '#d9534f'
+                                        },
+
+                                        tooltip: {
+                                            formatter: function () {
+                                                return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                        this.point.value + ' outliers</b> ';
+                                            }
+                                        },
+                                        plotOptions: {
+                                            series: {
+                                                events: {
+                                                    click: function (event) {
+                                                        callDrilldownInfOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
+                                                    }
+                                                },
+                                                dataLabels:{
+                                                    formatter:function(){
+                                                        var nf = new Intl.NumberFormat();
+                                                        return nf.format(this.point.value);
+                                                    }
+                                                },
+                                                cursor: 'pointer'
+                                            }
+                                        },
+                                        exporting: {
+                                            buttons: [{
+                                                text: 'Back to '+dta.location,
+                                                onclick: function (e) {
+                                                    var id = "*"
+                                                    var tit = "back"
+                                                    if($('#textInfOutlier').val() == "Back to bras") {
+                                                        tit = "drilldown"
+                                                        id = $('#isProvinceInfOutlier').val()
+                                                        $('#textInfOutlier').val('Back to province')
+                                                    }
+                                                    callDrilldownInfOutlier(id, tit)
+                                                },
+                                                theme: {
+                                                    fill: '#1ABB9C',
+                                                    'stroke-width': 1,
+                                                    stroke: '#169F85',
+                                                    color:'#fff',
+                                                    states: {
+                                                        hover: {
+                                                            fill: '#1ABB9C'
+                                                        }
+                                                    }
+                                                }
+                                            }]
+                                        },
+                                        series: [{
+                                            name: 'Outliers',
+                                            borderWidth: 1,
+                                            data: getHeatmapBrasOutlier(dta.data, dta.key),
+                                            dataLabels: {
+                                                enabled: true,
+                                                color: '#000000'
+                                            }
+                                        }]
+
+                                    });
+                                    if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                        $('#isProvinceInfOutlier').val(cates)
+                                        $('#textInfOutlier').val("Back to province")
+                                    }
+                                    else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
+                                        $('#textInfOutlier').val("Back to bras")
+                                    }
+                                    // Apply for button back
+                                    if(_type == 'drilldown') {
+                                        $('#inf-outlier .highcharts-button').show()
+                                        $('.highcharts-contextbutton').hide()
+                                    }
+                                    else{
+                                        $('#inf-outlier .highcharts-button').hide()
+                                    }
+                                }
+                            }
+                        })
+                    }
                 }
             });
 
@@ -1023,7 +1449,7 @@
                             })
                             // set series province& bras
                             //console.log(sortObjectsArray(dtaProvince,'y').slice(0,10))
-                            var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,9)
+                            var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,10)
                             jsArray.push({
                                 id: nameOld,
                                 name: nameOld,
@@ -1101,6 +1527,19 @@
                         y: dta[i][1],
                         k: dta[i][2]
                     })
+                }
+                return rs
+            }
+
+            function getHeatmapBrasOutlier(data, key){
+                var rs = []
+                for(var i=0;i<key.length;i++){
+                    var sumVl = 0
+                    for(var k=0;k<data.length;k++){
+                        if(data[k][0] == key[i])
+                            sumVl += data[k][2]
+                    }
+                    rs.push([0, i, sumVl])
                 }
                 return rs
             }

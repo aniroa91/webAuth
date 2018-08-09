@@ -94,7 +94,9 @@ case class DailyResponse(
                         kibanaOpsview:  (Array[(Int, Int)], Array[(Int, Int)]),
                         sigLogByHourly:  SigLogClientsDaily,
                         rsErrorsInf:   Array[(String, Double)],
-                        rsErrorHostDaily: Array[(String, Double, Double, Double, Double,Double,Double)]
+                        rsErrorHostDaily: Array[(String, Double, Double, Double, Double,Double,Double)],
+                        brasOutlier:   Array[(String, String, Int)],
+                        infOutlier :   Array[(String, String,Int, String)]
                         )
 
 case class BrasResponse(

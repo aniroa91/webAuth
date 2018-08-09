@@ -366,6 +366,30 @@ object BrasDAO {
     )
   }
 
+  def getInfAccessOutlierDaily(day: String) = {
+    val nextDay = CommonService.getNextDay(day)
+    dbConfig.db.run(
+      sql"""select bras_id, host,count(*)
+            from dwh_inf_module
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label = 1
+            group by bras_id,host
+            """
+        .as[(String, String, Int)]
+    )
+  }
+
+  def getBrasOutlierDaily(day: String) = {
+    val nextDay = CommonService.getNextDay(day)
+      dbConfig.db.run(
+        sql"""select bras_id,count(*)
+            from dwh_conn_bras_detail
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label = 'outlier'
+            group by bras_id
+            """
+          .as[(String, Int)]
+      )
+  }
+
   def getErrorHostdaily(bras: String, day: String) = {
     val nextDay = CommonService.getNextDay(day)
     if(bras.equals("*")){

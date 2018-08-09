@@ -32,6 +32,8 @@ GET      /drilldownErrorDevice         controllers.DeviceController.drilldownErr
 GET      /getServNoticeByType          controllers.DeviceController.getServNoticeByType(noti: String ?= "",day: String ?= "")
 GET      /drilldownInferrorDaily       controllers.DeviceController.drilldownInfErrorsDaily(id: String ?= "",day: String ?= "",err: String ?= "")
 GET      /getDailyByBrasLocation       controllers.DeviceController.getDailyByBrasLocation(id: String ?= "",day: String ?= "")
+GET      /drilldownBrasOutlier         controllers.DeviceController.drilldownBrasOutlier(id: String ?= "",day: String ?= "")
+GET      /drilldownInfOutlier          controllers.DeviceController.drilldownInfOutlier(id: String ?= "",day: String ?= "")
 
 GET      /noc                          controllers.DeviceController.dashboard
 GET      /inf                          controllers.DeviceController.inf(id: String ?= "")

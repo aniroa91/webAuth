@@ -315,6 +315,14 @@ object BrasService extends AbstractService{
     mapRs
   }
 
+  def getInfAccessOutlierDaily(day: String) = {
+    BrasDAO.getInfAccessOutlierDaily(day)
+  }
+
+  def getBrasOutlierDaily(day: String) = {
+    BrasDAO.getBrasOutlierDaily(day)
+  }
+
   def getErrorHostdaily(id: String,day: String) = {
     BrasDAO.getErrorHostdaily(id, day)
   }
