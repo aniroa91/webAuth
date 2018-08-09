@@ -194,12 +194,12 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       println("t6:"+(System.currentTimeMillis() -t6))
       val t7 = System.currentTimeMillis()
       val brasOutlier = Await.result(BrasService.getBrasOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
-           .map(x=> (LocationUtils.getNameProvincebyCode(x._1.split("-")(0)), x._1, x._2)).toArray.sorted
+           .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
       println("t7:"+(System.currentTimeMillis() -t7))
       val t8 = System.currentTimeMillis()
       val infOutlier = Await.result(BrasService.getInfAccessOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
-             .map(x=> ( LocationUtils.getNameProvincebyCode(x._1.split("-")(0)),x._1, x._3, x._2)).toArray.sorted
-
+             .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._3)).toArray.sorted
+      println("t8:"+(System.currentTimeMillis() -t8))
       println("tAll:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.daily(DailyResponse((rsSiglog._1, rsSiglog._2), rsErrorsDevice, rsNoticeOpsview,(kibanaBytime, opviewBytime), rsLogsigBytime, rsErrorsInf, rsErrorHostDaily, brasOutlier, infOutlier), day, username))
     }
@@ -214,17 +214,28 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         // get inf by All
         case id if(id.equals("*")) => {
           val outliers = Await.result(BrasService.getInfAccessOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
-            .map(x=> ( LocationUtils.getNameProvincebyCode(x._1.split("-")(0)),x._1, x._3, x._2)).toArray.sorted
+            .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._3)).toArray.sorted
           Json.obj(
             "data" -> outliers,
             "key"   -> outliers.map(x=> x._1).distinct.sorted,
-            "location" -> "province"
+            "location" -> "region"
+          )
+        }
+        // get inf by Region
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
+          val outliers = Await.result(BrasService.getInfAccessOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+            .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), LocationUtils.getNameProvincebyCode(x._1.split("-")(0)),x._1, x._3)).filter(x=> x._1 == id)
+              .map(x=> (x._2, x._4)).toArray.sorted
+          Json.obj(
+            "data" -> outliers,
+            "key"   -> outliers.map(x=> x._1).distinct.sorted,
+            "location" -> "region"
           )
         }
         // get inf by Province
         case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
           val outliers = Await.result(BrasService.getInfAccessOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
-            .map(x=> ( LocationUtils.getNameProvincebyCode(x._1.split("-")(0)),x._1, x._3, x._2)).filter(x=> x._1 == id).map(x=> (x._2, x._4, x._3)).toArray.sorted
+            .map(x=> ( LocationUtils.getNameProvincebyCode(x._1.split("-")(0)),x._1, x._3)).filter(x=> x._1 == id).map(x=> (x._2, x._3)).toArray.sorted
           Json.obj(
             "data"     -> outliers,
             "key"      -> outliers.map(x=> x._1).distinct.sorted,
@@ -234,7 +245,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         // get inf by Bras
         case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) =>{
           val outliers = Await.result(BrasService.getInfAccessOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
-             .filter(x=> x._1 == id).map(x=> (x._2, x._1, x._3)).toArray.sorted
+             .filter(x=> x._1 == id).map(x=> (x._2, x._3)).toArray.sorted
           Json.obj(
             "data" -> outliers,
             "key"   -> outliers.map(x=> x._1).distinct.sorted,
@@ -251,13 +262,40 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def drilldownBrasOutlier(id: String, day: String) = Action { implicit request =>
     try{
-      val brasOutlier = Await.result(BrasService.getBrasOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
-        .map(x=> (LocationUtils.getNameProvincebyCode(x._1.split("-")(0)), x._1, x._2)).toArray.sorted
-      val outliers = if(id.equals("*")) brasOutlier else brasOutlier.filter(x=> x._1 == id).map(x=> (x._2, x._1, x._3)).sorted
-      val rs = Json.obj(
-        "data" -> outliers,
-        "key"   -> outliers.map(x=> x._1).distinct.sorted
-      )
+      val rs = id match {
+        // get inf by All
+        case id if(id.equals("*")) => {
+          val brasOutlier = Await.result(BrasService.getBrasOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+            .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
+          Json.obj(
+            "data" -> brasOutlier,
+            "key"   -> brasOutlier.map(x=> x._1).distinct.sorted,
+            "location" -> "region"
+          )
+        }
+        // get inf by Region
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
+          val brasOutlier = Await.result(BrasService.getBrasOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+            .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)),LocationUtils.getNameProvincebyCode(x._1.split("-")(0)) ,x._2)).filter(x=> x._1 == id)
+              .map(x=> (x._2, x._3)).toArray.sorted
+          Json.obj(
+            "data" -> brasOutlier,
+            "key"   -> brasOutlier.map(x=> x._1).distinct.sorted,
+            "location" -> "region"
+          )
+        }
+        // get inf by Province
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
+          val brasOutlier = Await.result(BrasService.getBrasOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+            .map(x=> (LocationUtils.getNameProvincebyCode(x._1.split("-")(0)), x._1, x._2)).filter(x=> x._1 == id)
+              .map(x=> (x._2, x._3)).toArray.sorted
+          Json.obj(
+            "data" -> brasOutlier,
+            "key"   -> brasOutlier.map(x=> x._1).distinct.sorted,
+            "location" -> "province"
+          )
+        }
+      }
       Ok(Json.toJson(rs))
     }
     catch {

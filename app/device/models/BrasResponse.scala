@@ -95,8 +95,8 @@ case class DailyResponse(
                         sigLogByHourly:  SigLogClientsDaily,
                         rsErrorsInf:   Array[(String, Double)],
                         rsErrorHostDaily: Array[(String, Double, Double, Double, Double,Double,Double)],
-                        brasOutlier:   Array[(String, String, Int)],
-                        infOutlier :   Array[(String, String,Int, String)]
+                        brasOutlier:   Array[(String, Int)],
+                        infOutlier :   Array[(String, Int)]
                         )
 
 case class BrasResponse(

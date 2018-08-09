@@ -68,6 +68,9 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="text-align: center">
+                            <input type="hidden" id="textBrasOutlier">
+                            <input type="hidden" id="isRegionBrasOutlier">
+                            <input type="hidden" id="isProvinceBrasOutlier">
                         @if(response.brasOutlier.length >0) {
                             <div id="bras-outlier" style="height: 375px;"></div>
                         }else{
@@ -151,10 +154,10 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="text-align: center">
-                            <input type="hidden" id="cateInfOutlier">
                             <input type="hidden" id="textInfOutlier">
+                            <input type="hidden" id="isRegionInfOutlier">
                             <input type="hidden" id="isProvinceInfOutlier">
-                        @if(response.infOutlier.length >0) {
+                            @if(response.infOutlier.length >0) {
                             <div id="inf-outlier" style="height: 375px;"></div>
                         }else{
                             <span style="font-size: 13px">Not find data on @day</span>
@@ -1181,7 +1184,6 @@
                             cache: false,
                             success: function (dta) {
                                 if(dta != "Error"){
-                                    var isDrilldown = 0
                                     var vlMarTop = 40
                                     if(cates == "*") vlMarTop = 10
                                     Highcharts.chart('bras-outlier', {
@@ -1233,8 +1235,7 @@
                                             series: {
                                                 events: {
                                                     click: function (event) {
-                                                        if(isDrilldown == 0)
-                                                          callDrilldownBrasOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
+                                                        callDrilldownBrasOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
                                                     }
                                                 },
                                                 dataLabels:{
@@ -1248,9 +1249,21 @@
                                         },
                                         exporting: {
                                             buttons: [{
-                                                text: 'Back to province',
-                                                onclick: function () {
-                                                    callDrilldownBrasOutlier('*','back')
+                                                text: 'Back to '+dta.location,
+                                                onclick: function (e) {
+                                                    var id = "*"
+                                                    var tit = "back"
+                                                    if($('#textBrasOutlier').val() == "Back to province"){
+                                                        tit = "drilldown"
+                                                        id = $('#isRegionBrasOutlier').val()
+                                                        $('#textBrasOutlier').val('Back to region')
+                                                    }
+                                                    if($('#textBrasOutlier').val() == "Back to bras") {
+                                                        tit = "drilldown"
+                                                        id = $('#isProvinceBrasOutlier').val()
+                                                        $('#textBrasOutlier').val('Back to province')
+                                                    }
+                                                    callDrilldownBrasOutlier(id, tit)
                                                 },
                                                 theme: {
                                                     fill: '#1ABB9C',
@@ -1276,9 +1289,19 @@
                                         }]
 
                                     });
+                                    if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                        $('#isRegionBrasOutlier').val(cates)
+                                        $('#textBrasOutlier').val("Back to region")
+                                    }
+                                    if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                        $('#isProvinceBrasOutlier').val(cates)
+                                        $('#textBrasOutlier').val("Back to province")
+                                    }
+                                    else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
+                                        $('#textBrasOutlier').val("Back to bras")
+                                    }
                                     // Apply for button back
                                     if(_type == 'drilldown') {
-                                        isDrilldown =1
                                         $('#bras-outlier .highcharts-button').show()
                                         $('.highcharts-contextbutton').hide()
                                     }
@@ -1298,7 +1321,6 @@
                             cache: false,
                             success: function (dta) {
                                 if(dta != "Error" && dta.data.length >0){
-                                    $('#cateInfOutlier').val(cates)
                                     var vlMarTop = 40
                                     if(cates == "*") vlMarTop = 10
                                     Highcharts.chart('inf-outlier', {
@@ -1368,6 +1390,11 @@
                                                 onclick: function (e) {
                                                     var id = "*"
                                                     var tit = "back"
+                                                    if($('#textInfOutlier').val() == "Back to province"){
+                                                        tit = "drilldown"
+                                                        id = $('#isRegionInfOutlier').val()
+                                                        $('#textInfOutlier').val('Back to region')
+                                                    }
                                                     if($('#textInfOutlier').val() == "Back to bras") {
                                                         tit = "drilldown"
                                                         id = $('#isProvinceInfOutlier').val()
@@ -1399,6 +1426,10 @@
                                         }]
 
                                     });
+                                    if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                        $('#isRegionInfOutlier').val(cates)
+                                        $('#textInfOutlier').val("Back to region")
+                                    }
                                     if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
                                         $('#isProvinceInfOutlier').val(cates)
                                         $('#textInfOutlier').val("Back to province")
@@ -1536,8 +1567,9 @@
                 for(var i=0;i<key.length;i++){
                     var sumVl = 0
                     for(var k=0;k<data.length;k++){
-                        if(data[k][0] == key[i])
-                            sumVl += data[k][2]
+                        if(data[k][0] == key[i]){
+                            sumVl += data[k][1]
+                        }
                     }
                     rs.push([0, i, sumVl])
                 }
