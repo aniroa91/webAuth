@@ -55,15 +55,17 @@
                             <li class="tab-slider--trigger" rel="tabTop">Top N Bas</li>
                         </ul>
                         <div id="monthTab1" style="float: right">
-                           <form action="/searchMonthOverview" class="disInline" method="POST" id="ctSearch">
-                               @helper.CSRF.formField
-                               <label class="titPicker">From</label>
-                               <input class="form-control picker" type="text" id="startMonth" name="startMonth" readonly="true" value="@response.time.fromDate"/>
-                               <label class="titPicker">To</label>
-                               <input class="form-control picker" type="text" id="endMonth" name="endMonth" readonly="true" value="@response.time.toDate"/>
-                               <button type="submit" class="btn btn-success"><i class="fa fa-search" aria-hidden="true"></i></button>
-                               <a href="/device" class="btn btn-info"><i class="fa fa-refresh" aria-hidden="true"></i></a>
-                           </form>
+                        @if(response != null) {
+                            <form action="/searchMonthOverview" class="disInline" method="POST" id="ctSearch">
+                                @helper.CSRF.formField
+                                <label class="titPicker">From</label>
+                                <input class="form-control picker" type="text" id="startMonth" name="startMonth" readonly="true" value="@response.time.fromDate"/>
+                                <label class="titPicker">To</label>
+                                <input class="form-control picker" type="text" id="endMonth" name="endMonth" readonly="true" value="@response.time.toDate"/>
+                                <button type="submit" class="btn btn-success"><i class="fa fa-search" aria-hidden="true"></i></button>
+                                <a href="/device" class="btn btn-info"><i class="fa fa-refresh" aria-hidden="true"></i></a>
+                            </form>
+                        }
                         </div>
                         <div id="divTopN" class="disInline" style="display: none;float: right">
                             <div class="input-group date" id="monthPickerTop" style="width: 200px">
@@ -487,63 +489,51 @@
     <script>
             $(document).ready(function(){
                 $('[data-toggle="tooltip"]').tooltip();
-                // datepicker for tab TopN
-                $('#monthPickerTop').datepicker({
-                    autoclose: true,
-                    minViewMode: 1,
-                    startDate: '@getStartDate(response.time.startMonth+"-01")',
-                    endDate: '@getEndDate(response.time.endMonth+"-01")',
-                    format: 'yyyy-mm'
-                }).on('changeDate', function(selected){
-                    var startDate = new Date(selected.date.valueOf());
-                    var yr = startDate.getFullYear();
-                    var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
-                    var newDate = yr + '-' + month;
-                    callAjaxTopN(newDate)
-                });
-                // datepicker for tab Overview
-                $('#startMonth').datepicker({
-                    autoclose: true,
-                    minViewMode: 1,
-                    startDate: '@getStartDate(response.time.startMonth+"-01")',
-                    endDate: '@getEndDate(response.time.endMonth+"-01")',
-                    format: 'yyyy-mm'
-                }).on('changeDate', function(selected){
-                    //get month choosed
-                    var startDate = new Date(selected.date.valueOf());
-                    var yr = startDate.getFullYear();
-                    var month = startDate.getMonth() < 10 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
-                    var newDate = yr + '-' + month;
-                    $("#endMonth").data('datepicker').setStartDate(newDate);
-                });
-                $('#endMonth').datepicker({
-                    autoclose: true,
-                    minViewMode: 1,
-                    endDate:'@getEndDate(response.time.endMonth+"-01")',
-                    startDate: '@getStartDate(response.time.startMonth+"-01")',
-                    format: 'yyyy-mm'
-                }).on('changeDate', function(selected){
-                    var startDate = new Date(selected.date.valueOf());
-                    var yr = startDate.getFullYear();
-                    var month = startDate.getMonth() < 10 ? ('0' + Number(startDate.getMonth()+1)) : (Number(startDate.getMonth()+1));
-                    var newDate = yr + '-' + month;
-                    $("#startMonth").data('datepicker').setEndDate(newDate);
-               /*     // get month min
-                    var threeMonthAgo = new Date(startDate.setMonth(startDate.getMonth()-2))
-                    var yThreeAgo = threeMonthAgo.getFullYear();
-                    var monthThreeAgo = threeMonthAgo.getMonth() < 9 ? ('0' + Number(threeMonthAgo.getMonth()+1)) : (Number(threeMonthAgo.getMonth()+1));
-                    var dateThreeAgo = yThreeAgo + '-' + monthThreeAgo;
-                    var choosedDate = new Date(dateThreeAgo)
-                    var currentDate = new Date($('#startMonth').val())
-                    if(choosedDate.getTime()- currentDate.getTime() <= 0){
-                        //$("#startMonth").data('datepicker').setStartDate($('#startMonth').val());
-                    }
-                    else{
-                        //$("#startMonth").data('datepicker').setStartDate(dateThreeAgo);
-                        //$('#startMonth').val(dateThreeAgo)
-                        $("#startMonth").data('datepicker')._setDate(dateThreeAgo)
-                    }*/
-                });
+                @if(response != null){
+                    // datepicker for tab TopN
+                    $('#monthPickerTop').datepicker({
+                        autoclose: true,
+                        minViewMode: 1,
+                        startDate: '@getStartDate(response.time.startMonth+"-01")',
+                        endDate: '@getEndDate(response.time.endMonth+"-01")',
+                        format: 'yyyy-mm'
+                    }).on('changeDate', function (selected) {
+                        var startDate = new Date(selected.date.valueOf());
+                        var yr = startDate.getFullYear();
+                        var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth() + 1)) : (Number(startDate.getMonth() + 1));
+                        var newDate = yr + '-' + month;
+                        callAjaxTopN(newDate)
+                    });
+                    // datepicker for tab Overview
+                    $('#startMonth').datepicker({
+                        autoclose: true,
+                        minViewMode: 1,
+                        startDate: '@getStartDate(response.time.startMonth+"-01")',
+                        endDate: '@getEndDate(response.time.endMonth+"-01")',
+                        format: 'yyyy-mm'
+                    }).on('changeDate', function (selected) {
+                        //get month choosed
+                        var startDate = new Date(selected.date.valueOf());
+                        var yr = startDate.getFullYear();
+                        var month = startDate.getMonth() < 10 ? ('0' + Number(startDate.getMonth() + 1)) : (Number(startDate.getMonth() + 1));
+                        var newDate = yr + '-' + month;
+                        $("#endMonth").data('datepicker').setStartDate(newDate);
+                    });
+                    $('#endMonth').datepicker({
+                        autoclose: true,
+                        minViewMode: 1,
+                        endDate: '@getEndDate(response.time.endMonth+"-01")',
+                        startDate: '@getStartDate(response.time.startMonth+"-01")',
+                        format: 'yyyy-mm'
+                    }).on('changeDate', function (selected) {
+                        var startDate = new Date(selected.date.valueOf());
+                        var yr = startDate.getFullYear();
+                        var month = startDate.getMonth() < 10 ? ('0' + Number(startDate.getMonth() + 1)) : (Number(startDate.getMonth() + 1));
+                        var newDate = yr + '-' + month;
+                        $("#startMonth").data('datepicker').setEndDate(newDate);
+                    });
+                }
+
                 $(".tab-slider--body").hide();
                 $(".tab-slider--body:first").show();
 
@@ -873,6 +863,7 @@
                     });
                 })
 
+                @if(response != null){
                 // Total Opsview by Region
                 Highcharts.chart('region-opsview', {
                     chart: {
@@ -1184,7 +1175,7 @@
                             dataLabels:{
                                 formatter:function(){
                                     var nf = new Intl.NumberFormat();
-                                        return nf.format(this.point.value);
+                                    return nf.format(this.point.value);
                                 }
                             },
                             cursor: 'pointer'
@@ -1311,6 +1302,7 @@
                     }]
 
                 });
+                }
             });
 
             $(".tab-slider--nav li").click(function() {
