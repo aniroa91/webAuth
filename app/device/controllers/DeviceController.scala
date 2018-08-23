@@ -1165,7 +1165,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: controllers.BrasOutlier =>
       println("done")
+      println(data._typeS)
       searching = controllers.BrasOutlier(csrfToken = data.csrfToken, _typeS = data._typeS,bras = data.bras,date = data.date)
+      println(searching._typeS)
       Redirect(routes.DeviceController.search).flashing("info" -> "Bras searching!")
     }
 
