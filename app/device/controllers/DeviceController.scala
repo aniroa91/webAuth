@@ -1179,9 +1179,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def search =  withAuth { username => implicit request: Request[AnyContent] =>
     //try {
-    println("Start")
+    println("Start Controller")
       if (!searching.bras.equals("")) {
-        println("Host")
+        println(searching.bras)
+        println(searching._typeS)
         val _typeS = searching._typeS
         val time = searching.date
         var day = ""
@@ -1199,6 +1200,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         val timeStart= System.currentTimeMillis()
         // for result INF-HOST
         if(_typeS.equals("I")){
+          println("Host")
           val t00 = System.currentTimeMillis()
           // get errors by host tableIndex
           val errHost = HostService.getInfHostDailyResponse(brasId,day)
@@ -1251,6 +1253,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         }
         // for result BRAS
         else {
+          println("Bras")
           /* GET ES CURRENT */
           if (day.split("/")(1).equals(CommonService.getCurrentDay())) {
             // number outlier
