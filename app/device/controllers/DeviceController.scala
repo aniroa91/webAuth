@@ -39,7 +39,6 @@ case class DayPicker( csrfToken: String, day: String)
 @Singleton
 class DeviceController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with Secured{
 
-  private var searchOverview = controllers.MonthPicker("","","")
   val logger: Logger = Logger(this.getClass())
   val formOverview = Form(
     mapping(
@@ -73,8 +72,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: controllers.MonthPicker =>
       println("done")
-      searchOverview = controllers.MonthPicker(csrfToken = data.csrfToken, startMonth = data.startMonth,endMonth = data.endMonth)
-      Redirect(routes.DeviceController.overview).flashing("info" -> "Overview searching!")
+      Redirect(routes.DeviceController.overview).flashing("startMonth" -> data.startMonth, "endMonth" -> data.endMonth)
     }
 
     val formValidationResult = formOverview.bindFromRequest
@@ -87,8 +85,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       //val minMaxMonth = CommonService.getRangeCurrentMonth()
       val minMaxMonth = Await.result(BrasService.getMinMaxMonth(), Duration.Inf)
       val threeMonth = Await.result(BrasService.get3MonthLastest(),Duration.Inf)
-      val fromMonth = if(searchOverview.startMonth != "") searchOverview.startMonth+"-01" else threeMonth(threeMonth.length-1)
-      val toMonth = if(searchOverview.endMonth != "") searchOverview.endMonth+"-01" else threeMonth(0)
+      val fromMonth = if(request.flash.get("startMonth").toString != "None") request.flash.get("startMonth").get+"-01" else threeMonth(threeMonth.length-1)
+      val toMonth = if(request.flash.get("endMonth").toString != "None") request.flash.get("endMonth").get+"-01" else threeMonth(0)
       val rangeMonth = CommonService.getAllMonthfromRange(fromMonth,toMonth)
 
       // get Total INF Errors By Months
@@ -136,7 +134,6 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val rougeError = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
       val lostSignal = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
       val infTypeError = InfTypeError(infDown,userDown,rougeError,lostSignal)
-      searchOverview = controllers.MonthPicker("","","")
 
       Ok(device.views.html.overview(username,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),nocCount,contracts,heatmapOpsview,infTypeError,totalInf)))
     }
@@ -166,7 +163,6 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     try{
       val t0 = System.currentTimeMillis()
       val day = request.flash.get("day").getOrElse(CommonService.getCurrentDay())
-      println(day)
       val rsSiglog        = BrasService.getSigLogRegionDaily(day, "")
       println("t0:"+(System.currentTimeMillis() -t0))
       val t1 = System.currentTimeMillis()
@@ -1163,8 +1159,6 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: controllers.BrasOutlier =>
       println("done")
-      println(data._typeS)
-      println(data.bras)
       Redirect(routes.DeviceController.search).flashing("bras" -> data.bras, "_typeS" -> data._typeS, "date" -> data.date)
     }
 
@@ -1173,10 +1167,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   def search =  withAuth { username => implicit request: Request[AnyContent] =>
-    //try {
-    println("Start Controller")
+    try {
+      println("Start Controller")
       if (request.flash.get("bras").toString != "None") {
-        println(request.flash.get("bras").get)
         println(request.flash.get("bras").get)
         val _typeS = request.flash.get("_typeS").get
         val time = request.flash.get("date").get
@@ -1355,13 +1348,13 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         }
       }
       else{
-        println("Bras")
+        println("Empty data")
         Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
       }
-   /* }
+    }
     catch{
       case e: Exception => Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
-    }*/
+    }
   }
 
   def getHostJson(id: String) = Action { implicit request =>
