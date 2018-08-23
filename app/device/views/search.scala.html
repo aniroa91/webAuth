@@ -28,7 +28,7 @@
                 </div>
 
                 <div style="margin-top: 10px" class="col-md-2 col-sm-2 col-xs-12 form-group  top_search">
-                    <form action="/searchBras" method="POST" id="ctSearch">
+                    <form action="/searchBrasHost" method="POST" id="ctSearch">
                         @helper.CSRF.formField
                         <input type="hidden" id="_typeS" name="_typeS" value="@_typeS">
                         <input type="hidden" id="date" name="date" value="@day">

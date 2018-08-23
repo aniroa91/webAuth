@@ -62,7 +62,7 @@ POST     /searchMonthOverview          controllers.DeviceController.getFormMonth
 GET      /searchMonthOverview          controllers.DeviceController.overview
 
 GET      /searchBras                   controllers.DeviceController.search
-POST     /searchBras                   controllers.DeviceController.getFormBras
+POST     /searchBrasHost               controllers.DeviceController.getFormBras
 GET      /bras                         controllers.BrasController.index
 GET      /brasInfo                     controllers.BrasDetailController.index
 GET      /device/realtime-bras         controllers.DeviceController.realtimeBras
