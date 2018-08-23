@@ -1174,8 +1174,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   def search =  withAuth { username => implicit request: Request[AnyContent] =>
-    try {
+    //try {
+    println("Start")
       if (!searching.bras.equals("")) {
+        println("Host")
         val _typeS = searching._typeS
         val time = searching.date
         var day = ""
@@ -1350,12 +1352,14 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
             infErrorBytime, infHostBytime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost, KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost), day, brasId,_typeS,routes.DeviceController.search))
         }
       }
-      else
+      else{
+        println("Bras")
         Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
-    }
+      }
+   /* }
     catch{
       case e: Exception => Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
-    }
+    }*/
   }
 
   def getHostJson(id: String) = Action { implicit request =>
