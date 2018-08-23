@@ -39,9 +39,7 @@ case class DayPicker( csrfToken: String, day: String)
 @Singleton
 class DeviceController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with Secured{
 
-  private var searching = controllers.BrasOutlier("","","","")
   private var searchOverview = controllers.MonthPicker("","","")
-  private var searchDaily = controllers.DayPicker("","")
   val logger: Logger = Logger(this.getClass())
   val formOverview = Form(
     mapping(
@@ -157,8 +155,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: controllers.DayPicker =>
       println("done")
-      searchDaily = controllers.DayPicker(csrfToken = data.csrfToken, day = data.day)
-      Redirect(routes.DeviceController.getDaily).flashing("info" -> "Daily searching!")
+      Redirect(routes.DeviceController.getDaily).flashing("day" -> data.day)
     }
 
     val formValidationResult = formDaily.bindFromRequest
@@ -168,7 +165,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   def getDaily =  withAuth { username => implicit request =>
     try{
       val t0 = System.currentTimeMillis()
-      val day = if(searchDaily.day == null || searchDaily.day.equals("")) CommonService.getCurrentDay() else searchDaily.day
+      val day = request.flash.get("day").getOrElse(CommonService.getCurrentDay())
+      println(day)
       val rsSiglog        = BrasService.getSigLogRegionDaily(day, "")
       println("t0:"+(System.currentTimeMillis() -t0))
       val t1 = System.currentTimeMillis()
@@ -1167,10 +1165,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       println("done")
       println(data._typeS)
       println(data.bras)
-      searching = controllers.BrasOutlier(csrfToken = data.csrfToken, _typeS = data._typeS,bras = data.bras,date = data.date)
-      println(searching._typeS)
-      println("====")
-      Redirect(routes.DeviceController.search).flashing("info" -> "Bras searching!")
+      Redirect(routes.DeviceController.search).flashing("bras" -> data.bras, "_typeS" -> data._typeS, "date" -> data.date)
     }
 
     val formValidationResult = form.bindFromRequest
@@ -1180,13 +1175,13 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   def search =  withAuth { username => implicit request: Request[AnyContent] =>
     //try {
     println("Start Controller")
-      if (!searching.bras.equals("")) {
-        println(searching.bras)
-        println(searching._typeS)
-        val _typeS = searching._typeS
-        val time = searching.date
+      if (request.flash.get("bras").toString != "None") {
+        println(request.flash.get("bras").get)
+        println(request.flash.get("bras").get)
+        val _typeS = request.flash.get("_typeS").get
+        val time = request.flash.get("date").get
         var day = ""
-        val brasId = searching.bras
+        val brasId = request.flash.get("bras").get
         if (time == null || time == ""){
           day = CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay()
         }
