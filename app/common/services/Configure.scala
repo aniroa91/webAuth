@@ -16,13 +16,9 @@ object Configure {
   val ES_HOST = ConfigFactory.load().getString("es.dns.host")
   val ES_PORT = ConfigFactory.load().getString("es.dns.port").toInt
 
-  val ES_KIBANA_HOST = ConfigFactory.load().getString("es.dwh.host")
-  val ES_KIBANA_PORT = ConfigFactory.load().getString("es.dwh.port").toInt
-
   val LOGO_DEFAULT = "../assets/images/logo/domain.png"
 
   val client = HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
-  val client_kibana = HttpClient(ElasticsearchClientUri(Configure.ES_KIBANA_HOST,Configure.ES_KIBANA_PORT))
 
   def main(args: Array[String]) {
     println("")

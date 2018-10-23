@@ -17,14 +17,12 @@ import services.domain.CommonService.{formatUTC, getAggregations}
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
-import model.device.InfDAO.client_kibana
 import org.elasticsearch.search.sort.SortOrder
 import service.BrasService.{client, getValueAsInt, getValueAsString}
 
 object BrasDAO {
 
   val client = Configure.client
-  val client_kibana = Configure.client_kibana
   val monthSize = CommonService.monthSize
   val topN = CommonService.SIZE_DEFAULT
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
@@ -213,7 +211,7 @@ object BrasDAO {
   def getIndexRougeMudule(userInf_down: String): Array[(String,String,String,String,Int)] = {
     val dt = CommonService.getCurrentDay()
 
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_inf_index_*" / "docs")
         query { must(rangeQuery("rouge_error").gt(0),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(dt))) }
         aggregations (
@@ -940,7 +938,7 @@ object BrasDAO {
 
   def getOpviewBytimeResponse(bras: String,nowDay: String,hourly: Int): Array[(Int,Int)] = {
     if(bras.equals("*")){
-      val res = client_kibana.execute(
+      val res = client.execute(
         search(s"infra_dwh_opsview_*" / "docs")
           query { must(rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay)).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay)))) }
           aggregations (
@@ -954,7 +952,7 @@ object BrasDAO {
         .groupBy(_._1).mapValues(_.map(x=>x._2.toInt).sum).toArray.sorted
     }
     else {
-      val res = client_kibana.execute(
+      val res = client.execute(
         search(s"infra_dwh_opsview_*" / "docs")
           query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
           aggregations (
@@ -992,7 +990,7 @@ object BrasDAO {
 
   def getKibanaBytimeES(bras: String,day: String): Array[(Int,Int)] ={
     if(bras.equals("*")) {
-      val rs = client_kibana.execute(
+      val rs = client.execute(
         search(s"infra_dwh_kibana_*" / "docs")
           query {
           must(rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day)).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day))))
@@ -1007,7 +1005,7 @@ object BrasDAO {
       CommonService.getAggregationsSiglog(rs.aggregations.get("hourly")).map(x => (CommonService.getHoursFromMiliseconds(x._1.toLong) -> x._2.toInt))
     }
     else{
-      val rs = client_kibana.execute(
+      val rs = client.execute(
         search(s"infra_dwh_kibana_*" / "docs")
           query {
           must(termQuery("bras_id.keyword", bras), rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1)))))
@@ -1072,7 +1070,7 @@ object BrasDAO {
   }
 
   def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly:Int): Array[(Int,Int)] = {
-    val response = client_kibana.execute(
+    val response = client.execute(
       search(s"infra_dwh_inf_host_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         size 10000
@@ -1098,7 +1096,7 @@ object BrasDAO {
   def getInfhostResponse(bras: String,nowDay: String): Array[(String,Long,Long)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_inf_host_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
@@ -1121,7 +1119,7 @@ object BrasDAO {
   }
 
   def getInfModuleResponse(bras: String,nowDay: String): Array[(String,String,Long,Long,Long)] = {
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_inf_module_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),not(termQuery("module.keyword","-1")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
@@ -1175,7 +1173,7 @@ object BrasDAO {
   def getOpServByStatusResponse(bras: String,nowDay: String): Array[(String,String,Int)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    val response = client_kibana.execute(
+    val response = client.execute(
       search(s"infra_dwh_opsview_*" / "docs")
         query { must( termQuery("bras_id.keyword", bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(fromDay)).lt(CommonService.formatYYmmddToUTC(nextDay)))}
         aggregations (
@@ -1272,7 +1270,7 @@ object BrasDAO {
         .as[(String,Int)])
   }
   def getErrorSeverityES(bras: String,day: String): Array[(String,Long)] ={
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_kibana_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations(
@@ -1294,7 +1292,7 @@ object BrasDAO {
         .as[(String,Int)])
   }
   def getErrorTypeES(bras: String,day: String): Array[(String,Long)] ={
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_kibana_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations(
@@ -1316,7 +1314,7 @@ object BrasDAO {
         .as[(String,Int)])
   }
   def getFacilityES(bras: String,day: String): Array[(String,Long)] ={
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_kibana_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations(
@@ -1339,7 +1337,7 @@ object BrasDAO {
         .as[(String,Int)])
   }
   def getDdosES(bras: String,day: String): Array[(String,Long)] ={
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_kibana_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),termQuery("error_type","ddos"),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations(
@@ -1364,7 +1362,7 @@ object BrasDAO {
         .as[(String,String,Int)])
   }
   def getSeveValueES(bras: String,day: String): Array[((String,String),Long)] ={
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_kibana_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),not(termQuery("error_name.keyword","")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
         aggregations(

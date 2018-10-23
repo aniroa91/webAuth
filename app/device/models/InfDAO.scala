@@ -17,14 +17,12 @@ import services.domain.CommonService.getAggregations
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
-import model.device.BrasDAO.client_kibana
 import org.elasticsearch.search.sort.SortOrder
 import service.BrasService.{client, getValueAsInt, getValueAsString}
 
 object InfDAO {
 
   val client = Configure.client
-  val client_kibana = Configure.client_kibana
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
@@ -32,7 +30,7 @@ object InfDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
 
-    val res = client_kibana.execute(
+    val res = client.execute(
       search(s"infra_dwh_inf_index_*" / "docs")
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations (
@@ -65,7 +63,7 @@ object InfDAO {
   }
 
   def getNoOutlierInfByHost(host: String,nowDay: String): Int = {
-    val response = client_kibana.execute(
+    val response = client.execute(
       search(s"infra_dwh_inf_module_*" / "docs")
         query { must(termQuery("host.keyword",host),termQuery("label",1),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         size 10000
@@ -85,7 +83,7 @@ object InfDAO {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
 
-    val rs = client_kibana.execute(
+    val rs = client.execute(
       search(s"infra_dwh_inf_module_*" / "docs")
         query { must(termQuery("bras_id.keyword",bras),termQuery("label",1),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         size 1000
@@ -113,7 +111,7 @@ object InfDAO {
   }
 
   def getErrorHostbyHourly(host: String,nowDay: String): Array[(Int,Int,Int,Int,Int,Int,Int)] = {
-    val res = client_kibana.execute(
+    val res = client.execute(
       search(s"infra_dwh_inf_host_*" / "docs")
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations (
@@ -221,7 +219,7 @@ object InfDAO {
   }
 
   def getErrorTableModuleIndex(host: String,nowDay: String): Array[(String,Int,Int)] = {
-    val response = client_kibana.execute(
+    val response = client.execute(
       search(s"infra_dwh_inf_index_*" / "docs")
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
@@ -256,7 +254,7 @@ object InfDAO {
   }
 
   def getContractwithSf(host: String,nowDay: String): Array[(String,Int,Int,Int,Int)] = {
-    val response = client_kibana.execute(
+    val response = client.execute(
       search(s"infra_dwh_inf_index_*" / "docs")
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
