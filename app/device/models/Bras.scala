@@ -99,7 +99,7 @@ object BrasList {
     val dt = new DateTime();
     val nowDate  = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     dbConfig.db.run(
-      sqlu"""UPDATE dwh_conn_bras_detail SET verified =1, "timeVerified" = $nowDate::TIMESTAMP
+      sqlu"""UPDATE dwh_conn_bras_detail SET verified =1, "timeverified" = $nowDate::TIMESTAMP
             where bras_id =$id and date_time=$time::TIMESTAMP
                   """
     )
@@ -109,7 +109,7 @@ object BrasList {
     val dt = new DateTime();
     val nowDate  = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     dbConfig.db.run(
-      sqlu"""UPDATE dwh_conn_bras_detail SET verified =0, "timeVerified" = $nowDate::TIMESTAMP
+      sqlu"""UPDATE dwh_conn_bras_detail SET verified =0, "timeverified" = $nowDate::TIMESTAMP
             where bras_id =$id and date_time=$time::TIMESTAMP
                   """
     )
