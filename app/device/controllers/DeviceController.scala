@@ -182,7 +182,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       println("t4:"+(System.currentTimeMillis() -t4))
       val t5 = System.currentTimeMillis()
       val rsLogsigBytime  = BrasService.getSigLogByDaily("*", day)
-      println("t5:"+(System.currentTimeMillis() -t5))
+      println("t566:"+(System.currentTimeMillis() -t5))
       val t6 = System.currentTimeMillis()
       val rsErrorHostDaily = Await.result(BrasService.getErrorHostdaily("*",day), Duration.Inf).toArray
       println("t6:"+(System.currentTimeMillis() -t6))

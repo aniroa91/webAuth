@@ -178,9 +178,14 @@ object BrasService extends AbstractService{
   def getSigLogByDaily(bras: String, day: String): SigLogClientsDaily = {
     try {
       val brasId = if(bras.equals("*")) bras else bras.toLowerCase
-      val mulRes = client.execute(
+      val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+      val nowDay = DateTime.parse(day +" 00:00:00", formatter).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+      val nextDay = DateTime.parse(CommonService.getNextDay(day) +" 00:00:00", formatter).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+
+      val mulRes = if(brasId.equals("*")) client.execute(
         multi(
-          search(s"radius-streaming-${day}" / "docs") query (s"type:con AND typeLog:SignIn AND nasName:$brasId")
+          search(s"radius-streaming-*" / "docs")
+            query {must(termQuery("type", "con"), termQuery("typeLog", "SignIn"), rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lt(CommonService.formatStringToUTC(nextDay)))}
             aggregations (
             dateHistogramAggregation("hourly")
               .field("timestamp")
@@ -190,7 +195,8 @@ object BrasService extends AbstractService{
                 cardinalityAgg("name","name")
               )
             ),
-          search(s"radius-streaming-${day}" / "docs") query (s"type:con AND typeLog:LogOff AND nasName:$brasId")
+          search(s"radius-streaming-*" / "docs")
+            query {must(termQuery("type", "con"), termQuery("typeLog", "LogOff"), rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lt(CommonService.formatStringToUTC(nextDay)))}
             aggregations (
             dateHistogramAggregation("hourly")
               .field("timestamp")
@@ -202,6 +208,33 @@ object BrasService extends AbstractService{
             )
         )
       ).await
+      else
+        client.execute(
+          multi(
+            search(s"radius-streaming-*" / "docs")
+              query {must(termQuery("type", "con"), termQuery("typeLog", "SignIn"), termQuery("nasName", brasId), rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lt(CommonService.formatStringToUTC(nextDay)))}
+              aggregations (
+              dateHistogramAggregation("hourly")
+                .field("timestamp")
+                .interval(DateHistogramInterval.HOUR)
+                .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+                subAggregations(
+                cardinalityAgg("name","name")
+                )
+              ),
+            search(s"radius-streaming-*" / "docs")
+              query {must(termQuery("type", "con"), termQuery("typeLog", "LogOff"), termQuery("nasName", brasId), rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lt(CommonService.formatStringToUTC(nextDay)))}
+              aggregations (
+              dateHistogramAggregation("hourly")
+                .field("timestamp")
+                .interval(DateHistogramInterval.HOUR)
+                .timeZone(DateTimeZone.forID(DateTimeUtil.TIMEZONE_HCM))
+                subAggregations(
+                cardinalityAgg("name","name")
+                )
+              )
+          )
+        ).await
       val arrSigin = CommonService.getAggregationsAndCountDistinct(mulRes.responses(0).aggregations.get("hourly")).map(x => (CommonService.getHoursFromMiliseconds(x._1.toLong), x._2, x._3))
       val arrLogoff = CommonService.getAggregationsAndCountDistinct(mulRes.responses(1).aggregations.get("hourly")).map(x => (CommonService.getHoursFromMiliseconds(x._1.toLong), x._2, x._3))
       SigLogClientsDaily(arrSigin, arrLogoff)
@@ -355,11 +388,14 @@ object BrasService extends AbstractService{
   def getSigLogdaily(day: String, queries: String) = {
     try {
       val aggField = if (queries.equals("")) "nasName" else "card.olt"
-      val queryString = if (queries.equals("")) "" else s"AND nasName:$queries"
-      val multiRs = client.execute(
+      val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+      val nowDay = DateTime.parse(day +" 00:00:00", formatter).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+      val nextDay = DateTime.parse(CommonService.getNextDay(day) +" 00:00:00", formatter).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+
+      val multiRs = if(queries.equals("")) client.execute(
         multi(
-          search(s"radius-streaming-${day}" / "docs")
-            query (s"type:con AND typeLog:LogOff $queryString")
+          search(s"radius-streaming-*" / "docs")
+            query {must(termQuery("type", "con"), termQuery("typeLog", "LogOff"), rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lt(CommonService.formatStringToUTC(nextDay)))}
             aggregations (
             termsAggregation("bras")
               .field(s"$aggField") size 1000
@@ -367,8 +403,8 @@ object BrasService extends AbstractService{
               cardinalityAgg("name", "name")
               )
             ),
-          search(s"radius-streaming-${day}" / "docs")
-            query (s"type:con AND typeLog:SignIn $queryString")
+          search(s"radius-streaming-*" / "docs")
+            query {must(termQuery("type", "con"), termQuery("typeLog", "SignIn"), rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lt(CommonService.formatStringToUTC(nextDay)))}
             aggregations (
             termsAggregation("bras")
               .field(s"$aggField") size 1000
@@ -378,6 +414,29 @@ object BrasService extends AbstractService{
             )
         )
       ).await
+      else
+        client.execute(
+          multi(
+            search(s"radius-streaming-*" / "docs")
+              query {must(termQuery("type", "con"), termQuery("typeLog", "LogOff"), termQuery("nasName", queries), rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lt(CommonService.formatStringToUTC(nextDay)))}
+              aggregations (
+              termsAggregation("bras")
+                .field(s"$aggField") size 1000
+                subAggregations (
+                cardinalityAgg("name", "name")
+                )
+              ),
+            search(s"radius-streaming-*" / "docs")
+              query {must(termQuery("type", "con"), termQuery("typeLog", "SignIn"), termQuery("nasName", queries), rangeQuery("timestamp").gte(CommonService.formatStringToUTC(nowDay)).lt(CommonService.formatStringToUTC(nextDay)))}
+              aggregations (
+              termsAggregation("bras")
+                .field(s"$aggField") size 1000
+                subAggregations (
+                cardinalityAgg("name", "name")
+                )
+              )
+          )
+        ).await
       val rsLogoff = CommonService.getAggregationsAndCountDistinct(multiRs.responses(0).aggregations.get("bras"))
       val rsSignin = CommonService.getAggregationsAndCountDistinct(multiRs.responses(1).aggregations.get("bras"))
       (rsLogoff, rsSignin)
