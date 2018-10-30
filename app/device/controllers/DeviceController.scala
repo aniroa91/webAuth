@@ -1170,11 +1170,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     try {
       println("Start Controller")
       if (request.flash.get("bras").toString != "None") {
-        println(request.flash.get("bras").get)
+        println(request.flash.get("bras").get.trim)
         val _typeS = request.flash.get("_typeS").get
         val time = request.flash.get("date").get
         var day = ""
-        val brasId = request.flash.get("bras").get
+        val brasId = request.flash.get("bras").get.trim()
         if (time == null || time == ""){
           day = CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay()
         }

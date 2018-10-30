@@ -357,7 +357,7 @@ object BrasDAO {
     dbConfig.db.run(
       sql"""select bras_id, sum(warn_opsview),sum(unknown_opsview),sum(ok_opsview),sum(crit_opsview)
             from dwh_opsview_status
-            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and device_type='bras'
             group by bras_id
             """
         .as[(String, Double, Double,Double, Double)]
@@ -1153,7 +1153,7 @@ object BrasDAO {
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
       sql"""select service_name,count(*) from dwh_opsview
-             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and device_type='bras'
              group by service_name
                   """
         .as[(String,Int)])
@@ -1164,7 +1164,7 @@ object BrasDAO {
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
       sql"""select service_status,count(*) from dwh_opsview
-             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+             where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and device_type='bras'
              group by service_status
                   """
         .as[(String,Int)])

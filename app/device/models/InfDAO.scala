@@ -224,7 +224,7 @@ object InfDAO {
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
         termsAggregation("module")
-          .field("module.keyword")
+          .field("module")
           .subAggregations(
             termsAggregation("index")
               .field("index")
@@ -259,7 +259,7 @@ object InfDAO {
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
         termsAggregation("module")
-          .field("module.keyword")
+          .field("module")
           .subAggregations(
             termsAggregation("index")
               .field("index")
