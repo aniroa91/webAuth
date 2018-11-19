@@ -1370,8 +1370,9 @@ object BrasDAO {
           .field("severity.keyword")
           .subAggregations(
             termsAggregation("error_name")
-              .field("error_name.keyword")
+              .field("error_name.keyword") size 1000
           )
+        size 1000
         )
     ).await
     val mapSevErr = CommonService.getSecondAggregations(rs.aggregations.get("severity"),"error_name")
