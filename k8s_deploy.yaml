@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: ${JOB_NAME}
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ${JOB_NAME}
