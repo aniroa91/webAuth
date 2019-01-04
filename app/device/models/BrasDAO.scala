@@ -419,7 +419,7 @@ object BrasDAO {
     dbConfig.db.run(
       sql"""select bras_id, sum(alert_count),sum(crit_count),sum(emerg_count),sum(err_count),sum(notice_count),sum(warning_count)
             from dwh_kibana_agg
-            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP AND device_type='bras'
             group by bras_id
             """
          .as[(String, Double, Double,Double, Double,Double,Double)]
