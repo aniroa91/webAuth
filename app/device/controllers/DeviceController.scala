@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject.Inject
 import javax.inject.Singleton
+
 import play.api.mvc._
 import com.google.common.util.concurrent.AbstractService
 import model.device.{NocCount, _}
@@ -14,14 +15,16 @@ import service.{BrasService, HostService}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import controllers.Secured
+
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import play.api.libs.json.Json
 import services.domain.CommonService
 import services.domain.CommonService.formatYYYYmmddHHmmss
+
 import scala.util.control.Breaks._
 import play.api.Logger
-import device.utils.LocationUtils
+import device.utils.{CommonUtils, LocationUtils}
 import com.ftel.bigdata.utils.FileUtil
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileSystemView
@@ -135,10 +138,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val lostSignal = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
       val infTypeError = InfTypeError(infDown,userDown,rougeError,lostSignal)
 
-      Ok(device.views.html.overview(username,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),nocCount,contracts,heatmapOpsview,infTypeError,totalInf)))
+      Ok(device.views.html.monthly.overview(username,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),nocCount,contracts,heatmapOpsview,infTypeError,totalInf)))
     }
     catch{
-      case e: Exception => Ok(device.views.html.overview(username,null))
+      case e: Exception => Ok(device.views.html.monthly.overview(username,null))
     }
   }
 
@@ -161,44 +164,95 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def getDaily =  withAuth { username => implicit request =>
     try{
+      logger.info("======START SERVICE DAILY PAGE======")
       val t0 = System.currentTimeMillis()
       val day = request.flash.get("day").getOrElse(CommonService.getCurrentDay())
       val rsSiglog        = BrasService.getSigLogRegionDaily(day, "")
-      println("t0:"+(System.currentTimeMillis() -t0))
+      logger.info("t0:"+(System.currentTimeMillis() -t0))
       val t1 = System.currentTimeMillis()
       val rsErrorsDevice  = BrasService.getDeviceErrorsRegionDaily(day).map(x=> x._1 -> (x._2+x._3+x._4+x._5+x._6+x._7))
-      println("t1:"+(System.currentTimeMillis() -t1))
+      logger.info("t1:"+(System.currentTimeMillis() -t1))
       val t2 = System.currentTimeMillis()
       val rsNoticeOpsview = BrasService.getServiceNoticeRegionDaily(day, "*")
-      println("t2:"+(System.currentTimeMillis() -t2))
+      logger.info("t2:"+(System.currentTimeMillis() -t2))
       val t3 = System.currentTimeMillis()
       val rsErrorsInf     = BrasService.getInfErrorsDaily(day, "*").groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sorted
-      println("t3:"+(System.currentTimeMillis() -t3))
+      logger.info("t3:"+(System.currentTimeMillis() -t3))
       val t4 = System.currentTimeMillis()
       val arrOpsview      = BrasService.getOpviewBytimeResponse("*", day, 0)
       val opviewBytime    = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrOpsview, x)).toArray
       val arrKibana       = BrasService.getKibanaBytimeES("*", day).groupBy(_._1).mapValues(_.map(_._2).sum).toArray
       val kibanaBytime    = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana, x)).toArray
-      println("t4:"+(System.currentTimeMillis() -t4))
+      logger.info("t4:"+(System.currentTimeMillis() -t4))
       val t5 = System.currentTimeMillis()
       val rsLogsigBytime  = BrasService.getSigLogByDaily("*", day)
-      println("t566:"+(System.currentTimeMillis() -t5))
+      logger.info("t566:"+(System.currentTimeMillis() -t5))
       val t6 = System.currentTimeMillis()
       val rsErrorHostDaily = Await.result(BrasService.getErrorHostdaily("*",day), Duration.Inf).toArray
-      println("t6:"+(System.currentTimeMillis() -t6))
+      logger.info("t6:"+(System.currentTimeMillis() -t6))
       val t7 = System.currentTimeMillis()
       val brasOutlier = Await.result(BrasService.getBrasOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
            .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
-      println("t7:"+(System.currentTimeMillis() -t7))
+      logger.info("t7:"+(System.currentTimeMillis() -t7))
       val t8 = System.currentTimeMillis()
       val infOutlier = Await.result(BrasService.getInfAccessOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
              .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._3)).toArray.sorted
-      println("t8:"+(System.currentTimeMillis() -t8))
-      println("tAll:"+(System.currentTimeMillis() -t0))
+      logger.info("t8:"+(System.currentTimeMillis() -t8))
+      logger.info("tAll:"+(System.currentTimeMillis() -t0))
+      logger.info("======END SERVICE DAILY PAGE======")
       Ok(device.views.html.daily(DailyResponse((rsSiglog._1, rsSiglog._2), rsErrorsDevice, rsNoticeOpsview,(kibanaBytime, opviewBytime), rsLogsigBytime, rsErrorsInf, rsErrorHostDaily, brasOutlier, infOutlier), day, username))
     }
     catch{
       case e : Exception => Ok(device.views.html.daily(null, CommonService.getCurrentDay(), username))
+    }
+  }
+
+  def getErrInfHourly(_type: String, id: String, day: String, bras: String) = Action {implicit request =>
+    try{
+      // _type: 0 hourly time
+      // _type: 1 frame time
+      val jsError = if(_type == "0"){
+        val rs = Await.result(BrasService.getErrorHostdaily(bras, day), Duration.Inf).toArray
+        id match {
+          case id if(id == "0") => {
+            Json.obj(
+              "cates" -> (0 until 24).map(x=> x+"h"),
+              "data"  -> rs
+            )
+          }
+          case id if(id == "1") => {
+            val rsErrorHost = rs.map(x=> (CommonUtils.getRangeTime(x._1.toDouble), x._2, x._3, x._4, x._5, x._6, x._7,x._8))
+              .groupBy(x=> x._1).map(x=> (x._1, x._2.map(y=> y._2).sum, x._2.map(y=> y._3).sum, x._2.map(y=> y._4).sum, x._2.map(y=> y._5).sum, x._2.map(y=> y._6).sum, x._2.map(y=> y._7).sum, x._2.map(y=> y._8).sum)).toArray
+            Json.obj(
+              "cates" -> CommonUtils.rangeTime.map(x=> x._2).toArray.sorted,
+              "data"  -> rsErrorHost
+            )
+          }
+        }
+      }
+      else{
+        val rs = HostService.getErrorHostbyHourly(bras, day)
+        id match {
+          case id if(id == "0") => {
+            Json.obj(
+              "cates" -> (0 until 24).map(x=> x+"h"),
+              "data"  -> rs
+            )
+          }
+          case id if(id == "1") => {
+            val rsErrorHost = rs.map(x=> (CommonUtils.getRangeTime(x._1.toDouble), x._2, x._3, x._4, x._5, x._6, x._7, x._8))
+              .groupBy(x=> x._1).map(x=> (x._1, x._2.map(y=> y._2).sum, x._2.map(y=> y._3).sum, x._2.map(y=> y._4).sum, x._2.map(y=> y._5).sum, x._2.map(y=> y._6).sum, x._2.map(y=> y._7).sum, x._2.map(y=> y._8).sum)).toArray
+            Json.obj(
+              "cates" -> CommonUtils.rangeTime.map(x=> x._2).toArray.sorted,
+              "data"  -> rsErrorHost
+            )
+          }
+        }
+      }
+      Ok(Json.toJson(jsError))
+    }
+    catch {
+      case e: Exception => Ok("Error")
     }
   }
 
@@ -577,11 +631,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   def getErrorKibana(_typeError: String,month: String) = Action { implicit request =>
     try{
       // get Top total kibana
-      val topKibana = Await.result(BrasService.getTopKibana(month,_typeError), Duration.Inf)
+      val topKibana = Await.result(BrasService.getTopKibana(month,_typeError), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
       val kibanaObj = Json.obj(
-        "month" -> month,
-        "data" -> topKibana.map(x=>x._2),
-        "categories" -> topKibana.map(x=>x._1)
+        "data" -> topKibana,
+        "dataProvince" -> topKibana.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topKibana.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       Ok(Json.toJson(kibanaObj))
     }
@@ -593,11 +647,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   def getserviceStatus(_typeService: String,month: String) = Action { implicit request =>
     try{
       // get Top opsview status
-      val topOpsview = Await.result(BrasService.getTopOpsview(month,_typeService), Duration.Inf)
+      val topOpsview = Await.result(BrasService.getTopOpsview(month,_typeService), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
       val rs = Json.obj(
-        "month" -> month,
-        "data" -> topOpsview.map(x=>x._2),
-        "categories" -> topOpsview.map(x=>x._1)
+        "data" -> topOpsview,
+        "dataProvince" -> topOpsview.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topOpsview.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       Ok(Json.toJson(rs))
     }
@@ -639,36 +693,38 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   // Tab TOP N
-  def topNJson(month: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = Action { implicit request =>
-    try{
-      val monthString = if(month.equals("")) "Lastest 3 months" else month
+  def topNJson(monthStr: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = Action { implicit request =>
+    //try{
+      val month = if(monthStr.equals("")) CommonService.getPreviousMonth() else monthStr
       // get Top Sigin
-      val topSignin = Await.result(BrasService.getTopSignin(month), Duration.Inf)
+      val topSignin = Await.result(BrasService.getTopSignin(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3, x._4))
       val siginObj = Json.obj(
         "data" -> topSignin,
-        "dataBras" -> topSignin.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "dataProvince" -> topSignin.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
         "dataClients" -> topSignin.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sortWith(_._2 > _._2),
         "categories" -> topSignin.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top Logoff
-      val topLogoff = Await.result(BrasService.getTopLogoff(month), Duration.Inf)
+      val topLogoff = Await.result(BrasService.getTopLogoff(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3, x._4))
       val logoffObj = Json.obj(
         "data" -> topLogoff,
-        "dataBras" -> topLogoff.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "dataProvince" -> topLogoff.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
         "dataClients" -> topLogoff.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sortWith(_._2 > _._2),
         "categories" -> topLogoff.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top total kibana
-      val topKibana = Await.result(BrasService.getTopKibana(month,_typeError), Duration.Inf)
+      val topKibana = Await.result(BrasService.getTopKibana(month,_typeError), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
       val kibanaObj = Json.obj(
-        "data" -> topKibana.map(x=>x._2),
-        "categories" -> topKibana.map(x=>x._1)
+        "data" -> topKibana,
+        "dataProvince" -> topKibana.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topKibana.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top total opsview
-      val topOpsview = Await.result(BrasService.getTopOpsview(month,_typeService), Duration.Inf)
+      val topOpsview = Await.result(BrasService.getTopOpsview(month,_typeService), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
       val opsviewObj = Json.obj(
-        "data" -> topOpsview.map(x=>x._2),
-        "categories" -> topOpsview.map(x=>x._1)
+        "data" -> topOpsview,
+        "dataProvince" -> topOpsview.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topOpsview.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top total Inf
       val topInf = Await.result(BrasService.getTopInf(month,_typeInferr), Duration.Inf)
@@ -678,10 +734,12 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "categories" -> topInf.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top Not Passed Suyhao
-      val topSuyhao = Await.result(BrasService.getTopnotSuyhao(month), Duration.Inf)
+      val topSuyhao = Await.result(BrasService.getTopnotSuyhao(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3, x._4))
       val suyhaoObj = Json.obj(
-        "data" -> topSuyhao.map(x=>x._2-> x._3),
-        "categories" -> topSuyhao.map(x=>x._1)
+        "data" -> topSuyhao,
+        "dataProvince" -> topSuyhao.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "dataClients" -> topSuyhao.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topSuyhao.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top 10 OLT By Poor Connections
       val topPoor = Await.result(BrasService.getTopPoorconn(month,_typeOLTpoor), Duration.Inf)
@@ -691,20 +749,20 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       )
 
       val rs = Json.obj(
-        "month" -> monthString,
-        "topSignin" -> siginObj,
-        "topLogoff" -> logoffObj,
-        "topKibana" -> kibanaObj,
+        "month"      -> month,
+        "topSignin"  -> siginObj,
+        "topLogoff"  -> logoffObj,
+        "topKibana"  -> kibanaObj,
         "topOpsview" -> opsviewObj,
-        "topInf" -> infObj,
-        "topSuyhao" ->suyhaoObj,
-        "topPoor" -> poorObj
+        "topInf"     -> infObj,
+        "topSuyhao"  ->suyhaoObj,
+        "topPoor"    -> poorObj
       )
       Ok(Json.toJson(rs))
-    }
+    /*}
     catch{
       case e: Exception => Ok("Error")
-    }
+    }*/
   }
 
   // page NOC
@@ -1168,9 +1226,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def search =  withAuth { username => implicit request: Request[AnyContent] =>
     try {
-      println("Start Controller")
+      logger.info("======Start Service Search======")
       if (request.flash.get("bras").toString != "None") {
-        println(request.flash.get("bras").get.trim)
+        logger.info(request.flash.get("bras").get.trim)
         val _typeS = request.flash.get("_typeS").get
         val time = request.flash.get("date").get
         var day = ""
@@ -1188,15 +1246,15 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         val timeStart= System.currentTimeMillis()
         // for result INF-HOST
         if(_typeS.equals("I")){
-          println("Host")
+          logger.info("Search Host")
           val t00 = System.currentTimeMillis()
           // get errors by host tableIndex
           val errHost = HostService.getInfHostDailyResponse(brasId,day)
-          println("t00:"+ (System.currentTimeMillis() - t00))
+          logger.info("t00:"+ (System.currentTimeMillis() - t00))
           val t01 = System.currentTimeMillis()
           /* get bubble chart sigin and logoff by host */
           val sigLogbyModuleIndex = HostService.getSigLogbyModuleIndex(brasId,day)
-          println("t010:"+ (System.currentTimeMillis() - t01))
+          logger.info("t010:"+ (System.currentTimeMillis() - t01))
           for(i <- 0 until sigLogbyModuleIndex.length){
             // check group both signin and logoff
             if(sigLogbyModuleIndex(i)._2.indexOf("_") >= 0){
@@ -1206,42 +1264,42 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           val siginByModule = arrSiglogModuleIndex.groupBy(_._1).mapValues(_.map(_._3).sum).toArray
           val logoffByModule = arrSiglogModuleIndex.groupBy(_._1).mapValues(_.map(_._4).sum).toArray
           val sigLogModule = (siginByModule++logoffByModule).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toArray
-          println("t01:"+ (System.currentTimeMillis() - t01))
+          logger.info("t01:"+ (System.currentTimeMillis() - t01))
           val t0 = System.currentTimeMillis()
           val noOutlierModule = HostService.getNoOutlierInfByHost(brasId,day)
-          println("t0:"+ (System.currentTimeMillis() - t0))
+          logger.info("t0:"+ (System.currentTimeMillis() - t0))
           val t1 = System.currentTimeMillis()
           /* get total error by hourly*/
           val errorHourly = HostService.getErrorHostbyHourly(brasId,day)
-          println("t1:"+ (System.currentTimeMillis() - t1))
+          logger.info("t1:"+ (System.currentTimeMillis() - t1))
           val t2 = System.currentTimeMillis()
           /* get suyhao by module*/
           val suyhaoModule = Await.result(HostService.getSuyhaobyModule(brasId,day), Duration.Inf)
-          println("t2:"+ (System.currentTimeMillis() - t2))
+          logger.info("t2:"+ (System.currentTimeMillis() - t2))
           val t3 = System.currentTimeMillis()
           /* get sigin and logoff by hourly */
           val sigLogByHourly = HostService.getSiglogByHourly(brasId,day)
-          println("t3:"+ (System.currentTimeMillis() - t3))
+          logger.info("t3:"+ (System.currentTimeMillis() - t3))
           val t4 = System.currentTimeMillis()
           /* get splitter by host*/
           val splitterByHost = Await.result(HostService.getSplitterByHost(brasId,day), Duration.Inf)
-          println("t4:"+ (System.currentTimeMillis() - t4))
+          logger.info("t4:"+ (System.currentTimeMillis() - t4))
           val t5 = System.currentTimeMillis()
           /* get tableIndex error by module and index */
           val errModuleIndex = HostService.getErrorTableModuleIndex(brasId,day)
           val arrModule = errModuleIndex.map(x=>x._1).distinct
           val arrIndex = errModuleIndex.map(x=>x._2).distinct
-          println("t5:"+ (System.currentTimeMillis() - t5))
+          logger.info("t5:"+ (System.currentTimeMillis() - t5))
           val t6 = System.currentTimeMillis()
           // get table contract with sf>300
-          val sfContract = HostService.getContractwithSf(brasId,day)
-          println("t6:"+ (System.currentTimeMillis() - t6))
-          println("timeHost:"+ (System.currentTimeMillis() - t00))
+          val sfContract = Await.result(HostService.getPortPonDown(brasId,day), Duration.Inf)
+          logger.info("t6:"+ (System.currentTimeMillis() - t6))
+          logger.info("timeHost:"+ (System.currentTimeMillis() - t00))
           Ok(device.views.html.search(form,username,HostResponse(noOutlierModule,errHost,errorHourly,sigLogModule,arrSiglogModuleIndex,suyhaoModule,sigLogByHourly,splitterByHost,ErrModuleIndex(arrModule,arrIndex,errModuleIndex),sfContract),null,day,brasId,"I",routes.DeviceController.search))
         }
         // for result BRAS
         else {
-          println("Bras")
+          logger.info("Search Bras")
           /* GET ES CURRENT */
           if (day.split("/")(1).equals(CommonService.getCurrentDay())) {
             // number outlier
@@ -1286,8 +1344,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           logger.info("tKibanaBytime: " + (System.currentTimeMillis() - t20))
           // INF ERROR
           val t3 = System.currentTimeMillis()
-          val arrInferror = BrasService.getInfErrorBytimeResponse(brasId, day, 0)
-          val infErrorBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrInferror, x)).toArray
+          val infErrorBytime = BrasService.getInfErrorBytimeResponse(brasId, day, 0)
+          //val infErrorBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrInferror, x)).toArray
           logger.info("tInfErrorBytime: " + (System.currentTimeMillis() - t3))
           val t30 = System.currentTimeMillis()
           //val infErrorBytime = null
@@ -1348,7 +1406,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         }
       }
       else{
-        println("Empty data")
+        logger.info("Empty data")
         Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
       }
     }
@@ -1361,7 +1419,6 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     try{
       val t0 = System.currentTimeMillis()
       val rsHost = Await.result(BrasService.getHostBras(id), Duration.Inf)
-    //logger.info("success 0")
       val re = rsHost.map(
         iter =>
           Json.obj(
@@ -1415,8 +1472,24 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val brasKibana = Await.result(BrasService.getKibana(idBras,time,oldTime), Duration.Inf)
       logger.info("tOpKiba: " + (System.currentTimeMillis() - t4))
 
-      //logger.info("success 4")
+      val t5 = System.currentTimeMillis()
+      val signinUnique = if(_type == "LogOff") Await.result(BrasService.getSigninUnique(idBras, time), Duration.Inf).map(x=> x._2).sum
+                         else Await.result(BrasService.getSigninUnique(idBras, time), Duration.Inf).map(x=> x._1).sum
+      val trackingUser = Await.result(BrasService.getTrackingUser(idBras, time), Duration.Inf).toArray
+      val users = if(trackingUser.length > 0) trackingUser(0)._1 else 0
+      val perct = if(trackingUser.length > 0) trackingUser(0)._2 else 0
+      val metricErr = Await.result(BrasService.getErrorMetric(idBras, time), Duration.Inf).sum
+      val metrics = Json.obj(
+        "signin" -> signinUnique,
+        "label"  -> s"${_type} Unique",
+        "error"  -> metricErr,
+        "users"  -> users,
+        "perct"  -> perct
+      )
+      logger.info("metrics: " + (System.currentTimeMillis() - t5))
+
       val jsBras = Json.obj(
+        "metrics" -> metrics,
         "host" -> re,
         "sigLog" -> sigLog,
         "time" -> brasChart.map({ t => CommonService.formatUTC(t._1.toString)}),

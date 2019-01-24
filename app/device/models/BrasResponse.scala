@@ -74,7 +74,7 @@ case class KibanaOverview(
                               arrErrorType: Array[(String,Long)],
                               arrFacility: Array[(String,Long)],
                               arrDdos: Array[(String,Long)],
-                              arrSevValue:  Array[((String,String),Long)]
+                              arrSevValue:  Array[(String,String,String,Long)]
                             )
 case class BrasOutlier(
                       time: String,
@@ -94,7 +94,7 @@ case class DailyResponse(
                         kibanaOpsview:  (Array[(Int, Int)], Array[(Int, Int)]),
                         sigLogByHourly:  SigLogClientsDaily,
                         rsErrorsInf:   Array[(String, Double)],
-                        rsErrorHostDaily: Array[(String, Double, Double, Double, Double,Double,Double)],
+                        rsErrorHostDaily: Array[(String, Double, Double, Double, Double,Double,Double,Double)],
                         brasOutlier:   Array[(String, Int)],
                         infOutlier :   Array[(String, Int)]
                         )
@@ -103,7 +103,7 @@ case class BrasResponse(
                             currentsInfo: BrasInfor,
                             kibanaOpviewBytime: KibanaOpviewByTime,
                             sigLogBytime: SigLogByTime,
-                            infErrorBytime: Array[(Int,Int)],
+                            infErrorBytime: Array[(Int,Int, Int,Int, Int,Int,Int,Int)],
                             infHostBytime: Array[(String,Long,Long)],
                             infModuleBytime: Array[(String,String,Long,Long,Long)],
                             opServiceStt: Seq[(String,Int)],

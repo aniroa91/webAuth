@@ -15,7 +15,7 @@ import com.ftel.bigdata.utils.DateTimeUtil
 
 object HostService extends AbstractService{
 
-  def getInfHostDailyResponse(host: String,nowDay: String): Array[(String,Int,Int,Int,Int,Int,Int)] = {
+  def getInfHostDailyResponse(host: String,nowDay: String): Array[(String,Int,Int,Int,Int,Int,Int,Int)] = {
     InfDAO.getInfHostDailyResponse(host,nowDay)
   }
 
@@ -31,7 +31,7 @@ object HostService extends AbstractService{
     InfDAO.getSigLogbyModuleIndex(host,nowDay)
   }
 
-  def getErrorHostbyHourly(host: String,nowDay: String): Array[(Int,Int,Int,Int,Int,Int,Int)] = {
+  def getErrorHostbyHourly(host: String,nowDay: String): Array[(Int,Int,Int,Int,Int,Int,Int,Int)] = {
     InfDAO.getErrorHostbyHourly(host,nowDay)
   }
 
@@ -51,8 +51,8 @@ object HostService extends AbstractService{
     InfDAO.getErrorTableModuleIndex(host,nowDay)
   }
 
-  def getContractwithSf(host: String,nowDay: String): Array[(String,Int,Int,Int,Int)] = {
-    InfDAO.getContractwithSf(host,nowDay)
+  def getPortPonDown(host: String,nowDay: String): Future[Seq[(String,String,String)]] = {
+    InfDAO.getPortPonDown(host,nowDay)
   }
 
 }

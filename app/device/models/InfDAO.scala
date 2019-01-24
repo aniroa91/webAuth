@@ -26,7 +26,7 @@ object InfDAO {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
-  def getInfHostDailyResponse(host: String,nowDay: String): Array[(String,Int,Int,Int,Int,Int,Int)] = {
+  def getInfHostDailyResponse(host: String,nowDay: String): Array[(String,Int,Int,Int,Int,Int,Int,Int)] = {
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
 
@@ -44,13 +44,14 @@ object InfDAO {
             sumAgg("sum2","user_down"),
             sumAgg("sum3","inf_down"),
             sumAgg("sum4","rouge_error"),
-            sumAgg("sum5","lost_signal")
+            sumAgg("sum5","lost_signal"),
+            sumAgg("sum6", "jumper_error")
           )
         )  size 1000
     ).await
 
     val arrHostDaily = CommonService.getAggregationsKeyStringAndMultiSum(res.aggregations.get("daily"))
-    arrHostDaily.map(x=> (CommonService.formatUTC(x._1),x._2,x._3,x._4,x._5,x._6,x._7))
+    arrHostDaily.map(x=> (CommonService.formatUTC(x._1),x._2,x._3,x._4,x._5,x._6,x._7, x._8))
 
     /*dbConfig.db.run(
       sql"""select date_trunc('day' ,  date_time) as daily,sum(sf_error),sum(lofi_error),sum(user_down),sum(inf_down),sum(rouge_error),sum(lost_signal)
@@ -110,7 +111,7 @@ object InfDAO {
         .as[(String,Double,Double,Double)])
   }
 
-  def getErrorHostbyHourly(host: String,nowDay: String): Array[(Int,Int,Int,Int,Int,Int,Int)] = {
+  def getErrorHostbyHourly(host: String,nowDay: String): Array[(Int,Int,Int,Int,Int,Int,Int,Int)] = {
     val res = client.execute(
       search(s"infra_dwh_inf_host_*" / "docs")
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
@@ -125,13 +126,14 @@ object InfDAO {
             sumAgg("sum2","sf_error"),
             sumAgg("sum3","lofi_error"),
             sumAgg("sum4","rouge_error"),
-            sumAgg("sum5","lost_signal")
+            sumAgg("sum5","lost_signal"),
+            sumAgg("sum6", "jumper_error")
           )
         )  size 1000
     ).await
-    val arrHostHourly = CommonService.getAggregationsKeyStringAndMultiSum(res.aggregations.get("hourly")).map(x=> (CommonService.getHourFromES5(x._1),x._2,x._3,x._4,x._5,x._6,x._7))
-    val errorRes = arrHostHourly.groupBy(_._1).map{case (k,v) => k -> (v.map(x=> x._2).sum,v.map(x=> x._3).sum,v.map(x=> x._4).sum,v.map(x=> x._5).sum,v.map(x=> x._6).sum,v.map(x=> x._7).sum)}
-    errorRes.map(x=> (x._1,x._2._1,x._2._2,x._2._3,x._2._4,x._2._5,x._2._6)).toArray.sorted
+    val arrHostHourly = CommonService.getAggregationsKeyStringAndMultiSum(res.aggregations.get("hourly")).map(x=> (CommonService.getHourFromES5(x._1),x._2,x._3,x._4,x._5,x._6,x._7,x._8))
+    val errorRes = arrHostHourly.groupBy(_._1).map{case (k,v) => k -> (v.map(x=> x._2).sum,v.map(x=> x._3).sum,v.map(x=> x._4).sum,v.map(x=> x._5).sum,v.map(x=> x._6).sum,v.map(x=> x._7).sum,v.map(x=> x._7).sum)}
+    errorRes.map(x=> (x._1,x._2._1,x._2._2,x._2._3,x._2._4,x._2._5,x._2._6,x._2._7)).toArray.sorted
 
    /* dbConfig.db.run(
       sql"""select  extract(hour from  date_time) as hourly,sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error),sum(rouge_error),sum(lost_signal)
@@ -224,7 +226,7 @@ object InfDAO {
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
         termsAggregation("module")
-          .field("module")
+          .field("module.keyword")
           .subAggregations(
             termsAggregation("index")
               .field("index")
@@ -236,9 +238,8 @@ object InfDAO {
                 sumAgg("sum4","rouge_error"),
                 sumAgg("sum5","lost_signal")
               ) size 1000
-          ))
+          )) size 0
     ).await
-
     val mapModule = CommonService.getSecondAggregationsAndSumInfError(response.aggregations.get("module"),"index")
     val rsModuleInex = mapModule.flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1, x._2._1.toInt, (x._2._2+x._2._3+x._2._4+x._2._5+x._2._6+x._2._7).toInt))
@@ -253,8 +254,8 @@ object InfDAO {
         .as[(String,Int,Int)])*/
   }
 
-  def getContractwithSf(host: String,nowDay: String): Array[(String,Int,Int,Int,Int)] = {
-    val response = client.execute(
+  def getPortPonDown(host: String,nowDay: String): Future[Seq[(String,String,String)]] = {
+   /* val response = client.execute(
       search(s"infra_dwh_inf_index_*" / "docs")
         query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
@@ -274,16 +275,16 @@ object InfDAO {
     val mapContractSf = CommonService.getSecondAggregationsAndSumContractSf(response.aggregations.get("module"),"index")
     val rsContract = mapContractSf.flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1, x._2._1.toInt, x._2._2.toInt,x._2._3.toInt,x._2._4.toInt)).filter(x=> x._3>300)
-    rsContract
-
-    /*dbConfig.db.run(
-      sql"""select module,index,sum(sf_error) as sf_error,sum(sign_in) as sigin,sum(log_off) as logoff
-            from dwh_inf_index
+    rsContract*/
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = nowDay.split("/")(1)
+    dbConfig.db.run(
+      sql"""select date_time, module,result
+            from dwh_inf_port_pon
             where host= $host and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
-            group by module,index
-            having sum(sf_error)>300
+            order by date_time desc
                   """
-        .as[(String,Int,Int,Int,Int)])*/
+        .as[(String,String,String)])
   }
 
 }

@@ -106,10 +106,11 @@
                                         <th>Date</th>
                                         <th>Sf error</th>
                                         <th>Lofi error</th>
-                                        <th>User down</th>
-                                        <th>Inf down</th>
+                                        <th>Port PON down</th>
+                                        <th>Port INF down</th>
                                         <th>Rouge error</th>
                                         <th>Lost signal</th>
+                                        <th>Sf Module</th>
                                     </tr>
                                 </thead>
                                 @if(rsInfhost.infHostdaily != null) {
@@ -122,6 +123,7 @@
                                             <th>@rsInfhost.infHostdaily.map(x=>x._5).sum</th>
                                             <th>@rsInfhost.infHostdaily.map(x=>x._6).sum</th>
                                             <th>@rsInfhost.infHostdaily.map(x=>x._7).sum</th>
+                                            <th>@rsInfhost.infHostdaily.map(x=>x._8).sum</th>
                                         </tr>
                                     </tfoot>
                                     <tbody >
@@ -134,6 +136,7 @@
                                             <td>@rsInfhost.infHostdaily(i)._5</td>
                                             <td>@rsInfhost.infHostdaily(i)._6</td>
                                             <td>@rsInfhost.infHostdaily(i)._7</td>
+                                            <td>@rsInfhost.infHostdaily(i)._8</td>
                                         </tr>
                                     }
                                     </tbody>
@@ -151,7 +154,15 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content fixed_height_320">
-                            <div id="heat_mapInfTab" style="height: 250px;"></div>
+                            <div class="container">
+                                <ul class="nav nav-pills nav-stacked col-md-2" style="margin-top: 40px">
+                                    <li name="0" style="cursor: pointer" class="active"><a data-toggle="pill">HOURLY</a></li>
+                                    <li name="1" style="cursor: pointer"><a style="font-size: 12px" data-toggle="pill">FRAME TIME</a></li>
+                                </ul>
+                                <div class="tab-content col-md-10">
+                                    <div id="heat_mapInfTab" style="height: 250px;"></div>
+                                </div><!-- tab content -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -238,28 +249,18 @@
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="x_panel tile " style="height: 375px;padding: 0px;">
                         <div class="card-header">
-                            Contract with sf >300
+                            Cause port pon down
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
                             <table class="data table table-bordered tbScroll" id="tbSf" style="width: 100%">
                                 <thead >
                                     <tr>
+                                        <th>Date Time</th>
                                         <th>Module</th>
-                                        <th>Index</th>
-                                        <th>Sf</th>
-                                        <th>Signin</th>
-                                        <th>Logoff</th>
+                                        <th>Result</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="2" class="txtCenter">Total</th>
-                                        <th>@rsInfhost.sfContract.map(x=> x._3).sum</th>
-                                        <th>@rsInfhost.sfContract.map(x=> x._4).sum</th>
-                                        <th>@rsInfhost.sfContract.map(x=> x._5).sum</th>
-                                    </tr>
-                                </tfoot>
                                 @if(rsInfhost.sfContract != null) {
                                     <tbody >
                                     @for(i <- 0 until rsInfhost.sfContract.length) {
@@ -267,8 +268,6 @@
                                             <th>@rsInfhost.sfContract(i)._1</th>
                                             <th>@rsInfhost.sfContract(i)._2</th>
                                             <td>@rsInfhost.sfContract(i)._3</td>
-                                            <td>@rsInfhost.sfContract(i)._4</td>
-                                            <td>@rsInfhost.sfContract(i)._5</td>
                                         </tr>
                                     }
                                     </tbody>
@@ -483,8 +482,9 @@
                                     <div class="x_content">
                                         <table class="data table table-bordered" style="margin-bottom: 0px">
                                             <thead>
-                                                <th class="thTop" style="width: 17.5%">Severity</th>
-                                                <th class="thTop" style="width:63%;">Error_name</th>
+                                                <th class="thTop" style="width: 14.5%">Type</th>
+                                                <th class="thTop" style="width: 16.5%">Severity</th>
+                                                <th class="thTop" style="width:58%;">Error_name</th>
                                                 <th class="thTop">Nerror</th>
                                             </thead>
                                         </table>
@@ -493,9 +493,10 @@
                                             <tbody>
                                             @for(i <- 0 until response.kibanaOverview.arrSevValue.length) {
                                                 <tr>
-                                                    <td style="width: 18%">@response.kibanaOverview.arrSevValue(i)._1._1</td>
-                                                    <td style="width: 65%">@response.kibanaOverview.arrSevValue(i)._1._2</td>
-                                                    <td>@response.kibanaOverview.arrSevValue(i)._2</td>
+                                                    <td style="width: 10%">@response.kibanaOverview.arrSevValue(i)._1</td>
+                                                    <td style="width: 18%">@response.kibanaOverview.arrSevValue(i)._2</td>
+                                                    <td style="width: 60%">@response.kibanaOverview.arrSevValue(i)._3</td>
+                                                    <td>@response.kibanaOverview.arrSevValue(i)._4</td>
                                                 </tr>
                                             }
                                             </tbody>
@@ -694,7 +695,7 @@
     <script type="text/javascript" src="../assets/vendors/moment/moment.js"></script>
         <!--  Datepicker -->
     <script type="text/javascript" src="../assets/vendors/daterangepicker/daterangepicker.js"></script>
-
+    <script src="../assets/javascripts/common.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
                 // radio button click
@@ -983,7 +984,7 @@
                     }
                     // heat-map hourly error
                     @if(rsInfhost.errorHourly != null){
-                        Highcharts.chart('heat_mapInfTab', {
+                        var heat_mapInfTab = Highcharts.chart('heat_mapInfTab', {
                             chart: {
                                 type: 'heatmap',
                                 marginTop: 40,
@@ -999,7 +1000,7 @@
                             },
 
                             yAxis: {
-                                categories: ['user_down','inf_down','sf_error','lofi_error','rouge_error','lost_signal'],
+                                categories: ['Port PON down','Port INF down','Sf Error','Lofi Error','Rouge Error','Lost Signal','Sf Module'],
                                 title: null
                             },
 
@@ -1037,6 +1038,25 @@
                             }]
 
                         });
+                        // click group time tab
+                        $('.nav-pills li').click( function () {
+                            // _type: 0 hourly time
+                            // _type: 1 frame time
+                            $.ajax({
+                                url: "/getInfErrHourly?_type=1&id=" + $(this).attr('name')+"&day="+$('#date').val()+"&bras="+$('#bras').val(),
+                                cache: false,
+                                success: function (dta) {
+                                    if(dta != "Error"){
+                                        // update chart Heatmap
+                                        heat_mapInfTab.xAxis[0].update({categories: dta.cates})
+                                        heat_mapInfTab.series[0].setData(getErrorHourlyHeatmap(dta.data), true,true,false)
+                                    }
+                                    else{
+                                        alert("Error when execute query. Please check again your system!")
+                                    }
+                                }
+                            })
+                        })
                     }
                   // bubble chart module index
                   @if(rsInfhost.sigLogByModule != null){
@@ -1674,7 +1694,7 @@
                         },
 
                         yAxis: {
-                            categories: ['Nerror'],
+                            categories: ['Port PON down','Port INF down','Sf Error','Lofi Error','Rouge Error','Lost Signal','Sf Module'],
                             title: null
                         },
 
@@ -1703,7 +1723,7 @@
                         series: [{
                             name: 'Logoff per card',
                             borderWidth: 1,
-                            data: getDataHeatmap(@Html(Json.stringify(Json.toJson(response.infErrorBytime)))),
+                            data: getErrorHourlyHeatmap(@Html(Json.stringify(Json.toJson(response.infErrorBytime)))),
                             /*[[0, 0, 10], [1, 0, 92], [2, 0, 35], [3, 0, 72], [4, 0, 38], [5, 0, 88],  [6, 0, 13], [7, 0, 31], [8, 0, 85],  [9, 0, 47]],*/
                             dataLabels: {
                                 enabled: true,
@@ -1759,17 +1779,6 @@
                         value: Number(appHour[i][1]),
                         colorValue: Number(appHour[i][1]),
                     });
-                }
-                return jsonArr
-            }
-
-            function getErrorHourlyHeatmap(data){
-                var jsonArr = [];
-                for (var i =0 ; i < data.length; i++) {
-                    for(var j=0;j<6;j++){
-                      //if(Number(data[i][j])>0)
-                          jsonArr.push([Number(data[i][0]),j,Number(data[i][j+1])]);
-                    }
                 }
                 return jsonArr
             }

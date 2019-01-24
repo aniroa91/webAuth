@@ -4,6 +4,7 @@
 @import play.api.libs.json.Json
 @import services.domain.CommonService.getEndDate
 @import services.domain.CommonService.getStartDate
+@import device.utils.CommonUtils
 
 <!DOCTYPE html>
 
@@ -59,6 +60,7 @@
         <!-- page content -->
     <div class="right_col" role="main">
         @if(response != null){
+            <input type="hidden" id="bras" value="*">
             <div class="row top_tiles">
                 <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
                     <div class="x_panel tile">
@@ -300,7 +302,15 @@
                         </div>
                         <div class="x_content" style="text-align: center">
                         @if(response.rsErrorHostDaily.length >0) {
-                            <div id="heat_mapInfTab" style="height: 250px"></div>
+                            <div class="container">
+                                <ul class="nav nav-pills nav-stacked col-md-2" style="margin-top: 40px">
+                                    <li name="0" style="cursor: pointer" class="active"><a data-toggle="pill" style="width: 50%">HOURLY</a></li>
+                                    <li name="1" style="cursor: pointer"><a data-toggle="pill" style="width: 50%">FRAME TIME</a></li>
+                                </ul>
+                                <div class="tab-content col-md-10">
+                                    <div id="heat_mapInfTab" style="height: 250px"></div>
+                                </div><!-- tab content -->
+                            </div><!-- end of container -->
                         }else{
                             <span style="font-size: 13px">Not find data on @day</span>
                         }
@@ -364,6 +374,7 @@
     <script src="../assets/javascripts/treemap.js"></script>
     <script src="../assets/javascripts/funnel.js"></script>
     <script src="../assets/javascripts/drilldown.js"></script>
+    <script src="../assets/javascripts/common.js"></script>
         <!--  Datepicker -->
     <script src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript">
@@ -544,7 +555,7 @@
                             },
 
                             yAxis: {
-                                categories: ['user_down', 'inf_down', 'sf_error', 'lofi_error', 'rouge_error', 'lost_signal'],
+                                categories: ['Port PON down','Port INF down','Sf Error','Lofi Error','Rouge Error','Lost Signal','Sf Module'],
                                 title: null
                             },
 
@@ -579,6 +590,25 @@
                             }]
 
                         });
+                        // click group time tab
+                        $('.nav-pills li').click( function () {
+                            // _type: 0 hourly time
+                            // _type: 1 frame time
+                            $.ajax({
+                                url: "/getInfErrHourly?_type=0&id=" + $(this).attr('name')+"&day="+$('#day').val()+"&bras="+$('#bras').val(),
+                                cache: false,
+                                success: function (dta) {
+                                    if(dta != "Error"){
+                                        // update chart Heatmap
+                                        heat_mapInfTab.xAxis[0].update({categories: dta.cates})
+                                        heat_mapInfTab.series[0].setData(getErrorHourlyHeatmap(dta.data), true,true,false)
+                                    }
+                                    else{
+                                        alert("Error when execute query. Please check again your system!")
+                                    }
+                                }
+                            })
+                        })
                     }
                     @if(response.rsErrorsInf.length >0 ){
                         var errors_inf = Highcharts.chart('region-inf', {
@@ -940,7 +970,7 @@
                     // Select box Bras Location
                     $('.dropdown-child').click(function () {
                         var brasId = $(this).find('.dropdown-text').text()
-                        console.log(brasId)
+                        $('#bras').val((brasId == "All") ? "*" : brasId)
                         $.ajax({
                             url: "/getDailyByBrasLocation?id=" + brasId+"&day="+$('#day').val(),
                             cache: false,
@@ -988,6 +1018,9 @@
                                         }
                                     }
                                     treemapError.series[0].setData(getJsonTreemap(dta.data))
+                                }
+                                else{
+                                    alert("Error when execute query. Please check again your system!")
                                 }
                             }
                         })
@@ -1061,6 +1094,9 @@
                                     //bar_notice.series[0].setData(getDrildownStackBar(dta.data, dta.cates))
                                     //bar_notice.options.drilldown.series[0] = getDrillDown2Level(dta.data, dta.cates)
                                 }
+                                else{
+                                    alert("Error when execute query. Please check again your system!")
+                                }
                             }
                         })
                     })
@@ -1113,6 +1149,9 @@
                                     chartSigLogDaily.series[0].setData(addParamClients(dta.signin))
                                     chartSigLogDaily.series[1].setData(addParamClients(dta.logoff))
                                 }
+                                else{
+                                    alert("Error when execute query. Please check again your system!")
+                                }
                             }
                         })
                     }
@@ -1163,6 +1202,9 @@
                                         }
                                     }
                                     errors_inf.series[0].setData(dta.data)
+                                }
+                                else{
+                                    alert("Error when execute query. Please check again your system!")
                                 }
                             }
                         })
@@ -1311,6 +1353,9 @@
                                     //heat_bras_outlier.yAxis[0].update({categories: dta.key})
                                     //heat_bras_outlier.series[0].setData(getHeatmapBrasOutlier(dta.data, dta.key))
                                 }
+                                else{
+                                    alert("Error when execute query. Please check again your system!")
+                                }
                             }
                         })
                     }
@@ -1446,6 +1491,9 @@
                                         $('#inf-outlier .highcharts-button').hide()
                                     }
                                 }
+                                else{
+                                    alert("Error when execute query. Please check again your system!")
+                                }
                             }
                         })
                     }
@@ -1574,17 +1622,6 @@
                     rs.push([0, i, sumVl])
                 }
                 return rs
-            }
-
-            function getErrorHourlyHeatmap(data){
-                var jsonArr = [];
-                for (var i =0 ; i < data.length; i++) {
-                    for(var j=0;j<6;j++){
-                        //if(Number(data[i][j])>0)
-                        jsonArr.push([Number(data[i][0]),j,Number(data[i][j+1])]);
-                    }
-                }
-                return jsonArr
             }
 
             // order by array objects

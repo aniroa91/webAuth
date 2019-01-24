@@ -112,6 +112,32 @@
             </div>
         </div>
         <br>
+        <div class="row metricGrp" style="display: none">
+            <div class="divCircle col-lg-3 col-sm-3 col-md-3 col-xs-12">
+                <div class="circle">
+                    <div class="numberMetric signinVl"></div>
+                    <div class="txtMetric signinLabel"></div>
+                </div>
+            </div>
+            <div class="divCircle col-lg-3 col-sm-3 col-md-3 col-xs-12">
+                <div class="circle">
+                    <div class="numberMetric metricErr"></div>
+                    <div class="txtMetric">Inf Error</div>
+                </div>
+            </div>
+            <div class="divCircle col-lg-3 col-sm-3 col-md-3 col-xs-12">
+                <div class="circle">
+                    <div class="numberMetric metricUser">12</div>
+                    <div class="txtMetric">Number User</div>
+                </div>
+            </div>
+            <div class="divCircle col-lg-3 col-sm-3 col-md-3 col-xs-12">
+                <div class="circle">
+                    <div class="numberMetric metricPerct"></div>
+                    <div class="txtMetric">Percentage</div>
+                </div>
+            </div>
+        </div>
         <div class="row" style="margin-top: 15px">
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12" id="divBras" style="display: none">
                     <table class="data table table-bordered" id="tbBras" style="margin-bottom: 0px">
@@ -571,6 +597,12 @@
                             },
                             success: function (dtBras) {
                                 if(dtBras != "Error"){
+                                    $('.metricGrp').show()
+                                    $('.signinVl').text(dtBras.metrics.signin)
+                                    $('.signinLabel').text(dtBras.metrics.label)
+                                    $('.metricUser').text(dtBras.metrics.users)
+                                    $('.metricPerct').text(dtBras.metrics.perct +'%')
+                                    $('.metricErr').text(dtBras.metrics.error)
                                     $('#divBras').show();
                                     // table Bras
                                     var tbBras = $('#tbBras').DataTable( {

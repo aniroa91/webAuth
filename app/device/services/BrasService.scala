@@ -19,6 +19,18 @@ import scala.concurrent.duration.Duration
 
 object BrasService extends AbstractService{
 
+  def getErrorMetric(bras: String, time: String) = {
+    BrasDAO.getErrorMetric(bras, time)
+  }
+
+  def getSigninUnique(bras: String, time: String) = {
+    BrasDAO.getSigninUnique(bras, time)
+  }
+
+  def getTrackingUser(bras: String, time: String) = {
+    BrasDAO.getTrackingUser(bras, time)
+  }
+
   def getMinMaxMonth(): Future[Seq[(String,String)]] = {
     BrasDAO.getMinMaxMonth()
   }
@@ -99,7 +111,7 @@ object BrasService extends AbstractService{
     BrasDAO.getTopLogoff(month)
   }
 
-  def getTopKibana(month: String,_typeError: String): Future[Seq[(String,Int)]]   ={
+  def getTopKibana(month: String,_typeError: String): Future[Seq[(String,String,Int)]]   ={
     BrasDAO.getTopKibana(month,_typeError)
   }
 
@@ -127,7 +139,7 @@ object BrasService extends AbstractService{
     BrasDAO.getSigLogByBras(month,bras,lastMonth)
   }
 
-  def getTopOpsview(month: String,_typeService: String): Future[Seq[(String,Int)]]   ={
+  def getTopOpsview(month: String,_typeService: String): Future[Seq[(String,String,Int)]]   ={
     BrasDAO.getTopOpsview(month,_typeService)
   }
 
@@ -135,7 +147,7 @@ object BrasService extends AbstractService{
     BrasDAO.getTopInf(month,_typeInferr)
   }
 
-  def getTopnotSuyhao(month: String): Future[Seq[(String,Int,Int)]]   ={
+  def getTopnotSuyhao(month: String): Future[Seq[(String,String,Int,Int)]]   ={
     BrasDAO.getTopnotSuyhao(month)
   }
 
@@ -633,7 +645,7 @@ object BrasService extends AbstractService{
     BrasDAO.getSigLogBytimeCurrent(bras,nowDay)
   }
 
-  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly: Int): Array[(Int,Int)] = {
+  def getInfErrorBytimeResponse(bras: String,nowDay: String,hourly: Int): Array[(Int,Int, Int,Int, Int,Int,Int,Int)] = {
     BrasDAO.getInfErrorBytimeResponse(bras,nowDay,hourly)
   }
 
@@ -691,7 +703,7 @@ object BrasService extends AbstractService{
   def getSeveValueResponse(bras: String,nowDay: String):Future[Seq[(String,String,Int)]] = {
     BrasDAO.getSeveValueResponse(bras,nowDay)
   }
-  def getSeveValueES(bras: String,nowDay: String):  Array[((String,String),Long)] = {
+  def getSeveValueES(bras: String,nowDay: String):  Array[(String,String,String,Long)] = {
     BrasDAO.getSeveValueES(bras,nowDay)
   }
 

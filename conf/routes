@@ -27,6 +27,7 @@ GET      /device                       controllers.DeviceController.overview
 
 GET      /daily                        controllers.DeviceController.getDaily
 POST     /daily                        controllers.DeviceController.getFormDayPicker
+GET      /getInfErrHourly              controllers.DeviceController.getErrInfHourly(_type: String ?= "", id: String ?= "", day: String ?= "", bras: String ?= "")
 GET      /drilldownSigLogDaily         controllers.DeviceController.drilldownSigLogDaily(id: String ?= "",day: String ?= "")
 GET      /drilldownErrorDevice         controllers.DeviceController.drilldownErrorDevice(id: String ?= "",day: String ?= "",err: String ?= "")
 GET      /getServNoticeByType          controllers.DeviceController.getServNoticeByType(noti: String ?= "",day: String ?= "")

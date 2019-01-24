@@ -247,6 +247,39 @@
             .top_nav .navbar-right {
                 width: auto;
             }
+            .txtMetric{
+                font-size: 14px;
+            }
+            .numberMetric{
+                font-size: 34px;
+            }
+            .divCircle{
+                padding-left: 100px;
+            }
+            .circle {
+                /* circle styles */
+                width: 150px;
+                height: 150px;
+                border: 1px solid #222;
+                border-radius: 50%;
+                color: #fff;
+                background: linear-gradient(to right, #047edf, #6cb1e8 99%);
+                /* become a flex container */
+                /* its children will be flex items */
+                display: flex;
+                /* place items in column */
+                flex-direction: column;
+                /* center flex items horizontally */
+                align-items: center;
+                /* center all content vertically */
+                justify-content: center;
+            }
+
+            /* simulate one more item to "balance" dex text */
+            .circle:before {
+                content: "\A0";
+                visibility: hidden;
+            }
             .panel-heading {
                 padding: 10px 10px 0px!important;
                 border-bottom: 0px solid transparent!important;
@@ -617,6 +650,13 @@
             .top_nav .navbar-right {
                 width: auto;
             }
+            .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover{
+                background-color: #e02d57;
+                font-weight: 600;
+            }
+            .nav-pills>li>a:focus, .nav-pills>li>a, .nav-pills>li>a:hover{
+                background-color: #eee;
+            }
             .datepicker table tr td span:hover, .datepicker table tr td span.focused {
                 background: #5A738E;
                 color: #fff;
@@ -809,6 +849,13 @@
         <style type="text/css">
                 .top_nav .navbar-right {
                     width: auto;
+                }
+                .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover{
+                    background-color: #e02d57;
+                    font-weight: 600;
+                }
+                .nav-pills>li>a:focus, .nav-pills>li>a, .nav-pills>li>a:hover{
+                    background-color: #eee;
                 }
                 .panel-heading {
                     padding: 10px 10px 0px!important;
