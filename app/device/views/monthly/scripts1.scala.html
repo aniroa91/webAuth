@@ -17,8 +17,11 @@
                         var startDate = new Date(selected.date.valueOf());
                         var yr = startDate.getFullYear();
                         var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth() + 1)) : (Number(startDate.getMonth() + 1));
-                        var newDate = yr + '-' + month;
-                        callAjaxTopN(newDate)
+                        var newDate = yr + '-' + month
+                        if($('.tabControl .active').attr('name') == 'tabTop')
+                           callAjaxTopN(newDate)
+                        else if($('.tabControl .active').attr('name') == 'tabCompare')
+                           callAjaxCompare(newDate)
                 });
                 // datepicker for tab Overview
                 $('#startMonth').datepicker({
@@ -879,37 +882,45 @@
                 }
         });
 
-        $(".tab-slider--nav li").click(function() {
+        $(".controls li").click(function() {
                 var active = 0
                 if($(this).hasClass('active')){
                         active = 1
                 }
-                $(".tab-slider--body").hide();
-                var activeTab = $(this).attr("rel");
+                $(".tab-slider--body").hide()
+                var activeTab = $(this).attr("name")
                 $("#"+activeTab).fadeIn();
+                $('.controls .nav li').removeClass('active')
                 // for tab TOP N
-                if($(this).attr("rel") == "tabTop"){
+                if($(this).attr("name") == "tabTop"){
                         $('#divTopN').show();
                         $('#monthTab1').hide()
-                        $('.tab-slider--tabs').addClass('slide');
-                        $(".tab-slider--nav li").removeClass("active");
-                        $(this).addClass("active");
-                        if(active == 0 && $('#isClicked').val()==0)
-                                callAjaxTopN($('#month').val());
+                        $(this).addClass("active")
+                        if(active == 0 && $('#isClickedTab2').val()==0)
+                                callAjaxTopN($('#month').val())
                 }
                 // for tab Overview
-                else{
+                else if($(this).attr("name") == "tabOverview"){
                         $('#monthTab1').show()
                         $('#divTopN').hide()
-                        $('.tab-slider--tabs').removeClass('slide');
-                        $(".tab-slider--nav li").removeClass("active");
-                        $(this).addClass("active");
+                        $(this).addClass("active")
+                }
+                // for tab Compare
+                else{
+                        $('#divTopN').show();
+                        $('#monthTab1').hide()
+                        $(this).addClass("active")
+                        if(active == 0 && $('#isClickedTab3').val()==0)
+                                callAjaxCompare($('#month').val())
                 }
         });
 
         function getTopNByRegion(){
                 //$('#month').val("")
-                callAjaxTopN("");
+                if($('.tabControl .active').attr('name') == 'tabCompare')
+                        callAjaxCompare("")
+                else if($('.tabControl .active').attr('name') == 'tabTop')
+                        callAjaxTopN("")
         }
 
         function getSigLogByRegionStacked(sigIn,logOff,signinClients,logoffClients,cates){
@@ -2051,414 +2062,6 @@
                 }
 
                 return retVal;
-        }
-
-        // for page TOP N
-        function callAjaxTopN(month){
-                var _typeError = $('#typeKibanaError').val()
-                var _typeService = $('#typeServiceStatus').val()
-                var _typeOLTpoor = $('#typeOLTpoor').val()
-                var _typeInftoperr = $('#typeInftoperr').val()
-                $.ajax({
-                        url: "/topN-json?month="+month+"&_typeError="+_typeError+"&_typeService="+_typeService+'&_typeOLTpoor='+_typeOLTpoor+'&_typeInftoperr='+_typeInftoperr,
-                        cache: false,
-                        beforeSend: function () {
-                                $('#divTabTop').waitMe({
-                                        effect: 'roundBounce',
-                                        text: 'Please wait...',
-                                        bg: 'rgba(255,255,255,0.7)',
-                                        color: '#000',
-                                        textPos: 'vertical'
-                                });
-                        },
-                        success: function (dta) {
-                                if(dta != "Error"){
-                                        var monthStr = dta.month
-                                        $("#monthPickerTop").datepicker("update", monthStr)
-                                        $('#isClicked').val(1)
-                                        // top 10 sigin
-                                        Highcharts.chart('bar-signin', {
-                                                chart: {
-                                                        type: 'bar'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        type: 'category'
-                                                },
-                                                yAxis: {
-                                                        min: 0,
-                                                        title: {
-                                                                text: ''
-                                                        }
-                                                },
-                                                legend: {
-                                                        reversed: true
-                                                },
-                                                plotOptions: {
-                                                        series: {
-                                                                stacking: 'normal'
-                                                        }
-                                                },
-                                                tooltip : {
-                                                        headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
-                                                        pointFormat: '<b>{point.name}: {point.y}</b><br/>Total signin clients: {point.k}'
-                                                },
-                                                series: [{
-                                                        name: 'Province',
-                                                        data: getJsonDrillParenthaveClients(dta.topSignin.dataProvince, dta.topSignin.dataClients),
-                                                        color: '#1ABB9C'
-                                                }],
-                                                drilldown: {
-                                                        drillUpButton: {
-                                                                relativeTo: 'spacingBox',
-                                                                position: {
-                                                                        y: 0,
-                                                                        x: 0
-                                                                },
-                                                                theme: {
-                                                                        fill: '#85d088',
-                                                                        'stroke-width': 1,
-                                                                        stroke: 'silver',
-                                                                        r: 0,
-                                                                        states: {
-                                                                                hover: {
-                                                                                        fill: '#85d088',
-                                                                                }
-                                                                        }
-                                                                }
-                                                        },
-                                                        series: getJsonDrillChildren(dta.topSignin.data,dta.topSignin.categories)
-                                                }
-                                        });
-                                        // top 10 Logoff
-                                        Highcharts.chart('bar-logoff', {
-                                                chart: {
-                                                        type: 'bar'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        type: 'category'
-                                                },
-                                                yAxis: {
-                                                        min: 0,
-                                                        title: {
-                                                                text: ''
-                                                        }
-                                                },
-                                                tooltip : {
-                                                        headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
-                                                        pointFormat: '<b>{point.name}: {point.y}</b><br/>Total logoff clients: {point.k}'
-                                                },
-                                                legend: {
-                                                        reversed: true
-                                                },
-                                                plotOptions: {
-                                                        series: {
-                                                                stacking: 'normal'
-                                                        }
-                                                },
-                                                series: [{
-                                                        name: 'Province',
-                                                        data: getJsonDrillParenthaveClients(dta.topLogoff.dataProvince, dta.topLogoff.dataClients),
-                                                        color: '#d9534f'
-                                                }],
-                                                drilldown: {
-                                                        drillUpButton: {
-                                                                relativeTo: 'spacingBox',
-                                                                position: {
-                                                                        y: 0,
-                                                                        x: 0
-                                                                },
-                                                                theme: {
-                                                                        fill: '#85d088',
-                                                                        'stroke-width': 1,
-                                                                        stroke: 'silver',
-                                                                        r: 0,
-                                                                        states: {
-                                                                                hover: {
-                                                                                        fill: '#85d088',
-                                                                                }
-                                                                        }
-                                                                }
-                                                        },
-                                                        series: getJsonDrillChildren(dta.topLogoff.data,dta.topLogoff.categories)
-                                                }
-                                        });
-                                        // top 10 Kibana
-                                        Highcharts.chart('bar-kibana', {
-                                                chart: {
-                                                        type: 'bar'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        type: 'category'
-                                                },
-                                                yAxis: {
-                                                        min: 0,
-                                                        title: {
-                                                                text: ''
-                                                        }
-                                                },
-                                                legend: {
-                                                        reversed: true
-                                                },
-                                                plotOptions: {
-                                                        series: {
-                                                                stacking: 'normal',
-                                                                dataLabels: {
-                                                                        enabled: true,
-                                                                        align: 'top',
-                                                                        color: '#FFFFFF',
-                                                                        x: -10
-                                                                },
-                                                                pointPadding: 0.1,
-                                                                groupPadding: 0
-                                                        }
-                                                },
-                                                series: [{
-                                                        name: 'Province',
-                                                        data: getJsonDrillParenthaveClients(dta.topKibana.dataProvince, []),
-                                                        color: '#f1b53d'
-                                                }],
-                                                drilldown: {
-                                                        drillUpButton: {
-                                                                relativeTo: 'spacingBox',
-                                                                position: {
-                                                                        y: 0,
-                                                                        x: 0
-                                                                },
-                                                                theme: {
-                                                                        fill: '#85d088',
-                                                                        'stroke-width': 1,
-                                                                        stroke: 'silver',
-                                                                        r: 0,
-                                                                        states: {
-                                                                                hover: {
-                                                                                        fill: '#85d088',
-                                                                                }
-                                                                        }
-                                                                }
-                                                        },
-                                                        series: getJsonDrillChildren(dta.topKibana.data, dta.topKibana.categories)
-                                                }
-                                        });
-                                        // top 10 Opsview
-                                        Highcharts.chart('bar-opsview', {
-                                                chart: {
-                                                        type: 'bar'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        type: 'category'
-                                                },
-                                                yAxis: {
-                                                        min: 0,
-                                                        title: {
-                                                                text: ''
-                                                        }
-                                                },
-                                                legend: {
-                                                        reversed: true
-                                                },
-                                                plotOptions: {
-                                                        series: {
-                                                                stacking: 'normal',
-                                                                dataLabels: {
-                                                                        enabled: true,
-                                                                        align: 'top',
-                                                                        color: '#FFFFFF',
-                                                                        x: -10
-                                                                },
-                                                                pointPadding: 0.1,
-                                                                groupPadding: 0
-                                                        }
-                                                },
-                                                series: [{
-                                                        name: 'Province',
-                                                        data: getJsonDrillParenthaveClients(dta.topOpsview.dataProvince, []),
-                                                        color: '#73879C'
-                                                }],
-                                                drilldown: {
-                                                        drillUpButton: {
-                                                                relativeTo: 'spacingBox',
-                                                                position: {
-                                                                        y: 0,
-                                                                        x: 0
-                                                                },
-                                                                theme: {
-                                                                        fill: '#85d088',
-                                                                        'stroke-width': 1,
-                                                                        stroke: 'silver',
-                                                                        r: 0,
-                                                                        states: {
-                                                                                hover: {
-                                                                                        fill: '#85d088',
-                                                                                }
-                                                                        }
-                                                                }
-                                                        },
-                                                        series: getJsonDrillChildren(dta.topOpsview.data, dta.topOpsview.categories)
-                                                }
-                                        });
-                                        // top 10 Inf
-                                        Highcharts.chart('bar-inf', {
-                                                chart: {
-                                                        type: 'column'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        type: 'category'
-                                                },
-                                                yAxis: {
-                                                        min: 0,
-                                                        title: {
-                                                                text: ''
-                                                        }
-                                                },
-                                                tooltip : {
-                                                        headerFormat: '<span style = "font-size:11px">{series.name}</span><br>',
-                                                        pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
-                                                },
-                                                legend: {
-                                                        reversed: true
-                                                },
-                                                plotOptions: {
-                                                        series: {
-                                                                stacking: 'normal'
-                                                        }
-                                                },
-                                                series: [{
-                                                        name: 'Bras',
-                                                        data: getJsonDrillParent(dta.topInf.dataBras),
-                                                        color: '#832d1d'
-                                                }],
-                                                drilldown: {
-                                                        drillUpButton: {
-                                                                relativeTo: 'spacingBox',
-                                                                position: {
-                                                                        y: 0,
-                                                                        x: 0
-                                                                },
-                                                                theme: {
-                                                                        fill: '#85d088',
-                                                                        'stroke-width': 1,
-                                                                        stroke: 'silver',
-                                                                        r: 0,
-                                                                        states: {
-                                                                                hover: {
-                                                                                        fill: '#85d088',
-                                                                                }
-                                                                        }
-                                                                }
-                                                        },
-                                                        series: getJsonDrillChildren(dta.topInf.data,dta.topInf.categories)
-                                                },
-                                        });
-                                        // top 10 Suyhao
-                                        Highcharts.chart('bar-suyhao', {
-                                                chart: {
-                                                        type: 'bar'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        type: 'category'
-                                                },
-                                                yAxis: {
-                                                        min: 0,
-                                                        title: {
-                                                                text: ''
-                                                        }
-                                                },
-                                                legend: {
-                                                        reversed: true
-                                                },
-                                                tooltip: {
-                                                        formatter: function () {
-                                                                return '<b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>'+this.series.name+'<br><b>Total: ' +
-                                                                        Highcharts.numberFormat(this.point.y,0) + '</b> <br/> Total clients: '+ Highcharts.numberFormat(this.point.k,0);
-                                                        }
-                                                },
-                                                plotOptions: {
-                                                        series: {
-                                                                stacking: 'normal'
-                                                        }
-                                                },
-                                                series: [{
-                                                        name: 'Province',
-                                                        data: getJsonDrillParenthaveClients(dta.topSuyhao.dataProvince, dta.topSuyhao.dataClients),
-                                                        color: '#1ABB9C'
-                                                }],
-                                                drilldown: {
-                                                        drillUpButton: {
-                                                                relativeTo: 'spacingBox',
-                                                                position: {
-                                                                        y: 0,
-                                                                        x: 0
-                                                                },
-                                                                theme: {
-                                                                        fill: '#85d088',
-                                                                        'stroke-width': 1,
-                                                                        stroke: 'silver',
-                                                                        r: 0,
-                                                                        states: {
-                                                                                hover: {
-                                                                                        fill: '#85d088',
-                                                                                }
-                                                                        }
-                                                                }
-                                                        },
-                                                        series: getJsonDrillChildren(dta.topSuyhao.data,dta.topSuyhao.categories)
-                                                }
-                                        });
-                                        // top 10 Poor conn
-                                        Highcharts.chart('bar-poor', {
-                                                chart: {
-                                                        type: 'bar'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        categories: dta.topPoor.categories
-                                                },
-                                                yAxis: {
-                                                        min: 0,
-                                                        title: {
-                                                                text: ''
-                                                        }
-                                                },
-                                                legend: {
-                                                        reversed: true
-                                                },
-                                                plotOptions: {
-                                                        series: {
-                                                                stacking: 'normal'
-                                                        }
-                                                },
-                                                series: [{
-                                                        name: dta.month,
-                                                        data: dta.topPoor.data,
-                                                        color: '#9B59B6'
-                                                }]
-                                        });
-                                }
-                        },
-                        complete: function () {
-                                $('#divTabTop').waitMe("hide");
-                        },
-                });
         }
 
         function getJsonDrillParenthaveClients(dta,dataClients){

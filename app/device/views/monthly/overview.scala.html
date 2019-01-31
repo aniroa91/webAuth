@@ -47,10 +47,25 @@
             <div class="col-xs-12">
                 <div class="container">
                     <div class="tab-slider--nav" style="padding: 5px 20px 0px 20px;margin-bottom: 10px;">
-                        <ul class="tab-slider--tabs">
+                        @*<ul class="tab-slider--tabs">
                             <li class="tab-slider--trigger active" rel="tabOverview">Overview</li>
                             <li class="tab-slider--trigger" rel="tabTop">Top N Bas</li>
-                        </ul>
+                        </ul>*@
+
+                        <div class="controls">
+                            <ul class="nav tabControl">
+                                <li class="active" name="tabOverview">
+                                    <a>OVERVIEW</a>
+                                </li>
+                                <li name="tabTop">
+                                    <a>TOP PROVINCE</a>
+                                </li>
+                                <li name="tabCompare">
+                                    <a>COMPARE</a>
+                                </li>
+                            </ul>
+                        </div>
+
                         <div id="monthTab1" style="float: right">
                         @if(response != null) {
                             <form action="/searchMonthOverview" class="disInline" method="POST" id="ctSearch">
@@ -266,7 +281,8 @@
                         }
                         </div>
                         <div id="tabTop" class="tab-slider--body">
-                            <input type="hidden" id="isClicked" value="0">
+                            <input type="hidden" id="isClickedTab2" value="0">
+                            <input type="hidden" id="isClickedTab3" value="0">
                             <div class="col-xs-12" id="divTabTop">
                                 <div class="col-lg-12" style="padding:0px;">
                                     <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
@@ -431,6 +447,348 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="tabCompare" class="tab-slider--body">
+                            <div class="col-xs-12" id="divTabCpe">
+                                <div class="col-xs-12">
+                                    <div class="col-lg-2 col-xs-12 col-md-2 col-sm-2">
+                                        <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
+                                            <div class="panel-heading noborder" id="divSignin">
+                                                <div class="panel-icon" style="color: #43A047"><i class="fa fa-sign-in" aria-hidden="true"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <h4 class="md-title topLi">Signin</h4>
+                                                    <h1 class="mt5 signin">10,000</h1>
+                                                </div><!-- media-body -->
+                                                <div class="line"></div>
+                                                <div class="clearfix mt20">
+                                                    <div class="pull-left">
+                                                        <h5 class="md-title nomargin titprevSign">Signin 2018-12</h5>
+                                                        <h4 class="nomargin mb5 prevSignin">29,009</h4>
+                                                    </div>
+                                                    <div class="pull-right">
+                                                        <h5 class="md-title nomargin">Signin Change</h5>
+                                                        <h4 class="nomargin changeSig" style="color: #c10606"></h4>
+                                                    </div>
+                                                </div>
+
+                                            </div><!-- panel-body -->
+                                        </div>
+                                        <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #ffbf96, #fe7096)">
+                                            <div class="panel-heading noborder" id="divLogoff">
+                                                <div class="panel-icon" style="color: #fe7096"><i class="fa fa-sign-out" aria-hidden="true"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <h4 class="md-title topLi">Logoff</h4>
+                                                    <h1 class="mt5 logoff">120,000</h1>
+                                                </div><!-- media-body -->
+                                                <div class="line"></div>
+                                                <div class="clearfix mt20">
+                                                    <div class="pull-left">
+                                                        <h5 class="md-title nomargin titprevLog">Logoff 2018-12</h5>
+                                                        <h4 class="nomargin mb5 prevLog">29,009</h4>
+                                                    </div>
+                                                    <div class="pull-right">
+                                                        <h5 class="md-title nomargin">Logoff Change</h5>
+                                                        <h4 class="nomargin changeLog" style="color: #130463"> </h4>
+                                                    </div>
+                                                </div>
+
+                                            </div><!-- panel-body -->
+                                        </div>
+                                        <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
+                                            <div class="panel-heading noborder" id="divSuy">
+                                                <div class="panel-icon" style="color: #43A047"><i class="fa fa-cogs" aria-hidden="true"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <h4 class="md-title topLi">Suyhao</h4>
+                                                    <h1 class="mt5 suyhao">10,000</h1>
+                                                </div><!-- media-body -->
+                                                <div class="line"></div>
+                                                <div class="clearfix mt20">
+                                                    <div class="pull-left">
+                                                        <h5 class="md-title nomargin titprevSuy">Passed 2018-12</h5>
+                                                        <h4 class="nomargin mb5 prevSuy">29,009</h4>
+                                                    </div>
+                                                    <div class="pull-right">
+                                                        <h5 class="md-title nomargin">Passed Change</h5>
+                                                        <h4 class="nomargin changeSuy" style="color: #c10606"></h4>
+                                                    </div>
+                                                </div>
+
+                                            </div><!-- panel-body -->
+                                        </div>
+                                        <div class="panel panel-success-alt noborder"style="background: linear-gradient(to right, #ffbf96, #fe7096)">
+                                            <div class="panel-heading noborder" id="divNotsuy">
+                                                <div class="panel-icon" style="width: 45px;color: #fe7096"><i class="fa fa-fire" aria-hidden="true"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <h4 class="md-title topLi">Suyhao not Passed</h4>
+                                                    <h1 class="mt5 notSuy">610,000</h1>
+                                                </div><!-- media-body -->
+                                                <div class="line"></div>
+                                                <div class="clearfix mt20">
+                                                    <div class="pull-left">
+                                                        <h5 class="md-title nomargin titprevNotSuy">Not Passed</h5>
+                                                        <h4 class="nomargin mb5 prevNotsuy">29,009</h4>
+                                                    </div>
+                                                    <div class="pull-right">
+                                                        <h5 class="md-title nomargin">Not Passed Change</h5>
+                                                        <h4 class="nomargin changeNotsuy" style="color: #130463"> </h4>
+                                                    </div>
+                                                </div>
+
+                                            </div><!-- panel-body -->
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-10 col-xs-12 col-md-10 col-sm-10">
+                                        <div class="col-xs-12">
+                                            <div class="col-xs-12">
+                                                <div class="x-content">
+                                                    <div class="profile-title">
+                                                        <div class="col-md-6">
+                                                            <h2 class="service-title">Outlier by BRAS</h2>
+                                                        </div>
+                                                    </div>
+
+                                                    <table class="table no-wrap p-tableInf" style="background: #fff">
+                                                        <thead class="bg-light" style="background: #f9f9ff !important">
+                                                            <tr class="border-0">
+                                                                <th class="border-0" style="width: 44%"></th>
+                                                                <th class="border-0 currMonth currTd">Month</th>
+                                                                <th class="border-0 prevMonth prevId">Last month</th>
+                                                                <th class="border-0">Change(%)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td><span class="titTd">No Outlier</span></td>
+                                                                <td><p class="excerpt currBras currTd"> </p></td>
+                                                                <td><p class="excerpt prevBras prevId"></p></td>
+                                                                <td><p class="excerpt changeBras"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Affected Clients</span></td>
+                                                                <td><p class="excerpt currAffect currTd"> </p></td>
+                                                                <td><p class="excerpt prevAffect prevId"> </p></td>
+                                                                <td><p class="excerpt changeAffect"> </p></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <div class="x-content">
+                                                    <div class="profile-title">
+                                                        <div class="col-md-6">
+                                                            <h2 class="service-title">Outlier by INF</h2>
+                                                        </div>
+                                                    </div>
+                                                    <table class="table no-wrap p-tableInf" style="background: #fff">
+                                                        <thead class="bg-light" style="background: #f9f9ff !important">
+                                                            <tr class="border-0">
+                                                                <th class="border-0" style="width: 44%"></th>
+                                                                <th class="border-0 currMonth currTd">Month</th>
+                                                                <th class="border-0 prevMonth prevId">Last month</th>
+                                                                <th class="border-0">Change(%)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td><span class="titTd">Total Outlier</span></td>
+                                                                <td><p class="excerpt currOutInf currTd"> </p></td>
+                                                                <td><p class="excerpt prevOutInf prevId"></p></td>
+                                                                <td><p class="excerpt changeOutinf"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Total Clients</span></td>
+                                                                <td><p class="excerpt currClient currTd"> </p></td>
+                                                                <td><p class="excerpt prevClient prevId"> </p></td>
+                                                                <td><p class="excerpt changeClient"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Inf Down Outliers</span></td>
+                                                                <td><p class="excerpt currInfOut currTd"> </p></td>
+                                                                <td><p class="excerpt prevInfOut prevId"></p></td>
+                                                                <td><p class="excerpt changeInfOut"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Inf Down Clients</span></td>
+                                                                <td><p class="excerpt currInfCli currTd"> </p></td>
+                                                                <td><p class="excerpt prevInfCli prevId"> </p></td>
+                                                                <td><p class="excerpt changeInfCli"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">User Down Outliers</span></td>
+                                                                <td><p class="excerpt currUserOut currTd"> </p></td>
+                                                                <td><p class="excerpt prevUserOut prevId"></p></td>
+                                                                <td><p class="excerpt changeUserOut"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">User Down Clients</span></td>
+                                                                <td><p class="excerpt currUserClient currTd"> </p></td>
+                                                                <td><p class="excerpt prevUserCli prevId"> </p></td>
+                                                                <td><p class="excerpt changeUserCli"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Sf Outliers</span></td>
+                                                                <td><p class="excerpt currSfOut currTd"> </p></td>
+                                                                <td><p class="excerpt prevSfOut prevId"></p></td>
+                                                                <td><p class="excerpt changeSfOut"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Sf Clients</span></td>
+                                                                <td><p class="excerpt currSfClient currTd"> </p></td>
+                                                                <td><p class="excerpt prevSfCli prevId"> </p></td>
+                                                                <td><p class="excerpt changeSfCli"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Lost Signal Outliers</span></td>
+                                                                <td><p class="excerpt currSignalOut currTd"> </p></td>
+                                                                <td><p class="excerpt prevSigOut prevId"></p></td>
+                                                                <td><p class="excerpt changeSigOut"> </p></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Lost Signal Clients</span></td>
+                                                                <td><p class="excerpt currSignalClient currTd"> </p></td>
+                                                                <td><p class="excerpt prevSigCli prevId"> </p></td>
+                                                                <td><p class="excerpt changeSigCli"> </p></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="x-content">
+                                            <div class="profile-title">
+                                                <div class="col-md-6">
+                                                    <h2 class="service-title">INF Error</h2>
+                                                </div>
+                                            </div>
+                                            <table class="table no-wrap p-table" style="background: #fff" id="divInfErr">
+                                                <thead class="bg-light" style="background: #f9f9ff !important">
+                                                    <tr class="border-0">
+                                                        <th class="border-0"></th>
+                                                        <th class="border-0 currMonth currTd">Month</th>
+                                                        <th class="border-0 prevMonth prevId">Last month</th>
+                                                        <th class="border-0">Change(%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><span class="titTd">Total Inf</span></td>
+                                                        <td><p class="excerpt currTotal currTd"> </p></td>
+                                                        <td><p class="excerpt prevTotal prevId"></p></td>
+                                                        <td><p class="excerpt changeTotal prevId"> </p></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="titTd">Inf Down</span></td>
+                                                        <td><p class="excerpt currInfD currTd"> </p></td>
+                                                        <td><p class="excerpt prevInfD prevId"> </p></td>
+                                                        <td><p class="excerpt changeInf"> </p></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="titTd">User Down</span></td>
+                                                        <td><p class="excerpt currUserD currTd"> </p></td>
+                                                        <td><p class="excerpt prevUserD prevId"> </p></td>
+                                                        <td><p class="excerpt changeDown"> </p></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="titTd">Lost Signal</span></td>
+                                                        <td><p class="excerpt currSignal currTd"> </p></td>
+                                                        <td><p class="excerpt prevSignal prevId"> </p></td>
+                                                        <td><p class="excerpt changeSignal"> </p></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="titTd">Sf Error</span></td>
+                                                        <td><p class="excerpt currSf currTd"> </p></td>
+                                                        <td><p class="excerpt prevSf prevId"> </p></td>
+                                                        <td><p class="excerpt changeSf"> </p></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="titTd">Lofi Error</span></td>
+                                                        <td><p class="excerpt currLofi currTd"> </p></td>
+                                                        <td><p class="excerpt prevLofi prevId"> </p></td>
+                                                        <td><p class="excerpt changeLofi"> </p></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="titTd">Rouge Error</span></td>
+                                                        <td><p class="excerpt currRouge currTd"> </p></td>
+                                                        <td><p class="excerpt prevRouge prevId"> </p></td>
+                                                        <td><p class="excerpt changeRouge"> </p></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-xs-12 col-md-6 col-sm-6">
+                                        <div class="col-xs-12">
+                                            <div class="x-content">
+                                                <div class="profile-title">
+                                                    <div class="col-md-6">
+                                                        <h2 class="service-title">Kibana & Opsview</h2>
+                                                    </div>
+                                                </div>
+                                                <table class="table no-wrap p-table" style="background: #fff">
+                                                    <thead class="bg-light" style="background: #f9f9ff !important">
+                                                        <tr class="border-0">
+                                                            <th class="border-0"></th>
+                                                            <th class="border-0 currMonth currTd">Month</th>
+                                                            <th class="border-0 prevMonth prevId">Last month</th>
+                                                            <th class="border-0">Change(%)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><span class="titTd">Total Kibana</span></td>
+                                                            <td><p class="excerpt currKiba currTd"> </p></td>
+                                                            <td><p class="excerpt prevKiba prevId"></p></td>
+                                                            <td><p class="excerpt changeKiba"> </p></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="titTd">Total Opsview</span></td>
+                                                            <td><p class="excerpt currOps currTd"> </p></td>
+                                                            <td><p class="excerpt prevOps prevId"> </p></td>
+                                                            <td><p class="excerpt changeOps"> </p></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="4" class="profile-title" style="display: table-cell;padding: 6px 8px 6px 8px"><h2 class="service-title">Connections</h2></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="titTd">No Contract</span></td>
+                                                            <td><p class="excerpt currCt currTd"> </p></td>
+                                                            <td><p class="excerpt prevCt prevId"> </p></td>
+                                                            <td><p class="excerpt changeCt"> </p></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="titTd">No Device</span></td>
+                                                            <td><p class="excerpt currDev currTd"> </p></td>
+                                                            <td><p class="excerpt prevDev prevId"> </p></td>
+                                                            <td><p class="excerpt changeDev"> </p></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="titTd">Not poor Conn</span></td>
+                                                            <td><p class="excerpt currNotpoor currTd"> </p></td>
+                                                            <td><p class="excerpt prevNotpoor prevId"> </p></td>
+                                                            <td><p class="excerpt changeNotpoor"> </p></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="titTd">Poor Conn</span></td>
+                                                            <td><p class="excerpt currPoor currTd"> </p></td>
+                                                            <td><p class="excerpt prevPoor prevId"> </p></td>
+                                                            <td><p class="excerpt changePoor"> </p></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -483,10 +841,7 @@
     <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
         <!--  Datepicker -->
     <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
-    @scripts(response)
-     <script>
-
-     </script>
-
+    @scripts1(response)
+    @scripts2(response)
     </body>
 </html>

@@ -516,7 +516,10 @@
             .topLi{
                 margin-top: 5px;
             }
-
+            .mt5{
+                margin: 10px 0px 5px 0px;
+                font-size: 30px;
+            }
             section{
                 margin:100px auto;
                 height:1000px;
@@ -530,70 +533,132 @@
             ul.bar_tabs>li.active{
                 font-weight: 700;
             }
-            .tab-slider--nav {
-                width: 100%;
-                float: left;
-                margin-bottom: 20px;
+            .tab-slider--container{
+                margin-top: 50px;
             }
-
-            .tab-slider--tabs {
-                display: block;
-                float: left;
+            .currTd{
+                color: #0b1590
+            }
+            .table>tbody>tr>td{
+                vertical-align: inherit;
+            }
+            .p-tableInf>tbody>tr>td>p{
                 margin: 0;
-                padding: 0;
-                list-style: none;
-                position: relative;
-                border-radius: 35px;
-                overflow: hidden;
-                background: #fff;
-                height: 35px;
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
             }
-            .tab-slider--tabs:after {
-                content: "";
-                width: 50%;
-                background: #345F90;
-                height: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-                -webkit-transition: all 250ms ease-in-out;
-                transition: all 250ms ease-in-out;
-                border-radius: 35px;
+            .error{
+                border: 1px solid red;
             }
-            .tab-slider--tabs.slide:after {
-                left: 50%;
+            .prevId{
+                color: #b76704
             }
-
-            .tab-slider--trigger {
-                font-size: 12px;
-                line-height: 1;
+            .profile-title {
+                background: #115296;
+                border: 0;
+                color: white;
+                display: flex;
+            }
+            .service-title {
+                font-size: 20px;
                 font-weight: bold;
-                color: #345F90;
-                text-transform: uppercase;
-                text-align: center;
-                padding: 11px 20px;
-                position: relative;
-                z-index: 2;
-                cursor: pointer;
-                display: inline-block;
-                -webkit-transition: color 250ms ease-in-out;
-                transition: color 250ms ease-in-out;
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
             }
-            .tab-slider--trigger.active {
+            .list-unstyled {
+                padding-left: 0;
+                list-style: none;
+            }
+            .timeline .block {
+                margin: 0 0 0 185px;
+            }
+            .timeline .tags {
+                top: 10px;
+                width: 160px;
+            }
+            .tags > a {
+                width: 100%;
+            }
+            .changeDown{
+                font-size: 14px;
+                color: #c10606;
+            }
+            .changeUp{
+                font-size: 14px;
+                color: #0b9027;
+            }
+            .excerpt{
+                font-size: 18px;
+            }
+            .block_content {
+                height: 35px;
+                display: flex;
+                align-items: center;
+            }
+            .titTd{
+                background: #1ABB9C;
+                border-radius: 13px;
+                color: #fff;
+                font-size: 14px;
+                left: 10px;
+                padding: 4px 15px 4px 30px;
+            }
+            .panel-icon {
+                background: rgba(255,255,255,0.9);
+                -moz-border-radius: 3px;
+                -webkit-border-radius: 3px;
+                border-radius: 3px;
+                width: 52px;
+                height: 50px;
+                float: left;
+                margin-right: 15px;
+            }
+            .panel-icon .fa {
+                font-size: 30px;
+                padding: 12px 0 0 13px;
+            }
+            .line{
+                margin-bottom: 5px;
+                border: 0;
+                border-top: 1px solid #eee;
+            }
+            .panel {
+                margin-bottom: 20px;
+                width: 245px;
+                color: #fff;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+                box-shadow: 0 1px 1px rgba(0,0,0,.05);
+            }
+            .controls {
+                width: 50%;
+                float: left;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 0;
+                margin: 0;
+                white-space: nowrap;
+                text-align: center;
+                position: relative;
+                background: #fff
+            }
+            .controls li {
+                display: table-cell;
+                width: 1%;
+                height: 33px;
+                max-width: 90px;
+                cursor: pointer;
+            }
+            .controls li.active a{
                 color: #fff;
             }
-
-            .tab-slider--body {
-                margin-bottom: 20px;
+            .controls li.active {
+                background: linear-gradient(to right, #84d9d2, #1194a9);
+                border-top: 3px solid #f60;
             }
+            .controls li a {
+                padding: 4px 0px 0px 0px!important;
+                font-size: 18px;
+                color: #0d62a7;
+            }
+
             input[type="radio"]{
                 margin-top: 0px;
             }

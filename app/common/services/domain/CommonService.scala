@@ -87,6 +87,11 @@ object CommonService extends AbstractService {
     prev.minusMonths(1).toString("yyyy-MM")
   }
 
+  def getPreviousMonth(month: String): String = {
+    val prev = DateTimeUtil.create(month, "yyyy-MM")
+    prev.minusMonths(1).toString("yyyy-MM")
+  }
+
   def getPreviousDay(day: String): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(1).toString(DateTimeUtil.YMD)

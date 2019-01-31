@@ -70,7 +70,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val errorFunction = { formWithErrors: Form[controllers.MonthPicker] =>
       println("error")
-      Ok(device.views.html.overview(username,null))
+      Ok(device.views.html.monthly.overview(username,null))
     }
 
     val successFunction = { data: controllers.MonthPicker =>
@@ -692,9 +692,213 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
+  // Tab Compare
+  def compareByMonth(month: String) = Action{ implicit request =>
+    try{
+      val currMonth = if(month.equals("")) CommonService.getPreviousMonth() else month
+      val prevMonth = CommonService.getPreviousMonth(currMonth)
+      /* Box Signin & Logoff */
+      val sigLog = Await.result(BrasService.getSigLogByMonth(currMonth), Duration.Inf)
+      val signinObj = Json.obj(
+        "currSignin" -> sigLog.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum,
+        "prevSignin" -> sigLog.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum,
+        "percent"    -> CommonService.percent(sigLog.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum.toLong, sigLog.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum.toLong)
+      )
+      val logoffObj = Json.obj(
+        "currLogoff" -> sigLog.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum,
+        "prevLogoff" -> sigLog.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum,
+        "percent"    -> CommonService.percent(sigLog.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum.toLong, sigLog.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum.toLong)
+      )
+      /* Box Suyhao */
+      val suyhao = Await.result(BrasService.getSuyhaoByMonth(currMonth), Duration.Inf)
+      val suyhaoObj = Json.obj(
+        "currSuyhao" -> suyhao.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum,
+        "prevSuyhao" -> suyhao.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum,
+        "percent"    -> CommonService.percent(suyhao.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum.toLong, suyhao.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum.toLong)
+      )
+      val notSuyhaoObj = Json.obj(
+        "currNotsuyhao" -> suyhao.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum,
+        "prevNotsuyhao" -> suyhao.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum,
+        "percent"       -> CommonService.percent(suyhao.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum.toLong, suyhao.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum.toLong)
+      )
+      /* Box Bras Outlier & affected_clients */
+      val brasOutlier = Await.result(BrasService.getBrasOutlierByMonth(currMonth), Duration.Inf)
+      val brasObj = Json.obj(
+        "currBras" -> brasOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum,
+        "prevBras" -> brasOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum,
+        "percent"  -> CommonService.percent(brasOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum.toLong, brasOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum.toLong)
+      )
+      val affectObj = Json.obj(
+        "currAffect" -> brasOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum,
+        "prevAffect" -> brasOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum,
+        "percent"  -> CommonService.percent(brasOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum.toLong, brasOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum.toLong)
+      )
+      /* Box INF Outlier */
+      val infOutlier = Await.result(BrasService.getInfOutlierByMonth(currMonth), Duration.Inf)
+      val outliInfObj = Json.obj(
+        "currOut" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum,
+        "prevOut" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum,
+        "percent"  -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum.toLong)
+      )
+      val clientInfObj = Json.obj(
+        "currClient" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum,
+        "prevClient" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum,
+        "percent"    -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum.toLong)
+      )
+      val infDownCliObj = Json.obj(
+        "currInfCli" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._4).sum,
+        "prevInfCli" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._4).sum,
+        "percent"    -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._4).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._4).sum.toLong)
+      )
+      val infDownOutObj = Json.obj(
+        "currInfOut" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._5).sum,
+        "prevInfOut" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._5).sum,
+        "percent"    -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._5).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._5).sum.toLong)
+      )
+      val userDownCliObj = Json.obj(
+        "currUserCli" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._6).sum,
+        "prevUserCli" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._6).sum,
+        "percent"    -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._6).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._6).sum.toLong)
+      )
+      val userDownOutObj = Json.obj(
+        "currUserOut" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._7).sum,
+        "prevUserOut" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._7).sum,
+        "percent"     -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._7).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._7).sum.toLong)
+      )
+      val sfCliObj = Json.obj(
+        "currSfCli" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._8).sum,
+        "prevSfCli" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._8).sum,
+        "percent"    -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._8).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._8).sum.toLong)
+      )
+      val sfOutObj = Json.obj(
+        "currSfOut" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._9).sum,
+        "prevSfOut" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._9).sum,
+        "percent"     -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._9).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._9).sum.toLong)
+      )
+      val signalCliObj = Json.obj(
+        "currSigCli" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._10).sum,
+        "prevSigCli" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._10).sum,
+        "percent"    -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._10).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._10).sum.toLong)
+      )
+      val signalOutObj = Json.obj(
+        "currSigOut" -> infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._11).sum,
+        "prevSigOut" -> infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._11).sum,
+        "percent"     -> CommonService.percent(infOutlier.filter(x=> x._1 == currMonth+"-01").map(x=> x._11).sum.toLong, infOutlier.filter(x=> x._1 == prevMonth+"-01").map(x=> x._11).sum.toLong)
+      )
+      /* Box Contract & Device & Connections */
+      val device = Await.result(BrasService.getDeviceByMonth(currMonth), Duration.Inf)
+      val noContractObj = Json.obj(
+        "currNoct" -> device.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum,
+        "prevNoct" -> device.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum,
+        "percent"  -> CommonService.percent(device.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum.toLong, device.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum.toLong)
+      )
+      val noDeviceObj = Json.obj(
+        "currNodev" -> device.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum,
+        "prevNodev" -> device.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum,
+        "percent"  -> CommonService.percent(device.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum.toLong, device.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum.toLong)
+      )
+      val notPoorObj = Json.obj(
+        "currNotpoor" -> device.filter(x=> x._1 == currMonth+"-01").map(x=> x._4).sum,
+        "prevNotpoor" -> device.filter(x=> x._1 == prevMonth+"-01").map(x=> x._4).sum,
+        "percent"  -> CommonService.percent(device.filter(x=> x._1 == currMonth+"-01").map(x=> x._4).sum.toLong, device.filter(x=> x._1 == prevMonth+"-01").map(x=> x._4).sum.toLong)
+      )
+      val poorObj = Json.obj(
+        "currPoor" -> device.filter(x=> x._1 == currMonth+"-01").map(x=> x._5).sum,
+        "prevPoor" -> device.filter(x=> x._1 == prevMonth+"-01").map(x=> x._5).sum,
+        "percent"  -> CommonService.percent(device.filter(x=> x._1 == currMonth+"-01").map(x=> x._5).sum.toLong, device.filter(x=> x._1 == prevMonth+"-01").map(x=> x._5).sum.toLong)
+      )
+      /* Box Kibana & Opsview */
+      val kibaOps = Await.result(BrasService.getKibaOpsByMonth(currMonth), Duration.Inf)
+      val kibanaObj = Json.obj(
+        "currKiba" -> kibaOps.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum,
+        "prevKiba" -> kibaOps.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum,
+        "percent"  -> CommonService.percent(kibaOps.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum.toLong, kibaOps.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum.toLong)
+      )
+      val opsObj = Json.obj(
+        "currOps" -> kibaOps.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum,
+        "prevOps" -> kibaOps.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum,
+        "percent"  -> CommonService.percent(kibaOps.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum.toLong, kibaOps.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum.toLong)
+      )
+      /* Box INF Error */
+      val infError = Await.result(BrasService.getInfErrorByMonth(currMonth), Duration.Inf)
+      val totalInfObj = Json.obj(
+        "currTotal" -> infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum,
+        "prevTotal" -> infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum,
+        "percent"  -> CommonService.percent(infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._2).sum.toLong, infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._2).sum.toLong)
+      )
+      val infDownObj = Json.obj(
+        "currInfD" -> infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum,
+        "prevInfD" -> infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum,
+        "percent"  -> CommonService.percent(infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._3).sum.toLong, infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._3).sum.toLong)
+      )
+      val userDownObj = Json.obj(
+        "currUserD" -> infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._4).sum,
+        "prevUserD" -> infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._4).sum,
+        "percent"  -> CommonService.percent(infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._4).sum.toLong, infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._4).sum.toLong)
+      )
+      val signalObj = Json.obj(
+        "currSignal" -> infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._5).sum,
+        "prevSignal" -> infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._5).sum,
+        "percent"  -> CommonService.percent(infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._5).sum.toLong, infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._5).sum.toLong)
+      )
+      val sfObj = Json.obj(
+        "currSf" -> infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._6).sum,
+        "prevSf" -> infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._6).sum,
+        "percent"  -> CommonService.percent(infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._6).sum.toLong, infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._6).sum.toLong)
+      )
+      val lofiObj = Json.obj(
+        "currLofi" -> infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._7).sum,
+        "prevLofi" -> infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._7).sum,
+        "percent"  -> CommonService.percent(infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._7).sum.toLong, infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._7).sum.toLong)
+      )
+      val rougeObj = Json.obj(
+        "currRouge" -> infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._8).sum,
+        "prevRouge" -> infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._8).sum,
+        "percent"  -> CommonService.percent(infError.filter(x=> x._1 == currMonth+"-01").map(x=> x._8).sum.toLong, infError.filter(x=> x._1 == prevMonth+"-01").map(x=> x._8).sum.toLong)
+      )
+      val rs = Json.obj(
+        "currMonth"  -> currMonth,
+        "prevMonth"  -> prevMonth,
+        "signin"     -> signinObj,
+        "logoff"     -> logoffObj,
+        "suyhao"     -> suyhaoObj,
+        "notSuyhao"  -> notSuyhaoObj,
+        "bras"       -> brasObj,
+        "affected"   -> affectObj,
+        "outliInf"   -> outliInfObj,
+        "clientInf"  -> clientInfObj,
+        "infDownout" -> infDownOutObj,
+        "infDowncli" -> infDownCliObj,
+        "userDownCli" -> userDownCliObj,
+        "userDownout" -> userDownOutObj,
+        "sfCli"       -> sfCliObj,
+        "sfOut"       -> sfOutObj,
+        "signalOut"   -> signalOutObj,
+        "signalCli"   -> signalCliObj,
+        "noContract" -> noContractObj,
+        "noDevice"   -> noDeviceObj,
+        "poor"       -> poorObj,
+        "notPoor"    -> notPoorObj,
+        "kibana"     -> kibanaObj,
+        "opsview"    -> opsObj,
+        "totalInf"   -> totalInfObj,
+        "infDown"    -> infDownObj,
+        "userDown"   -> userDownObj,
+        "signal"     -> signalObj,
+        "sf"         -> sfObj,
+        "lofi"       -> lofiObj,
+        "rouge"      -> rougeObj
+      )
+      Ok(Json.toJson(rs))
+    }
+    catch {
+      case e: Exception => Ok("Error")
+    }
+  }
+
   // Tab TOP N
   def topNJson(monthStr: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = Action { implicit request =>
-    //try{
+    try{
       val month = if(monthStr.equals("")) CommonService.getPreviousMonth() else monthStr
       // get Top Sigin
       val topSignin = Await.result(BrasService.getTopSignin(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3, x._4))
@@ -759,10 +963,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "topPoor"    -> poorObj
       )
       Ok(Json.toJson(rs))
-    /*}
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
   }
 
   // page NOC
@@ -1489,19 +1693,19 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       logger.info("metrics: " + (System.currentTimeMillis() - t5))
 
       val jsBras = Json.obj(
-        "metrics" -> metrics,
-        "host" -> re,
-        "sigLog" -> sigLog,
-        "time" -> brasChart.map({ t => CommonService.formatUTC(t._1.toString)}),
-        "logoff" -> brasChart.map({ t => (CommonService.formatUTC(t._1),t._2)}),
-        "signin" -> brasChart.map({ t => (CommonService.formatUTC(t._1),t._3)}),
-        "users" -> brasChart.map({ t => t._4}),
-        "heatCard" -> heatCard,
+        "metrics"      -> metrics,
+        "host"         -> re,
+        "sigLog"       -> sigLog,
+        "time"         -> brasChart.map({ t => CommonService.formatUTC(t._1.toString)}),
+        "logoff"       -> brasChart.map({ t => (CommonService.formatUTC(t._1),t._2)}),
+        "signin"       -> brasChart.map({ t => (CommonService.formatUTC(t._1),t._3)}),
+        "users"        -> brasChart.map({ t => t._4}),
+        "heatCard"     -> heatCard,
         "heatLinecard" -> heatLinecard,
-        "dtaCard" -> listCard,
-        "brasKibana" -> brasKibana,
-        "brasOpview" -> brasOpview,
-        "userLogoff" -> userLogoff
+        "dtaCard"      -> listCard,
+        "brasKibana"   -> brasKibana,
+        "brasOpview"   -> brasOpview,
+        "userLogoff"   -> userLogoff
       )
       println("time:"+ (System.currentTimeMillis() -t0))
       Ok(Json.toJson(jsBras))
@@ -1510,43 +1714,5 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       case e: Exception => Ok("Error")
     }
   }
-
-  /*def getBrasJson(id: String) = Action { implicit request =>
-    try{
-      val lstBras = Await.result(BrasService.listBrasById(id), Duration.Inf)
-      var mapBras = collection.mutable.Map[String, Seq[(String,String,String,String)]]()
-      val arrOutlier = lstBras.map(x => (x._1->x._2)).toList.distinct
-      val mapSigLog = new Array[String](arrOutlier.length)
-      var num =0;
-      for(outlier <- arrOutlier){
-        // get  map num of signin and logoff
-        val objBras = Await.result(BrasService.getNumLogSiginById(outlier._1,outlier._2), Duration.Inf)
-        mapSigLog(num)= objBras(0)._1.toString +"/" +objBras(0)._2.toString
-        num = num +1;
-        // get kibana and opview
-        val tm = outlier._2.substring(0,outlier._2.indexOf(".")+3)
-        val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-        val dateTime = DateTime.parse(tm, formatter)
-        val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-        val brasKey = Await.result(BrasService.opViewKibana(outlier._1,dateTime.toString,oldTime), Duration.Inf)
-        mapBras += (outlier._1+"/"+outlier._2-> brasKey)
-      }
-      val arrLine = lstBras.map(x => (x._1, x._2) -> x._3).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
-      val arrCard = lstBras.map(x => (x._1, x._2, x._3) -> x._4).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
-      val arrHost = lstBras.map(x => (x._1, x._2, x._3,x._4) -> x._5).groupBy(x => x._1).mapValues(x => x.map(y => y._2).mkString("|"))
-      val jsBras = Json.obj(
-        "bras" -> arrOutlier,
-        "logSig" ->mapSigLog,
-        "linecard" -> arrLine,
-        "card" -> arrCard,
-        "host" -> arrHost,
-        "mapBras" -> mapBras
-      )
-      Ok(Json.toJson(jsBras))
-    }
-    catch{
-      case e: Exception => Ok("error")
-    }
-  }*/
 
 }

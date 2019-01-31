@@ -27,6 +27,97 @@ object BrasDAO {
   val topN = CommonService.SIZE_DEFAULT
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
+  def getSigLogByMonth(month: String): Future[Seq[(String, Int, Int)]] = {
+    val currMonth = month+"-01"
+    val prevMonth = CommonService.getPreviousMonth(month)+"-01"
+    dbConfig.db.run(
+      sql"""select month, sum(signin), sum(logoff)
+            from dmt_overview_conn
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            group by month
+            order by month desc
+                  """
+        .as[(String, Int, Int)])
+  }
+
+  def getSuyhaoByMonth(month: String): Future[Seq[(String, Int, Int)]] = {
+    val currMonth = month+"-01"
+    val prevMonth = CommonService.getPreviousMonth(month)+"-01"
+    dbConfig.db.run(
+      sql"""select month, sum(passed_suyhao), sum(not_passed_suyhao)
+            from dmt_overview_suyhao
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            group by month
+            order by month desc
+                  """
+        .as[(String, Int, Int)])
+  }
+
+  def getBrasOutlierByMonth(month: String): Future[Seq[(String, Int, Int)]] = {
+    val currMonth = month+"-01"
+    val prevMonth = CommonService.getPreviousMonth(month)+"-01"
+    dbConfig.db.run(
+      sql"""select month, sum(no_outliers), sum(affected_clients)
+            from dmt_overview_bras_outlier
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            group by month
+            order by month desc
+                  """
+        .as[(String, Int, Int)])
+  }
+
+  def getInfOutlierByMonth(month: String): Future[Seq[(String, Int, Int, Int, Int,Int, Int, Int, Int, Int, Int)]] = {
+    val currMonth = month+"-01"
+    val prevMonth = CommonService.getPreviousMonth(month)+"-01"
+    dbConfig.db.run(
+      sql"""select month, sum(total_outliers), sum(total_clients), sum(inf_down_clients), sum(inf_down_outliers), sum(user_down_clients), sum(user_down_outliers), sum(sf_clients), sum(sf_outliers), sum(lost_signal_clients), sum(lost_signal_outliers)
+            from dmt_overview_inf_outlier
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            group by month
+            order by month desc
+                  """
+        .as[(String, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)])
+  }
+
+  def getDeviceByMonth(month: String): Future[Seq[(String, Int, Int, Int, Int)]] = {
+    val currMonth = month+"-01"
+    val prevMonth = CommonService.getPreviousMonth(month)+"-01"
+    dbConfig.db.run(
+      sql"""select month, sum(no_contract), sum(no_device), sum(not_poor_conn), sum(poor_conn)
+            from dmt_overview_device
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            group by month
+            order by month desc
+                  """
+        .as[(String, Int, Int, Int, Int)])
+  }
+
+  def getInfErrorByMonth(month: String): Future[Seq[(String, Int, Int, Int, Int, Int, Int, Int)]] = {
+    val currMonth = month+"-01"
+    val prevMonth = CommonService.getPreviousMonth(month)+"-01"
+    dbConfig.db.run(
+      sql"""select month, sum(total_inf), sum(inf_down), sum(user_down), sum(lost_signal), sum(sf_error), sum(lofi_error), sum(rouge_error)
+            from dmt_overview_inf
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            group by month
+            order by month desc
+                  """
+        .as[(String, Int, Int, Int, Int,Int, Int, Int)])
+  }
+
+  def getKibaOpsByMonth(month: String): Future[Seq[(String, Int, Int)]] = {
+    val currMonth = month+"-01"
+    val prevMonth = CommonService.getPreviousMonth(month)+"-01"
+    dbConfig.db.run(
+      sql"""select month, sum(total_kibana), sum(total_opsview)
+            from dmt_overview_noc
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            group by month
+            order by month desc
+                  """
+        .as[(String, Int, Int)])
+  }
+
   def getSigninUnique(id: String, time: String): Future[Seq[(Int, Int)]] = {
     dbConfig.db.run(
       sql"""select sum(signin_unique), sum(logoff_unique)
@@ -37,10 +128,13 @@ object BrasDAO {
   }
 
   def getErrorMetric(id: String, time: String): Future[Seq[(Int)]] = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(time, formatter)
+    val oldTime  = dateTime.minusMinutes(30).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     dbConfig.db.run(
       sql"""select sum(error)
             from dwh_inf_module
-            where bras_id= $id and date_time =$time::TIMESTAMP
+            where bras_id= $id and date_time <= $time::TIMESTAMP and date_time >= $oldTime::TIMESTAMP
                   """
         .as[(Int)])
   }

@@ -1,0 +1,607 @@
+@(response: model.device.RegionOverview )
+
+<script type="text/javascript">
+        // for page Tab Compare
+        function callAjaxCompare(month){
+            $.ajax({
+                url: "/compare-json?month="+month,
+                cache: false,
+                beforeSend: function () {
+                    $('#divTabCpe').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                },
+                success: function (dta) {
+                    if(dta != "Error"){
+                        $('#monthPickerTop').removeClass('error')
+                        var currMonth = dta.currMonth
+                        $("#monthPickerTop").datepicker("update", currMonth)
+                        $('#isClickedTab3').val(1)
+                        /* BOX SIGNIN */
+                        $('#divSignin .signin').text(Number(dta.signin.currSignin).toLocaleString())
+                        $('#divSignin .prevSignin').text(Number(dta.signin.prevSignin).toLocaleString())
+                        var percSignin = (Number(dta.signin.percent) >=0)? '<i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.signin.percent+' %' : '<i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.signin.percent+' %'
+                        $('#divSignin .changeSig').html(percSignin)
+                        $('#divSignin .titprevSign').text('Signin '+dta.prevMonth)
+                        /* BOX LOGOFF */
+                        $('#divLogoff .logoff').text(Number(dta.logoff.currLogoff).toLocaleString())
+                        $('#divLogoff .prevLog').text(Number(dta.logoff.prevLogoff).toLocaleString())
+                        var percLogoff = (Number(dta.logoff.percent) >=0)? '<i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.logoff.percent+' %' : '<i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.logoff.percent+' %'
+                        $('#divLogoff .changeLog').html(percLogoff)
+                        $('#divLogoff .titprevLog').text('Logoff '+dta.prevMonth)
+                        /* BOX SUYHAO */
+                        $('#divSuy .suyhao').text(Number(dta.suyhao.currSuyhao).toLocaleString())
+                        $('#divSuy .prevSuy').text(Number(dta.suyhao.prevSuyhao).toLocaleString())
+                        var percSuy = (Number(dta.suyhao.percent) >=0)? '<i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.suyhao.percent+' %' : '<i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.suyhao.percent+' %'
+                        $('#divSuy .changeSuy').html(percSuy)
+                        $('#divSuy .titprevSuy').text('Suyhao '+dta.prevMonth)
+                        /* BOX NOT PASSED SUYHAO */
+                        $('#divNotsuy .notSuy').text(Number(dta.notSuyhao.currNotsuyhao).toLocaleString())
+                        $('#divNotsuy .prevNotsuy').text(Number(dta.notSuyhao.prevNotsuyhao).toLocaleString())
+                        var percNotsuy = (Number(dta.notSuyhao.percent) >=0)? '<i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.notSuyhao.percent+' %' : '<i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.notSuyhao.percent+' %'
+                        $('#divNotsuy .changeNotsuy').html(percNotsuy)
+                        $('#divNotsuy .titprevNotSuy').text('Not '+dta.prevMonth)
+                        /* BOX BRAS OUTLIER*/
+                        $('.currBras').text(Number(dta.bras.currBras).toLocaleString())
+                        $('.prevBras').text(Number(dta.bras.prevBras).toLocaleString())
+                        var percBras = (Number(dta.bras.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.bras.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.bras.percent+' % </span>'
+                        $('.changeBras').html(percBras)
+                        $('.titprevBras').text('No Outlier '+dta.prevMonth)
+
+                        $('.currAffect').text(Number(dta.affected.currAffect).toLocaleString())
+                        $('.prevAffect').text(Number(dta.affected.prevAffect).toLocaleString())
+                        var percAff = (Number(dta.affected.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.affected.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.affected.percent+' % </span>'
+                        $('.changeAffect').html(percAff)
+                        $('.titprevAffect').text('Affected Clients '+dta.prevMonth)
+                        /* BOX INF OUTLIER */
+                        $('.currOutInf').text(Number(dta.outliInf.currOut).toLocaleString())
+                        $('.prevOutInf').text(Number(dta.outliInf.prevOut).toLocaleString())
+                        var percOut = (Number(dta.outliInf.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.outliInf.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.outliInf.percent+' % </span>'
+                        $('.changeOutinf').html(percOut)
+                        $('.titprevOutInf').text('No Inf Outlier '+dta.prevMonth)
+
+                        $('.currClient').text(Number(dta.clientInf.currClient).toLocaleString())
+                        $('.prevClient').text(Number(dta.clientInf.prevClient).toLocaleString())
+                        var percClient = (Number(dta.clientInf.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.clientInf.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.clientInf.percent+' % </span>'
+                        $('.changeClient').html(percClient)
+                        $('.titpreClient').text('No Inf Clients '+dta.prevMonth)
+
+                        $('.currInfCli').text(Number(dta.infDowncli.currInfCli).toLocaleString())
+                        $('.prevInfCli').text(Number(dta.infDowncli.prevInfCli).toLocaleString())
+                        var percInfCli = (Number(dta.infDowncli.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.infDowncli.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.infDowncli.percent+' % </span>'
+                        $('.changeInfCli').html(percInfCli)
+                        $('.titpreInfCli').text('Inf Down Clients '+dta.prevMonth)
+
+                        $('.currInfOut').text(Number(dta.infDownout.currInfOut).toLocaleString())
+                        $('.prevInfOut').text(Number(dta.infDownout.prevInfOut).toLocaleString())
+                        var percInfOut = (Number(dta.infDownout.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.infDownout.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.infDownout.percent+' % </span>'
+                        $('.changeInfOut').html(percInfOut)
+                        $('.titprevInfOut').text('Inf Down Outlier '+dta.prevMonth)
+
+                        $('.currUserClient').text(Number(dta.userDownCli.currUserCli).toLocaleString())
+                        $('.prevUserCli').text(Number(dta.userDownCli.prevUserCli).toLocaleString())
+                        var percUsercli = (Number(dta.userDownCli.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.userDownCli.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.userDownCli.percent+' % </span>'
+                        $('.changeUserCli').html(percUsercli)
+                        $('.titpreUserCli').text('User Down Clients '+dta.prevMonth)
+
+                        $('.currUserOut').text(Number(dta.userDownout.currUserOut).toLocaleString())
+                        $('.prevUserOut').text(Number(dta.userDownout.prevUserOut).toLocaleString())
+                        var percUserout = (Number(dta.userDownout.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.userDownout.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.userDownout.percent+' % </span>'
+                        $('.changeUserOut').html(percUserout)
+                        $('.titprevUserOut').text('User Down Outlier '+dta.prevMonth)
+
+                        $('.currSfClient').text(Number(dta.sfCli.currSfCli).toLocaleString())
+                        $('.prevSfCli').text(Number(dta.sfCli.prevSfCli).toLocaleString())
+                        var percSfcli = (Number(dta.sfCli.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.sfCli.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.sfCli.percent+' % </span>'
+                        $('.changeSfCli').html(percSfcli)
+                        $('.titpreSfcli').text('Sf Clients '+dta.prevMonth)
+
+                        $('.currSfOut').text(Number(dta.sfOut.currSfOut).toLocaleString())
+                        $('.prevSfOut').text(Number(dta.sfOut.prevSfOut).toLocaleString())
+                        var percSfout = (Number(dta.sfOut.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.sfOut.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.sfOut.percent+' % </span>'
+                        $('.changeSfOut').html(percSfout)
+                        $('.titprevSfOut').text('Sf Outlier '+dta.prevMonth)
+
+                        $('.currSignalClient').text(Number(dta.signalCli.currSigCli).toLocaleString())
+                        $('.prevSigCli').text(Number(dta.signalCli.prevSigCli).toLocaleString())
+                        var percSigcli = (Number(dta.signalCli.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.signalCli.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.signalCli.percent+' % </span>'
+                        $('.changeSigCli').html(percSigcli)
+                        $('.titpreSigCli').text('Lost Signal Clients '+dta.prevMonth)
+
+                        $('.currSignalOut').text(Number(dta.signalOut.currSigOut).toLocaleString())
+                        $('.prevSigOut').text(Number(dta.signalOut.prevSigOut).toLocaleString())
+                        var percSigout = (Number(dta.signalOut.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.signalOut.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.signalOut.percent+' % </span>'
+                        $('.changeSigOut').html(percSigout)
+                        $('.titprevSigOut').text('Lost Signal Outlier '+dta.prevMonth)
+
+                        /* BOX Contract & Device */
+                        $('.prevMonth').text(dta.prevMonth)
+                        $('.currMonth').text(dta.currMonth)
+                        $('.currCt').text(Number(dta.noContract.currNoct).toLocaleString())
+                        $('.prevCt').text(Number(dta.noContract.prevNoct).toLocaleString())
+                        var percCt = (Number(dta.noContract.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.noContract.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.noContract.percent+' % </span>'
+                        $('.changeCt').html(percCt)
+
+                        $('.currDev').text(Number(dta.noDevice.currNodev).toLocaleString())
+                        $('.prevDev').text(Number(dta.noDevice.prevNodev).toLocaleString())
+                        var percDev = (Number(dta.noDevice.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.noDevice.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.noDevice.percent+' % </span>'
+                        $('.changeDev').html(percDev)
+                        /* BOX Connections */
+                        $('.currNotpoor').text(Number(dta.notPoor.currNotpoor).toLocaleString())
+                        $('.prevNotpoor').text(Number(dta.notPoor.prevNotpoor).toLocaleString())
+                        var percnotP = (Number(dta.notPoor.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.notPoor.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.notPoor.percent+' % </span>'
+                        $('.changeNotpoor').html(percnotP)
+
+                        $('.currPoor').text(Number(dta.poor.currPoor).toLocaleString())
+                        $('.prevPoor').text(Number(dta.poor.prevPoor).toLocaleString())
+                        var percConn = (Number(dta.poor.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.poor.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.poor.percent+' % </span>'
+                        $('.changePoor').html(percConn)
+                        /* BOX Kibana & Opsview */
+                        $('.currKiba').text(Number(dta.kibana.currKiba).toLocaleString())
+                        $('.prevKiba').text(Number(dta.kibana.prevKiba).toLocaleString())
+                        var percKiba = (Number(dta.kibana.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.kibana.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.kibana.percent+' % </span>'
+                        $('.changeKiba').html(percKiba)
+
+                        $('.currOps').text(Number(dta.opsview.currOps).toLocaleString())
+                        $('.prevOps').text(Number(dta.opsview.prevOps).toLocaleString())
+                        var percOps = (Number(dta.opsview.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.opsview.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.opsview.percent+' % </span>'
+                        $('.changeOps').html(percOps)
+                        /* BOX Inf Error */
+                        $('#divInfErr .currTotal').text(Number(dta.totalInf.currTotal).toLocaleString())
+                        $('#divInfErr .prevTotal').text(Number(dta.totalInf.prevTotal).toLocaleString())
+                        var percInf = (Number(dta.totalInf.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.totalInf.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.totalInf.percent+' % </span>'
+                        $('#divInfErr .changeTotal').html(percInf)
+
+                        $('#divInfErr .currInfD').text(Number(dta.infDown.currInfD).toLocaleString())
+                        $('#divInfErr .prevInfD').text(Number(dta.infDown.prevInfD).toLocaleString())
+                        var percInfD = (Number(dta.infDown.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.infDown.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.infDown.percent+' % </span>'
+                        $('#divInfErr .changeInf').html(percInfD)
+
+                        $('#divInfErr .currUserD').text(Number(dta.userDown.currUserD).toLocaleString())
+                        $('#divInfErr .prevUserD').text(Number(dta.userDown.prevUserD).toLocaleString())
+                        var percUserD = (Number(dta.userDown.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.userDown.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.userDown.percent+' % </span>'
+                        $('#divInfErr .changeDown').html(percUserD)
+
+                        $('#divInfErr .currSignal').text(Number(dta.signal.currSignal).toLocaleString())
+                        $('#divInfErr .prevSignal').text(Number(dta.signal.prevSignal).toLocaleString())
+                        var percSignal = (Number(dta.signal.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.signal.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.signal.percent+' % </span>'
+                        $('#divInfErr .changeSignal').html(percSignal)
+
+                        $('#divInfErr .currSf').text(Number(dta.sf.currSf).toLocaleString())
+                        $('#divInfErr .prevSf').text(Number(dta.sf.prevSf).toLocaleString())
+                        var percSf = (Number(dta.sf.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.sf.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.sf.percent+' % </span>'
+                        $('#divInfErr .changeSf').html(percSf)
+
+                        $('#divInfErr .currLofi').text(Number(dta.lofi.currLofi).toLocaleString())
+                        $('#divInfErr .prevLofi').text(Number(dta.lofi.prevLofi).toLocaleString())
+                        var percLofi = (Number(dta.lofi.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.lofi.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.lofi.percent+' % </span>'
+                        $('#divInfErr .changeLofi').html(percLofi)
+
+                        $('#divInfErr .currRouge').text(Number(dta.rouge.currRouge).toLocaleString())
+                        $('#divInfErr .prevRouge').text(Number(dta.rouge.prevRouge).toLocaleString())
+                        var percRouge = (Number(dta.rouge.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.rouge.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.rouge.percent+' % </span>'
+                        $('#divInfErr .changeRouge').html(percRouge)
+                    }
+                    else{
+                        $('#monthPickerTop').addClass('error')
+                        alert('Have error. Please select other month !')
+                    }
+                },
+                complete: function () {
+                    $('#divTabCpe').waitMe("hide");
+                },
+            });
+        }
+
+        // for page TOP N
+        function callAjaxTopN(month){
+            var _typeError = $('#typeKibanaError').val()
+            var _typeService = $('#typeServiceStatus').val()
+            var _typeOLTpoor = $('#typeOLTpoor').val()
+            var _typeInftoperr = $('#typeInftoperr').val()
+            $.ajax({
+                url: "/topN-json?month="+month+"&_typeError="+_typeError+"&_typeService="+_typeService+'&_typeOLTpoor='+_typeOLTpoor+'&_typeInftoperr='+_typeInftoperr,
+                cache: false,
+                beforeSend: function () {
+                    $('#divTabTop').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                },
+                success: function (dta) {
+                    if(dta != "Error"){
+                        var monthStr = dta.month
+                        $("#monthPickerTop").datepicker("update", monthStr)
+                        $('#isClickedTab1').val(1)
+                        // top 10 sigin
+                        Highcharts.chart('bar-signin', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                type: 'category'
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: ''
+                                }
+                            },
+                            legend: {
+                                reversed: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal'
+                                }
+                            },
+                            tooltip : {
+                                headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
+                                pointFormat: '<b>{point.name}: {point.y}</b><br/>Total signin clients: {point.k}'
+                            },
+                            series: [{
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topSignin.dataProvince, dta.topSignin.dataClients),
+                                color: '#1ABB9C'
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topSignin.data,dta.topSignin.categories)
+                            }
+                        });
+                        // top 10 Logoff
+                        Highcharts.chart('bar-logoff', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                type: 'category'
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: ''
+                                }
+                            },
+                            tooltip : {
+                                headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
+                                pointFormat: '<b>{point.name}: {point.y}</b><br/>Total logoff clients: {point.k}'
+                            },
+                            legend: {
+                                reversed: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal'
+                                }
+                            },
+                            series: [{
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topLogoff.dataProvince, dta.topLogoff.dataClients),
+                                color: '#d9534f'
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topLogoff.data,dta.topLogoff.categories)
+                            }
+                        });
+                        // top 10 Kibana
+                        Highcharts.chart('bar-kibana', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                type: 'category'
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: ''
+                                }
+                            },
+                            legend: {
+                                reversed: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal',
+                                    dataLabels: {
+                                        enabled: true,
+                                        align: 'top',
+                                        color: '#FFFFFF',
+                                        x: -10
+                                    },
+                                    pointPadding: 0.1,
+                                    groupPadding: 0
+                                }
+                            },
+                            series: [{
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topKibana.dataProvince, []),
+                                color: '#f1b53d'
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topKibana.data, dta.topKibana.categories)
+                            }
+                        });
+                        // top 10 Opsview
+                        Highcharts.chart('bar-opsview', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                type: 'category'
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: ''
+                                }
+                            },
+                            legend: {
+                                reversed: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal',
+                                    dataLabels: {
+                                        enabled: true,
+                                        align: 'top',
+                                        color: '#FFFFFF',
+                                        x: -10
+                                    },
+                                    pointPadding: 0.1,
+                                    groupPadding: 0
+                                }
+                            },
+                            series: [{
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topOpsview.dataProvince, []),
+                                color: '#73879C'
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topOpsview.data, dta.topOpsview.categories)
+                            }
+                        });
+                        // top 10 Inf
+                        Highcharts.chart('bar-inf', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                type: 'category'
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: ''
+                                }
+                            },
+                            tooltip : {
+                                headerFormat: '<span style = "font-size:11px">{series.name}</span><br>',
+                                pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
+                            },
+                            legend: {
+                                reversed: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal'
+                                }
+                            },
+                            series: [{
+                                name: 'Bras',
+                                data: getJsonDrillParent(dta.topInf.dataBras),
+                                color: '#832d1d'
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topInf.data,dta.topInf.categories)
+                            },
+                        });
+                        // top 10 Suyhao
+                        Highcharts.chart('bar-suyhao', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                type: 'category'
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: ''
+                                }
+                            },
+                            legend: {
+                                reversed: true
+                            },
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>'+this.series.name+'<br><b>Total: ' +
+                                            Highcharts.numberFormat(this.point.y,0) + '</b> <br/> Total clients: '+ Highcharts.numberFormat(this.point.k,0);
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal'
+                                }
+                            },
+                            series: [{
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topSuyhao.dataProvince, dta.topSuyhao.dataClients),
+                                color: '#1ABB9C'
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topSuyhao.data,dta.topSuyhao.categories)
+                            }
+                        });
+                        // top 10 Poor conn
+                        Highcharts.chart('bar-poor', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: dta.topPoor.categories
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: ''
+                                }
+                            },
+                            legend: {
+                                reversed: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal'
+                                }
+                            },
+                            series: [{
+                                name: dta.month,
+                                data: dta.topPoor.data,
+                                color: '#9B59B6'
+                            }]
+                        });
+                    }
+                },
+                complete: function () {
+                    $('#divTabTop').waitMe("hide");
+                },
+            });
+        }
+</script>

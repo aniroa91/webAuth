@@ -19,6 +19,34 @@ import scala.concurrent.duration.Duration
 
 object BrasService extends AbstractService{
 
+  def getSigLogByMonth(month: String) = {
+    BrasDAO.getSigLogByMonth(month)
+  }
+
+  def getSuyhaoByMonth(month: String) = {
+    BrasDAO.getSuyhaoByMonth(month)
+  }
+
+  def getBrasOutlierByMonth(month: String) = {
+    BrasDAO.getBrasOutlierByMonth(month)
+  }
+
+  def getInfOutlierByMonth(month: String) = {
+    BrasDAO.getInfOutlierByMonth(month)
+  }
+
+  def getDeviceByMonth(month: String) = {
+    BrasDAO.getDeviceByMonth(month)
+  }
+
+  def getKibaOpsByMonth(month: String) = {
+    BrasDAO.getKibaOpsByMonth(month)
+  }
+
+  def getInfErrorByMonth(month: String) = {
+    BrasDAO.getInfErrorByMonth(month)
+  }
+
   def getErrorMetric(bras: String, time: String) = {
     BrasDAO.getErrorMetric(bras, time)
   }
