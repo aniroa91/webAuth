@@ -163,7 +163,22 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-12" style="padding:0px;">
-                                    <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
+                                    <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Total Outliers Bras Device</h2>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content" style="text-align: center">
+                                                <input type="hidden" id="textBrasOutlier">
+                                                <input type="hidden" id="isRegionBrasOutlier">
+                                                <input type="hidden" id="isProvinceBrasOutlier">
+                                                <div id="bras-outlier" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <input type="hidden" id="regionInf">
                                             <input type="hidden" id="isRegion">
@@ -177,6 +192,21 @@
                                             </div>
                                             <div class="x_content">
                                                 <div id="region-inf" style="height:350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Total Outliers Inf Device</h2>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content" style="text-align: center">
+                                                <input type="hidden" id="textInfOutlier">
+                                                <input type="hidden" id="isRegionInfOutlier">
+                                                <input type="hidden" id="isProvinceInfOutlier">
+                                                <div id="inf-outlier" style="height: 350px;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -467,7 +497,7 @@
                                                     </div>
                                                     <div class="pull-right">
                                                         <h5 class="md-title nomargin">Signin Change</h5>
-                                                        <h4 class="nomargin changeSig" style="color: #c10606"></h4>
+                                                        <h5 class="nomargin changeSig" style="color: #c10606"></h5>
                                                     </div>
                                                 </div>
 
@@ -489,7 +519,7 @@
                                                     </div>
                                                     <div class="pull-right">
                                                         <h5 class="md-title nomargin">Logoff Change</h5>
-                                                        <h4 class="nomargin changeLog" style="color: #130463"> </h4>
+                                                        <h5 class="nomargin changeLog" style="color: #130463"> </h5>
                                                     </div>
                                                 </div>
 
@@ -510,8 +540,8 @@
                                                         <h4 class="nomargin mb5 prevSuy">29,009</h4>
                                                     </div>
                                                     <div class="pull-right">
-                                                        <h5 class="md-title nomargin">Passed Change</h5>
-                                                        <h4 class="nomargin changeSuy" style="color: #c10606"></h4>
+                                                        <h5 class="md-title nomargin">Change</h5>
+                                                        <h5 class="nomargin changeSuy" style="color: #c10606"></h5>
                                                     </div>
                                                 </div>
 
@@ -532,8 +562,8 @@
                                                         <h4 class="nomargin mb5 prevNotsuy">29,009</h4>
                                                     </div>
                                                     <div class="pull-right">
-                                                        <h5 class="md-title nomargin">Not Passed Change</h5>
-                                                        <h4 class="nomargin changeNotsuy" style="color: #130463"> </h4>
+                                                        <h5 class="md-title nomargin">Change</h5>
+                                                        <h5 class="nomargin changeNotsuy" style="color: #130463"> </h5>
                                                     </div>
                                                 </div>
 
@@ -682,19 +712,19 @@
                                                         <td><span class="titTd">Total Inf</span></td>
                                                         <td><p class="excerpt currTotal currTd"> </p></td>
                                                         <td><p class="excerpt prevTotal prevId"></p></td>
-                                                        <td><p class="excerpt changeTotal prevId"> </p></td>
+                                                        <td><p class="excerpt changeTotal"> </p></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><span class="titTd">Inf Down</span></td>
+                                                        <td><span class="titTd">Port Inf Down</span></td>
                                                         <td><p class="excerpt currInfD currTd"> </p></td>
                                                         <td><p class="excerpt prevInfD prevId"> </p></td>
                                                         <td><p class="excerpt changeInf"> </p></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><span class="titTd">User Down</span></td>
+                                                        <td><span class="titTd">Port PON Down</span></td>
                                                         <td><p class="excerpt currUserD currTd"> </p></td>
                                                         <td><p class="excerpt prevUserD prevId"> </p></td>
-                                                        <td><p class="excerpt changeDown"> </p></td>
+                                                        <td><p class="excerpt changeDownU"> </p></td>
                                                     </tr>
                                                     <tr>
                                                         <td><span class="titTd">Lost Signal</span></td>

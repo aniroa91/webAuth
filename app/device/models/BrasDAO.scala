@@ -417,6 +417,18 @@ object BrasDAO {
         .as[(String,String,String,Int)])
   }
 
+  def getOutlierMonthly(fromMonth: String,toMonth: String, name: String) = {
+    val db = s"dmt_overview_${name}_outlier"
+    dbConfig.db.run(
+      sql"""select bras_id,count(*)
+            from #$db
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            group by bras_id
+            """
+        .as[(String, Int)]
+    )
+  }
+
   def getProvinceContract(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int,Int)]] = {
     dbConfig.db.run(
       sql"""select month,province,host,sum(no_contract) as no_contract,sum(no_device) as no_device,sum(poor_conn) as poor_conn

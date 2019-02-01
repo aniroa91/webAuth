@@ -79,6 +79,10 @@ object BrasService extends AbstractService{
     BrasDAO.getProvinceOpsview(fromMonth,toMonth)
   }
 
+  def getOutlierMonthly(fromMonth: String,toMonth: String,db: String) ={
+    BrasDAO.getOutlierMonthly(fromMonth,toMonth,db)
+  }
+
   def getProvinceContract(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int,Int)]]   ={
     BrasDAO.getProvinceContract(fromMonth,toMonth)
   }

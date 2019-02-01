@@ -26,25 +26,25 @@
                         $('#divSignin .prevSignin').text(Number(dta.signin.prevSignin).toLocaleString())
                         var percSignin = (Number(dta.signin.percent) >=0)? '<i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.signin.percent+' %' : '<i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.signin.percent+' %'
                         $('#divSignin .changeSig').html(percSignin)
-                        $('#divSignin .titprevSign').text('Signin '+dta.prevMonth)
+                        $('#divSignin .titprevSign').text(dta.prevMonth)
                         /* BOX LOGOFF */
                         $('#divLogoff .logoff').text(Number(dta.logoff.currLogoff).toLocaleString())
                         $('#divLogoff .prevLog').text(Number(dta.logoff.prevLogoff).toLocaleString())
                         var percLogoff = (Number(dta.logoff.percent) >=0)? '<i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.logoff.percent+' %' : '<i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.logoff.percent+' %'
                         $('#divLogoff .changeLog').html(percLogoff)
-                        $('#divLogoff .titprevLog').text('Logoff '+dta.prevMonth)
+                        $('#divLogoff .titprevLog').text(dta.prevMonth)
                         /* BOX SUYHAO */
                         $('#divSuy .suyhao').text(Number(dta.suyhao.currSuyhao).toLocaleString())
                         $('#divSuy .prevSuy').text(Number(dta.suyhao.prevSuyhao).toLocaleString())
                         var percSuy = (Number(dta.suyhao.percent) >=0)? '<i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.suyhao.percent+' %' : '<i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.suyhao.percent+' %'
                         $('#divSuy .changeSuy').html(percSuy)
-                        $('#divSuy .titprevSuy').text('Suyhao '+dta.prevMonth)
+                        $('#divSuy .titprevSuy').text(dta.prevMonth)
                         /* BOX NOT PASSED SUYHAO */
                         $('#divNotsuy .notSuy').text(Number(dta.notSuyhao.currNotsuyhao).toLocaleString())
                         $('#divNotsuy .prevNotsuy').text(Number(dta.notSuyhao.prevNotsuyhao).toLocaleString())
                         var percNotsuy = (Number(dta.notSuyhao.percent) >=0)? '<i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.notSuyhao.percent+' %' : '<i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.notSuyhao.percent+' %'
                         $('#divNotsuy .changeNotsuy').html(percNotsuy)
-                        $('#divNotsuy .titprevNotSuy').text('Not '+dta.prevMonth)
+                        $('#divNotsuy .titprevNotSuy').text(dta.prevMonth)
                         /* BOX BRAS OUTLIER*/
                         $('.currBras').text(Number(dta.bras.currBras).toLocaleString())
                         $('.prevBras').text(Number(dta.bras.prevBras).toLocaleString())
@@ -164,7 +164,7 @@
                         $('#divInfErr .currUserD').text(Number(dta.userDown.currUserD).toLocaleString())
                         $('#divInfErr .prevUserD').text(Number(dta.userDown.prevUserD).toLocaleString())
                         var percUserD = (Number(dta.userDown.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.userDown.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.userDown.percent+' % </span>'
-                        $('#divInfErr .changeDown').html(percUserD)
+                        $('#divInfErr .changeDownU').html(percUserD)
 
                         $('#divInfErr .currSignal').text(Number(dta.signal.currSignal).toLocaleString())
                         $('#divInfErr .prevSignal').text(Number(dta.signal.prevSignal).toLocaleString())
@@ -603,5 +603,286 @@
                     $('#divTabTop').waitMe("hide");
                 },
             });
+        }
+
+        function getHeatmapBrasOutlier(data, key){
+            var rs = []
+            for(var i=0;i<key.length;i++){
+                var sumVl = 0
+                for(var k=0;k<data.length;k++){
+                    if(data[k][0] == key[i]){
+                        sumVl += data[k][1]
+                    }
+                }
+                rs.push([0, i, sumVl])
+            }
+            return rs
+        }
+
+        //drilldown heat map Inf Outliers
+        function callDrilldownOutlier(cates, _type, db){
+            $.ajax({
+                url: "/ddOutlierByMonth?id=" + cates+"&fromMonth="+$('#startMonth').val()+"&toMonth="+$('#endMonth').val()+"&db="+db,
+                cache: false,
+                success: function (dta) {
+                    if(dta != "Error" && dta.data.length >0){
+                        if(db == "inf") {
+                            var vlMarTop1 = 40
+                            if (cates == "*") vlMarTop1 = 10
+                            Highcharts.chart('inf-outlier', {
+                                chart: {
+                                    type: 'heatmap',
+                                    marginTop: vlMarTop1,
+                                    marginBottom: 60,
+                                    plotBorderWidth: 1
+                                },
+
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    categories: ["Outliers"]
+                                },
+
+                                yAxis: {
+                                    categories: dta.key,
+                                    title: null,
+                                    labels: {
+                                        style: {
+                                            'min-width': '125px'
+                                        },
+                                        useHTML: true
+                                    }
+                                },
+
+                                legend: {
+                                    align: 'center',
+                                    verticalAlign: 'bottom',
+                                    y: 20,
+                                    x: 40
+                                },
+
+                                colorAxis: {
+                                    min: 0,
+                                    minColor: '#FFFFFF',
+                                    maxColor: '#1194a9'
+                                },
+
+                                tooltip: {
+                                    formatter: function () {
+                                        return '<b>' + this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                this.point.value + ' outliers</b> ';
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        events: {
+                                            click: function (event) {
+                                                callDrilldownOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown', 'inf')
+                                            }
+                                        },
+                                        dataLabels: {
+                                            formatter: function () {
+                                                var nf = new Intl.NumberFormat();
+                                                return nf.format(this.point.value);
+                                            }
+                                        },
+                                        cursor: 'pointer'
+                                    }
+                                },
+                                exporting: {
+                                    buttons: [{
+                                        text: 'Back to ' + dta.location,
+                                        onclick: function (e) {
+                                            var id = "*"
+                                            var tit = "back"
+                                            if ($('#textInfOutlier').val() == "Back to province") {
+                                                tit = "drilldown"
+                                                id = $('#isRegionInfOutlier').val()
+                                                $('#textInfOutlier').val('Back to region')
+                                            }
+                                            if ($('#textInfOutlier').val() == "Back to bras") {
+                                                tit = "drilldown"
+                                                id = $('#isProvinceInfOutlier').val()
+                                                $('#textInfOutlier').val('Back to province')
+                                            }
+                                            callDrilldownOutlier(id, tit, 'inf')
+                                        },
+                                        theme: {
+                                            fill: '#1ABB9C',
+                                            'stroke-width': 1,
+                                            stroke: '#169F85',
+                                            color: '#fff',
+                                            states: {
+                                                hover: {
+                                                    fill: '#1ABB9C'
+                                                }
+                                            }
+                                        }
+                                    }]
+                                },
+                                series: [{
+                                    name: 'Outliers',
+                                    borderWidth: 1,
+                                    data: getHeatmapBrasOutlier(dta.data, dta.key),
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000'
+                                    }
+                                }]
+
+                            });
+                            if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                $('#isRegionInfOutlier').val(cates)
+                                $('#textInfOutlier').val("Back to region")
+                            }
+                            if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                $('#isProvinceInfOutlier').val(cates)
+                                $('#textInfOutlier').val("Back to province")
+                            }
+                            else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
+                                $('#textInfOutlier').val("Back to bras")
+                            }
+                            // Apply for button back
+                            if (_type == 'drilldown') {
+                                $('#inf-outlier .highcharts-button').show()
+                                $('.highcharts-contextbutton').hide()
+                            }
+                            else {
+                                $('#inf-outlier .highcharts-button').hide()
+                            }
+                        }
+                        else{
+                            var vlMarTop = 40
+                            if(cates == "*") vlMarTop = 10
+                            Highcharts.chart('bras-outlier', {
+                                chart: {
+                                    type: 'heatmap',
+                                    marginTop: vlMarTop,
+                                    marginBottom: 60,
+                                    plotBorderWidth: 1
+                                },
+
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    categories: ["Outliers"]
+                                },
+
+                                yAxis: {
+                                    categories: dta.key,
+                                    title: null,
+                                    labels: {
+                                        style: {
+                                            'min-width': '125px'
+                                        },
+                                        useHTML : true
+                                    }
+                                },
+
+                                legend: {
+                                    align: 'center',
+                                    verticalAlign: 'bottom',
+                                    y: 20,
+                                    x: 40
+                                },
+
+                                colorAxis: {
+                                    min: 0,
+                                    minColor: '#FFFFFF',
+                                    maxColor: '#1ABB9C'
+                                },
+
+                                tooltip: {
+                                    formatter: function () {
+                                        return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                this.point.value + ' outliers</b> ';
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        events: {
+                                            click: function (event) {
+                                                callDrilldownOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown','bras')
+                                            }
+                                        },
+                                        dataLabels:{
+                                            formatter:function(){
+                                                var nf = new Intl.NumberFormat();
+                                                return nf.format(this.point.value);
+                                            }
+                                        },
+                                        cursor: 'pointer'
+                                    }
+                                },
+                                exporting: {
+                                    buttons: [{
+                                        text: 'Back to '+dta.location,
+                                        onclick: function (e) {
+                                            var id = "*"
+                                            var tit = "back"
+                                            if($('#textBrasOutlier').val() == "Back to province"){
+                                                tit = "drilldown"
+                                                id = $('#isRegionBrasOutlier').val()
+                                                $('#textBrasOutlier').val('Back to region')
+                                            }
+                                            if($('#textBrasOutlier').val() == "Back to bras") {
+                                                tit = "drilldown"
+                                                id = $('#isProvinceBrasOutlier').val()
+                                                $('#textBrasOutlier').val('Back to province')
+                                            }
+                                            callDrilldownOutlier(id, tit,'bras')
+                                        },
+                                        theme: {
+                                            fill: '#1ABB9C',
+                                            'stroke-width': 1,
+                                            stroke: '#169F85',
+                                            color:'#fff',
+                                            states: {
+                                                hover: {
+                                                    fill: '#1ABB9C'
+                                                }
+                                            }
+                                        }
+                                    }]
+                                },
+                                series: [{
+                                    name: 'Outliers',
+                                    borderWidth: 1,
+                                    data: getHeatmapBrasOutlier(dta.data, dta.key),
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000'
+                                    }
+                                }]
+
+                            });
+                            if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                $('#isRegionBrasOutlier').val(cates)
+                                $('#textBrasOutlier').val("Back to region")
+                            }
+                            if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                $('#isProvinceBrasOutlier').val(cates)
+                                $('#textBrasOutlier').val("Back to province")
+                            }
+                            else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
+                                $('#textBrasOutlier').val("Back to bras")
+                            }
+                            // Apply for button back
+                            if(_type == 'drilldown') {
+                                $('#bras-outlier .highcharts-button').show()
+                                $('.highcharts-contextbutton').hide()
+                            }
+                            else{
+                                $('#bras-outlier .highcharts-button').hide()
+                            }
+                        }
+                    }
+                    else{
+                        alert("Error when execute query. Please check again your system!")
+                    }
+                }
+            })
         }
 </script>

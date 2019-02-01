@@ -10,7 +10,9 @@ case class RegionOverview(
                          contracts: Array[(String,String,String,String,Int,Int,Int)],
                          opsviewType: Array[(String,String)],
                          infTypeError: InfTypeError,
-                         totalInf: Array[(String,String,Double)]
+                         totalInf: Array[(String,String,Double)],
+                         brasOutlier:   Array[(String, Int)],
+                         infOutlier :   Array[(String, Int)]
                          )
 case class TimePicker(
                      startMonth: String,

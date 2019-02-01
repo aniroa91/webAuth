@@ -82,7 +82,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     formValidationResult.fold(errorFunction, successFunction)
   }
 
-  // index page Dashboard Device
+  // index page Dashboard Device Monthly
   def overview =  withAuth { username => implicit request =>
     try {
       //val minMaxMonth = CommonService.getRangeCurrentMonth()
@@ -137,8 +137,13 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val rougeError = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
       val lostSignal = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
       val infTypeError = InfTypeError(infDown,userDown,rougeError,lostSignal)
+      // OUTLIERS
+      val brasOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth, toMonth,"bras"), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+        .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
+      val infOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth, toMonth,"inf"), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+        .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
 
-      Ok(device.views.html.monthly.overview(username,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),nocCount,contracts,heatmapOpsview,infTypeError,totalInf)))
+      Ok(device.views.html.monthly.overview(username,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),nocCount,contracts,heatmapOpsview,infTypeError,totalInf,brasOutlier,infOutlier)))
     }
     catch{
       case e: Exception => Ok(device.views.html.monthly.overview(username,null))
@@ -250,6 +255,49 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         }
       }
       Ok(Json.toJson(jsError))
+    }
+    catch {
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def drilldownOutlierMonth(id: String, fromMonth: String, toMonth: String, db: String) = Action {implicit  request =>
+    try{
+      val rs = id match {
+        // get inf by All
+        case id if(id.equals("*")) => {
+          val brasOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth+"-01", toMonth+"-01", db), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+            .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
+          Json.obj(
+            "data" -> brasOutlier,
+            "key"   -> brasOutlier.map(x=> x._1).distinct.sorted,
+            "location" -> "region"
+          )
+        }
+        // get inf by Region
+        case id if(id.substring(id.indexOf(" ")+1).matches("^\\d+$")) => {
+          val brasOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth+"-01", toMonth+"-01", db), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+            .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)),LocationUtils.getNameProvincebyCode(x._1.split("-")(0)) ,x._2)).filter(x=> x._1 == id)
+            .map(x=> (x._2, x._3)).toArray.sorted
+          Json.obj(
+            "data" -> brasOutlier,
+            "key"   -> brasOutlier.map(x=> x._1).distinct.sorted,
+            "location" -> "region"
+          )
+        }
+        // get inf by Province
+        case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")<0) => {
+          val brasOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth+"-01", toMonth+"-01", db), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+            .map(x=> (LocationUtils.getNameProvincebyCode(x._1.split("-")(0)), x._1, x._2)).filter(x=> x._1 == id)
+            .map(x=> (x._2, x._3)).toArray.sorted
+          Json.obj(
+            "data" -> brasOutlier,
+            "key"   -> brasOutlier.map(x=> x._1).distinct.sorted,
+            "location" -> "province"
+          )
+        }
+      }
+      Ok(Json.toJson(rs))
     }
     catch {
       case e: Exception => Ok("Error")

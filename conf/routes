@@ -36,6 +36,8 @@ GET      /getDailyByBrasLocation       controllers.DeviceController.getDailyByBr
 GET      /drilldownBrasOutlier         controllers.DeviceController.drilldownBrasOutlier(id: String ?= "",day: String ?= "")
 GET      /drilldownInfOutlier          controllers.DeviceController.drilldownInfOutlier(id: String ?= "",day: String ?= "")
 
+GET      /ddOutlierByMonth             controllers.DeviceController.drilldownOutlierMonth(id: String ?= "",fromMonth: String ?= "",toMonth: String ?= "", db: String ?= "")
+
 GET      /noc                          controllers.DeviceController.dashboard
 GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
 GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")
