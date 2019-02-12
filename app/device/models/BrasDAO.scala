@@ -418,9 +418,10 @@ object BrasDAO {
   }
 
   def getOutlierMonthly(fromMonth: String,toMonth: String, name: String) = {
+    val colSum = if(name == "bras") "no_outliers" else "total_outliers"
     val db = s"dmt_overview_${name}_outlier"
     dbConfig.db.run(
-      sql"""select bras_id,count(*)
+      sql"""select bras_id, sum(#$colSum)
             from #$db
             where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
             group by bras_id

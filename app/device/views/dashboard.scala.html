@@ -115,26 +115,26 @@
         <div class="row metricGrp" style="display: none">
             <div class="divCircle col-lg-3 col-sm-3 col-md-3 col-xs-12">
                 <div class="circle">
-                    <div class="numberMetric signinVl"></div>
+                    <div class="numberMetric"><span class="signinVl" title="Số KHG ra/vào mạng tại thời điểm xảy ra bất thường"></span></div>
                     <div class="txtMetric signinLabel"></div>
                 </div>
             </div>
             <div class="divCircle col-lg-3 col-sm-3 col-md-3 col-xs-12">
                 <div class="circle">
-                    <div class="numberMetric metricErr"></div>
-                    <div class="txtMetric">Inf Error</div>
+                    <div class="numberMetric"><span class="metricErr" title="Số KHG bị ảnh hưởng bởi lỗi thiết bị Access trong khoảng thời gian 30 phút trước khi xảy ra bất thường"></span></div>
+                    <div class="txtMetric">Users By INF Error </div>
                 </div>
             </div>
             <div class="divCircle col-lg-3 col-sm-3 col-md-3 col-xs-12">
                 <div class="circle">
-                    <div class="numberMetric metricUser">12</div>
-                    <div class="txtMetric">Number User</div>
+                    <div class="numberMetric"><span class="metricUser" title="Số KHG đã khôi phục kết nối sau thời điểm bất thường"></span></div>
+                    <div class="txtMetric">Users Restored Connection</div>
                 </div>
             </div>
             <div class="divCircle col-lg-3 col-sm-3 col-md-3 col-xs-12">
                 <div class="circle">
-                    <div class="numberMetric metricPerct"></div>
-                    <div class="txtMetric">Percentage</div>
+                    <div class="numberMetric"><span class="metricPerct" title="Tỷ lệ KHG đã khôi phục kết nối sau thời điểm bất thường"></span></div>
+                    <div class="txtMetric">Rate Of Users Restored</div>
                 </div>
             </div>
         </div>
@@ -143,8 +143,8 @@
                     <table class="data table table-bordered" id="tbBras" style="margin-bottom: 0px">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 14px">
-                                <th colspan="2">Kibana <i class="fa fa-info-circle toolTipText" title="Data is loaded in 30 minutes"></i></th>
-                                <th colspan="2">Opsview <i class="fa fa-info-circle toolTipText" title="Data is loaded in 30 minutes"></i></th>
+                                <th colspan="2">Kibana <i class="fa fa-info-circle toolTipText" title="Thống kê lỗi thiết bị BRAS trong khoảng thời gian 30 phút trước khi xảy ra bất thường"></i></th>
+                                <th colspan="2">Opsview <i class="fa fa-info-circle toolTipText" title="Thống kê các thay đổi trạng thái của service quản lý trong khoảng thời gian 30 phút trước khi xảy ra bất thường"></i></th>
                             </tr>
                             <tr style="color: cornsilk">
                                 <th colspan="1" style="width: 35%">Error Name</th>
@@ -172,7 +172,7 @@
             </div>
             <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12" id="heat-mapChart" style="display: none">
                 <div class="titleInline">
-                    <h2 id="titLineCard" style="margin-right: 5px;font-weight: 600"></h2> <i class="fa fa-info-circle toolTipText" title="Data card is loaded between 1 minutes before and 1 minutes later than the current time bras"></i>
+                    <h2 id="titLineCard" style="margin-right: 5px;font-weight: 600"></h2> <i class="fa fa-info-circle toolTipText" title="Thống kê hoạt động kết nối theo card và linecard trên thiết bị BRAS trong thời gian trước và sau 1 phút so với thời điểm bất thường"></i>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_panel tile">
@@ -185,7 +185,7 @@
         <br>
         <div style="display: none" id="line-chart">
             <div class="titleInline">
-                <h2 style="margin-right: 5px;font-weight: 600"> Detail information</h2> <i class="fa fa-info-circle toolTipText" title="Data is loaded between 30 minutes before and 30 minutes later than the current time bras"></i>
+                <h2 style="margin-right: 5px;font-weight: 600"> Detail Information</h2> <i class="fa fa-info-circle toolTipText" title="Thông tin ra vào mạng của BRAS bị bất thường trước và sau 30 phút so với thời điểm bất thường"></i>
                 <div class="clearfix"></div>
             </div>
             <div class="x_panel tile">
@@ -210,7 +210,7 @@
                     <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 16px">
-                                <th colspan="11">List Of OLT Get Error</th>
+                                <th colspan="11">List Of OLT Get Error <i class="fa fa-info-circle toolTipText" title="Danh sách thiết bị OLT và module tương ứng bị lỗi trong khoảng thời gian 30 phút trước khi xảy ra bất thường"></i></th>
                             </tr>
                             <tr style="font-size: 14px;color:#ddd">
                                 <th style="width: 15%">Host</th>
@@ -698,10 +698,10 @@
                                         if(!($('#tbUser i:eq(0)').hasClass('fa-download'))) {
                                             $('.buttons-csv').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>');
                                             if(sigLog[0][1] <= sigLog[0][2]){
-                                                $('.dt-buttons').prepend('<span class="titCsvBtn" title="Data is loaded in a minute" style="background: #149c7f">List Of Client Signed In</span>');
+                                                $('.dt-buttons').prepend('<span class="titCsvBtn" title="Danh sách KHG vào mạng tại thời điểm bất thường" style="background: #149c7f">List Of Client Signed In</span>');
                                             }
                                             else{
-                                                $('.dt-buttons').prepend('<span class="titCsvBtn" title="Data is loaded in a minute" style="background: #d9534f">List Of Client Logged Off</span>');
+                                                $('.dt-buttons').prepend('<span class="titCsvBtn" title="Danh sách KHG ra mạng tại thời điểm bất thường" style="background: #d9534f">List Of Client Logged Off</span>');
                                             }
                                             /*$('.buttons-excel').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')
                                             $('.buttons-pdf').prepend('<i class="fa fa-download" style="margin-right: 2px"></i>')*/

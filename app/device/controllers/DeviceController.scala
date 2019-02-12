@@ -1731,9 +1731,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val users = if(trackingUser.length > 0) trackingUser(0)._1 else 0
       val perct = if(trackingUser.length > 0) trackingUser(0)._2 else 0
       val metricErr = Await.result(BrasService.getErrorMetric(idBras, time), Duration.Inf).sum
+      val nameMetric = if(numLog>numSig) "Logged Off" else "Signed In"
       val metrics = Json.obj(
         "signin" -> signinUnique,
-        "label"  -> s"${_type} Unique",
+        "label"  -> s"Users $nameMetric",
         "error"  -> metricErr,
         "users"  -> users,
         "perct"  -> perct
