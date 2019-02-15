@@ -1600,10 +1600,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           //val infErrorBytime = (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrInferror, x)).toArray
           logger.info("tInfErrorBytime: " + (System.currentTimeMillis() - t3))
           val t30 = System.currentTimeMillis()
-          //val infErrorBytime = null
-          // INF HOST
-          val infHostBytime = BrasService.getInfhostResponse(brasId, day).filter(x=> (x._2 !=0 && x._3 !=0))
-          logger.info("tInfHostBytime: " + (System.currentTimeMillis() - t30))
+          // INF SERVICE
+          val serviceByTime = Await.result(BrasService.getServiceNameStt(brasId.substring(0, brasId.indexOf("-")), day), Duration.Inf).map(x=> (x._1, x._2.toLowerCase(), x._3))
+          logger.info("serviceByTime: " + (System.currentTimeMillis() - t30))
           // val infHostBytime = null
           val t4 = System.currentTimeMillis()
           // INF MODULE
@@ -1651,10 +1650,14 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           // SIGNIN LOGOFF BY HOST
           val siglogByhost = BrasService.getSigLogByHost(brasId, day)
           logger.info("tSiglogByhost: " + (System.currentTimeMillis() - t10))
+          // SERVICE SANKEY
+          val t11 = System.currentTimeMillis()
+          val sankeyService = Await.result(BrasService.getSankeyService(brasId.substring(0, brasId.indexOf("-")), day), Duration.Inf)
+          logger.info("tSankeyService: " + (System.currentTimeMillis() - t11))
 
           logger.info("timeAll: " + (System.currentTimeMillis() - timeStart))
           Ok(device.views.html.search(form, username,null ,BrasResponse(BrasInfor(noOutlierByhost,numOutlier, (sigLog._1, sigLog._2),(sigLogClients._1,sigLogClients._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
-            infErrorBytime, infHostBytime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost, KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost), day, brasId,_typeS,routes.DeviceController.search))
+            infErrorBytime, serviceByTime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost, KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost, sankeyService), day, brasId,_typeS,routes.DeviceController.search))
         }
       }
       else{
@@ -1739,7 +1742,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "users"  -> users,
         "perct"  -> perct
       )
-      logger.info("metrics: " + (System.currentTimeMillis() - t5))
+      logger.info("tMetrics: " + (System.currentTimeMillis() - t5))
+
+      val t6 = System.currentTimeMillis()
+      val devSwt = Await.result(BrasService.getDeviceSwitch(idBras.substring(0, idBras.indexOf("-"))+"%", time, oldTime), Duration.Inf)
+      logger.info("TDevice type: " + (System.currentTimeMillis() - t6))
 
       val jsBras = Json.obj(
         "metrics"      -> metrics,
@@ -1754,9 +1761,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "dtaCard"      -> listCard,
         "brasKibana"   -> brasKibana,
         "brasOpview"   -> brasOpview,
-        "userLogoff"   -> userLogoff
+        "userLogoff"   -> userLogoff,
+        "devSwitch"    -> devSwt
       )
-      println("time:"+ (System.currentTimeMillis() -t0))
+      logger.info("Time:"+ (System.currentTimeMillis() -t0))
       Ok(Json.toJson(jsBras))
     }
     catch{

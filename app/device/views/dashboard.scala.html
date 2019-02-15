@@ -195,6 +195,29 @@
             </div>
         </div>
         <br>
+        <div class="row">
+            <div class="col-xs-12" id="divSwt" style="display: none">
+                <table class="data table table-bordered scrollTB" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Bras Id <i class="fa fa-info-circle toolTipText" title="Danh sách thiết bị Switch bị lỗi trong khoảng thời gian 30 phút trước khi xảy ra bất thường"></i></th>
+                            <th>Service Name</th>
+                            <th>Service Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #f5f10d">
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br>
         <div class="row" id="hostBras" style="display: none">
             <div class="col-lg-5 col-sm-5 col-md-5 col-xs-12">
                 <div class="card-header">
@@ -242,7 +265,7 @@
         <!-- footer content -->
     <footer>
         <div class="pull-right">
-            Dashboard Admin 21/09/2017
+            Dashboard Monitor 2018
         </div>
         <div class="clearfix"></div>
     </footer>
@@ -345,6 +368,15 @@
                 }, 5000);
 
                 activeOnclick();
+
+                $('.scrollTB').DataTable( {
+                    "scrollY":        "200px",
+                    "scrollCollapse": true,
+                    "paging":         false,
+                    "info":     false,
+                    "searching":     false,
+                    "sort":     false
+                });
 
                 $('[data-toggle="tooltip"]').tooltip();
                 $("[data-toggle='toggle']").click(function() {
@@ -738,6 +770,17 @@
                                         $('#tbHost tbody').html('');
                                         $('#tbHost tbody').append(html);
                                     }
+                                    // table Device type Switch
+                                    $('#divSwt').show()
+                                    $('.scrollTB').DataTable().rows().remove().draw()
+                                    for(var i=0;i< dtBras.devSwitch.length;i++){
+                                        $('.scrollTB').DataTable().row.add( [
+                                            dtBras.devSwitch[i][0],
+                                            dtBras.devSwitch[i][1],
+                                            dtBras.devSwitch[i][2],
+                                            dtBras.devSwitch[i][3]
+                                        ] ).draw( false );
+                                    }
                                 }
                                 else{
                                     location.href = "/noc";
@@ -758,9 +801,17 @@
                     $('#tbHost').waitMe("hide");
                     $('#line-bras').waitMe("hide");
                     $('#heat-mapChart').waitMe("hide");
+                    $('#divSwt').waitMe("hide");
                 }
 
                 function waitMe(){
+                    $('#divSwt').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
                     $('#heat-mapChart').waitMe({
                         effect: 'roundBounce',
                         text: 'Please wait...',

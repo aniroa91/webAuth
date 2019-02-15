@@ -1188,35 +1188,42 @@ object BrasDAO {
         .as[(Int,Int)])*/
   }
 
-  def getInfhostResponse(bras: String,nowDay: String): Array[(String,Long,Long)] = {
+  def getSankeyService(bras: String, nowDay: String) = {
+    val brasId = s"%$bras%"
     val fromDay = nowDay.split("/")(0)
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-    val rs = client.execute(
-      search(s"infra_dwh_inf_host_*" / "docs")
-        query { must(termQuery("bras_id.keyword",bras),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
-        aggregations(
-        termsAggregation("host")
-          .field("host.keyword")
-          .subaggs(
-            sumAgg("sum0","sf_error"),
-            sumAgg("sum1","lofi_error")
-          ) size 100
-        )
-    ).await
-    CommonService.getTermGroupMultiSums(rs, "host", "sum0","sum1")
-   /* dbConfig.db.run(
-      sql"""select host, sum(sf_error) as cpe,sum(lofi_error) as lostip
-            from dwh_inf_host
-            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
-            group by host
+    dbConfig.db.run(
+      sql"""select bras_id, service_name, count(*)
+            from dwh_opsview
+            where date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP AND device_type='switch'
+            	  AND bras_id IN(
+            			select bras_id
+                        from dwh_opsview where bras_id like $brasId and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP AND device_type='switch'
+            			group by bras_id
+            			order by count(*) desc limit 10
+            		)
+            group by bras_id, service_name
                   """
-        .as[(String,Int,Int)])*/
+        .as[(String, String, Int)])
+  }
+
+  def getServiceNameStt(bras: String, nowDay: String) = {
+    val brasId = s"%$bras%"
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select service_name, service_status, count(*)
+            from dwh_opsview
+            where bras_id like $brasId and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP AND device_type='switch'
+            group by service_name, service_status
+                  """
+        .as[(String, String, Int)])
   }
 
   def getInfModuleResponse(bras: String,nowDay: String): Array[(String,String,Long,Long,Long)] = {
     val rs = client.execute(
       search(s"infra_dwh_inf_module_*" / "docs")
-        query { must(termQuery("bras_id.keyword",bras),not(termQuery("module.keyword","-1")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        query { must(termQuery("bras_id",bras),not(termQuery("module.keyword","-1")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations(
         termsAggregation("host")
           .field("host.keyword")

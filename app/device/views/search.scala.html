@@ -575,18 +575,7 @@
                             <div class="col-lg-6 col-sm-6 col-md-6">
                                 <div class="x_panel tile" style="padding: 0px;">
                                     <div class="card-header">
-                                        Nerror By Host <i class="fa fa-info-circle toolTipText" title="Deletes"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="col-host" style="height: 300px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Sigin and Logoff By Host <i class="fa fa-info-circle toolTipText" title="Thống kê hoạt động ra vào mạng theo thiết bị Access trong BRAS"></i>
+                                        Signin and Logoff By Host <i class="fa fa-info-circle toolTipText" title="Thống kê hoạt động ra vào mạng theo thiết bị Access trong BRAS"></i>
                                         <div class="clearfix"></div>
                                     </div>
                                     <div class="x_content">
@@ -595,10 +584,37 @@
                                 </div>
                             </div>
                             <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;
-                                    height: 355px">
+                                <div class="x_panel tile" style="padding: 0px;">
                                     <div class="card-header">
-                                        Nerror by host, module and error <i class="fa fa-info-circle toolTipText" title="Thống kê lỗi thiết bị Access theo từng thiết bị Access trong BRAS"></i>
+                                        No. Of Alert By Switch And Status <i class="fa fa-info-circle toolTipText" title="Thống kê số cảnh báo theo từng Switch và trạng thái"></i>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
+                                        <div id="col-service" style="height: 370px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-6 col-md-6">
+                                <div class="x_panel tile" style="padding: 0px;">
+                                    <div class="card-header">
+                                        No. Of Alert By Switch And Monitoring Service <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái theo từng Switch và service quản lý"></i>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
+                                        @if(response.sankeyService.map(x=> x._1).distinct.length <= 4){
+                                            <div id="sankey-service" style="height: 370px;"></div>
+                                        }else{
+                                            <div id="sankey-service" style="height: 570px;"></div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-6 col-md-6">
+                            </div>
+                            <div class="col-lg-6 col-sm-6 col-md-6">
+                                <div class="x_panel tile" style="padding: 0px;height: 355px">
+                                    <div class="card-header">
+                                        Nerror By Host, Module And Error <i class="fa fa-info-circle toolTipText" title="Thống kê lỗi thiết bị Access theo từng thiết bị Access trong BRAS"></i>
                                         <div class="clearfix"></div>
                                     </div>
                                     <div class="x_content">
@@ -672,7 +688,7 @@
     <script src="../assets/javascripts/exporting.js"></script>
     <script src="../assets/javascripts/heatmap.js"></script>
     <script src="../assets/javascripts/treemap.js"></script>
-
+    <script src="../assets/javascripts/sankey.js"></script>
 
         <!-- Counter number -->
     <script src="../assets/javascripts/jquery.counterup.min.js"></script>
@@ -1570,17 +1586,17 @@
                 /* END KIBANA JS */
 
                 /* INF JS */
-                // col nerror by host
-                @if(response.infHostBytime != null){
-                    Highcharts.chart('col-host', {
+                // col service by status
+                @if(response.serviceByTime != null){
+                    Highcharts.chart('col-service', {
                         chart: {
-                            type: 'column'
+                            type: 'bar'
                         },
                         title: {
                             text: ''
                         },
                         xAxis: {
-                            categories: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=> x._1))))
+                            categories: @Html(Json.stringify(Json.toJson(response.serviceByTime.map(x=> x._1).distinct)))
                         },
                         yAxis: {
                             min: 0,
@@ -1591,20 +1607,25 @@
                         legend: {
                             reversed: true
                         },
-                        colors: ['rgb(148, 50, 115)', '#f6c163'],
                         plotOptions: {
                             series: {
                                 stacking: 'normal'
                             },
                         },
-                        series: [{
-                            name: 'Sf',
-                            data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._2))))
+                        series: getSeriesStackBar(@Html(Json.stringify(Json.toJson(response.serviceByTime))), @Html(Json.stringify(Json.toJson(response.serviceByTime.map(x=> x._2).distinct))), @Html(Json.stringify(Json.toJson(response.serviceByTime.map(x=> x._1).distinct))))
+                    });
+                }
+                @if(response.sankeyService != null){
+                    Highcharts.chart('sankey-service', {
+                        title: {
+                            text: ''
                         },
-                            {
-                                name: 'Lofi',
-                                data: @Html(Json.stringify(Json.toJson(response.infHostBytime.map(x=>x._3))))
-                            }]
+                        series: [{
+                            keys: ['from', 'to', 'weight'],
+                            data: @Html(Json.stringify(Json.toJson(response.sankeyService))),
+                            type: 'sankey',
+                            name: 'Switch And Monitoring'
+                        }]
                     });
                 }
                 @if(response.siglogByhost != null){
@@ -1789,6 +1810,46 @@
                     jsonArr.push([Number(data[i][0]),0,Number(data[i][1])]);
                 }
                 return jsonArr
+            }
+
+            function getSeriesStackBar(dta, arrKey1, arrKey2){
+                var jsArray = []
+                var colors = [
+                    '#d9534f',
+                    '#73879C',
+                    '#1ABB9C',
+                    '#f1b53d',
+                    '#E74C3C',
+                    '#73879C',
+                    '#832d1d',
+                    '#0000cc',
+                    '#09006d',
+                    '#cccccc',
+                    '#669999',
+                    '#f2ccff',
+                    '#e6e600',
+                    '#132639',
+                    '#99cc00',
+                    '#466d6d',
+                    '#ffc6b3',
+                    '#666633',
+                    '#ffff00'];
+                for(var i=0; i< arrKey1.length; i++ ){
+                    var arrData = []
+                    for(var j=0;j<arrKey2.length;j++ ) {
+                        for (var k = 0; k < dta.length; k++) {
+                            if (arrKey1[i] == dta[k][1] && arrKey2[j] == dta[k][0]){
+                                arrData.push(dta[k][2])
+                            }
+                        }
+                    }
+                    jsArray.push({
+                        name: arrKey1[i],
+                        data: arrData,
+                        color: colors[i]
+                    })
+                }
+                return jsArray
             }
 
             function getDrilldownBubleChart(dta,arrModule){

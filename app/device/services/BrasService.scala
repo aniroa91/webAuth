@@ -681,8 +681,12 @@ object BrasService extends AbstractService{
     BrasDAO.getInfErrorBytimeResponse(bras,nowDay,hourly)
   }
 
-  def getInfhostResponse(bras: String,nowDay: String):Array[(String,Long,Long)] = {
-    BrasDAO.getInfhostResponse(bras,nowDay)
+  def getSankeyService(bras: String,nowDay: String) = {
+    BrasDAO.getSankeyService(bras,nowDay)
+  }
+
+  def getServiceNameStt(bras: String,nowDay: String) = {
+    BrasDAO.getServiceNameStt(bras,nowDay)
   }
 
   def getInfModuleResponse(bras: String,nowDay: String): Array[(String,String,Long,Long,Long)] = {
@@ -775,6 +779,10 @@ object BrasService extends AbstractService{
 
   def getKibana(id : String,time: String,oldTime: String): Future[Seq[(String,String)]] = {
     BrasesCard.getKibana(id,time,oldTime)
+  }
+
+  def getDeviceSwitch(id : String,time: String,oldTime: String) = {
+    BrasesCard.getDeviceSwitch(id,time,oldTime)
   }
 
   def getNumLogSiginById(id : String,time: String): Future[Seq[(Int,Int)]] = {

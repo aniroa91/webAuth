@@ -91,6 +91,17 @@ object BrasesCard {
     //}finally dbConfig.db.close
   }
 
+  def getDeviceSwitch(id : String,time: String,oldTime: String) : Future[Seq[(String,String,String,Int)]] = {
+    println(id)
+    dbConfig.db.run(
+      sql"""select bras_id,service_name,service_status, count(*)
+            from dwh_opsview
+            where bras_id like $id and device_type='switch' and date_time>=$oldTime::TIMESTAMP and date_time <=$time::TIMESTAMP
+            GROUP BY bras_id,service_name,service_status
+         """
+        .as[(String,String,String,Int)])
+  }
+
   def getKibana(id : String,time: String,oldTime: String) : Future[Seq[(String,String)]] = {
     dbConfig.db.run(
       sql"""select distinct case when tbK.error_name='' then tbK.facility else tbK.error_name end,tbK.severity

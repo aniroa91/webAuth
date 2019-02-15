@@ -106,11 +106,12 @@ case class BrasResponse(
                             kibanaOpviewBytime: KibanaOpviewByTime,
                             sigLogBytime: SigLogByTime,
                             infErrorBytime: Array[(Int,Int, Int,Int, Int,Int,Int,Int)],
-                            infHostBytime: Array[(String,Long,Long)],
+                            serviceByTime: Seq[(String,String,Int)],
                             infModuleBytime: Array[(String,String,Long,Long,Long)],
                             opServiceStt: Seq[(String,Int)],
                             servNameStt: ServiceNameStatus,
                             linecardhost: Array[(String,String)],
                             kibanaOverview: KibanaOverview,
-                            siglogByhost: SigLogByHost
+                            siglogByhost: SigLogByHost,
+                            sankeyService: Seq[(String,String,Int)]
                        )
