@@ -117,7 +117,7 @@
                         <div class="x_content" style="text-align: center">
                             @if(response.errorsDevice.length >0){
                                 <div id="tree-map" style="height: 350px;"></div>
-                                <form id="frmDeviceErr" style="text-align: center">
+                                <form id="frmDeviceErr" style="text-align: center;font-size: 11px">
                                     <input type="hidden" id="typeDeviceErr" value="*">
                                     <label class="radio-inline radioText">
                                         <input type="radio" value="*" name="optradio" checked>All
@@ -219,16 +219,16 @@
                         <div class="x_content" style="text-align: center">
                         @if(response.rsErrorsInf.length >0 ) {
                             <div id="region-inf" style="height: 350px;"></div>
-                            <form id="frmInfErrordaily" style="text-align: center">
+                            <form id="frmInfErrordaily" style="text-align: center;font-size: 12px">
                                 <input type="hidden" id="typeInfErr" value="*">
                                 <label class="radio-inline radioText">
                                     <input type="radio" value="*" name="optradio" checked>All
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" value="user_down" name="optradio">UserDown
+                                    <input type="radio" value="user_down" name="optradio">PortPON Down
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" value="inf_down" name="optradio">InfDown
+                                    <input type="radio" value="inf_down" name="optradio">PortInf Down
                                 </label>
                                 <label class="radio-inline">
                                     <input type="radio" value="sf_error" name="optradio">SfError
@@ -592,6 +592,7 @@
                             }]
 
                         });
+
                         // click group time tab
                         $('.nav-pills li').click( function () {
                             // _type: 0 hourly time
@@ -606,7 +607,7 @@
                                         heat_mapInfTab.series[0].setData(getErrorHourlyHeatmap(dta.data), true,true,false)
                                     }
                                     else{
-                                        alert("Error when execute query. Please check again your system!")
+                                        console.log("Error when execute query. Please check again your system!")
                                     }
                                 }
                             })
@@ -916,6 +917,8 @@
                         });
                     }
                     @if(response.noticeOpsview.length > 0){
+                        // right click event
+                        fntRightClick()
                         var bar_notice = Highcharts.chart('bar-service', {
                             chart: {
                                 type: 'bar'
@@ -938,7 +941,15 @@
                             },
                             plotOptions: {
                                 series: {
-                                    stacking: 'normal'
+                                    stacking: 'normal',
+                                    point:{
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.noticeOpsview))),@Html(Json.stringify(Json.toJson(response.noticeOpsview.map(x=> x._1).toSeq.distinct.sorted)))),
@@ -957,7 +968,7 @@
                         });
                     }
 
-                    function getJsonTreemap(dta){
+                function getJsonTreemap(dta){
                         var jsonArr = [];
                         for (var i = 0; i < dta.length; i++) {
                             jsonArr.push({
@@ -1020,9 +1031,16 @@
                                         }
                                     }
                                     treemapError.series[0].setData(getJsonTreemap(dta.data))
+                                    // right click yAxis
+                                    $('#tree-map .highcharts-level-group-1 rect').mousedown(function(e) {
+                                        if(e.which == 3 && e.target.point.name.indexOf('-') >=0){
+                                            window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                        }
+                                        return false;
+                                    });
                                 }
                                 else{
-                                    alert("Error when execute query. Please check again your system!")
+                                    console.log("Error when execute query. Please check again your system!")
                                 }
                             }
                         })
@@ -1097,7 +1115,7 @@
                                     //bar_notice.options.drilldown.series[0] = getDrillDown2Level(dta.data, dta.cates)
                                 }
                                 else{
-                                    alert("Error when execute query. Please check again your system!")
+                                    console.log("Error when execute query. Please check again your system!")
                                 }
                             }
                         })
@@ -1150,9 +1168,16 @@
                                     chartSigLogDaily.xAxis[1].update({categories: dta.cates});
                                     chartSigLogDaily.series[0].setData(addParamClients(dta.signin))
                                     chartSigLogDaily.series[1].setData(addParamClients(dta.logoff))
+                                    // right click yAxis
+                                    $('#region-siglog-bar .highcharts-xaxis-labels text').mousedown(function(e) {
+                                        if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                            window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                        }
+                                        return false;
+                                    });
                                 }
                                 else{
-                                    alert("Error when execute query. Please check again your system!")
+                                    console.log("Error when execute query. Please check again your system!")
                                 }
                             }
                         })
@@ -1204,9 +1229,16 @@
                                         }
                                     }
                                     errors_inf.series[0].setData(dta.data)
+                                    // right click yAxis
+                                    $('#region-inf .highcharts-data-label tspan').contextmenu(function(e) {
+                                        if(e.target.textContent.indexOf('-') >=0){
+                                            window.open("/fwdRequest?bras=" + e.target.textContent)
+                                        }
+                                        return false;
+                                    });
                                 }
                                 else{
-                                    alert("Error when execute query. Please check again your system!")
+                                    console.log("Error when execute query. Please check again your system!")
                                 }
                             }
                         })
@@ -1352,11 +1384,18 @@
                                     else{
                                         $('#bras-outlier .highcharts-button').hide()
                                     }
+                                    // right click yAxis
+                                    $('#bras-outlier .highcharts-yaxis-labels span').mousedown(function(e) {
+                                        if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                            window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                        }
+                                        return false;
+                                    });
                                     //heat_bras_outlier.yAxis[0].update({categories: dta.key})
                                     //heat_bras_outlier.series[0].setData(getHeatmapBrasOutlier(dta.data, dta.key))
                                 }
                                 else{
-                                    alert("Error when execute query. Please check again your system!")
+                                    console.log("Error when execute query. Please check again your system!")
                                 }
                             }
                         })
@@ -1492,9 +1531,16 @@
                                     else{
                                         $('#inf-outlier .highcharts-button').hide()
                                     }
+                                    // right click yAxis
+                                    $('#inf-outlier .highcharts-yaxis-labels span').mousedown(function(e) {
+                                        if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                            window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                        }
+                                        return false;
+                                    });
                                 }
                                 else{
-                                    alert("Error when execute query. Please check again your system!")
+                                    console.log("Error when execute query. Please check again your system!")
                                 }
                             }
                         })

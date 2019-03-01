@@ -91,7 +91,22 @@
                                                                 type: 'category'
                                                         },
                                                         colors:['#f60'],
-
+                                                        plotOptions: {
+                                                                series: {
+                                                                        point: {
+                                                                                events: {
+                                                                                        contextmenu: function (e) {
+                                                                                                if($('#brasRighClick').val().indexOf('-') >=0)
+                                                                                                        window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
+                                                                                        },
+                                                                                        mouseOver: function () {
+                                                                                                if(this.name.indexOf('-')>=0)
+                                                                                                        $('#brasRighClick').val(this.name)
+                                                                                        }
+                                                                                }
+                                                                        }
+                                                                }
+                                                        },
                                                         series: [{
                                                                 name: id,
                                                                 data: getDrillDownStackedAndLine( dta.dtaByRegion)
@@ -148,6 +163,22 @@
                                                                                 +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
                                                                 }
                                                         },
+                                                        plotOptions: {
+                                                                series: {
+                                                                        point: {
+                                                                                events: {
+                                                                                        contextmenu: function (e) {
+                                                                                                if($('#brasRighClick').val().indexOf('-') >=0)
+                                                                                                        window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
+                                                                                        },
+                                                                                        mouseOver: function () {
+                                                                                                if(this.name.indexOf('-')>=0)
+                                                                                                        $('#brasRighClick').val(this.name)
+                                                                                        }
+                                                                                }
+                                                                        }
+                                                                }
+                                                        },
                                                         colors: ['#5A738E'],
                                                         series: [{
                                                                 name: id,
@@ -184,6 +215,8 @@
                                 success: function (dta) {
                                         if(dta != "Error"){
                                                 // top 10 Kibana
+                                                // right click event
+                                                fntRightClick()
                                                 Highcharts.chart('bar-kibana', {
                                                         chart: {
                                                                 type: 'bar'
@@ -211,6 +244,14 @@
                                                                                 align: 'top',
                                                                                 color: '#FFFFFF',
                                                                                 x: -10
+                                                                        },
+                                                                        point:{
+                                                                                events: {
+                                                                                        contextmenu: function (e) {
+                                                                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                                                                        window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                                                        }
+                                                                                }
                                                                         },
                                                                         pointPadding: 0.1,
                                                                         groupPadding: 0
@@ -259,6 +300,8 @@
                                 success: function (dta) {
                                         if(dta != "Error"){
                                                 // top 10 Opsview
+                                                // right click event
+                                                fntRightClick()
                                                 Highcharts.chart('bar-opsview', {
                                                         chart: {
                                                                 type: 'bar'
@@ -286,6 +329,14 @@
                                                                                 align: 'top',
                                                                                 color: '#FFFFFF',
                                                                                 x: -10
+                                                                        },
+                                                                        point:{
+                                                                                events: {
+                                                                                        contextmenu: function (e) {
+                                                                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                                                                        window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                                                        }
+                                                                                }
                                                                         },
                                                                         pointPadding: 0.1,
                                                                         groupPadding: 0
@@ -342,7 +393,7 @@
                                                                 text: ''
                                                         },
                                                         xAxis: {
-                                                                categories: dta.categories
+                                                                type: 'category'
                                                         },
                                                         yAxis: {
                                                                 min: 0,
@@ -358,11 +409,38 @@
                                                                         stacking: 'normal'
                                                                 }
                                                         },
+                                                        tooltip: {
+                                                                formatter: function () {
+                                                                        return '<b>' + this.point.name +'</b><br>Total: ' +
+                                                                                Highcharts.numberFormat(this.point.y,0)
+                                                                }
+                                                        },
                                                         series: [{
-                                                                name: dta.month,
-                                                                data: dta.data,
+                                                                name: 'Province',
+                                                                data: getJsonDrillParenthaveClients(dta.dataProvince, []),
                                                                 color: '#9B59B6'
-                                                        }]
+                                                        }],
+                                                        drilldown: {
+                                                                drillUpButton: {
+                                                                        relativeTo: 'spacingBox',
+                                                                        position: {
+                                                                                y: 0,
+                                                                                x: 0
+                                                                        },
+                                                                        theme: {
+                                                                                fill: '#85d088',
+                                                                                'stroke-width': 1,
+                                                                                stroke: 'silver',
+                                                                                r: 0,
+                                                                                states: {
+                                                                                        hover: {
+                                                                                                fill: '#85d088',
+                                                                                        }
+                                                                                }
+                                                                        }
+                                                                },
+                                                                series: getJsonDrillChildren(dta.data, dta.categories)
+                                                        }
                                                 });
                                         }
                                 },
@@ -380,6 +458,8 @@
                                 success: function (dta) {
                                         if(dta != "Error"){
                                                 // top 10 Inf
+                                                // right click event
+                                                fntRightClick()
                                                 Highcharts.chart('bar-inf', {
                                                         chart: {
                                                                 type: 'column'
@@ -405,35 +485,30 @@
                                                         },
                                                         plotOptions: {
                                                                 series: {
-                                                                        stacking: 'normal'
-                                                                }
-                                                        },
-                                                        series: [{
-                                                                name: 'Bras',
-                                                                data: getJsonDrillParent(dta.dataBras),
-                                                                color: '#832d1d'
-                                                        }],
-                                                        drilldown: {
-                                                                drillUpButton: {
-                                                                        relativeTo: 'spacingBox',
-                                                                        position: {
-                                                                                y: 0,
-                                                                                x: 0
-                                                                        },
-                                                                        theme: {
-                                                                                fill: '#85d088',
-                                                                                'stroke-width': 1,
-                                                                                stroke: 'silver',
-                                                                                r: 0,
-                                                                                states: {
-                                                                                        hover: {
-                                                                                                fill: '#85d088',
+                                                                        stacking: 'normal',
+                                                                        point:{
+                                                                                events: {
+                                                                                        contextmenu: function (e) {
+                                                                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                                                                        window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
                                                                                         }
                                                                                 }
                                                                         }
-                                                                },
-                                                                series: getJsonDrillChildren(dta.data,dta.categories)
+                                                                }
                                                         },
+                                                        series: getDrildownForCol(dta.data, dta.cates),
+                                                        drilldown:{
+                                                                drillUpButton:{
+                                                                        relativeTo: 'spacingBox',
+                                                                        position:{
+                                                                                align:"right",
+                                                                                verticalAlign:"top",
+                                                                                x:10,
+                                                                                y:-10
+                                                                        }
+                                                                },
+                                                                series: getDrillDown2LevelForCol(dta.data, dta.cates)
+                                                        }
                                                 });
                                         }
                                 },
@@ -441,6 +516,7 @@
                 })
 
                 @if(response != null){
+                fntRightClick()
                 Highcharts.chart('inf-outlier', {
                         chart: {
                                 type: 'heatmap',
@@ -602,7 +678,15 @@
                         },
                         plotOptions: {
                                 series: {
-                                        stacking: 'normal'
+                                        stacking: 'normal',
+                                        point:{
+                                            events:{
+                                                    contextmenu: function (e) {
+                                                            if(e.toElement.point.name.indexOf('-') >=0)
+                                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                    }
+                                            }
+                                        }
                                 }
                         },
                         series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),0),
@@ -616,7 +700,8 @@
                                                 y:-10
                                         }
                                 },
-                                series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),'normal')}
+                                series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),'normal')
+                        }
                 });
                 // Total Opsview by Region
                 Highcharts.chart('region-kibana', {
@@ -640,7 +725,15 @@
                         },
                         plotOptions: {
                                 series: {
-                                        stacking: 'normal'
+                                        stacking: 'normal',
+                                        point:{
+                                                events: {
+                                                        contextmenu: function (e) {
+                                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                                        window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                        }
+                                                }
+                                        }
                                 }
                         },
                         series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct))),1),
@@ -776,6 +869,23 @@
                                 type: 'category'
                         },
                         colors:['#f60'],
+
+                        plotOptions: {
+                                series: {
+                                        point: {
+                                                events: {
+                                                        contextmenu: function (e) {
+                                                                if($('#brasRighClick').val().indexOf('-') >=0)
+                                                                        window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
+                                                        },
+                                                        mouseOver: function () {
+                                                                if(this.name.indexOf('-')>=0)
+                                                                        $('#brasRighClick').val(this.name)
+                                                        }
+                                                }
+                                        }
+                                }
+                        },
 
                         series: [{
                                 name:'Alert count',
@@ -926,6 +1036,22 @@
                         yAxis: {
                                 title: {
                                         text: ''
+                                }
+                        },
+                        plotOptions: {
+                                series: {
+                                        point: {
+                                                events: {
+                                                        contextmenu: function (e) {
+                                                                if($('#brasRighClick').val().indexOf('-') >=0)
+                                                                        window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
+                                                        },
+                                                        mouseOver: function () {
+                                                                if(this.name.indexOf('-')>=0)
+                                                                        $('#brasRighClick').val(this.name)
+                                                        }
+                                                }
+                                        }
                                 }
                         },
                         colors: ['#5A738E'],
@@ -1171,6 +1297,22 @@
                                                                         +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
                                                         }
                                                 },
+                                                plotOptions: {
+                                                        series: {
+                                                                point: {
+                                                                        events: {
+                                                                                contextmenu: function (e) {
+                                                                                        if($('#brasRighClick').val().indexOf('-') >=0)
+                                                                                                window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
+                                                                                },
+                                                                                mouseOver: function () {
+                                                                                        if(this.name.indexOf('-')>=0)
+                                                                                                $('#brasRighClick').val(this.name)
+                                                                                }
+                                                                        }
+                                                                }
+                                                        }
+                                                },
                                                 colors: ['#5A738E'],
                                                 series: [{
                                                         name: $('#typeInfError').val(),
@@ -1211,6 +1353,22 @@
                                                         formatter: function () {
                                                                 return 'Region: ' + this.point.name + '<br/>'+this.series.name + '<br/>Month: '+newDate+'<br/>'
                                                                         +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
+                                                        }
+                                                },
+                                                plotOptions: {
+                                                        series: {
+                                                                point: {
+                                                                        events: {
+                                                                                contextmenu: function (e) {
+                                                                                        if($('#brasRighClick').val().indexOf('-') >=0)
+                                                                                                window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
+                                                                                },
+                                                                                mouseOver: function () {
+                                                                                        if(this.name.indexOf('-')>=0)
+                                                                                                $('#brasRighClick').val(this.name)
+                                                                                }
+                                                                        }
+                                                                }
                                                         }
                                                 },
                                                 series: [{
@@ -1409,6 +1567,13 @@
                                                 }]
 
                                         });
+                                        // right click yAxis
+                                        $('#region-inf .highcharts-xaxis-labels text').mousedown(function(e) {
+                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                }
+                                                return false;
+                                        });
                                 }
                         }
                 })
@@ -1596,6 +1761,13 @@
                                                 }]
 
                                         });
+                                        // right click yAxis
+                                        $('#region-opsview-heatmap .highcharts-xaxis-labels text').mousedown(function(e) {
+                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                }
+                                                return false;
+                                        });
                                 }
                         }
                 })
@@ -1693,6 +1865,13 @@
                                                 }]
 
                                         });
+                                        // right click yAxis
+                                        $('#region-inf .highcharts-xaxis-labels text').mousedown(function(e) {
+                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                }
+                                                return false;
+                                        });
                                 }
                         }
                 })
@@ -1771,6 +1950,13 @@
                                                 series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0])
 
                                         });
+                                        // right click yAxis
+                                        $('#region-siglog-bar .highcharts-xaxis-labels text').mousedown(function(e) {
+                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                }
+                                                return false;
+                                        });
                                 }
                         }
                 })
@@ -1847,6 +2033,13 @@
 
                                                 series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0])
 
+                                        });
+                                        // right click yAxis
+                                        $('#region-siglog-bar .highcharts-xaxis-labels text').mousedown(function(e) {
+                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                }
+                                                return false;
                                         });
                                 }
                         }

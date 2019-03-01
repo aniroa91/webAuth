@@ -220,6 +220,8 @@
                         var monthStr = dta.month
                         $("#monthPickerTop").datepicker("update", monthStr)
                         $('#isClickedTab1').val(1)
+                        // right click event
+                        fntRightClick()
                         // top 10 sigin
                         Highcharts.chart('bar-signin', {
                             chart: {
@@ -242,7 +244,15 @@
                             },
                             plotOptions: {
                                 series: {
-                                    stacking: 'normal'
+                                    stacking: 'normal',
+                                    point:{
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             tooltip : {
@@ -302,7 +312,15 @@
                             },
                             plotOptions: {
                                 series: {
-                                    stacking: 'normal'
+                                    stacking: 'normal',
+                                    point:{
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             series: [{
@@ -355,6 +373,14 @@
                             plotOptions: {
                                 series: {
                                     stacking: 'normal',
+                                    point:{
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                            }
+                                        }
+                                    },
                                     dataLabels: {
                                         enabled: true,
                                         align: 'top',
@@ -415,6 +441,14 @@
                             plotOptions: {
                                 series: {
                                     stacking: 'normal',
+                                    point:{
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                            }
+                                        }
+                                    },
                                     dataLabels: {
                                         enabled: true,
                                         align: 'top',
@@ -478,35 +512,30 @@
                             },
                             plotOptions: {
                                 series: {
-                                    stacking: 'normal'
-                                }
-                            },
-                            series: [{
-                                name: 'Bras',
-                                data: getJsonDrillParent(dta.topInf.dataBras),
-                                color: '#832d1d'
-                            }],
-                            drilldown: {
-                                drillUpButton: {
-                                    relativeTo: 'spacingBox',
-                                    position: {
-                                        y: 0,
-                                        x: 0
-                                    },
-                                    theme: {
-                                        fill: '#85d088',
-                                        'stroke-width': 1,
-                                        stroke: 'silver',
-                                        r: 0,
-                                        states: {
-                                            hover: {
-                                                fill: '#85d088',
+                                    stacking: 'normal',
+                                    point:{
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if(e.toElement.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
                                             }
                                         }
                                     }
-                                },
-                                series: getJsonDrillChildren(dta.topInf.data,dta.topInf.categories)
+                                }
                             },
+                            series: getDrildownForCol(dta.topInf.data, dta.topInf.cates),
+                            drilldown:{
+                                drillUpButton:{
+                                    relativeTo: 'spacingBox',
+                                    position:{
+                                        align:"right",
+                                        verticalAlign:"top",
+                                        x:10,
+                                        y:-10
+                                    }
+                                },
+                                series: getDrillDown2LevelForCol(dta.topInf.data, dta.topInf.cates)
+                            }
                         });
                         // top 10 Suyhao
                         Highcharts.chart('bar-suyhao', {
@@ -530,8 +559,8 @@
                             },
                             tooltip: {
                                 formatter: function () {
-                                    return '<b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>'+this.series.name+'<br><b>Total: ' +
-                                            Highcharts.numberFormat(this.point.y,0) + '</b> <br/> Total clients: '+ Highcharts.numberFormat(this.point.k,0);
+                                    return '<b>' + this.point.name +'</b><br>Total: ' +
+                                            Highcharts.numberFormat(this.point.y,0) + '<br/> Total clients: '+ Highcharts.numberFormat(this.point.k,0);
                                 }
                             },
                             plotOptions: {
@@ -575,7 +604,7 @@
                                 text: ''
                             },
                             xAxis: {
-                                categories: dta.topPoor.categories
+                                type: 'category'
                             },
                             yAxis: {
                                 min: 0,
@@ -591,11 +620,38 @@
                                     stacking: 'normal'
                                 }
                             },
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.point.name +'</b><br>Total: ' +
+                                            Highcharts.numberFormat(this.point.y,0)
+                                }
+                            },
                             series: [{
-                                name: dta.month,
-                                data: dta.topPoor.data,
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topPoor.dataProvince, []),
                                 color: '#9B59B6'
-                            }]
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topPoor.data, dta.topPoor.categories)
+                            }
                         });
                     }
                 },
@@ -878,9 +934,16 @@
                                 $('#bras-outlier .highcharts-button').hide()
                             }
                         }
+                        // right click yAxis
+                        $('#'+db+'-outlier .highcharts-yaxis-labels span').mousedown(function(e) {
+                            if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
+                                window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                            }
+                            return false;
+                        });
                     }
                     else{
-                        alert("Error when execute query. Please check again your system!")
+                        console.log("Error when execute query. Please check again your system!")
                     }
                 }
             })

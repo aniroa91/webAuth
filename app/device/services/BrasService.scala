@@ -19,6 +19,15 @@ import scala.concurrent.duration.Duration
 
 object BrasService extends AbstractService{
 
+  def getSuggestions(prefix: String) = {
+    val response = client.execute(
+      search(s"bras-name") query
+        matchPhrasePrefixQuery("bras_id", prefix.toUpperCase) limit(10)
+    ).await
+    response.hits.hits.map(x => x.sourceAsMap)
+      .map(x => x.getOrElse("bras_id", "??").asInstanceOf[String])
+  }
+
   def getSigLogByMonth(month: String) = {
     BrasDAO.getSigLogByMonth(month)
   }
@@ -175,7 +184,7 @@ object BrasService extends AbstractService{
     BrasDAO.getTopOpsview(month,_typeService)
   }
 
-  def getTopInf(month: String,_typeInferr: String): Future[Seq[(String,String,Int)]]   ={
+  def getTopInf(month: String,_typeInferr: String): Future[Seq[(String, String, String, Int)]]   ={
     BrasDAO.getTopInf(month,_typeInferr)
   }
 
@@ -183,7 +192,7 @@ object BrasService extends AbstractService{
     BrasDAO.getTopnotSuyhao(month)
   }
 
-  def getTopPoorconn(month: String,_typeOLTpoor: String): Future[Seq[(String,Int)]]   ={
+  def getTopPoorconn(month: String,_typeOLTpoor: String): Future[Seq[(String,String,Int)]]   ={
     BrasDAO.getTopPoorconn(month,_typeOLTpoor)
   }
 
@@ -683,6 +692,10 @@ object BrasService extends AbstractService{
 
   def getSankeyService(bras: String,nowDay: String) = {
     BrasDAO.getSankeyService(bras,nowDay)
+  }
+
+  def getDeviceServStatus(bras: String, day: String) = {
+    BrasDAO.getDeviceServStatus(bras,day)
   }
 
   def getServiceNameStt(bras: String,nowDay: String) = {

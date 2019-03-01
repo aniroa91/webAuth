@@ -65,6 +65,9 @@ GET      /inf/confirmLabel             controllers.DeviceController.confirmLabel
 POST     /searchMonthOverview          controllers.DeviceController.getFormMonthPicker
 GET      /searchMonthOverview          controllers.DeviceController.overview
 
+GET      /suggest                      controllers.DeviceController.suggest(ct: String ?= "")
+GET      /fwdRequest                   controllers.DeviceController.fwdRequest(bras: String)
+
 GET      /searchBras                   controllers.DeviceController.search
 POST     /searchBrasHost               controllers.DeviceController.getFormBras
 GET      /bras                         controllers.BrasController.index

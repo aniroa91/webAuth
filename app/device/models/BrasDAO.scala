@@ -834,48 +834,27 @@ object BrasDAO {
         .as[(String,String,Int)])
   }
 
-  def getTopInf(month: String,typeInferr: String): Future[Seq[(String,String,Int)]] = {
-    if(month.equals("")) {
-      val month = CommonService.get3MonthAgo()+"-01"
-      dbConfig.db.run(
-        sql"""select d.bras_id,d.host,d.total_inf from(
-                  select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.total_inf desc) AS r , c.*
+  def getTopInf(month: String,typeInferr: String): Future[Seq[(String,String, String,Int)]] = {
+    val query = month + "-01"
+    dbConfig.db.run(
+      sql"""select d.province,d.bras_id,d.host,d.total_inf from(
+                  select row_number() OVER (PARTITION BY c.province ORDER BY c.total_inf desc) AS r , c.*
                   from(
-                       select b.bras_id, a.host, sum(#$typeInferr) as total_inf
+                       select b.province,a.bras_id, a.host, sum(#$typeInferr) as total_inf
                        from dmt_overview_inf a,
-                            (select bras_id
-                             from dmt_overview_inf
-                             where month > $month::TIMESTAMP
-                             group by bras_id
-                             order by sum(#$typeInferr) desc
-                             limit 20) b
-                        where a.bras_id = b.bras_id and month > $month::TIMESTAMP
-                        group by b.bras_id, a.host
-                        order by b.bras_id, a.host) c) d
-              where d.r <= 20
-                  """
-          .as[(String,String,Int)])
-    } else{
-      val query = month + "-01"
-      dbConfig.db.run(
-        sql"""select d.bras_id,d.host,d.total_inf from(
-                  select row_number() OVER (PARTITION BY c.bras_id ORDER BY c.total_inf desc) AS r , c.*
-                  from(
-                       select b.bras_id, a.host, sum(#$typeInferr) as total_inf
-                       from dmt_overview_inf a,
-                            (select bras_id
+                            (select province
                              from dmt_overview_inf
                              where month = $query::TIMESTAMP
-                             group by bras_id
+                             group by province
                              order by sum(#$typeInferr) desc
                              limit 20) b
-                        where a.bras_id = b.bras_id and month = $query::TIMESTAMP
-                        group by b.bras_id, a.host
-                        order by b.bras_id, a.host) c) d
+                        where a.province = b.province and month = $query::TIMESTAMP
+                        group by b.province,a.bras_id, a.host
+                        order by b.province,a.bras_id, a.host) c) d
               where d.r <= 20
+              order by d.province,d.bras_id, d.host
                   """
-          .as[(String,String,Int)])
-    }
+        .as[(String,String,String,Int)])
   }
 
   def getTopnotSuyhao(month: String): Future[Seq[(String,String,Int,Int)]] = {
@@ -901,30 +880,27 @@ object BrasDAO {
         .as[(String,String,Int,Int)])
   }
 
-  def getTopPoorconn(month: String,typeOLTpoor:String): Future[Seq[(String,Int)]] = {
-    if(month.equals("")) {
-      val month = CommonService.get3MonthAgo()+"-01"
-      dbConfig.db.run(
-        sql"""select host,sum(#$typeOLTpoor)
-            from dmt_overview_device
-            where month > $month::TIMESTAMP
-            group by host
-            order by sum(#$typeOLTpoor) desc
-            limit 10
+  def getTopPoorconn(month: String,typeOLTpoor:String): Future[Seq[(String,String,Int)]] = {
+    val query = month + "-01"
+    dbConfig.db.run(
+      sql"""select d.province,d.host,d.conn from(
+                  select row_number() OVER (PARTITION BY c.province ORDER BY c.conn desc) AS r , c.*
+                  from(
+                       select b.province, a.host, sum(#$typeOLTpoor) conn
+                       from dmt_overview_device a,
+                            (select province
+                             from dmt_overview_device
+                             where month = $query::TIMESTAMP
+                             group by province
+                             having sum(#$typeOLTpoor) >0
+                             order by sum(#$typeOLTpoor) desc
+                             limit 10) b
+                        where a.province = b.province and month = $query::TIMESTAMP
+                        group by b.province, a.host
+                        order by b.province, a.host) c) d
+              where d.r <= 10
                   """
-          .as[(String,Int)])
-    } else{
-      val query = month + "-01"
-      dbConfig.db.run(
-        sql"""select host,sum(#$typeOLTpoor)
-            from dmt_overview_device
-            where month = $query::TIMESTAMP
-            group by host
-            order by sum(#$typeOLTpoor) desc
-            limit 10
-                  """
-          .as[(String,Int)])
-    }
+        .as[(String,String,Int)])
   }
 
   def get3MonthLastest(): Future[Seq[(String)]] = {
@@ -1270,6 +1246,19 @@ object BrasDAO {
              group by service_status
                   """
         .as[(String,Int)])
+  }
+
+  def getDeviceServStatus(bras: String, nowDay: String): Future[Seq[(String,String,String,Int)]] = {
+    val brasId = s"%$bras%"
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+     dbConfig.db.run(
+       sql"""select bras_id, service_name,service_status,count(*)
+             from dwh_opsview
+             where bras_id like $brasId and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and device_type ='power'
+             group by bras_id, service_name,service_status
+                   """
+         .as[(String,String, String,Int)])
   }
 
   def getOpServByStatusResponse(bras: String,nowDay: String): Array[(String,String,Int)] = {

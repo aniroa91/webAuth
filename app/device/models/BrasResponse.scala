@@ -71,6 +71,13 @@ case class ServiceNameStatus(
                          arrService: Seq[(String,String,Int)]
                        )
 
+case class DeviceNameStatus(
+                              arrBras: Seq[String],
+                              arrName: Seq[String],
+                              arrStatus: Seq[String],
+                              arrService: Seq[(String,String, String,Int)]
+                            )
+
 case class KibanaOverview(
                               arrSeverity: Array[(String,Long)],
                               arrErrorType: Array[(String,Long)],
@@ -113,5 +120,6 @@ case class BrasResponse(
                             linecardhost: Array[(String,String)],
                             kibanaOverview: KibanaOverview,
                             siglogByhost: SigLogByHost,
-                            sankeyService: Seq[(String,String,Int)]
+                            sankeyService: Seq[(String,String,Int)],
+                            devNameStt: DeviceNameStatus
                        )

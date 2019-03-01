@@ -610,6 +610,45 @@
                                 </div>
                             </div>
                             <div class="col-lg-6 col-sm-6 col-md-6">
+                                <div class="x_panel tile" style="padding: 0px;">
+                                    <div class="card-header">
+                                        Nerror Of Power Devices By Service And Status <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái theo từng service quản lý và trạng thái của thiết bị Power"></i>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content">
+                                        <div>
+                                            <table class="data table table-bordered" style="width: 100%;margin-bottom: 0px">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 20%" class="thTop">Bras Id</th>
+                                                        <th style="width: 20%" class="thTop">Service Name</th>
+                                                        @for(i <- 0 until response.devNameStt.arrStatus.length) {
+                                                            <th style="width: @(45/response.devNameStt.arrStatus.length)%" class="thTop">@response.devNameStt.arrStatus(i)</th>
+                                                        }
+                                                        <th class="thTop" style="width: 15%">Total</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div style="height: 226px;overflow: auto">
+                                            <table class="data table table-bordered tbScroll" id="tbInfSev" style="margin-bottom: 0px">
+                                                <tbody >
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <table class="data table table-bordered" style="margin-bottom: 0px">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 40%">Total</th>
+                                                    @for(i <- 0 until response.devNameStt.arrStatus.length) {
+                                                        <th class="infAll_@response.devNameStt.arrStatus(i)" style="width: @(45/response.devNameStt.arrStatus.length)%"></th>
+                                                    }
+                                                    <th id="ttColallDev" style="width: 15%"></th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-lg-6 col-sm-6 col-md-6">
                                 <div class="x_panel tile" style="padding: 0px;height: 355px">
@@ -667,7 +706,7 @@
         <!-- footer content -->
     <footer>
         <div class="pull-right">
-            Dashboard Admin 21/09/2017
+            Dashboard Admin Monitor 2018
         </div>
         <div class="clearfix"></div>
     </footer>
@@ -720,32 +759,31 @@
                     var tog = $(this).data('toggle');
                     $('a[data-toggle="'+tog+'"]').not('[data-title="'+sel+'"]').removeClass('active').addClass('notActive');
                     $('a[data-toggle="'+tog+'"][data-title="'+sel+'"]').removeClass('notActive').addClass('active');
-                    var csvFile = 'bras.csv'
                     if(sel == "B"){
                         $('#_typeS').val("B")
                         $('#bras').val("")
-                        $('#bras').attr('placeholder','Search bras...');
-                        csvFile = 'bras.csv'
+                        $('#bras').attr('placeholder','Search bras...')
+                        // autocomplete search contract
+                        suggest()
                     }
                     else{
                         $('#_typeS').val("I")
                         $('#bras').val("")
-                        $('#bras').attr('placeholder','Search inf host...');
-                        csvFile = 'host_inf.csv'
-                    }
-                    jQuery.get('../assets/'+csvFile, function (data) {
-                        $(".autocomplete").autocomplete({
-                            source: data.split('\n'),
-                            select: function (event, ui) {
-                                $("#bras").val(ui.item.value);
-                                $("#ctSearch").submit();
-                            }
+                        $('#bras').attr('placeholder','Search inf host...')
+                        jQuery.get('../assets/host_inf.csv', function (data) {
+                            $(".autocomplete").autocomplete({
+                                source: data.split('\n'),
+                                select: function (event, ui) {
+                                    $("#bras").val(ui.item.value);
+                                    $("#ctSearch").submit();
+                                }
+                            });
                         });
-                    });
+                    }
                 })
                 // autocomplete
                 if($('#_typeS').val() == "B") {
-                    jQuery.get('../assets/bras.csv', function (data) {
+                    /*jQuery.get('../assets/bras.csv', function (data) {
                         $(".autocomplete").autocomplete({
                             source: data.split('\n'),
                             select: function (event, ui) {
@@ -753,7 +791,9 @@
                                 $("#ctSearch").submit();
                             }
                         });
-                    });
+                    });*/
+                    // autocomplete search contract
+                    suggest()
                 }
                 else{
                     jQuery.get('../assets/host_inf.csv', function (data) {
@@ -778,6 +818,41 @@
 
                 function cb(start, end) {
                     $('#reportrange span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+                }
+
+
+                function suggest(){
+                    // autocomplete search contract
+                    var autocompleteOptions = {
+                        minLength: 1,
+                        source: function (request, response) {
+                            $.ajax({
+                                url: "/suggest",
+                                data: {
+                                    ct: $("#bras").val()
+                                }
+                            }).done(function(dta) {
+                                console.log(dta.data)
+                                response($.map(dta.data, function(obj) {
+                                    return {
+                                        value: obj
+                                    };
+                                }));
+
+                            });
+                        },
+                        select: function (event, ui) {
+                            $("#bras").val(ui.item.value);
+                            $("#ctSearch").submit();
+                        }
+                    };
+
+                    $(".autocomplete").autocomplete(autocompleteOptions)
+                            .autocomplete( "instance" )._renderItem = function( ul, item ) {
+                        return $( "<li>" )
+                                .append( "<div>" + item.value + "</div>" )
+                                .appendTo( ul );
+                    };
                 }
 
                 $('#reportrange').daterangepicker({
@@ -1203,6 +1278,28 @@
                             sumCol += parseInt($(this).text());
                         });
                         $('#col-' + i).text(sumCol);
+                    }
+                }
+                // table inf service
+                @if(response != null && response.devNameStt != null){
+                    var devService = @Html(Json.stringify(Json.toJson(response.devNameStt.arrService)))
+                    var devName = @Html(Json.stringify(Json.toJson(response.devNameStt.arrName)))
+                    var devStt = @Html(Json.stringify(Json.toJson(response.devNameStt.arrStatus)))
+                    var devBras = @Html(Json.stringify(Json.toJson(response.devNameStt.arrBras)))
+                        $('#tbInfSev tbody').append(getBodyServiceHaveBras(devService, devBras, devName, devStt))
+                    // set total all by col inf table
+                    var sumDevColAll = 0;
+                    $('#tbInfSev .ttRow').each(function () {
+                        sumDevColAll += parseInt($(this).text());
+                    });
+                    $('#ttColallDev').text(sumDevColAll);
+                    // set total by col inf table
+                    for (var i = 0; i < devStt.length; i++) {
+                        var sumColDev = 0;
+                        $('#tbInfSev .' + devStt[i]).each(function () {
+                            sumColDev += parseInt($(this).text());
+                        });
+                        $('.infAll_' + devStt[i]).text(sumColDev);
                     }
                 }
                 /* OPVIEW JS */
@@ -1788,6 +1885,32 @@
                         }
                     }
                     html += tr+'<th class="ttRow">'+ttRow+'</th></tr>';
+                }
+                return html;
+            }
+
+            function getBodyServiceHaveBras(dtaService, dtaBras, dtaName, dtaStatus){
+                var html = '';
+                var widStt = Number(45/dtaStatus.length)
+                for (var i = 0; i < dtaBras.length; i++) {
+                    for( var j=0; j< dtaName.length;j++){
+                        var isName =0
+                        var totalRow = 0
+                        var rsStatus = '';
+                        for( var k=0; k< dtaStatus.length;k++){
+                            var isStatus = 0
+                            for( var id=0; id< dtaService.length;id++){
+                                if((dtaBras[i] == dtaService[id][0]) && (dtaName[j] == dtaService[id][1]) && dtaStatus[k] == dtaService[id][2]){
+                                  isName =1
+                                  isStatus =1
+                                  totalRow += dtaService[id][3]
+                                  rsStatus += '<td class="'+dtaStatus[k]+'" style="width:'+widStt+'">'+dtaService[id][3]+'</td>'
+                                }
+                            }
+                            if(isStatus == 0) rsStatus += '<td class="'+dtaStatus[k]+'" style="width:'+widStt+'">0</td>'
+                        }
+                        if(isName == 1) html +='<tr><th style="width: 19%">'+dtaBras[i]+'</th><th style="width: 20%">'+dtaName[j]+'</th>'+rsStatus+'<th class="ttRow" style="widows: 14%;">'+totalRow+'</th></tr>'
+                    }
                 }
                 return html;
             }

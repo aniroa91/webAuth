@@ -711,11 +711,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   def getOltPoorconn(_typeOlt: String,month: String) = Action { implicit request =>
     try{
       // get Top opsview status
-      val topOLT = Await.result(BrasService.getTopPoorconn(month,_typeOlt), Duration.Inf)
+      val topOLT = Await.result(BrasService.getTopPoorconn(month,_typeOlt), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
       val rs = Json.obj(
-        "month" -> month,
-        "data" -> topOLT.map(x=>x._2),
-        "categories" -> topOLT.map(x=>x._1)
+        "data" -> topOLT,
+        "dataProvince" -> topOLT.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topOLT.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       Ok(Json.toJson(rs))
     }
@@ -727,11 +727,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   def getInfTopErr(_typeInf: String,month: String) = Action { implicit request =>
     try{
       // get Top total Inf
-      val topInf = Await.result(BrasService.getTopInf(month,_typeInf), Duration.Inf)
+      val topInf = Await.result(BrasService.getTopInf(month,_typeInf), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3, x._4))
       val rs = Json.obj(
         "data" -> topInf,
-        "dataBras" -> topInf.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
-        "categories" -> topInf.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+        "cates" -> topInf.map(x=> x._1).toSeq.distinct.sorted
       )
       Ok(Json.toJson(rs))
     }
@@ -979,11 +978,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "categories" -> topOpsview.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top total Inf
-      val topInf = Await.result(BrasService.getTopInf(month,_typeInferr), Duration.Inf)
+      val topInf = Await.result(BrasService.getTopInf(month,_typeInferr), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3, x._4))
       val infObj = Json.obj(
         "data" -> topInf,
-        "dataBras" -> topInf.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
-        "categories" -> topInf.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+        "cates" -> topInf.map(x=> x._1).toSeq.distinct.sorted
       )
       // get Top Not Passed Suyhao
       val topSuyhao = Await.result(BrasService.getTopnotSuyhao(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3, x._4))
@@ -994,10 +992,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "categories" -> topSuyhao.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
       // get Top 10 OLT By Poor Connections
-      val topPoor = Await.result(BrasService.getTopPoorconn(month,_typeOLTpoor), Duration.Inf)
+      val topPoor = Await.result(BrasService.getTopPoorconn(month,_typeOLTpoor), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
       val poorObj = Json.obj(
-        "data" -> topPoor.map(x=>x._2),
-        "categories" -> topPoor.map(x=>x._1)
+        "data" -> topPoor,
+        "dataProvince" -> topPoor.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "categories" -> topPoor.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
 
       val rs = Json.obj(
@@ -1469,16 +1468,29 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: controllers.BrasOutlier =>
       println("done")
-      Redirect(routes.DeviceController.search).flashing("bras" -> data.bras, "_typeS" -> data._typeS, "date" -> data.date)
+      Redirect(routes.DeviceController.search).flashing("bras" -> data.bras.toUpperCase, "_typeS" -> data._typeS, "date" -> data.date)
     }
 
     val formValidationResult = form.bindFromRequest
     formValidationResult.fold(errorFunction, successFunction)
   }
 
+  def fwdRequest(bras: String) = withAuth {username => implicit request: Request[AnyContent] =>
+    Redirect(routes.DeviceController.search).flashing( "bras" -> bras.toUpperCase, "_typeS" -> "B", "date" -> "")
+  }
+
+  def suggest(ct: String) = withAuth { username =>  implicit request: Request[AnyContent] =>
+    val bras = BrasService.getSuggestions(ct.toUpperCase)
+    val rs = Json.obj(
+      "data" -> bras
+    )
+    Ok(Json.toJson(rs))
+  }
+
   def search =  withAuth { username => implicit request: Request[AnyContent] =>
     try {
       logger.info("======Start Service Search======")
+      println(request.flash.get("bras").toString)
       if (request.flash.get("bras").toString != "None") {
         logger.info(request.flash.get("bras").get.trim)
         val _typeS = request.flash.get("_typeS").get
@@ -1654,10 +1666,17 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           val t11 = System.currentTimeMillis()
           val sankeyService = Await.result(BrasService.getSankeyService(brasId.substring(0, brasId.indexOf("-")), day), Duration.Inf)
           logger.info("tSankeyService: " + (System.currentTimeMillis() - t11))
+          // table Nerror Of Power Devices By Service And Status
+          val t12 = System.currentTimeMillis()
+          val devServByStt = Await.result(BrasService.getDeviceServStatus(brasId.substring(0, brasId.indexOf("-")), day), Duration.Inf)
+          val devName = devServByStt.map(x => x._2).distinct
+          val devStatus = devServByStt.map(x => x._3).distinct
+          val devBras = devServByStt.map(x => x._1).distinct
+          logger.info("tDeviceStatus: " + (System.currentTimeMillis() - t12))
 
           logger.info("timeAll: " + (System.currentTimeMillis() - timeStart))
           Ok(device.views.html.search(form, username,null ,BrasResponse(BrasInfor(noOutlierByhost,numOutlier, (sigLog._1, sigLog._2),(sigLogClients._1,sigLogClients._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
-            infErrorBytime, serviceByTime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost, KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost, sankeyService), day, brasId,_typeS,routes.DeviceController.search))
+            infErrorBytime, serviceByTime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost, KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost, sankeyService, DeviceNameStatus(devBras, devName, devStatus, devServByStt)), day, brasId,_typeS,routes.DeviceController.search))
         }
       }
       else{
@@ -1666,7 +1685,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       }
     }
     catch{
-      case e: Exception => Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
+      case e: Exception => Ok(device.views.html.search(form,username,null,null,CommonService.getCurrentDay()+"/"+CommonService.getCurrentDay(),null,"B",routes.DeviceController.search))
     }
   }
 
