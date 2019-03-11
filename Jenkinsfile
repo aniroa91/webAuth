@@ -1,6 +1,6 @@
 pipeline {
 
-    agent { node { label 'master' } }
+    agent { node { label 'agent33' } }
 
     environment {
         HTTP_PROXY = 'http://proxy.hcm.fpt.vn:80'
