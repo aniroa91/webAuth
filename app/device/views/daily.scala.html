@@ -945,8 +945,8 @@
                                     point:{
                                         events: {
                                             contextmenu: function (e) {
-                                                if(e.toElement.point.name.indexOf('-') >=0)
-                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                if(e.target.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
                                             }
                                         }
                                     }
@@ -1170,8 +1170,8 @@
                                     chartSigLogDaily.series[1].setData(addParamClients(dta.logoff))
                                     // right click yAxis
                                     $('#region-siglog-bar .highcharts-xaxis-labels text').mousedown(function(e) {
-                                        if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
-                                            window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                        if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
+                                            window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                         }
                                         return false;
                                     });
@@ -1386,8 +1386,8 @@
                                     }
                                     // right click yAxis
                                     $('#bras-outlier .highcharts-yaxis-labels span').mousedown(function(e) {
-                                        if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
-                                            window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                        if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
+                                            window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                         }
                                         return false;
                                     });
@@ -1533,8 +1533,8 @@
                                     }
                                     // right click yAxis
                                     $('#inf-outlier .highcharts-yaxis-labels span').mousedown(function(e) {
-                                        if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
-                                            window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                        if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
+                                            window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                         }
                                         return false;
                                     });

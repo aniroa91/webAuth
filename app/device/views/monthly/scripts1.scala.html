@@ -248,8 +248,8 @@
                                                                         point:{
                                                                                 events: {
                                                                                         contextmenu: function (e) {
-                                                                                                if(e.toElement.point.name.indexOf('-') >=0)
-                                                                                                        window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                                                                if(e.target.point.name.indexOf('-') >=0)
+                                                                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
                                                                                         }
                                                                                 }
                                                                         },
@@ -333,8 +333,8 @@
                                                                         point:{
                                                                                 events: {
                                                                                         contextmenu: function (e) {
-                                                                                                if(e.toElement.point.name.indexOf('-') >=0)
-                                                                                                        window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                                                                if(e.target.point.name.indexOf('-') >=0)
+                                                                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
                                                                                         }
                                                                                 }
                                                                         },
@@ -489,8 +489,8 @@
                                                                         point:{
                                                                                 events: {
                                                                                         contextmenu: function (e) {
-                                                                                                if(e.toElement.point.name.indexOf('-') >=0)
-                                                                                                        window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                                                                if(e.target.point.name.indexOf('-') >=0)
+                                                                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
                                                                                         }
                                                                                 }
                                                                         }
@@ -682,8 +682,8 @@
                                         point:{
                                             events:{
                                                     contextmenu: function (e) {
-                                                            if(e.toElement.point.name.indexOf('-') >=0)
-                                                                    window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                            if(e.target.point.name.indexOf('-') >=0)
+                                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
                                                     }
                                             }
                                         }
@@ -729,8 +729,8 @@
                                         point:{
                                                 events: {
                                                         contextmenu: function (e) {
-                                                                if(e.toElement.point.name.indexOf('-') >=0)
-                                                                        window.open("/fwdRequest?bras=" + e.toElement.point.name, "_blank")
+                                                                if(e.target.point.name.indexOf('-') >=0)
+                                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
                                                         }
                                                 }
                                         }
@@ -1569,8 +1569,8 @@
                                         });
                                         // right click yAxis
                                         $('#region-inf .highcharts-xaxis-labels text').mousedown(function(e) {
-                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
-                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                                 }
                                                 return false;
                                         });
@@ -1763,8 +1763,8 @@
                                         });
                                         // right click yAxis
                                         $('#region-opsview-heatmap .highcharts-xaxis-labels text').mousedown(function(e) {
-                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
-                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                                 }
                                                 return false;
                                         });
@@ -1867,8 +1867,8 @@
                                         });
                                         // right click yAxis
                                         $('#region-inf .highcharts-xaxis-labels text').mousedown(function(e) {
-                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
-                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                                 }
                                                 return false;
                                         });
@@ -1952,8 +1952,8 @@
                                         });
                                         // right click yAxis
                                         $('#region-siglog-bar .highcharts-xaxis-labels text').mousedown(function(e) {
-                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
-                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                                 }
                                                 return false;
                                         });
@@ -2036,8 +2036,8 @@
                                         });
                                         // right click yAxis
                                         $('#region-siglog-bar .highcharts-xaxis-labels text').mousedown(function(e) {
-                                                if(e.which == 3 && e.toElement.textContent.indexOf('-') >=0){
-                                                        window.open("/fwdRequest?bras=" + e.toElement.textContent, "_blank")
+                                                if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
+                                                        window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                                 }
                                                 return false;
                                         });
