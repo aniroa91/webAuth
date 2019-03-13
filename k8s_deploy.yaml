@@ -43,7 +43,7 @@ metadata:
   name: ing-${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   rules:
-  - host: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}.bigdata.local
+  - host: play-noc-staging.bigdata.local
     http:
       paths:
       - path: /
