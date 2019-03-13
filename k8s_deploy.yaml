@@ -40,7 +40,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingr-${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+  name: ing-${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   rules:
   - host: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}.bigdata.local
