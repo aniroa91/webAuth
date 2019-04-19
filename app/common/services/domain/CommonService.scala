@@ -411,6 +411,10 @@ object CommonService extends AbstractService {
   def isDayValid(day: String): Boolean = {
     Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
   }
+
+  def format2Decimal(number: Double): Double = {
+    BigDecimal(number).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
   
   def formatNumber(number: Long): String = {
     val formatter = java.text.NumberFormat.getIntegerInstance

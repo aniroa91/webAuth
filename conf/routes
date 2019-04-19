@@ -77,5 +77,8 @@ GET      /host-json                    controllers.DeviceController.getHostJson(
 GET      /confirmLabel                 controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
 GET      /rejectLabel                  controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
 
+GET       /problem                      controllers.ProblemController.index
+POST      /problem/getJsonProblem       controllers.ProblemController.getJsonProblem
+
 
 #######################################################################

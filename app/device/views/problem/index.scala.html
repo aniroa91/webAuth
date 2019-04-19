@@ -1,0 +1,782 @@
+@(response: device.models.ProblemResponse, email: String, postUrl: Call)(implicit request: RequestHeader)
+
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.percent
+@import play.api.libs.json.Json
+@import services.domain.CommonService.formatUTC
+@import services.domain.CommonService.formatYYYYmmddHHmmss
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Dashboard Admin </title>
+
+            <!-- Bootstrap -->
+        @common.views.html.common.css("Problem")
+    </head>
+    @common.views.html.common.top()
+        <!-- top navigation -->
+    <div class="top_nav">
+        <div class="nav_menu">
+            <nav>
+                <div class="nav toggle" style="margin-bottom: 10px">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <img src="../assets/images/user.default.png" alt="">@email
+                            <span class=" fa fa-angle-down"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-usermenu pull-right">
+                            <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+        <!-- /top navigation -->
+        <!-- page content -->
+    <div class="right_col" role="main">
+        @helper.CSRF.formField
+        <input type="hidden" id="date" value="@response.weekly(0)._2">
+        <input type="hidden" id="province">
+        <div class="row mg-t-15">
+            <div class="col-xs-12">
+                <div class="owl-carousel owl-theme">
+                @for(i <- 0 until response.weekly.length) {
+                    @if(i == 0) {
+                        <div class="item activeBox">
+                            <span><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
+                            <h5>@response.weekly(i)._2</h5>
+                        </div>
+                    }else{
+                        <div class="item">
+                            <span><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
+                            <h5>@response.weekly(i)._2</h5>
+                        </div>
+                    }
+                }
+                </div>
+            </div>
+        </div>
+        <div class="row mg-t-15">
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                <div class="region"></div>
+                <a class="apply btn btn-xs btn-success"><i class="fa fa-check-circle"></i> Apply</a>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="col-xs-12" style="padding: 0px 20px 0px 20px">
+                    <table class="table table-borderless table-condensed" id="tbDevType">
+                        <tr>
+                        @for(i <- 0 until response.deviceType.length){
+                            <th>@response.deviceType(i)._1</th>
+                        }
+                            <th style="border-left: 1px solid #ddd;color: #337ab7">Total</th>
+                        </tr>
+                        <tr>
+                        @for(i <- 0 until response.deviceType.length){
+                            <th>@response.deviceType(i)._2</th>
+                        }
+                            <th style="border-left: 1px solid #ddd;color: #337ab7">@response.deviceType.map(x=> x._2).sum</th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-xs-12">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div id="bar-connect" style="height: 600px"></div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div id="bar-error" style="height: 300px"></div>
+                        <div id="bar-warn" style="height: 300px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mg-t-15">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div id="bar-critAlert" style="height: 300px"></div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div id="bar-warnAlert" style="height: 300px"></div>
+            </div>
+        </div>
+        <div class="row mg-t-15">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div id="pie-broken" style="height: 300px"></div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div id="bubble-suyhao" style="height: 300px"></div>
+            </div>
+        </div>
+        <div class="row mg-t-15">
+            <div class="col-xs-12" style="margin-bottom: 15px">
+                <div class="x_panel tile ">
+                    <div class="x_title">
+                        <h2> Devices Get Problem With OLT Error</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <table class="data table table-bordered tbScroll" id="tbOlt">
+                            <thead >
+                                <tr>
+                                    <th>Host</th>
+                                    <th>Module</th>
+                                    <th>User Down</th>
+                                    <th>Inf Down</th>
+                                    <th>Lofi Error</th>
+                                    <th>Sf Error</th>
+                                    <th>Rouge Error</th>
+                                    <th>Sf Module</th>
+                                </tr>
+                            </thead>
+                            @for(i <- 0 until response.olts.length) {
+                                <tr>
+                                    <th>@response.olts(i)._1</th>
+                                    <th>@response.olts(i)._2</th>
+                                    <td>@response.olts(i)._3</td>
+                                    <td>@response.olts(i)._4</td>
+                                    <td>@response.olts(i)._5</td>
+                                    <td>@response.olts(i)._6</td>
+                                    <td>@response.olts(i)._7</td>
+                                    <td>@response.olts(i)._8</td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+            <!-- /page content -->
+            <!-- footer content -->
+        <footer>
+            <div class="pull-right">
+                Dashboard Monitor 2018
+            </div>
+            <div class="clearfix"></div>
+        </footer>
+            <!-- /footer content -->
+    </div>
+    </div>
+
+        <!-- jQuery -->
+    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- Custom Theme Scripts -->
+    <script src="../assets/custom/js/custom.min.js"></script>
+        <!-- Hight chart -->
+    <script src="../assets/javascripts/highstock.js"></script>
+    <script src="../assets/javascripts/highcharts-more.js"></script>
+    <script src="../assets/javascripts/exporting.js"></script>
+        <!-- Counter number -->
+    <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
+        <!-- Datatable -->
+    <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="../assets/vendors/jszip/vfs_fonts.js"></script>
+
+    <script src="../assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
+    <script src="../assets/javascripts/waitMe.js"></script>
+    <script src="../assets/javascripts/owl.carousel.js"></script>
+    <script src="../assets/javascripts/jsTree.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                var tbOLt = $('#tbOlt').DataTable( {
+                    dom: 'Bfrtip',
+                    "scrollY":        "350px",
+                    "scrollCollapse": true,
+                    "paging":         false,
+                    "info":     false,
+                    "searching":     false,
+                    "sort":     false,
+                    destroy: true
+                });
+                $('.owl-carousel').owlCarousel({
+                    loop: true,
+                    margin: 10,
+                    responsiveClass: true,
+                    responsive: {
+                        0: {
+                            items: 7,
+                            nav: true
+                        }
+                    }
+                });
+                // jsTree Region and province
+                $('.region').jstree({
+                    "plugins" : ["checkbox"],
+                    'checkbox': {
+                        three_state: true
+                    },
+                    'core' : {
+                        expand_selected_onload : true,
+                        "themes":{
+                            "icons":false
+                        },
+                        'data' : getJsonTreeListRegion(@Html(Json.stringify(Json.toJson(response.location))),@Html(Json.stringify(Json.toJson( response.location.map(x => x._1).distinct.sorted ))))
+                    }
+                }).on('changed.jstree', function (e, data) {
+                    var i, j, nodes = [], provinces= [];
+                    for(i = 0, j = data.selected.length; i < j; i++) {
+                        nodes.push(data.instance.get_node(data.selected[i]).id);
+                    }
+                    var regionArr = nodes.join(', ').split(',')
+                    for(var i=0;i< regionArr.length;i++){
+                        if(regionArr[i].indexOf('Vung') < 0 && regionArr[i].indexOf('International') < 0){
+                            provinces.push(regionArr[i])
+                        }
+                    }
+                    $('#province').val(provinces)
+                });
+                // click apply location jstree
+                $('.apply').click(function () {
+                    callAjaxProblem("location")
+                })
+                // click box weekly
+                $('.owl-item').click(function () {
+                    var date = $(this).find('.item h5').text()
+                    $('.owl-item').find('.item').removeClass('activeBox')
+                    $(this).find('.item').addClass('activeBox')
+                    $('#date').val(date)
+                    callAjaxProblem("date")
+                })
+                //Chart: Devices Get Problem With Connectivity
+                @if(response.probConnectivity != null){
+                var chartConn = Highcharts.chart('bar-connect', {
+                    chart: {
+                        type: 'bar',
+                            zoomType: 'x',
+                            events: {
+                                load: function () {
+                                    this.xAxis[0].setExtremes(0 , 10);
+                                }
+                            }
+                    },
+                    title: {
+                        text: 'Devices Get Problem With Connectivity'
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.probConnectivity.map(x=> x._1)))),
+                        scrollbar: {
+                            enabled: true
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    colors: ['#1ABB9C', '#d9534f'],
+                    legend: {
+                        reversed: true
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        },
+                    },
+                    series: [{
+                        name: 'Signin',
+                        data: @Html(Json.stringify(Json.toJson(response.probConnectivity.map(x=> x._2))))
+                    }, {
+                        name: 'Logoff',
+                        data: @Html(Json.stringify(Json.toJson(response.probConnectivity.map(x=> x._3))))
+                    }]
+                });
+                }
+                //Chart: Devices Get Warn Problem
+                @if(response.probError != null){
+                var chartError = Highcharts.chart('bar-error', {
+                    chart: {
+                        type: 'bar',
+                        zoomType: 'x',
+                        events: {
+                            load: function () {
+                                this.xAxis[0].setExtremes(0 , 10);
+                            }
+                        }
+                    },
+                    title: {
+                        text: 'Devices Get Error Problem'
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.probError.map(x=> x._1)))),
+                        scrollbar: {
+                            enabled: true
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    colors: ['#832d1d'],
+                    legend: {
+                        reversed: true
+                    },
+                    series: [{
+                        showInLegend:false,
+                        name: 'Error',
+                        data: @Html(Json.stringify(Json.toJson(response.probError.map(x=> x._2))))
+                    }]
+                });
+                }
+                //Chart: Devices Get Error Problem
+                @if(response.probWarn != null){
+                var chartWarn = Highcharts.chart('bar-warn', {
+                    chart: {
+                        type: 'bar',
+                        zoomType: 'x',
+                        events: {
+                            load: function () {
+                                this.xAxis[0].setExtremes(0 , 10);
+                            }
+                        }
+                    },
+                    title: {
+                        text: 'Devices Get Warn Problem'
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.probWarn.map(x=> x._1)))),
+                        scrollbar: {
+                            enabled: true
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    colors: ['#f1b53d'],
+                    legend: {
+                        reversed: true
+                    },
+                    series: [{
+                        showInLegend:false,
+                        name: 'Warn',
+                        data: @Html(Json.stringify(Json.toJson(response.probWarn.map(x=> x._2))))
+                    }]
+                });
+                }
+                //Chart: Devices Get Error Problem
+                @if(response.critAlert != null){
+                var chartCrit = Highcharts.chart('bar-critAlert', {
+                    chart: {
+                        type: 'column',
+                        zoomType: 'x',
+                        events: {
+                            load: function () {
+                                this.xAxis[0].setExtremes(0 , 10);
+                            }
+                        }
+                    },
+                    title: {
+                        text: 'Devices Get Problem With Critical Alert'
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.critAlert.map(x=> x._1)))),
+                        scrollbar: {
+                            enabled: true
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    colors: ['#5A738E'],
+                    legend: {
+                        reversed: true
+                    },
+                    series: [{
+                        showInLegend:false,
+                        name: 'Crit',
+                        data: @Html(Json.stringify(Json.toJson(response.critAlert.map(x=> x._2))))
+                    }]
+                });
+                }
+                //Chart: Devices Get Error Problem
+                @if(response.warnAlert != null){
+                var chartWarnAlert = Highcharts.chart('bar-warnAlert', {
+                    chart: {
+                        type: 'column',
+                        zoomType: 'x',
+                        events: {
+                            load: function () {
+                                this.xAxis[0].setExtremes(0 , 10);
+                            }
+                        }
+                    },
+                    title: {
+                        text: 'Devices Get Problem With Warn Alert'
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(response.warnAlert.map(x=> x._1)))),
+                        scrollbar: {
+                            enabled: true
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    colors: ['#d9534f'],
+                    legend: {
+                        reversed: true
+                    },
+                    series: [{
+                        showInLegend:false,
+                        name: 'Warn',
+                        data: @Html(Json.stringify(Json.toJson(response.warnAlert.map(x=> x._2))))
+                    }]
+                });
+                }
+                @if(response.suyhao != null){
+                Highcharts.chart('bubble-suyhao', {
+
+                    chart: {
+                        type: 'bubble'
+                    },
+                    title: {
+                        text: 'Devices Get Problem With Suy Hao Index'
+                    },
+                    xAxis: {
+                        gridLineWidth: 1,
+                        title: {
+                            text: 'Pass'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Not Pass'
+                        }
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'top',
+                        y: 30,
+                        navigation: {
+                            activeColor: '#3E576F',
+                            animation: true,
+                            arrowSize: 12,
+                            inactiveColor: '#CCC',
+                            style: {
+                                fontWeight: 'bold',
+                                color: '#333',
+                                fontSize: '12px'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        useHTML: true,
+                        headerFormat: '<table>',
+                        pointFormat:
+                        '<tr><th>Host: </th><td>{point.name}</td></tr>'+
+                        '<tr><th>Pass:</th><td> {point.x}</td></tr>' +
+                        '<tr><th>Not Pass:</th><td> {point.y}</td></tr>' +
+                        '<tr><th>Rate:</th><td> {point.k}</td></tr>',
+                        footerFormat: '</table>',
+                        followPointer: true
+                    },
+                    series: getJsonBubleChart(@Html(Json.stringify(Json.toJson(response.suyhao))))
+                });
+                }
+                @if(response.broken != null){
+                var pieBroken = Highcharts.chart('pie-broken', {
+                    chart: {
+                        type: 'pie',
+                        options3d: {
+                            enabled: false,
+                            alpha: 45
+                        }
+                    },
+                    title: {
+                        text: 'Devices Get Problem With Broken Cable'
+                    },
+                    tooltip: {
+                        pointFormat: 'Lost Signal: <b>{point.y} ({point.percentage:.2f}%)</b><br>Affected Client: <b>{point.k}</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: false,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.name}'
+                            },
+                            showInLegend: false
+                        }
+                    },
+                    series: [{
+                        type: 'pie',
+                        data: parsePieJson(@Html(Json.stringify(Json.toJson(response.broken))))
+                    }]
+                });
+                }
+                // ajax filter
+                function callAjaxProblem(_type){
+                    var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
+                    $.ajax({
+                        url: "/problem/getJsonProblem",
+                        cache: false,
+                        data: fields,
+                        type: "POST",
+                        beforeSend: function () {
+                            $('.activeBox').waitMe({
+                                effect: 'progressBar',
+                                text: 'Please wait...',
+                                bg: 'rgba(255,255,255,0.7)',
+                                color: '#000',
+                                textPos: 'vertical'
+                            });
+                        },
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                if(_type == "Date") {
+                                    // update jstree location
+                                    $('.region').jstree(true).settings.core.data = getJsonTreeListRegion(dta.location.data, dta.location.key);
+                                    $('.region').jstree(true).refresh();
+                                }
+                                // update table deviceType
+                                $('#tbDevType').html("")
+                                var tbody = '<tr>'
+                                for(var i=0; i< dta.deviceType.data.length; i++){
+                                    tbody += '<th>'+dta.deviceType.data[i][0]+'</th>'
+                                }
+                                tbody += '<th style="border-left: 1px solid #ddd;color: #337ab7">Total</th></tr><tr>'
+                                for(var i=0; i< dta.deviceType.data.length; i++){
+                                    tbody += '<th>'+dta.deviceType.data[i][1]+'</th>'
+                                }
+                                tbody += '<th style="border-left: 1px solid #ddd;color: #337ab7">'+dta.deviceType.sum+'</th></tr>'
+                                $('#tbDevType').append(tbody)
+                                // update series charts Connect
+                                chartConn.xAxis[0].update({categories: dta.probConn.cates})
+                                updateChartStack(chartConn, getJsonStackSeries(dta.probConn, 0))
+                                chartConn.xAxis[0].setExtremes(0, Number(dta.probConn.cates.length) > 10 ? 10 : Number(dta.probConn.cates.length) -1)
+                                // update series charts Error
+                                chartError.xAxis[0].update({categories: dta.probErr.cates})
+                                updateChartStack(chartError, getJsonStackSeries(dta.probErr, 1))
+                                chartError.xAxis[0].setExtremes(0, Number(dta.probErr.cates.length) > 10 ? 10 : Number(dta.probErr.cates.length) -1);
+                                // update series charts Warn
+                                chartWarn.xAxis[0].update({categories: dta.probWarn.cates})
+                                updateChartStack(chartWarn, getJsonStackSeries(dta.probWarn, 1))
+                                chartWarn.xAxis[0].setExtremes(0, Number(dta.probWarn.cates.length) > 10 ? 10 : Number(dta.probWarn.cates.length) -1);
+                                // update series charts Crit Alerts
+                                chartCrit.xAxis[0].update({categories: dta.probCrit.cates})
+                                updateChartStack(chartCrit, getJsonStackSeries(dta.probCrit, 1))
+                                chartCrit.xAxis[0].setExtremes(0, Number(dta.probCrit.cates.length) > 10 ? 10 : Number(dta.probCrit.cates.length) -1);
+                                // update series charts Warn Alerts
+                                chartWarnAlert.xAxis[0].update({categories: dta.probWarnAlert.cates})
+                                updateChartStack(chartWarnAlert, getJsonStackSeries(dta.probWarnAlert, 1))
+                                chartWarnAlert.xAxis[0].setExtremes(0, Number(dta.probWarnAlert.cates.length) > 10 ? 10 : Number(dta.probWarnAlert.cates.length) -1);
+                                //update chart pie broken
+                                pieBroken.series[0].setData(parsePieJson(dta.broken), true)
+                                // update chart bubble
+                                Highcharts.chart('bubble-suyhao', {
+
+                                    chart: {
+                                        type: 'bubble'
+                                    },
+                                    title: {
+                                        text: 'Devices Get Problem With Suy Hao Index'
+                                    },
+                                    xAxis: {
+                                        gridLineWidth: 1,
+                                        title: {
+                                            text: 'Pass'
+                                        }
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: 'Not Pass'
+                                        }
+                                    },
+                                    legend: {
+                                        layout: 'vertical',
+                                        align: 'right',
+                                        verticalAlign: 'top',
+                                        y: 30,
+                                        navigation: {
+                                            activeColor: '#3E576F',
+                                            animation: true,
+                                            arrowSize: 12,
+                                            inactiveColor: '#CCC',
+                                            style: {
+                                                fontWeight: 'bold',
+                                                color: '#333',
+                                                fontSize: '12px'
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        useHTML: true,
+                                        headerFormat: '<table>',
+                                        pointFormat:
+                                        '<tr><th>Host: </th><td>{point.name}</td></tr>'+
+                                        '<tr><th>Pass:</th><td> {point.x}</td></tr>' +
+                                        '<tr><th>Not Pass:</th><td> {point.y}</td></tr>' +
+                                        '<tr><th>Rate:</th><td> {point.k}</td></tr>',
+                                        footerFormat: '</table>',
+                                        followPointer: true
+                                    },
+                                    series: getJsonBubleChart(dta.suyhao)
+                                });
+                                // update table olts
+                                tbOLt.clear()
+                                tbOLt.rows.add($(dta.olt)).draw( );
+                            }
+                            else{
+                                alert("Error when execute query. Please check again your system!")
+                            }
+                        },
+                        complete: function () {
+                            $('.activeBox').waitMe("hide");
+                        }
+                    });
+                }
+            });
+
+            function parsePieJson(dta){
+                var jsonArr = [];
+                for(var i=0;i<dta.length;i++){
+                    jsonArr.push({
+                        "y":Number(dta[i][1]),
+                        "k":Number(dta[i][2]),
+                        "name": dta[i][0]
+                    });
+
+                }
+                return jsonArr;
+            }
+
+            function getJsonBubleChart(dta){
+                var jsonArr = [];
+                for(var i=0;i<dta.length;i++){
+                    var color = getRandomColor()
+                    var pass= Number(dta[i][1]), notPass=Number(dta[i][2]), rate =Number(dta[i][3])
+                    jsonArr.push({
+                        data: [{"x":pass, "y":notPass, "k":rate,}],
+                        name: dta[i][0],
+                        marker: {
+                            fillColor: {
+                                radialGradient: { cx: 0.4, cy: 0.3, r: 0.7 },
+                                stops: [
+                                    [0, color],
+                                    [1, Highcharts.Color(color).setOpacity(0.9).get('rgba')]
+                                ]
+                            }
+                        }
+                    });
+
+                }
+                return jsonArr;
+            }
+
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            function getJsonStackSeries(data, _type){
+                var rs = []
+                // _type=0: istack else none stack
+                if(_type == 0){
+                    rs.push({
+                                name: "Signin",
+                                data: data.signin
+                            },
+                            {
+                                name: "Logoff",
+                                data: data.logoff
+                            })
+                }
+                else{
+                    rs.push({
+                                name: data.name,
+                                data: data.data
+                            })
+                }
+                return rs
+            }
+
+            function updateChartStack(charts, data){
+                var seriesLength = charts.series.length;
+                for(var i = seriesLength -1; i > -1; i--) {
+                    charts.series[i].remove();
+                }
+                for(var i=0; i< data.length; i++) {
+                    charts.addSeries(data[i]);
+                }
+            }
+
+            function getParamFields(token){
+                var obj = {
+                    "csrfToken" : token,
+                    "province"  : $('#province').val(),
+                    "date"  : $('#date').val()
+                }
+                return obj
+            }
+            
+            function getJsonTreeListRegion(dta, arrKey){
+                /*[
+                       { "id" : "ajson1", "parent" : "#", "text" : "Simple root node" },
+                       { "id" : "ajson2", "parent" : "#", "text" : "Root node 2" },
+                       { "id" : "ajson3", "parent" : "ajson2", "text" : "Child 1" },
+                       { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2" },
+                        ]*/
+                var jsArray = []
+                jsArray.push({
+                    "text": "Choose Region",
+                    "id": "All",
+                    "parent": "#",
+                    'state' : {
+                        'opened' : false,
+                        'selected' : true
+                    }
+                })
+                for(var key=0;key<arrKey.length;key++){
+                    jsArray.push({
+                        "text": arrKey[key],
+                        "id": arrKey[key],
+                        "parent": "All"
+                    })
+                    for(var i=0;i<dta.length;i++){
+                        if(arrKey[key] == dta[i][0]){
+                            jsArray.push({
+                                "text": dta[i][1],
+                                "id": dta[i][1],
+                                "parent": arrKey[key]
+                            })
+                        }
+                    }
+                }
+                return jsArray
+            }
+    </script>
+    </body>
+</html>
