@@ -24,6 +24,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
 
   def index =  withAuth { username => implicit request =>
     try {
+      val t0 = System.currentTimeMillis()
       val weekly = Await.result(ProblemService.listWeekly(), Duration.Inf)
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(weekly(0)._2), Duration.Inf)
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
@@ -38,6 +39,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val olts = Await.result(ProblemService.listOLT(weekly(0)._2), Duration.Inf)
                 .map(x=> (x._1, x._2, CommonService.formatPattern(x._3), CommonService.formatPattern(x._4), CommonService.formatPattern(x._5),
                   CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
+      println("t0:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.problem.index(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts), username, controllers.routes.ProblemController.index()))
     }
     catch{
@@ -47,6 +49,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
 
   def getJsonProblem() = Action { implicit request =>
     try{
+      val t0 = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
       val province = request.body.asFormUrlEncoded.get("province").head
 
@@ -111,7 +114,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
         "broken"     -> broken,
         "olt"        -> olts
       )
-
+      println("t0:"+(System.currentTimeMillis() -t0))
       Ok(Json.toJson(rs))
     }
     catch{
