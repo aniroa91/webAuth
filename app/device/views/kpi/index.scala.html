@@ -1,0 +1,274 @@
+@(response: device.models.KpiResponse, email: String, postUrl: Call)(implicit request: RequestHeader)
+
+@import play.api.libs.json.Json
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Dashboard Admin </title>
+
+            <!-- Bootstrap -->
+        @common.views.html.common.css("Kpi")
+    </head>
+    @common.views.html.common.top()
+        <!-- top navigation -->
+    <div class="top_nav">
+        <div class="nav_menu">
+            <nav>
+                <div class="nav toggle" style="margin-bottom: 10px">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <img src="../assets/images/user.default.png" alt="">@email
+                            <span class=" fa fa-angle-down"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-usermenu pull-right">
+                            <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+        <!-- /top navigation -->
+        <!-- page content -->
+    <div class="right_col" role="main">
+        @if(response != null){
+        @helper.CSRF.formField
+        <input type="hidden" id="date" value="@response.weekly(0)._2">
+        <input type="hidden" id="province">
+        <div class="row mg-t-15">
+            <div class="col-xs-12">
+                <div class="owl-carousel owl-theme">
+                @for(i <- 0 until response.weekly.length) {
+                    @if(i == 0) {
+                        <div class="item activeBox">
+                            <span><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
+                            <h5>@response.weekly(i)._2</h5>
+                        </div>
+                    }else{
+                        <div class="item">
+                            <span><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
+                            <h5>@response.weekly(i)._2</h5>
+                        </div>
+                    }
+                }
+                </div>
+            </div>
+        </div>
+        <div class="row mg-t-15">
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                <div class="region"></div>
+                <a class="apply btn btn-xs btn-success"><i class="fa fa-check-circle"></i> Apply</a>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12" id="boxIndex">
+                @for(i <- 0 until response.kpi.length) {
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                        <div class="itemBox itemGreen">
+                            <p>@response.kpi(i)._1</p>
+                            <span>@response.kpi(i)._2</span>
+                            @if(response.kpi(i)._4 >=0){
+                                <h5>Goal: @response.kpi(i)._3 (<b style="color: green"><i class="fa fa-arrow-up" aria-hidden="true"></i> @response.kpi(i)._4 %</b>)</h5>
+                            }else{
+                                <h5>Goal: @response.kpi(i)._3 (<b style="color: red"><i class="fa fa-arrow-down" aria-hidden="true"></i> @response.kpi(i)._4 %</b>)</h5>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        }else{
+            <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
+        }
+    </div>
+        <!-- /page content -->
+        <!-- footer content -->
+    <footer>
+        <div class="pull-right">
+            Dashboard Monitor 2018
+        </div>
+        <div class="clearfix"></div>
+    </footer>
+        <!-- /footer content -->
+    </div>
+    </div>
+
+        <!-- jQuery -->
+    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- Custom Theme Scripts -->
+    <script src="../assets/custom/js/custom.min.js"></script>
+        <!-- Counter number -->
+    <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+    <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
+    <script src="../assets/vendors/jszip/vfs_fonts.js"></script>
+    <script src="../assets/javascripts/waitMe.js"></script>
+    <script src="../assets/javascripts/owl.carousel.js"></script>
+    <script src="../assets/javascripts/jsTree.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                $('.owl-carousel').owlCarousel({
+                    loop: true,
+                    margin: 10,
+                    responsiveClass: true,
+                    responsive: {
+                        0: {
+                            items: 7,
+                            nav: true
+                        }
+                    }
+                });
+                if(@response != null){
+                    // jsTree Region and province
+                    $('.region').jstree({
+                        "plugins": ["checkbox"],
+                        'checkbox': {
+                            three_state: true
+                        },
+                        'core': {
+                            expand_selected_onload: true,
+                            "themes": {
+                                "icons": false
+                            },
+                            'data': getJsonTreeListRegion(@Html(Json.stringify(Json.toJson(response.location))), @Html(Json.stringify(Json.toJson( response.location.map(x => x._1).distinct.sorted ))))
+                        }
+                    }).on('changed.jstree', function (e, data) {
+                        var i, j, nodes = [], provinces = [];
+                        for (i = 0, j = data.selected.length; i < j; i++) {
+                            nodes.push(data.instance.get_node(data.selected[i]).id);
+                        }
+                        var regionArr = nodes.join(', ').split(',')
+                        for (var i = 0; i < regionArr.length; i++) {
+                            if (regionArr[i].indexOf('Vung') < 0 && regionArr[i].indexOf('International') < 0) {
+                                provinces.push(regionArr[i])
+                            }
+                        }
+                        $('#province').val(provinces)
+                    });
+                }
+                // click apply location jstree
+                $('.apply').click(function () {
+                    callAjaxProblem("location")
+                })
+                // click box weekly
+                $('.owl-item').click(function () {
+                    var date = $(this).find('.item h5').text()
+                    $('.owl-item').find('.item').removeClass('activeBox')
+                    $(this).find('.item').addClass('activeBox')
+                    $('#date').val(date)
+                    callAjaxProblem("date")
+                })
+                // ajax filter
+                function callAjaxProblem(_type){
+                    var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
+                    $.ajax({
+                        url: "/kpi/getJsonKpi",
+                        cache: false,
+                        data: fields,
+                        type: "POST",
+                        beforeSend: function () {
+                            $('.activeBox').waitMe({
+                                effect: 'progressBar',
+                                text: 'Please wait...',
+                                bg: 'rgba(255,255,255,0.7)',
+                                color: '#000',
+                                textPos: 'vertical'
+                            });
+                        },
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                if(_type == "Date") {
+                                    // update jstree location
+                                    $('.region').jstree(true).settings.core.data = getJsonTreeListRegion(dta.location.data, dta.location.key);
+                                    $('.region').jstree(true).refresh();
+                                }
+                                // update content kpi index
+                                $('#boxIndex').html("")
+                                if(dta.kpi.length <= 0){
+                                    $('#boxIndex').append('<p class="nullData">Not found data. Please choose other location</p>')
+                                }
+                                else{
+                                    var indexs = ""
+                                    for(var i=0; i< dta.kpi.length; i++){
+                                        indexs += '<div class="col-lg-2 col-md-3 col-sm-4 col-xs-12"><div class="itemBox itemGreen">'
+                                        indexs += '<p>'+dta.kpi[i][0]+'</p>'
+                                        indexs += '<span>'+dta.kpi[i][1]+'</span>'
+                                        if(dta.kpi[i][3] >=0){
+                                            indexs += '<h5>Goal: '+dta.kpi[i][2]+' (<b style="color: green"><i class="fa fa-arrow-up" aria-hidden="true"></i>'+dta.kpi[i][3]+' %</b>)</h5></div></div>'
+                                        }
+                                        else{
+                                            indexs += '<h5>Goal: '+dta.kpi[i][2]+' (<b style="color: red"><i class="fa fa-arrow-down" aria-hidden="true"></i>'+dta.kpi[i][3]+' %</b>)</h5></div></div>'
+                                        }
+                                    }
+                                    $('#boxIndex').append(indexs)
+                                }
+                            }
+                            else{
+                                alert("Error when execute query. Please check again your system!")
+                            }
+                        },
+                        complete: function () {
+                            $('.activeBox').waitMe("hide");
+                        }
+                    });
+                }
+            });
+
+            function getParamFields(token){
+                var obj = {
+                    "csrfToken" : token,
+                    "province"  : $('#province').val(),
+                    "date"  : $('#date').val()
+                }
+                return obj
+            }
+
+            function getJsonTreeListRegion(dta, arrKey){
+                /*[
+                       { "id" : "ajson1", "parent" : "#", "text" : "Simple root node" },
+                       { "id" : "ajson2", "parent" : "#", "text" : "Root node 2" },
+                       { "id" : "ajson3", "parent" : "ajson2", "text" : "Child 1" },
+                       { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2" },
+                        ]*/
+                var jsArray = []
+                jsArray.push({
+                    "text": "Choose Region",
+                    "id": "All",
+                    "parent": "#",
+                    'state' : {
+                        'opened' : false,
+                        'selected' : true
+                    }
+                })
+                for(var key=0;key<arrKey.length;key++){
+                    jsArray.push({
+                        "text": arrKey[key],
+                        "id": arrKey[key],
+                        "parent": "All"
+                    })
+                    for(var i=0;i<dta.length;i++){
+                        if(arrKey[key] == dta[i][0]){
+                            jsArray.push({
+                                "text": dta[i][1],
+                                "id": dta[i][1],
+                                "parent": arrKey[key]
+                            })
+                        }
+                    }
+                }
+                return jsArray
+            }
+    </script>
+    </body>
+</html>

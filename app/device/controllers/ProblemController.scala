@@ -40,14 +40,14 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
                 .map(x=> (x._1, x._2, CommonService.formatPattern(x._3), CommonService.formatPattern(x._4), CommonService.formatPattern(x._5),
                   CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
       println("t0:"+(System.currentTimeMillis() -t0))
-      Ok(device.views.html.problem.index(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts), username, controllers.routes.ProblemController.index()))
+      Ok(device.views.html.weekly.index(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts), username, controllers.routes.ProblemController.index()))
     }
     catch{
-      case e: Exception => Ok(device.views.html.problem.index(null, username, controllers.routes.ProblemController.index()))
+      case e: Exception => Ok(device.views.html.weekly.index(null, username, controllers.routes.ProblemController.index()))
     }
   }
 
-  def getJsonProblem() = Action { implicit request =>
+  def getJsonProblem() = withAuth {username => implicit request =>
     try{
       val t0 = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head

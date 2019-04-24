@@ -47,6 +47,7 @@
         <!-- /top navigation -->
         <!-- page content -->
     <div class="right_col" role="main">
+        @if(response != null){
         @helper.CSRF.formField
         <input type="hidden" id="date" value="@response.weekly(0)._2">
         <input type="hidden" id="province">
@@ -156,6 +157,9 @@
                 </div>
             </div>
         </div>
+        }else{
+            <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
+        }
     </div>
             <!-- /page content -->
             <!-- footer content -->
@@ -215,32 +219,35 @@
                         }
                     }
                 });
-                // jsTree Region and province
-                $('.region').jstree({
-                    "plugins" : ["checkbox"],
-                    'checkbox': {
-                        three_state: true
-                    },
-                    'core' : {
-                        expand_selected_onload : true,
-                        "themes":{
-                            "icons":false
+                if(@response != null)
+                {
+                    // jsTree Region and province
+                    $('.region').jstree({
+                        "plugins": ["checkbox"],
+                        'checkbox': {
+                            three_state: true
                         },
-                        'data' : getJsonTreeListRegion(@Html(Json.stringify(Json.toJson(response.location))),@Html(Json.stringify(Json.toJson( response.location.map(x => x._1).distinct.sorted ))))
-                    }
-                }).on('changed.jstree', function (e, data) {
-                    var i, j, nodes = [], provinces= [];
-                    for(i = 0, j = data.selected.length; i < j; i++) {
-                        nodes.push(data.instance.get_node(data.selected[i]).id);
-                    }
-                    var regionArr = nodes.join(', ').split(',')
-                    for(var i=0;i< regionArr.length;i++){
-                        if(regionArr[i].indexOf('Vung') < 0 && regionArr[i].indexOf('International') < 0){
-                            provinces.push(regionArr[i])
+                        'core': {
+                            expand_selected_onload: true,
+                            "themes": {
+                                "icons": false
+                            },
+                            'data': getJsonTreeListRegion(@Html(Json.stringify(Json.toJson(response.location))), @Html(Json.stringify(Json.toJson( response.location.map(x => x._1).distinct.sorted ))))
                         }
-                    }
-                    $('#province').val(provinces)
-                });
+                    }).on('changed.jstree', function (e, data) {
+                        var i, j, nodes = [], provinces = [];
+                        for (i = 0, j = data.selected.length; i < j; i++) {
+                            nodes.push(data.instance.get_node(data.selected[i]).id);
+                        }
+                        var regionArr = nodes.join(', ').split(',')
+                        for (var i = 0; i < regionArr.length; i++) {
+                            if (regionArr[i].indexOf('Vung') < 0 && regionArr[i].indexOf('International') < 0) {
+                                provinces.push(regionArr[i])
+                            }
+                        }
+                        $('#province').val(provinces)
+                    });
+                }
                 // click apply location jstree
                 $('.apply').click(function () {
                     callAjaxProblem("location")
@@ -537,7 +544,7 @@
                 function callAjaxProblem(_type){
                     var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
                     $.ajax({
-                        url: "/problem/getJsonProblem",
+                        url: "/weekly/getJsonProblem",
                         cache: false,
                         data: fields,
                         type: "POST",

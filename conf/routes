@@ -77,8 +77,10 @@ GET      /host-json                    controllers.DeviceController.getHostJson(
 GET      /confirmLabel                 controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
 GET      /rejectLabel                  controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
 
-GET       /problem                      controllers.ProblemController.index
-POST      /problem/getJsonProblem       controllers.ProblemController.getJsonProblem
+GET       /weekly                      controllers.ProblemController.index
+POST      /weekly/getJsonProblem       controllers.ProblemController.getJsonProblem
 
+GET       /kpi                         controllers.KpiController.index
+POST      /kpi/getJsonKpi              controllers.KpiController.getJsonKpi
 
 #######################################################################

@@ -415,7 +415,7 @@ object CommonService extends AbstractService {
   def format2Decimal(number: Double): Double = {
     BigDecimal(number).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
-  
+
   def formatNumber(number: Long): String = {
     val formatter = java.text.NumberFormat.getIntegerInstance
     if (number > 1000000000) {
@@ -428,8 +428,21 @@ object CommonService extends AbstractService {
       number.toString
     }
     //formatter.format(number)
-    
+
     //BigDecimal(value).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+  
+  def formatNumberDouble(number: Double): String = {
+    val formatter = java.text.NumberFormat.getIntegerInstance
+    if (number > 1000000000) {
+      BigDecimal(number / (1000000000 * 1.0)).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble + " B"
+    } else if (number > 1000000) {
+      BigDecimal(number / (1000000 * 1.0)).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble + " M"
+    } else if (number > 1000) {
+      BigDecimal(number / (1000 * 1.0)).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble + " K"
+    } else {
+      number.toString
+    }
   }
   
   @deprecated
@@ -449,7 +462,17 @@ object CommonService extends AbstractService {
     val frnum = new DecimalFormat("###,###.###");
     frnum.format(number);
   }
-  
+
+  def percentDouble(number: Double, prev: Double): Double = {
+    if(prev == 0.0){
+      100.0
+    }
+    else{
+      val value = ((number - prev) / (prev * 1.0)) * 100.0
+      BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+    }
+  }
+
   def percent(number: Long, prev: Long): Double = {
     val value = ((number - prev) / (prev * 1.0)) * 100.0
     BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
