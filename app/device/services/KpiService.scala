@@ -28,6 +28,7 @@ object KpiService extends AbstractService{
             group by kpi_index) week
             join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date)
             group by kpi_index) quarter on week.kpi_index = quarter.kpi_index
+            order by week.kpi_index
             """
         .as[(String, Double, Double)])
   }

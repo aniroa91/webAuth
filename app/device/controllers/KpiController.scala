@@ -51,7 +51,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
       val kpi = Await.result(KpiService.listKpiJson(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1) >= 0).
         map(x=> (x._2, x._3, x._4)).groupBy(x=> x._1).map(x=> (x._1, x._2.map(y=> y._2).sum, x._2.map(y=> y._3).sum))
-          .map(x=> (x._1, CommonService.formatNumberDouble(x._2.toLong), CommonService.formatNumberDouble(x._3.toLong), CommonService.percentDouble(x._3, x._2)))
+          .map(x=> (x._1, CommonService.formatNumberDouble(x._2.toLong), CommonService.formatNumberDouble(x._3.toLong), CommonService.percentDouble(x._3, x._2))).toArray.sorted
 
       val objLocation = Json.obj(
         "key"  -> location.map(x=> x._1).distinct.sorted,

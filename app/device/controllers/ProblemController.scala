@@ -29,14 +29,14 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(weekly(0)._2), Duration.Inf)
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
       val deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
-      val probConnectivity = Await.result(ProblemService.listProbconnectivity(weekly(0)._2), Duration.Inf)
-      val probError = Await.result(ProblemService.listProbError(weekly(0)._2), Duration.Inf)
-      val probWarn = Await.result(ProblemService.listProbWarning(weekly(0)._2), Duration.Inf)
-      val critAlert = Await.result(ProblemService.listCritAlerts(weekly(0)._2), Duration.Inf)
-      val warnAlert = Await.result(ProblemService.listWarnAlerts(weekly(0)._2), Duration.Inf)
-      val suyhao = Await.result(ProblemService.listSuyhao(weekly(0)._2), Duration.Inf).map(x=> (x._1, x._2, x._3, CommonService.format2Decimal(x._4)))
-      val broken = Await.result(ProblemService.listBroken(weekly(0)._2), Duration.Inf)
-      val olts = Await.result(ProblemService.listOLT(weekly(0)._2), Duration.Inf)
+      val probConnectivity = Await.result(ProblemService.listProbconnectivity(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
+      val probError = Await.result(ProblemService.listProbError(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
+      val probWarn = Await.result(ProblemService.listProbWarning(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
+      val critAlert = Await.result(ProblemService.listCritAlerts(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
+      val warnAlert = Await.result(ProblemService.listWarnAlerts(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
+      val suyhao = Await.result(ProblemService.listSuyhao(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf).map(x=> (x._1, x._2, x._3, CommonService.format2Decimal(x._4)))
+      val broken = Await.result(ProblemService.listBroken(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
+      val olts = Await.result(ProblemService.listOLT(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
                 .map(x=> (x._1, x._2, CommonService.formatPattern(x._3), CommonService.formatPattern(x._4), CommonService.formatPattern(x._5),
                   CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
       println("t0:"+(System.currentTimeMillis() -t0))
@@ -58,14 +58,14 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1) >=0)
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
       val deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
-      val probConnect = Await.result(ProblemService.listProbconnectivity(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1.split("-")(0)) >=0)
-      val probError = Await.result(ProblemService.listProbError(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1.split("-")(0)) >=0)
-      val probWarn = Await.result(ProblemService.listProbWarning(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1.split("-")(0)) >=0)
-      val critAlert = Await.result(ProblemService.listCritAlerts(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1.split("-")(0)) >=0)
-      val warnAlert = Await.result(ProblemService.listWarnAlerts(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1.split("-")(0)) >=0)
-      val suyhao = Await.result(ProblemService.listSuyhao(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1.substring(0, 3)) >=0).map(x=> (x._1, x._2, x._3, CommonService.format2Decimal(x._4)))
-      val broken = Await.result(ProblemService.listBroken(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1.substring(0, 3)) >=0)
-      val olts = Await.result(ProblemService.listOLT(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1.substring(0, 3)) >=0)
+      val probConnect = Await.result(ProblemService.listProbconnectivity(date, arrProv), Duration.Inf)
+      val probError = Await.result(ProblemService.listProbError(date, arrProv), Duration.Inf)
+      val probWarn = Await.result(ProblemService.listProbWarning(date, arrProv), Duration.Inf)
+      val critAlert = Await.result(ProblemService.listCritAlerts(date, arrProv), Duration.Inf)
+      val warnAlert = Await.result(ProblemService.listWarnAlerts(date, arrProv), Duration.Inf)
+      val suyhao = Await.result(ProblemService.listSuyhao(date, arrProv), Duration.Inf).map(x=> (x._1, x._2, x._3, CommonService.format2Decimal(x._4)))
+      val broken = Await.result(ProblemService.listBroken(date, arrProv), Duration.Inf)
+      val olts = Await.result(ProblemService.listOLT(date, arrProv), Duration.Inf)
         .map(x=> (x._1, x._2, CommonService.formatPattern(x._3), CommonService.formatPattern(x._4), CommonService.formatPattern(x._5),
           CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
     

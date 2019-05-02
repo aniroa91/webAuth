@@ -129,7 +129,7 @@
                         }
                     }
                 });
-                if(@response != null){
+                if(@Html(Json.stringify(Json.toJson(response.location))) != null){
                     // jsTree Region and province
                     $('.region').jstree({
                         "plugins": ["checkbox"],

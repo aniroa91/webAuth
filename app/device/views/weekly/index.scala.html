@@ -77,20 +77,28 @@
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
                 <div class="col-xs-12" style="padding: 0px 20px 0px 20px">
-                    <table class="table table-borderless table-condensed" id="tbDevType">
-                        <tr>
-                        @for(i <- 0 until response.deviceType.length){
-                            <th>@response.deviceType(i)._1</th>
-                        }
-                            <th style="border-left: 1px solid #ddd;color: #337ab7">Total</th>
-                        </tr>
-                        <tr>
-                        @for(i <- 0 until response.deviceType.length){
-                            <th>@response.deviceType(i)._2</th>
-                        }
-                            <th style="border-left: 1px solid #ddd;color: #337ab7">@response.deviceType.map(x=> x._2).sum</th>
-                        </tr>
-                    </table>
+                    <div class="x_panel tile ">
+                        <div class="">
+                            <h2> Devices Have Problem With Devive Types <i class="fa fa-info-circle" title="Tổng số thiết bị gặp vấn đề trong tuần theo từng loại thiết bị"></i></h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <table class="table table-borderless table-condensed" id="tbDevType" style="border-bottom: 1px solid #ddd">
+                                <tr>
+                                    @for(i <- 0 until response.deviceType.length){
+                                        <th>@response.deviceType(i)._1</th>
+                                    }
+                                    <th style="border-left: 1px solid #ddd;color: #337ab7">Total</th>
+                                </tr>
+                                <tr>
+                                    @for(i <- 0 until response.deviceType.length){
+                                        <th>@response.deviceType(i)._2</th>
+                                    }
+                                    <th style="border-left: 1px solid #ddd;color: #337ab7">@response.deviceType.map(x=> x._2).sum</th>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-xs-12">
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -123,7 +131,7 @@
             <div class="col-xs-12" style="margin-bottom: 15px">
                 <div class="x_panel tile ">
                     <div class="x_title">
-                        <h2> Devices Get Problem With OLT Error</h2>
+                        <h2> Devices Get Problem With OLT Error <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề với các lỗi OLT (sf, lofi, port pon down, port uplink down, rogue ONT, sf làm nhảy module)"></i></h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -219,8 +227,7 @@
                         }
                     }
                 });
-                if(@response != null)
-                {
+                if(@Html(Json.stringify(Json.toJson(response.location))) != null){
                     // jsTree Region and province
                     $('.region').jstree({
                         "plugins": ["checkbox"],
@@ -273,7 +280,8 @@
                             }
                     },
                     title: {
-                        text: 'Devices Get Problem With Connectivity'
+                        useHTML: true,
+                        text: 'Devices Get Problem With Connectivity <i class="fa fa-info-circle" title="Các thiết bị BRAS gặp vấn đề trong hoạt động kết nối mạng trong tuần"></i>'
                     },
                     xAxis: {
                         categories: @Html(Json.stringify(Json.toJson(response.probConnectivity.map(x=> x._1)))),
@@ -318,7 +326,8 @@
                         }
                     },
                     title: {
-                        text: 'Devices Get Error Problem'
+                        useHTML: true,
+                        text: 'Devices Get Error Problem <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề từ mức độ lỗi (error, critical, alert, emerge) trở lên trong tuần"></i>'
                     },
                     xAxis: {
                         categories: @Html(Json.stringify(Json.toJson(response.probError.map(x=> x._1)))),
@@ -356,7 +365,8 @@
                         }
                     },
                     title: {
-                        text: 'Devices Get Warn Problem'
+                        useHTML: true,
+                        text: 'Devices Get Warn Problem <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề từ mức độ cảnh báo (warning, notice, info, debug) trở xuống trong tuần"></i>'
                     },
                     xAxis: {
                         categories: @Html(Json.stringify(Json.toJson(response.probWarn.map(x=> x._1)))),
@@ -394,7 +404,8 @@
                         }
                     },
                     title: {
-                        text: 'Devices Get Problem With Critical Alert'
+                        useHTML: true,
+                        text: 'Devices Get Problem With Critical Alert <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề với cảnh báo Critical trong tuần"></i>'
                     },
                     xAxis: {
                         categories: @Html(Json.stringify(Json.toJson(response.critAlert.map(x=> x._1)))),
@@ -432,7 +443,8 @@
                         }
                     },
                     title: {
-                        text: 'Devices Get Problem With Warn Alert'
+                        useHTML: true,
+                        text: 'Devices Get Problem With Warn Alert <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề với cảnh báo Warning trong tuần"></i>'
                     },
                     xAxis: {
                         categories: @Html(Json.stringify(Json.toJson(response.warnAlert.map(x=> x._1)))),
@@ -464,7 +476,8 @@
                         type: 'bubble'
                     },
                     title: {
-                        text: 'Devices Get Problem With Suy Hao Index'
+                        useHTML: true,
+                        text: 'Devices Get Problem With Suy Hao Index <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề với tỷ lệ suy hao không đạt trong tuần"></i>'
                     },
                     xAxis: {
                         gridLineWidth: 1,
@@ -518,7 +531,8 @@
                         }
                     },
                     title: {
-                        text: 'Devices Get Problem With Broken Cable'
+                        useHTML: true,
+                        text: 'Devices Get Problem With Broken Cable <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề với đứt cáp tập điểm cấp 2 trong tuần"></i>'
                     },
                     tooltip: {
                         pointFormat: 'Lost Signal: <b>{point.y} ({point.percentage:.2f}%)</b><br>Affected Client: <b>{point.k}</b>'
