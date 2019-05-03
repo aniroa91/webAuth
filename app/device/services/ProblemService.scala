@@ -47,7 +47,7 @@ object ProblemService extends AbstractService{
         .as[(String, Long, Long)])
   }
 
-  def listProbError(week: String, prov: Array[String]): Future[Seq[(String, Long)]] = {
+  def listProbError(week: String, prov: Array[String], devType: String): Future[Seq[(String, Long)]] = {
     val startDate = week.split("->")(0).trim
     val endDate = week.split("->")(1).trim
     val lstProv = prov.toList
@@ -56,15 +56,25 @@ object ProblemService extends AbstractService{
         vList.foreach(pp.setString)
       }
     }
-    dbConfig.db.run(
-      sql"""select bras_id, sum(err) err from dmt_weekly_kib where week = $startDate::TIMESTAMP AND flag_err =1 AND province IN ($lstProv#${",?" * (lstProv.size - 1)})
+    if(devType == "*"){
+      dbConfig.db.run(
+        sql"""select bras_id, sum(err) err from dmt_weekly_kib where week = $startDate::TIMESTAMP AND flag_err =1 AND province IN ($lstProv#${",?" * (lstProv.size - 1)})
             group by bras_id having sum(err)>0
             order by sum(err) desc
             """
-        .as[(String, Long)])
+          .as[(String, Long)])
+    }
+    else{
+      dbConfig.db.run(
+        sql"""select bras_id, sum(err) err from dmt_weekly_kib where week = $startDate::TIMESTAMP AND flag_err =1 AND province IN ($lstProv#${",?" * (lstProv.size - 1)}) AND device_type= $devType
+            group by bras_id having sum(err)>0
+            order by sum(err) desc
+            """
+          .as[(String, Long)])
+    }
   }
 
-  def listProbWarning(week: String, prov: Array[String]): Future[Seq[(String, Long)]] = {
+  def listProbWarning(week: String, prov: Array[String], devType: String): Future[Seq[(String, Long)]] = {
     val lstProv = prov.toList
     implicit object SetListString extends SetParameter[List[String]] {
       def apply(vList: List[String], pp: PositionedParameters) {
@@ -72,15 +82,25 @@ object ProblemService extends AbstractService{
       }
     }
     val startDate = week.split("->")(0).trim
-    dbConfig.db.run(
-      sql"""select bras_id, sum(warn) warn from dmt_weekly_kib where week = $startDate::TIMESTAMP AND (flag_warn =1 OR flag_cluster = 1) AND province IN ($lstProv#${",?" * (lstProv.size - 1)})
+    if(devType == "*"){
+      dbConfig.db.run(
+        sql"""select bras_id, sum(warn) warn from dmt_weekly_kib where week = $startDate::TIMESTAMP AND (flag_warn =1 OR flag_cluster = 1) AND province IN ($lstProv#${",?" * (lstProv.size - 1)})
             group by bras_id
             order by sum(warn) desc
             """
-        .as[(String, Long)])
+          .as[(String, Long)])
+    }
+    else{
+      dbConfig.db.run(
+        sql"""select bras_id, sum(warn) warn from dmt_weekly_kib where week = $startDate::TIMESTAMP AND (flag_warn =1 OR flag_cluster = 1) AND province IN ($lstProv#${",?" * (lstProv.size - 1)}) AND device_type= $devType
+            group by bras_id
+            order by sum(warn) desc
+            """
+          .as[(String, Long)])
+    }
   }
 
-  def listCritAlerts(week: String, prov: Array[String]): Future[Seq[(String, Long)]] = {
+  def listCritAlerts(week: String, prov: Array[String], devType: String): Future[Seq[(String, Long)]] = {
     val startDate = week.split("->")(0).trim
     val lstProv = prov.toList
     implicit object SetListString extends SetParameter[List[String]] {
@@ -88,15 +108,25 @@ object ProblemService extends AbstractService{
         vList.foreach(pp.setString)
       }
     }
-    dbConfig.db.run(
-      sql"""select bras_id, sum(crit) crit from dmt_weekly_ops where week = $startDate::TIMESTAMP AND flag_crit =1 AND province IN ($lstProv#${",?" * (lstProv.size - 1)})
+    if(devType == "*"){
+      dbConfig.db.run(
+        sql"""select bras_id, sum(crit) crit from dmt_weekly_ops where week = $startDate::TIMESTAMP AND flag_crit =1 AND province IN ($lstProv#${",?" * (lstProv.size - 1)})
             group by bras_id having sum(crit) >0
             order by sum(crit) desc
             """
-        .as[(String, Long)])
+          .as[(String, Long)])
+    }
+    else{
+      dbConfig.db.run(
+        sql"""select bras_id, sum(crit) crit from dmt_weekly_ops where week = $startDate::TIMESTAMP AND flag_crit =1 AND province IN ($lstProv#${",?" * (lstProv.size - 1)}) AND device_type= $devType
+            group by bras_id having sum(crit) >0
+            order by sum(crit) desc
+            """
+          .as[(String, Long)])
+    }
   }
 
-  def listWarnAlerts(week: String, prov: Array[String]): Future[Seq[(String, Long)]] = {
+  def listWarnAlerts(week: String, prov: Array[String], devType: String): Future[Seq[(String, Long)]] = {
     val startDate = week.split("->")(0).trim
     val lstProv = prov.toList
     implicit object SetListString extends SetParameter[List[String]] {
@@ -104,12 +134,22 @@ object ProblemService extends AbstractService{
         vList.foreach(pp.setString)
       }
     }
-    dbConfig.db.run(
-      sql"""select bras_id, sum(warn) warn from dmt_weekly_ops where week = $startDate::TIMESTAMP AND (flag_warn = 1 OR flag_cluster = 1) AND province IN ($lstProv#${",?" * (lstProv.size - 1)})
+    if(devType == "*") {
+      dbConfig.db.run(
+        sql"""select bras_id, sum(warn) warn from dmt_weekly_ops where week = $startDate::TIMESTAMP AND (flag_warn = 1 OR flag_cluster = 1) AND province IN ($lstProv#${",?" * (lstProv.size - 1)})
             group by bras_id having sum(warn) >0
             order by sum(warn) desc
             """
-        .as[(String, Long)])
+          .as[(String, Long)])
+    }
+    else{
+      dbConfig.db.run(
+        sql"""select bras_id, sum(warn) warn from dmt_weekly_ops where week = $startDate::TIMESTAMP AND (flag_warn = 1 OR flag_cluster = 1) AND province IN ($lstProv#${",?" * (lstProv.size - 1)}) AND device_type= $devType
+            group by bras_id having sum(warn) >0
+            order by sum(warn) desc
+            """
+          .as[(String, Long)])
+    }
   }
 
   def listSuyhao(week: String, prov: Array[String]): Future[Seq[(String, Long, Long, Double)]] = {

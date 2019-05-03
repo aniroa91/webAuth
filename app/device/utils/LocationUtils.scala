@@ -25,6 +25,6 @@ object LocationUtils {
 
   def getNameProvWorld(code: String): String = MAP_WORLD.find(x=> x._1._2 == code.trim).getOrElse(("","") -> "")._1._1
 
-  def getCodeProvWorld(name: String): String = MAP_WORLD.find(x=> x._1._1 == name.trim).getOrElse(("","") -> "")._1._2
+  def getCodeProvWorld(name: String): String = MAP_WORLD.find(x=> x._1._1 == name.trim).getOrElse(("",name) -> "")._1._2
 
 }

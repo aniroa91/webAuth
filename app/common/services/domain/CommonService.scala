@@ -463,6 +463,11 @@ object CommonService extends AbstractService {
     frnum.format(number);
   }
 
+  def format2DecimalDouble(number: Double): String ={
+    val frnum = new DecimalFormat("###,###.##");
+    frnum.format(number);
+  }
+
   def percentDouble(number: Double, prev: Double): Double = {
     if(prev == 0.0){
       100.0
@@ -496,6 +501,12 @@ object CommonService extends AbstractService {
 
   def formatDateYYMMDD( date : DateTime) : String = {
     date.toString(DateTimeFormat.forPattern("yyyy/MM/dd"))
+  }
+
+  def formatStringYYMMDD( date : String) : String = {
+    val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
   }
 
   def formatDateDDMMYY( date : String) : String = {

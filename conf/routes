@@ -79,8 +79,10 @@ GET      /rejectLabel                  controllers.BrasController.rejectLabel(id
 
 GET       /weekly                      controllers.ProblemController.index
 POST      /weekly/getJsonProblem       controllers.ProblemController.getJsonProblem
+POST      /weekly/getJsonByDevType     controllers.ProblemController.getJsonByDevType
 
 GET       /kpi                         controllers.KpiController.index
 POST      /kpi/getJsonKpi              controllers.KpiController.getJsonKpi
+POST      /kpi/getKpiTimeSeries        controllers.KpiController.getKpiTimeSeries
 
 #######################################################################

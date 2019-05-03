@@ -2,6 +2,7 @@ package service
 
 import slick.driver.PostgresDriver.api._
 import services.domain.AbstractService
+
 import scala.concurrent.Future
 import play.api.Play
 import play.api.db.slick.DatabaseConfigProvider
@@ -24,24 +25,32 @@ object KpiService extends AbstractService{
     val startDate = week.split("->")(0).trim
     dbConfig.db.run(
       sql"""select  week.kpi_index, week.vlWeek, quarter.vlQuarter
-            from (select kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP
+            from (select kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP AND province ='All'
             group by kpi_index) week
-            join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date)
+            join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date) AND province ='All'
             group by kpi_index) quarter on week.kpi_index = quarter.kpi_index
             order by week.kpi_index
             """
         .as[(String, Double, Double)])
   }
 
-  def listKpiJson(week: String): Future[Seq[(String, String, Double, Double)]] = {
+  def listKpiJson(week: String, prov: String): Future[Seq[(String, Double, Double)]] = {
     val startDate = week.split("->")(0).trim
     dbConfig.db.run(
-      sql"""select week.province, week.kpi_index, week.vlWeek, quarter.vlQuarter
-            from (select province, kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP
-            group by province, kpi_index) week
-            join (select province, kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date)
-            group by province,kpi_index) quarter on week.kpi_index = quarter.kpi_index
+      sql"""select week.kpi_index, week.vlWeek, quarter.vlQuarter
+            from (select kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP AND province = $prov
+            group by kpi_index) week
+            join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date) AND province = $prov
+            group by kpi_index) quarter on week.kpi_index = quarter.kpi_index
             """
-        .as[(String, String, Double, Double)])
+        .as[(String, Double, Double)])
+  }
+
+  def listKpiTimeSeries(week: String, prov: String, index: String): Future[Seq[(String, Double)]] = {
+    val startDate = week.split("->")(0).trim
+    dbConfig.db.run(
+      sql"""select week, value from dmt_weekly_kpi where week <= $startDate::TIMESTAMP AND province = $prov AND kpi_index = $index order by week
+            """
+        .as[(String, Double)])
   }
 }

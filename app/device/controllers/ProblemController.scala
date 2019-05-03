@@ -30,10 +30,10 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
       val deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
       val probConnectivity = Await.result(ProblemService.listProbconnectivity(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
-      val probError = Await.result(ProblemService.listProbError(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
-      val probWarn = Await.result(ProblemService.listProbWarning(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
-      val critAlert = Await.result(ProblemService.listCritAlerts(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
-      val warnAlert = Await.result(ProblemService.listWarnAlerts(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
+      val probError = Await.result(ProblemService.listProbError(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray, "*"), Duration.Inf)
+      val probWarn = Await.result(ProblemService.listProbWarning(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray, "*"), Duration.Inf)
+      val critAlert = Await.result(ProblemService.listCritAlerts(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray, "*"), Duration.Inf)
+      val warnAlert = Await.result(ProblemService.listWarnAlerts(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray, "*"), Duration.Inf)
       val suyhao = Await.result(ProblemService.listSuyhao(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf).map(x=> (x._1, x._2, x._3, CommonService.format2Decimal(x._4)))
       val broken = Await.result(ProblemService.listBroken(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
       val olts = Await.result(ProblemService.listOLT(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
@@ -59,10 +59,10 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
       val deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
       val probConnect = Await.result(ProblemService.listProbconnectivity(date, arrProv), Duration.Inf)
-      val probError = Await.result(ProblemService.listProbError(date, arrProv), Duration.Inf)
-      val probWarn = Await.result(ProblemService.listProbWarning(date, arrProv), Duration.Inf)
-      val critAlert = Await.result(ProblemService.listCritAlerts(date, arrProv), Duration.Inf)
-      val warnAlert = Await.result(ProblemService.listWarnAlerts(date, arrProv), Duration.Inf)
+      val probError = Await.result(ProblemService.listProbError(date, arrProv, "*"), Duration.Inf)
+      val probWarn = Await.result(ProblemService.listProbWarning(date, arrProv, "*"), Duration.Inf)
+      val critAlert = Await.result(ProblemService.listCritAlerts(date, arrProv, "*"), Duration.Inf)
+      val warnAlert = Await.result(ProblemService.listWarnAlerts(date, arrProv, "*"), Duration.Inf)
       val suyhao = Await.result(ProblemService.listSuyhao(date, arrProv), Duration.Inf).map(x=> (x._1, x._2, x._3, CommonService.format2Decimal(x._4)))
       val broken = Await.result(ProblemService.listBroken(date, arrProv), Duration.Inf)
       val olts = Await.result(ProblemService.listOLT(date, arrProv), Duration.Inf)
@@ -113,6 +113,54 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
         "suyhao"     -> suyhao,
         "broken"     -> broken,
         "olt"        -> olts
+      )
+      println("t0:"+(System.currentTimeMillis() -t0))
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getJsonByDevType() = withAuth {username => implicit request =>
+    try{
+      val t0 = System.currentTimeMillis()
+      val date = request.body.asFormUrlEncoded.get("date").head
+      val province = request.body.asFormUrlEncoded.get("province").head
+      val devType = request.body.asFormUrlEncoded.get("devType").head
+
+      var arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvWorld(x))
+      if(arrProv.indexOf("BRU") >= 0) arrProv :+= "BRA"
+      val probError = Await.result(ProblemService.listProbError(date, arrProv, devType), Duration.Inf)
+      val probWarn = Await.result(ProblemService.listProbWarning(date, arrProv, devType), Duration.Inf)
+      val critAlert = Await.result(ProblemService.listCritAlerts(date, arrProv, devType), Duration.Inf)
+      val warnAlert = Await.result(ProblemService.listWarnAlerts(date, arrProv, devType), Duration.Inf)
+
+      val objErr = Json.obj(
+        "cates"  -> probError.map(x=> x._1),
+        "data" -> probError.map(x=> x._2),
+        "name" -> "Error"
+      )
+      val objWarn = Json.obj(
+        "cates"  -> probWarn.map(x=> x._1),
+        "data" -> probWarn.map(x=> x._2),
+        "name" -> "Warn"
+      )
+      val objCrit = Json.obj(
+        "cates"  -> critAlert.map(x=> x._1),
+        "data" -> critAlert.map(x=> x._2),
+        "name" -> "Crit"
+      )
+      val objWarnAlert = Json.obj(
+        "cates"  -> warnAlert.map(x=> x._1),
+        "data" -> warnAlert.map(x=> x._2),
+        "name" -> "Warn"
+      )
+      val rs = Json.obj(
+        "probErr"    -> objErr,
+        "probWarn"   -> objWarn,
+        "probCrit"   -> objCrit,
+        "probWarnAlert"   -> objWarnAlert
       )
       println("t0:"+(System.currentTimeMillis() -t0))
       Ok(Json.toJson(rs))

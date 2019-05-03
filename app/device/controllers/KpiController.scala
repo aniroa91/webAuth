@@ -3,8 +3,8 @@ package controllers
 import javax.inject.Inject
 import javax.inject.Singleton
 
-import device.models.{KpiResponse, ProblemResponse}
-import device.utils.LocationUtils
+import device.models.KpiResponse
+import device.utils.{CommonUtils, LocationUtils}
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 
@@ -29,7 +29,8 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val weekly = Await.result(ProblemService.listWeekly(), Duration.Inf)
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(weekly(0)._2), Duration.Inf)
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
-      val kpi = Await.result(KpiService.listKpi(weekly(0)._2), Duration.Inf).map(x=> (x._1, CommonService.formatNumberDouble(x._2.toLong), CommonService.formatNumberDouble(x._3.toLong), CommonService.percentDouble(x._3, x._2)))
+      val kpi = Await.result(KpiService.listKpi(weekly(0)._2), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2),
+        CommonService.format2DecimalDouble(x._3), CommonService.percentDouble(x._2, x._3)))
 
       println("time:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.kpi.index(KpiResponse(weekly, location, kpi), username, controllers.routes.KpiController.index()))
@@ -43,23 +44,33 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
     try{
       val time = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
-      val province = request.body.asFormUrlEncoded.get("province").head
-
-      var arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvWorld(x))
-      if(arrProv.indexOf("BRU") >= 0) arrProv :+= "BRA"
-      val lstProvince = Await.result(ProblemService.listProvinceByWeek(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1) >=0)
-      val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
-      val kpi = Await.result(KpiService.listKpiJson(date), Duration.Inf).filter(x=> arrProv.indexOf(x._1) >= 0).
-        map(x=> (x._2, x._3, x._4)).groupBy(x=> x._1).map(x=> (x._1, x._2.map(y=> y._2).sum, x._2.map(y=> y._3).sum))
-          .map(x=> (x._1, CommonService.formatNumberDouble(x._2.toLong), CommonService.formatNumberDouble(x._3.toLong), CommonService.percentDouble(x._3, x._2))).toArray.sorted
-
-      val objLocation = Json.obj(
-        "key"  -> location.map(x=> x._1).distinct.sorted,
-        "data" -> location
-      )
+      var province = LocationUtils.getCodeProvWorld(request.body.asFormUrlEncoded.get("province").head)
+      println(province)
+      if(province == "BRU") province = "BRA"
+      val kpi = Await.result(KpiService.listKpiJson(date, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2), CommonService.format2DecimalDouble(x._3),
+            CommonService.percentDouble(x._2, x._3), CommonUtils.getTitleIndex(x._1), CommonUtils.getDescriptIndex(x._1))).toArray.sorted
       val rs = Json.obj(
-        "location"   -> objLocation,
         "kpi" -> kpi
+      )
+      println("timeJson:"+(System.currentTimeMillis() -time))
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getKpiTimeSeries() = withAuth {username => implicit request =>
+    try{
+      val time = System.currentTimeMillis()
+      val date = request.body.asFormUrlEncoded.get("date").head
+      val index = request.body.asFormUrlEncoded.get("index").head
+      var province = LocationUtils.getCodeProvWorld(request.body.asFormUrlEncoded.get("province").head)
+      if(province == "BRU") province = "BRA"
+      val kpiWeekly = Await.result(KpiService.listKpiTimeSeries(date, province, index), Duration.Inf)
+      val rs = Json.obj(
+        "cate" -> kpiWeekly.map(x=> CommonService.formatStringYYMMDD(x._1)),
+        "data" -> kpiWeekly.map(x=> CommonService.format2Decimal(x._2))
       )
       println("timeJson:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))

@@ -1,6 +1,7 @@
 @(response: device.models.KpiResponse, email: String, postUrl: Call)(implicit request: RequestHeader)
 
 @import play.api.libs.json.Json
+@import device.utils.CommonUtils
 
 <!DOCTYPE html>
 
@@ -74,13 +75,13 @@
             <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12" id="boxIndex">
                 @for(i <- 0 until response.kpi.length) {
                     <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
-                        <div class="itemBox itemGreen">
-                            <p>@response.kpi(i)._1</p>
+                        <div class="itemBox itemGreen" name="@CommonUtils.getTitleIndex(response.kpi(i)._1)" id="@response.kpi(i)._1">
+                            <p>@CommonUtils.getTitleIndex(response.kpi(i)._1) <i class="fa fa-info-circle" title="@CommonUtils.getDescriptIndex(response.kpi(i)._1)"></i></p>
                             <span>@response.kpi(i)._2</span>
-                            @if(response.kpi(i)._4 >=0){
-                                <h5>Goal: @response.kpi(i)._3 (<b style="color: green"><i class="fa fa-arrow-up" aria-hidden="true"></i> @response.kpi(i)._4 %</b>)</h5>
+                            @if(response.kpi(i)._4 >0){
+                                <h5>Goal: @response.kpi(i)._3 (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i> @response.kpi(i)._4 %</b>)</h5>
                             }else{
-                                <h5>Goal: @response.kpi(i)._3 (<b style="color: red"><i class="fa fa-arrow-down" aria-hidden="true"></i> @response.kpi(i)._4 %</b>)</h5>
+                                <h5>Goal: @response.kpi(i)._3 (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i> @response.kpi(i)._4 %</b>)</h5>
                             }
                         </div>
                     </div>
@@ -90,6 +91,14 @@
         }else{
             <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
         }
+        <div id="modal">
+            <div class="close">
+               <a data-izimodal-close="">×</a>
+            </div>
+            <div style="margin-top: 20px;padding: 10px">
+                <div id="boxLine"></div>
+            </div>
+        </div>
     </div>
         <!-- /page content -->
         <!-- footer content -->
@@ -116,6 +125,11 @@
     <script src="../assets/javascripts/waitMe.js"></script>
     <script src="../assets/javascripts/owl.carousel.js"></script>
     <script src="../assets/javascripts/jsTree.js"></script>
+    <script src="../assets/javascripts/iziModal.min.js"></script>
+        <!-- Hight chart -->
+    <script src="../assets/javascripts/highstock.js"></script>
+    <script src="../assets/javascripts/highcharts-more.js"></script>
+    <script src="../assets/javascripts/exporting.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
                 $('.owl-carousel').owlCarousel({
@@ -134,9 +148,11 @@
                     $('.region').jstree({
                         "plugins": ["checkbox"],
                         'checkbox': {
-                            three_state: true
+                            deselect_all: true,
+                            three_state: false
                         },
                         'core': {
+                            multiple: false,
                             expand_selected_onload: true,
                             "themes": {
                                 "icons": false
@@ -150,16 +166,94 @@
                         }
                         var regionArr = nodes.join(', ').split(',')
                         for (var i = 0; i < regionArr.length; i++) {
-                            if (regionArr[i].indexOf('Vung') < 0 && regionArr[i].indexOf('International') < 0) {
-                                provinces.push(regionArr[i])
-                            }
+                            provinces.push(regionArr[i])
                         }
                         $('#province').val(provinces)
                     });
                 }
+                // click box show timeseries
+                $(document).on('click','.itemBox', function (event) {
+                    event.preventDefault();
+                    var title = $(this).attr('name')
+                    var id = $(this).attr('id')
+                    $.ajax({
+                        url: "/kpi/getKpiTimeSeries",
+                        cache: false,
+                        data: {
+                            "csrfToken" : document.querySelector('input[name=csrfToken]').value,
+                            "province"  : $('#province').val(),
+                            "date"  : $('#date').val(),
+                            "index": id
+                        },
+                        type: "POST",
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                $('#modal').iziModal('open');
+                                Highcharts.chart('boxLine', {
+                                    chart: {
+                                        type: 'line',
+                                        zoomType: 'x',
+                                        width: $("#boxLine").width(),
+                                        events: {
+                                            load: function () {
+                                                this.xAxis[0].setExtremes(0 , (dta.cate.length > 30)? 30: dta.cate.length-1 );
+                                            }
+                                        }
+                                    },
+                                    title: {
+                                        text: title
+                                    },
+                                    xAxis: {
+                                        categories: dta.cate,
+                                        scrollbar: {
+                                            enabled: true
+                                        }
+                                        /*labels: {
+                                            formatter: function () {
+                                                if ($('#date').val().trim() === this.value) {
+                                                    return '<span style="fill: red;">' + this.value + '</span>';
+                                                } else {
+                                                    return this.value;
+                                                }
+                                            }
+                                        }*/
+                                    },
+                                    legend: {
+                                        enabled: false
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: 'Value'
+                                        }
+                                    },
+                                    colors: ['rgb(245,112,112)'],
+                                    plotOptions: {
+                                        line: {
+                                            dataLabels: {
+                                                enabled: false
+                                            },
+                                            enableMouseTracking: true
+                                        }
+                                    },
+                                    series: [{
+                                        name: title,
+                                        data: dta.data
+                                    }]
+                                });
+                            }
+                            else{
+                                alert("Error when execute query. Please check again your system!")
+                            }
+                        }
+                    });
+                });
+                $('#modal').iziModal({
+                    width: '50%'
+                });
+
                 // click apply location jstree
                 $('.apply').click(function () {
-                    callAjaxProblem("location")
+                    callAjaxKpi("location")
                 })
                 // click box weekly
                 $('.owl-item').click(function () {
@@ -167,10 +261,10 @@
                     $('.owl-item').find('.item').removeClass('activeBox')
                     $(this).find('.item').addClass('activeBox')
                     $('#date').val(date)
-                    callAjaxProblem("date")
+                    callAjaxKpi("date")
                 })
                 // ajax filter
-                function callAjaxProblem(_type){
+                function callAjaxKpi(_type){
                     var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
                     $.ajax({
                         url: "/kpi/getJsonKpi",
@@ -188,11 +282,11 @@
                         },
                         success: function (dta) {
                             if(dta != "Error"){
-                                if(_type == "Date") {
+                                /*if(_type == "Date") {
                                     // update jstree location
                                     $('.region').jstree(true).settings.core.data = getJsonTreeListRegion(dta.location.data, dta.location.key);
                                     $('.region').jstree(true).refresh();
-                                }
+                                }*/
                                 // update content kpi index
                                 $('#boxIndex').html("")
                                 if(dta.kpi.length <= 0){
@@ -201,14 +295,14 @@
                                 else{
                                     var indexs = ""
                                     for(var i=0; i< dta.kpi.length; i++){
-                                        indexs += '<div class="col-lg-2 col-md-3 col-sm-4 col-xs-12"><div class="itemBox itemGreen">'
-                                        indexs += '<p>'+dta.kpi[i][0]+'</p>'
+                                        indexs += '<div class="col-lg-2 col-md-3 col-sm-4 col-xs-12"><div class="itemBox itemGreen" name="'+dta.kpi[i][4]+'" id="'+dta.kpi[i][0]+'">'
+                                        indexs += '<p>'+dta.kpi[i][4]+' <i class="fa fa-info-circle" title="'+dta.kpi[i][5]+'"></i></p>'
                                         indexs += '<span>'+dta.kpi[i][1]+'</span>'
-                                        if(dta.kpi[i][3] >=0){
-                                            indexs += '<h5>Goal: '+dta.kpi[i][2]+' (<b style="color: green"><i class="fa fa-arrow-up" aria-hidden="true"></i>'+dta.kpi[i][3]+' %</b>)</h5></div></div>'
+                                        if(dta.kpi[i][3] >0){
+                                            indexs += '<h5>Goal: '+dta.kpi[i][2]+' (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i>'+dta.kpi[i][3]+' %</b>)</h5></div></div>'
                                         }
                                         else{
-                                            indexs += '<h5>Goal: '+dta.kpi[i][2]+' (<b style="color: red"><i class="fa fa-arrow-down" aria-hidden="true"></i>'+dta.kpi[i][3]+' %</b>)</h5></div></div>'
+                                            indexs += '<h5>Goal: '+dta.kpi[i][2]+' (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i>'+dta.kpi[i][3]+' %</b>)</h5></div></div>'
                                         }
                                     }
                                     $('#boxIndex').append(indexs)
