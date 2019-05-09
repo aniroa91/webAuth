@@ -2,31 +2,40 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+  name: ${K8S_SERVICE_NAME}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+      app: ${K8S_SERVICE_NAME}
   template:
     metadata:
       labels:
-        app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+        app: ${K8S_SERVICE_NAME}
     spec:
+      hostAliases:
+      - ip: "172.27.11.208"
+        hostnames:
+        - "ipa.bigdata.local"
+      - ip: "172.27.11.227"
+        hostnames:
+        - "replicas-ipa.bigdata.local"
       containers:
-      - name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
-        image: bigdata-registry.local:5043/${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${BUILD_ID}
+      - name: ${K8S_SERVICE_NAME}
+        image: bigdata-registry.local:5043/${JOB_NAME}:${BUILD_ID}-${BUILD_TIMESTAMP}-${GIT_COMMIT}
         ports:
         - containerPort: 9000
+      imagePullSecrets:
+        - name: regcred
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+  name: ${K8S_SERVICE_NAME}
   labels:
-    app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+    app: ${K8S_SERVICE_NAME}
 spec:
   ports:
   - port: 9000
@@ -34,20 +43,21 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+    app: ${K8S_SERVICE_NAME}
+  type: ClusterIP
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ing-${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+  name: ing-${K8S_SERVICE_NAME}
 spec:
   rules:
-  - host: play-noc-staging.bigdata.local
+  - host: $K8S_SERVICE_NAME.bigdata.local
     http:
       paths:
       - path: /
         backend:
-          serviceName: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+          serviceName: ${K8S_SERVICE_NAME}
           servicePort: 9000
 ---
