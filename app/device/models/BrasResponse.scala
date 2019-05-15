@@ -109,6 +109,7 @@ case class DailyResponse(
                         )
 
 case class BrasResponse(
+                            ticketOutlier: Seq[(String,String)],
                             currentsInfo: BrasInfor,
                             kibanaOpviewBytime: KibanaOpviewByTime,
                             sigLogBytime: SigLogByTime,

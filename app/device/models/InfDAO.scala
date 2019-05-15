@@ -277,7 +277,7 @@ object InfDAO {
       .map(x => (x._1, x._2._1.toInt, x._2._2.toInt,x._2._3.toInt,x._2._4.toInt)).filter(x=> x._3>300)
     rsContract*/
     val fromDay = nowDay.split("/")(0)
-    val nextDay = nowDay.split("/")(1)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
       sql"""select date_time, module,result
             from dwh_inf_port_pon
@@ -285,6 +285,23 @@ object InfDAO {
             order by date_time desc
                   """
         .as[(String,String,String)])
+  }
+
+  def getTicketOutlierByHost(host: String,nowDay: String): Future[Seq[(String,String)]] = {
+    val hostName = s"%$host%"
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select tb.* from
+            ((select 'ticket' device_type, created_date as time from dwh_ticket
+              where device_name like $hostName AND created_date >= $fromDay::TIMESTAMP AND created_date < $nextDay::TIMESTAMP)
+            union all
+             (select 'outlier' device_type, date_time as time from dwh_inf_module
+              where host= $host AND date_time >= $fromDay::TIMESTAMP AND date_time < $nextDay::TIMESTAMP AND label =1)
+             ) as tb
+             order by tb.time desc
+                  """
+        .as[(String,String)])
   }
 
 }

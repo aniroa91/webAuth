@@ -788,6 +788,52 @@ object BrasDAO {
         .as[(String,String,Int,Int)])
   }
 
+  def topInfOut(month: String): Future[Seq[(String,String,Int)]] = {
+    val query = month + "-01"
+    dbConfig.db.run(
+      sql"""select d.province,d.bras_id,d.total_outliers from(
+                  select row_number() OVER (PARTITION BY c.province ORDER BY c.total_outliers desc) AS r , c.*
+                  from(
+                       select b.province, a.bras_id, sum(total_outliers) total_outliers
+                       from dmt_overview_inf_outlier a,
+                            (select province
+                             from dmt_overview_inf_outlier
+                             where month = $query::TIMESTAMP
+                             group by province
+                             having sum(total_outliers) >0
+                             order by sum(total_outliers) desc
+                             limit 10) b
+                        where a.province = b.province and month = $query::TIMESTAMP
+                        group by b.province, a.bras_id
+                        order by b.province, a.bras_id) c) d
+              where d.r <= 10
+                  """
+        .as[(String,String,Int)])
+  }
+
+  def topBrasOut(month: String): Future[Seq[(String,String,Int)]] = {
+    val query = month + "-01"
+    dbConfig.db.run(
+      sql"""select d.province,d.bras_id,d.no_outliers from(
+                  select row_number() OVER (PARTITION BY c.province ORDER BY c.no_outliers desc) AS r , c.*
+                  from(
+                       select b.province, a.bras_id, sum(no_outliers) no_outliers
+                       from dmt_overview_bras_outlier a,
+                            (select province
+                             from dmt_overview_bras_outlier
+                             where month = $query::TIMESTAMP
+                             group by province
+                             having sum(no_outliers) >0
+                             order by sum(no_outliers) desc
+                             limit 10) b
+                        where a.province = b.province and month = $query::TIMESTAMP
+                        group by b.province, a.bras_id
+                        order by b.province, a.bras_id) c) d
+              where d.r <= 10
+                  """
+        .as[(String,String,Int)])
+  }
+
   def getTopKibana(month: String,typeError: String): Future[Seq[(String,String,Int)]] = {
     val query = month + "-01"
     dbConfig.db.run(
@@ -1224,6 +1270,22 @@ object BrasDAO {
             group by host,module
                   """
         .as[(String,String,Int,Int,Int)])*/
+  }
+
+  def getTicketOutlierByBrasId(bras: String,nowDay: String): Future[Seq[(String,String)]] = {
+    val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    dbConfig.db.run(
+      sql"""select tb.* from
+            ((select 'ticket' device_type, created_date as time from dwh_ticket
+              where device_name= $bras AND created_date >= $fromDay::TIMESTAMP AND created_date < $nextDay::TIMESTAMP)
+            union all
+             (select 'outlier' device_type, date_time as time from dwh_conn_bras_detail
+              where bras_id= $bras AND date_time >= $fromDay::TIMESTAMP AND date_time < $nextDay::TIMESTAMP)
+             ) as tb
+             order by tb.time desc
+                  """
+        .as[(String,String)])
   }
 
   def getOpsviewServiceNameResponse(bras: String,nowDay: String): Future[Seq[(String,Int)]] = {

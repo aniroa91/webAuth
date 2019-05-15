@@ -350,6 +350,114 @@
                                 series: getJsonDrillChildren(dta.topLogoff.data,dta.topLogoff.categories)
                             }
                         });
+
+                        // top 10 bras outliers
+                        // Create the chart
+                        Highcharts.chart('pie-bras', {
+                            chart: {
+                                type: 'pie',
+                                options3d: {
+                                    enabled: false,
+                                    alpha: 45
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: false,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '{point.name}: {point.percentage:.2f}%'
+                                    },
+                                    showInLegend: false
+                                }
+                            },
+                            colors : ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#1ABB9C', '#832d1d', '#09006d', '#cccccc', '#669999', '#e6e600'],
+                            tooltip: {
+                                pointFormat: 'Total Bras Outliers: <b>{point.y} ({point.percentage:.2f}%)</b>'
+                            },
+                            series: [{
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topBrasOut.dataProvince, dta.topBrasOut.dataClients)
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topBrasOut.data,dta.topBrasOut.categories)
+                            }
+                        });
+                        // top 10 inf outliers
+                        Highcharts.chart('pie-inf', {
+                            chart: {
+                                type: 'pie',
+                                options3d: {
+                                    enabled: false,
+                                    alpha: 45
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: false,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '{point.name}: {point.percentage:.2f}%'
+                                    },
+                                    showInLegend: false
+                                }
+                            },
+                            colors : ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#1ABB9C', '#832d1d', '#09006d', '#cccccc', '#669999', '#e6e600'],
+                            tooltip: {
+                                pointFormat: 'Total Inf Outliers: <b>{point.y} ({point.percentage:.2f}%)</b>'
+                            },
+                            series: [{
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topInfOut.dataProvince, dta.topInfOut.dataClients)
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topInfOut.data,dta.topInfOut.categories)
+                            }
+                        });
                         // top 10 Kibana
                         Highcharts.chart('bar-kibana', {
                             chart: {

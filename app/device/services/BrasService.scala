@@ -152,6 +152,14 @@ object BrasService extends AbstractService{
     BrasDAO.getTopLogoff(month)
   }
 
+  def topInfOut(month: String): Future[Seq[(String,String,Int)]]   ={
+    BrasDAO.topInfOut(month)
+  }
+
+  def topBrasOut(month: String): Future[Seq[(String,String,Int)]]   ={
+    BrasDAO.topBrasOut(month)
+  }
+
   def getTopKibana(month: String,_typeError: String): Future[Seq[(String,String,Int)]]   ={
     BrasDAO.getTopKibana(month,_typeError)
   }
@@ -704,6 +712,10 @@ object BrasService extends AbstractService{
 
   def getInfModuleResponse(bras: String,nowDay: String): Array[(String,String,Long,Long,Long)] = {
     BrasDAO.getInfModuleResponse(bras,nowDay)
+  }
+
+  def getTicketOutlierByBrasId(bras: String,nowDay: String): Future[Seq[(String,String)]] = {
+    BrasDAO.getTicketOutlierByBrasId(bras,nowDay)
   }
 
   def getOpsviewServiceSttResponse(bras: String,nowDay: String):Future[Seq[(String,Int)]] = {

@@ -55,4 +55,8 @@ object HostService extends AbstractService{
     InfDAO.getPortPonDown(host,nowDay)
   }
 
+  def getTicketOutlierByHost(host: String,nowDay: String): Future[Seq[(String,String)]] = {
+    InfDAO.getTicketOutlierByHost(host,nowDay)
+  }
+
 }

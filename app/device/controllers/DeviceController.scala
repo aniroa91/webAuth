@@ -963,6 +963,22 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "dataClients" -> topLogoff.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sortWith(_._2 > _._2),
         "categories" -> topLogoff.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
+      // get top province Bras outliers
+      val topBrasOut = Await.result(BrasService.topBrasOut(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
+      val brasOutObj = Json.obj(
+        "data" -> topBrasOut,
+        "dataProvince" -> topBrasOut.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "dataClients" -> "",
+        "categories" -> topBrasOut.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+      )
+      // get top province Inf outliers
+      val topInfOut = Await.result(BrasService.topInfOut(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
+      val infOutObj = Json.obj(
+        "data" -> topInfOut,
+        "dataProvince" -> topInfOut.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "dataClients" -> "",
+        "categories" -> topInfOut.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+      )
       // get Top total kibana
       val topKibana = Await.result(BrasService.getTopKibana(month,_typeError), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3))
       val kibanaObj = Json.obj(
@@ -1003,6 +1019,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "month"      -> month,
         "topSignin"  -> siginObj,
         "topLogoff"  -> logoffObj,
+        "topBrasOut" -> brasOutObj,
+        "topInfOut"  -> infOutObj,
         "topKibana"  -> kibanaObj,
         "topOpsview" -> opsviewObj,
         "topInf"     -> infObj,
@@ -1558,8 +1576,13 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           // get table contract with sf>300
           val sfContract = Await.result(HostService.getPortPonDown(brasId,day), Duration.Inf)
           logger.info("t6:"+ (System.currentTimeMillis() - t6))
+          // get ticket timeline
+          val t7 = System.currentTimeMillis()
+          val ticketOutlier = Await.result(HostService.getTicketOutlierByHost(brasId, day), Duration.Inf)
+          logger.info("tTicket: " + (System.currentTimeMillis() - t7))
+
           logger.info("timeHost:"+ (System.currentTimeMillis() - t00))
-          Ok(device.views.html.search(form,username,HostResponse(noOutlierModule,errHost,errorHourly,sigLogModule,arrSiglogModuleIndex,suyhaoModule,sigLogByHourly,splitterByHost,ErrModuleIndex(arrModule,arrIndex,errModuleIndex),sfContract),null,day,brasId,"I",routes.DeviceController.search))
+          Ok(device.views.html.search(form,username,HostResponse(ticketOutlier,noOutlierModule,errHost,errorHourly,sigLogModule,arrSiglogModuleIndex,suyhaoModule,sigLogByHourly,splitterByHost,ErrModuleIndex(arrModule,arrIndex,errModuleIndex),sfContract),null,day,brasId,"I",routes.DeviceController.search))
         }
         // for result BRAS
         else {
@@ -1673,9 +1696,12 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
           val devStatus = devServByStt.map(x => x._3).distinct
           val devBras = devServByStt.map(x => x._1).distinct
           logger.info("tDeviceStatus: " + (System.currentTimeMillis() - t12))
+          val t13 = System.currentTimeMillis()
+          val ticketOutlier = Await.result(BrasService.getTicketOutlierByBrasId(brasId, day), Duration.Inf)
+          logger.info("tTicket: " + (System.currentTimeMillis() - t13))
 
           logger.info("timeAll: " + (System.currentTimeMillis() - timeStart))
-          Ok(device.views.html.search(form, username,null ,BrasResponse(BrasInfor(noOutlierByhost,numOutlier, (sigLog._1, sigLog._2),(sigLogClients._1,sigLogClients._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
+          Ok(device.views.html.search(form, username,null ,BrasResponse(ticketOutlier, BrasInfor(noOutlierByhost,numOutlier, (sigLog._1, sigLog._2),(sigLogClients._1,sigLogClients._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
             infErrorBytime, serviceByTime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost, KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost, sankeyService, DeviceNameStatus(devBras, devName, devStatus, devServByStt)), day, brasId,_typeS,routes.DeviceController.search))
         }
       }

@@ -143,6 +143,38 @@
                         }
                     }
                 });
+                Highcharts.chart('boxLine', {
+                    chart: {
+                        type: 'line'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        categories: ["test"]
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Value'
+                        }
+                    },
+                    colors: ['rgb(245,112,112)'],
+                    plotOptions: {
+                        line: {
+                            dataLabels: {
+                                enabled: false
+                            },
+                            enableMouseTracking: true
+                        }
+                    },
+                    series: [{
+                        name: "test",
+                        data: [12]
+                    }]
+                });
                 if(@Html(Json.stringify(Json.toJson(response.location))) != null){
                     // jsTree Region and province
                     $('.region').jstree({

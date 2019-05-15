@@ -179,6 +179,13 @@
                 </div>
             </div>
             <div class="row top_tiles">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel tile" style="padding: 0px">
+                        <div id="time-line-host"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row top_tiles">
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                     <div class="x_panel tile" style="padding: 0px">
                         <div class="card-header">
@@ -379,6 +386,14 @@
                         <div class="x_content">
                             <div id="int-col-hourly" style="height: 250px;"></div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row top_tiles">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel tile" style="padding: 0px">
+                        <div id="time-line-bras"></div>
                     </div>
                 </div>
             </div>
@@ -728,7 +743,7 @@
     <script src="../assets/javascripts/heatmap.js"></script>
     <script src="../assets/javascripts/treemap.js"></script>
     <script src="../assets/javascripts/sankey.js"></script>
-
+    <script src="../assets/javascripts/roadmap.js"></script>
         <!-- Counter number -->
     <script src="../assets/javascripts/jquery.counterup.min.js"></script>
     <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
@@ -945,6 +960,19 @@
                         "searching":     false,
                         "sort":     false
                     });
+                    if(@rsInfhost.ticketOutlier.length >0)
+                    {
+                        var events = parseTicketOut(@Html(Json.stringify(Json.toJson(rsInfhost.ticketOutlier))))
+                        $('#time-line-host').show()
+                        $('#time-line-host').roadmap(events, {
+                            eventsPerSlide: (@rsInfhost.ticketOutlier.length > 6) ? 6 : @rsInfhost.ticketOutlier.length,
+                            slide: 1,
+                            prevArrow: '<i class="fa fa-chevron-left" style="color: #73879C;font-size:24px" aria-hidden="true"></i>',
+                            nextArrow: '<i class="fa fa-chevron-right" style="color: #73879C;font-size:24px" aria-hidden="true"></i>'
+                    });
+                    }else{
+                        $('#time-line-host').hide()
+                    }
                     // line col signin and logoff by hourly
                     @if(rsInfhost.sigLogByHourly != null){
                         Highcharts.chart('col-lineSigLog', {
@@ -1259,6 +1287,19 @@
                     "searching":     false,
                     "sort":     false
                 });
+                if(@response.ticketOutlier.length >0)
+                {
+                    var events = parseTicketOut(@Html(Json.stringify(Json.toJson(response.ticketOutlier))))
+                    $('#time-line-bras').show()
+                    $('#time-line-bras').roadmap(events, {
+                        eventsPerSlide: (@response.ticketOutlier.length > 6) ? 6 : @response.ticketOutlier.length,
+                        slide: 1,
+                        prevArrow: '<i class="fa fa-chevron-left" style="color: #73879C;font-size:24px" aria-hidden="true"></i>',
+                        nextArrow: '<i class="fa fa-chevron-right" style="color: #73879C;font-size:24px" aria-hidden="true"></i>'
+                    });
+                }else{
+                    $('#time-line-bras').hide()
+                }
                 // table opview service
                 @if(response != null && response.servNameStt != null){
                     var mapService = @Html(Json.stringify(Json.toJson(response.servNameStt.arrService)))
@@ -1913,6 +1954,19 @@
                     }
                 }
                 return html;
+            }
+
+            function parseTicketOut(dta){
+                var jsonArr = [];
+                for (var i = 0; i < dta.length; i++) {
+                    var color = (dta[i][0] == 'ticket') ? '#07881f':'#ff5d48'
+                    jsonArr.push({
+                        date: dta[i][0],
+                        content: dta[i][1],
+                        color: color
+                    });
+                }
+                return jsonArr
             }
 
             function getJsonTreemap(appHour){

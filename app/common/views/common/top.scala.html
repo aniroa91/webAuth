@@ -19,11 +19,16 @@
                             <div class="menu_section">
                                 <ul class="nav side-menu">
                                     <li><a><i class="fa fa-home"></i> Dashboard </a>
-                                        <ul class="nav child_menu" style="display: block">
+                                        <ul class="nav child_menu">
                                             <li><a href="/daily"><i class="fa fa-clock-o" aria-hidden="true"></i>
                                                 Daily</a></li>
-                                            <li><a href="/weekly"><i class="fa fa-clock-o" aria-hidden="true"></i>
-                                                Weekly</a></li>
+                                            <li><a><i class="fa fa-clock-o" aria-hidden="true"></i>Weekly</a>
+                                                <ul class="nav child_menu">
+                                                    <li><a href="/weekly"><i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                                        Problem Device</a></li>
+                                                    <li><a href="/kpi"><i class="fa fa-hand-pointer-o"></i> KPI </a></li>
+                                                </ul>
+                                            </li>
                                             <li><a href="/device"><i class="fa fa-clock-o" aria-hidden="true"></i>
                                                 Monthly</a></li>
                                         </ul>
@@ -33,7 +38,6 @@
                                     <li><a href="/searchBras" id="searchBras"><i class="fa fa-search"></i>
                                         Search </a>
                                     </li>
-                                    <li><a href="/kpi"><i class="fa fa-hand-pointer-o"></i> KPI </a></li>
                                 </ul>
                             </div>
 

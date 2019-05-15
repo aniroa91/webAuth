@@ -7,6 +7,7 @@ case class ErrModuleIndex(
                          )
 
 case class HostResponse(
+                         ticketOutlier: Seq[(String,String)],
                          noOutlierModule:Int,
                          infHostdaily: Array[(String,Int,Int,Int,Int,Int,Int,Int)],
                          errorHourly: Array[(Int,Int,Int,Int,Int,Int,Int,Int)],
