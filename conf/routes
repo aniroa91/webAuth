@@ -85,4 +85,7 @@ GET       /kpi                         controllers.KpiController.index
 POST      /kpi/getJsonKpi              controllers.KpiController.getJsonKpi
 POST      /kpi/getKpiTimeSeries        controllers.KpiController.getKpiTimeSeries
 
+GET       /export                      controllers.ExportController.index
+POST      /exportData                  controllers.ExportController.exportData
+
 #######################################################################

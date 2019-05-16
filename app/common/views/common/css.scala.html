@@ -926,8 +926,6 @@
 
         <link href="../assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
-        <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
-        <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
         <link href="../assets/custom/css/roadmap.min.css" rel="stylesheet">
         <style type="text/css">
                 .top_nav .navbar-right {
@@ -1464,3 +1462,111 @@
                 }
         </style>
     }
+
+    @if(item == "Export"){
+    <link href="../assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Font Awesome -->
+    <link href="../assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        <!-- Custom Theme Style -->
+    <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
+    <link href="../assets/custom/css/waitMe.css" rel="stylesheet">
+    <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
+        <!--  Datepicker -->
+    <link href="../assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
+    <style type="text/css">
+            .top_nav .navbar-right {
+                width: auto;
+            }
+            .ui-helper-hidden-accessible {display: none;}
+            .ui-autocomplete {
+                position: absolute;
+                z-index: 1000;
+                cursor: pointer;
+                max-height: 200px;
+                overflow: auto;
+                left:1440px;
+                padding: 0;
+                margin-top: 2px;
+                list-style: none;
+                background-color: #ffffff;
+                border: 1px solid #ccc;
+                -webkit-border-radius: 5px;
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            }
+            .ui-autocomplete > li {
+                padding: 3px 20px;
+            }
+            .ui-autocomplete > li.ui-state-focus {
+                background-color: #26B99A;
+                color: white;
+            }
+            .panel-heading {
+                padding: 10px 10px 0px!important;
+                border-bottom: 0px solid transparent!important;
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+            }
+            .btn-secondary, .btn-secondary:hover{
+                background: #6c757d;
+                color: #fff;
+            }
+            .downTopMenu{
+                font-size: 16px;float: right;margin-top: 20px;margin-right: 13px;
+            }
+            .dropdown-menu li {
+                width:229px;
+            }
+            .navTop{
+                margin-left: -41px;
+            }
+            .dropdown-menu li a{
+                font-size: 20px;
+                padding-top: 12px;
+            }
+            .nav-sm .navbar.nav_title a i{
+                margin:0px!important;
+            }
+
+            section{
+                margin:100px auto;
+                height:1000px;
+            }
+            .right_col{
+                min-height: inherit!important;
+            }
+            .dropdown-menu>li>a{
+                white-space: inherit!important;
+            }
+            .disInline{
+                display: -webkit-inline-flex;
+                display: -ms-inline-flexbox;
+                display: inline-flex;
+            }
+            .picker{
+                background: #fff!important;
+                cursor: pointer;
+                border: 1px solid #16a085!important;
+            }
+            .hight-light{
+                border: 1px solid #16a085!important;
+            }
+            .error{
+                border: 1px solid red!important;
+            }
+            .input-group{
+                margin-bottom: 20px;
+            }
+            .disInline h4{
+                width: 60%;
+            }
+            .selectBox{
+                border: 1px solid #16a085!important;
+                cursor: pointer;
+                margin-bottom: 25px;
+            }
+    </style>
+}

@@ -42,6 +42,8 @@ import java.time.format.DateTimeFormatter
 
 object CommonService extends AbstractService {
 
+  val MIN_RECORD = 5
+  val MAX_RECORD = 1000000
   val monthSize = 20*3
   val SIZE_DEFAULT = 20
   val RANK_HOURLY = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"
@@ -92,6 +94,11 @@ object CommonService extends AbstractService {
     prev.minusMonths(1).toString("yyyy-MM")
   }
 
+  def formatDateYYMMDD(day: String): String = {
+    val date = DateTimeUtil.create(day, DateTimeUtil.YMD)
+    date.toString("yyyyMMdd")
+  }
+
   def getPreviousDay(day: String): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(1).toString(DateTimeUtil.YMD)
@@ -105,6 +112,11 @@ object CommonService extends AbstractService {
   def getCurrentDay(): String = {
     val date = new DateTime()
     date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
+  }
+
+  def getCurrentDateYYMMDD(): String = {
+    val date = new DateTime()
+    date.toString(DateTimeFormat.forPattern("yyyyMMdd"))
   }
 
   def getAllMonthfromRange(fromMonth: String,toMonth: String): Array[(String)] = {

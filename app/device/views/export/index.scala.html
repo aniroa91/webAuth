@@ -1,0 +1,366 @@
+@( email: String, postUrl: Call)(implicit request: RequestHeader)
+
+@import services.domain.CommonService
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Dashboard Admin </title>
+
+            <!-- Bootstrap -->
+        @common.views.html.common.css("Export")
+    </head>
+    @common.views.html.common.top()
+        <!-- top navigation -->
+    <div class="top_nav">
+        <div class="nav_menu">
+            <nav>
+                <div class="nav toggle" style="margin-bottom: 10px">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <img src="../assets/images/user.default.png" alt="">@email
+                            <span class=" fa fa-angle-down"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-usermenu pull-right">
+                            <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+        <!-- /top navigation -->
+        <!-- page content -->
+    <div class="right_col" role="main">
+        @helper.CSRF.formField
+        <div class="row top_tiles">
+            <div class="x_panel">
+                <div class="col-lg-6 col-md-8 col-sm-8 col-xs-12">
+                    <div class="x_panel tile" style="padding: 50px 0px 50px 0px">
+                        <div class="col-lg-6 col-xs-12 disInline">
+                            <h4>Device Type</h4>
+                            <select class="form-control selectBox" id="slDevType">
+                                <option value="0">Core</option>
+                                <option value="1">Access</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-6 col-xs-12 disInline">
+                            <h4>Data Source</h4>
+                            <select class="form-control selectBox" id="slSrc">
+                                <option value="Kibana">Kibana</option>
+                                <option value="Opsview">Opsview</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-6 col-xs-12 disInline">
+                            <h4 style="width: 37%">From Date</h4>
+                            <div class="input-group" style="width: 64%">
+                                <input class="form-control picker" type="text" id="startDate" name="startDate" readonly="true" value="@CommonService.getCurrentDay()">
+                                <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xs-12 disInline">
+                            <h4 style="width: 37%">To Date</h4>
+                            <div class="input-group" style="width: 64%">
+                                <input class="form-control picker" type="text" id="endDate" name="endDate" readonly="true" value="@CommonService.getCurrentDay()">
+                                <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xs-12 disInline">
+                            <h4>Device Name</h4>
+                            <input class="form-control hight-light autocomplete" type="text" id="device" placeholder="Search device name...">
+                        </div>
+                        <div class="col-lg-6 col-xs-12 disInline">
+                            <a id="export" class="btn btn-success"><i class="fa fa-download" aria-hidden="true"></i> Export</a>
+                            <a href="/export" class="btn btn-secondary"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12" style="padding-top: 110px">
+                    <a id="review" class="btn btn-warning"><i class="fa fa-hand-o-right" aria-hidden="true"></i> Review</a>
+                </div>
+                <div class="col-lg-5 col-xs-12">
+                    <div id="divSample" style="display: none;border: 1px solid #ddd;overflow: auto">
+                        <table class="table no-wrap p-tableInf" id="tbSample">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- /page content -->
+        <!-- footer content -->
+    <footer>
+        <div class="pull-right">
+            Dashboard Monitor 2018
+        </div>
+        <div class="clearfix"></div>
+    </footer>
+        <!-- /footer content -->
+    </div>
+    </div>
+
+        <!-- jQuery -->
+    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- Custom Theme Scripts -->
+    <script src="../assets/custom/js/custom.min.js"></script>
+    <script src="../assets/javascripts/waitMe.js"></script>
+        <!-- Autocomplete -->
+    <script src="../assets/javascripts/jquery-ui.js"></script>
+        <!--  Datepicker -->
+    <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                // datepicker for tab Overview
+                $('#startDate').datepicker({
+                    autoclose: true,
+                    minViewMode: 0,
+                    endDate: '+0d',
+                    format: 'yyyy-mm-dd'
+                }).on('changeDate', function (selected) {
+                    //get month choosed
+                    var startDate = new Date(selected.date.valueOf());
+                    var dd = String(startDate.getDate()).padStart(2, '0');
+                    var mm = String(startDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    var yyyy = startDate.getFullYear();
+                    var date = yyyy + '-' + mm+'-'+ dd
+                    $("#endDate").data('datepicker').setStartDate(date);
+
+                    // set range date 1 month
+                    var nextDate = new Date(selected.date.valueOf())
+                    var currMonth = new Date(new Date().toLocaleDateString()).getTime()
+                    var nextMonth = new Date(new Date(nextDate.setMonth(nextDate.getMonth() +1)).toLocaleDateString()).getTime()
+
+                    nextDate = (currMonth > nextMonth) ? nextDate : new Date()
+                    dd = String(nextDate.getDate()).padStart(2, '0');
+                    mm = String(nextDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = nextDate.getFullYear();
+                    date = yyyy + '-' + mm+'-'+ dd
+
+                    $("#endDate").data('datepicker').setEndDate(date);
+                });
+                $('#endDate').datepicker({
+                    autoclose: true,
+                    minViewMode: 0,
+                    startDate: '+0d',
+                    endDate: '+0d',
+                    format: 'yyyy-mm-dd'
+                }).on('changeDate', function (selected) {
+                    var startDate = new Date(selected.date.valueOf());
+
+                    var dd = String(startDate.getDate()).padStart(2, '0');
+                    var mm = String(startDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    var yyyy = startDate.getFullYear();
+                    var date = yyyy + '-' + mm+'-'+ dd
+                    $("#startDate").data('datepicker').setEndDate(date);
+
+                    // set range date 1 month
+                    var prevDate = new Date(selected.date.valueOf())
+                    prevDate = new Date(prevDate.setMonth(prevDate.getMonth() -1))
+                    dd = String(prevDate.getDate()).padStart(2, '0');
+                    mm = String(prevDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = prevDate.getFullYear();
+                    date = yyyy + '-' + mm+'-'+ dd
+                    $("#startDate").data('datepicker').setStartDate(date);
+                });
+                // autocomplete search contract
+                var autocompleteOptions = {
+                    minLength: 1,
+                    source: function (request, response) {
+                        $.ajax({
+                            url: "/suggest",
+                            data: {
+                                ct: $("#device").val()
+                            }
+                        }).done(function(dta) {
+                            response($.map(dta.data, function(obj) {
+                                return {
+                                    value: obj
+                                };
+                            }));
+
+                        });
+                    },
+                    select: function (event, ui) {
+                        $("#device").val(ui.item.value);
+                    }
+                };
+
+                $(".autocomplete").autocomplete(autocompleteOptions)
+                        .autocomplete( "instance" )._renderItem = function( ul, item ) {
+                    return $( "<li>" )
+                            .append( "<div>" + item.value + "</div>" )
+                            .appendTo( ul );
+                };
+                // change select box device type
+                $('#slDevType').on('change', function () {
+                    $('#slSrc').html("")
+                    if($(this).val() == 0){
+                        $('#slSrc').append('<option value="Kibana">Kibana</option><option value="Opsview">Opsview</option>')
+                    }
+                    else{
+                        $('#slSrc').append('<option value="Opsview">Opsview</option><option value="Inf">Inf</option><option value="Suyhao">Suyhao</option>')
+                    }
+                });
+                // review click data
+                $('#review').on('click', function () {
+                    ajaxExport(@CommonService.MIN_RECORD, 'review')
+                });
+                // click export data
+                $('#export').on('click', function () {
+                    ajaxExport(@CommonService.MAX_RECORD, 'export')
+                });
+
+                function ajaxExport(colRow, id){
+                    if($('#device').val().trim() == ""){
+                        $('#device').addClass('error').removeClass('hight-light')
+                        return false
+                    }
+                    $('#device').addClass('hight-light')
+                    var fields = getParamFields(document.querySelector('input[name=csrfToken]').value, colRow)
+                    $.ajax({
+                        url: "/exportData",
+                        cache: false,
+                        data: fields,
+                        type: "POST",
+                        beforeSend: function () {
+                            $('#'+id).waitMe({
+                                effect: 'pulse',
+                                text: '',
+                                bg: '#26B99A',
+                                color: '#fff',
+                                textPos: 'vertical'
+                            });
+                        },
+                        success: function (dta) {
+                            if(dta != "Error"){
+                                if(dta.data.length >0){
+                                    // for review data table
+                                    if(colRow == 5) {
+                                        $('#divSample').addClass('animated zoomIn')
+                                        $('#divSample').show()
+                                        parseSampleData(dta.data)
+                                    }
+                                    // for export csv
+                                    else{
+                                        $('#divSample').hide()
+                                        exportToCsv(dta.fileName, addHeaderToArray(dta.data))
+                                    }
+                                }
+                                else{
+                                    $('#tbSample thead').html("")
+                                    $('#tbSample tbody').html("")
+                                    $('#divSample').hide()
+                                    alert("Data empty. Please choose other filter!")
+                                }
+                            }
+                            else{
+                                alert("Error when execute query. Please check again your system!")
+                            }
+                        },
+                        complete: function () {
+                            $('#'+id).waitMe("hide");
+                        }
+                    });
+                }
+            });
+
+            function getParamFields(token, colRow){
+                var obj = {
+                    "colRow"   : colRow,
+                    "csrfToken"  : token,
+                    "device"     : $('#device').val(),
+                    "fromDate"   : $('#startDate').val(),
+                    "toDate"     : $('#endDate').val(),
+                    "dataSource" : $('#slSrc').val()
+                }
+                return obj
+            }
+
+            function parseSampleData(dta){
+                $('#tbSample thead').html("")
+                $('#tbSample tbody').html("")
+                var headers = Object.keys(dta[0]), thead = '<tr>'
+                for(var i=0;i<headers.length;i++){
+                    thead +='<th>'+headers[i]+'</th>'
+                }
+                $('#tbSample thead').append(thead +'</tr>')
+                for(var i=0;i<dta.length;i++){
+                    var values = Object.values(dta[i]), tr = '<tr>'
+                    for(var k=0;k<values.length;k++){
+                         tr +='<td style="white-space: nowrap">'+values[k]+'</td>'
+                    }
+                    $('#tbSample tbody').append(tr+'</tr>')
+                }
+            }
+
+            function addHeaderToArray(dta){
+                var rs = []
+                rs.push(Object.keys(dta[0]))
+                for(var i=0;i<dta.length;i++){
+                    rs.push(Object.values(dta[i]))
+                }
+                return rs
+            }
+
+            function exportToCsv(filename, rows) {
+                var processRow = function (row) {
+                    var finalVal = '';
+                    for (var j = 0; j < row.length; j++) {
+                        var innerValue = row[j] === null ? '' : row[j].toString();
+                        if (row[j] instanceof Date) {
+                            innerValue = row[j].toLocaleString();
+                        };
+                        var result = innerValue.replace(/"/g, '""');
+                        if (result.search(/("|,|\n)/g) >= 0)
+                            result = '"' + result + '"';
+                        if (j > 0)
+                            finalVal += ',';
+                        finalVal += result;
+                    }
+                    return finalVal + '\n';
+                };
+
+                var csvFile = '';
+                for (var i = 0; i < rows.length; i++) {
+                    csvFile += processRow(rows[i]);
+                }
+
+                var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+                if (navigator.msSaveBlob) { // IE 10+
+                    navigator.msSaveBlob(blob, filename);
+                } else {
+                    var link = document.createElement("a");
+                    if (link.download !== undefined) { // feature detection
+                        // Browsers that support HTML5 download attribute
+                        var url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", filename);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                }
+            }
+    </script>
+    </body>
+</html>
