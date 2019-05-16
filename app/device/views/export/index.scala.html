@@ -154,8 +154,8 @@
                     mm = String(nextDate.getMonth() + 1).padStart(2, '0'); //January is 0!
                     yyyy = nextDate.getFullYear();
                     date = yyyy + '-' + mm+'-'+ dd
-
                     $("#endDate").data('datepicker').setEndDate(date);
+                    $("#endDate").data('datepicker').setDate(date);
                 });
                 $('#endDate').datepicker({
                     autoclose: true,
@@ -163,24 +163,7 @@
                     startDate: '+0d',
                     endDate: '+0d',
                     format: 'yyyy-mm-dd'
-                }).on('changeDate', function (selected) {
-                    var startDate = new Date(selected.date.valueOf());
-
-                    var dd = String(startDate.getDate()).padStart(2, '0');
-                    var mm = String(startDate.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    var yyyy = startDate.getFullYear();
-                    var date = yyyy + '-' + mm+'-'+ dd
-                    $("#startDate").data('datepicker').setEndDate(date);
-
-                    // set range date 1 month
-                    var prevDate = new Date(selected.date.valueOf())
-                    prevDate = new Date(prevDate.setMonth(prevDate.getMonth() -1))
-                    dd = String(prevDate.getDate()).padStart(2, '0');
-                    mm = String(prevDate.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    yyyy = prevDate.getFullYear();
-                    date = yyyy + '-' + mm+'-'+ dd
-                    $("#startDate").data('datepicker').setStartDate(date);
-                });
+                })
                 // autocomplete search contract
                 var autocompleteOptions = {
                     minLength: 1,
@@ -234,7 +217,7 @@
                         $('#device').addClass('error').removeClass('hight-light')
                         return false
                     }
-                    $('#device').addClass('hight-light')
+                    $('#device').addClass('hight-light').removeClass('error')
                     var fields = getParamFields(document.querySelector('input[name=csrfToken]').value, colRow)
                     $.ajax({
                         url: "/exportData",
