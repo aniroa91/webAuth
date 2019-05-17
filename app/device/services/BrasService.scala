@@ -32,6 +32,38 @@ object BrasService extends AbstractService{
     BrasDAO.getSigLogByMonth(month)
   }
 
+  def getTopBrasOutMonthly() = {
+    BrasDAO.getTopBrasOutMonthly()
+  }
+
+  def getTopConnectMonthly() = {
+    BrasDAO.getTopConnectMonthly()
+  }
+
+  def getTopOltMonthly() = {
+    BrasDAO.getTopOltMonthly()
+  }
+
+  def getTopServBrasErrMonthly() = {
+    BrasDAO.getTopServBrasErrMonthly()
+  }
+
+  def getTopServOpsviewMonthly() = {
+    BrasDAO.getTopServOpsviewMonthly()
+  }
+
+  def getTopServInfErrMonthly() = {
+    BrasDAO.getTopServInfErrMonthly()
+  }
+
+  def getTopOverviewNocMonthly(col: String) = {
+    BrasDAO.getTopOverviewNocMonthly(col)
+  }
+
+  def getTopInfErrMonthly() = {
+    BrasDAO.getTopInfErrMonthly()
+  }
+
   def getSuyhaoByMonth(month: String) = {
     BrasDAO.getSuyhaoByMonth(month)
   }

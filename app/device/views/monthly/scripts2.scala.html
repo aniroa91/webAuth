@@ -1,10 +1,484 @@
 @(response: model.device.RegionOverview )
 
 <script type="text/javascript">
+        // for page Tab Trend
+        function callAjaxTrending(){
+            $.ajax({
+                url: "/monthly/getTrend",
+                cache: false,
+                beforeSend: function () {
+                    $('#divTabTrend').waitMe({
+                        effect: 'roundBounce',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                },
+                success: function (dta) {
+                    if(dta != "Error"){
+                        $('#isClickedTab4').val(1)
+                        // Connectivity By Month
+                        var monthTrend3 = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'month-trend3'
+                            },
+                            title: '',
+                            xAxis: [{
+                                categories: dta.topConnect.categories
+                            }],
+                            legend: {
+                                enabled: false
+                            },
+                            colors: ['#1ABB9C', '#5A738E', '#d62855'],
+                            tooltip: {
+                                formatter: function () {
+                                    return this.points.reduce(function (s, point) {
+                                        var tooltip = (point.series.name == "Signin" || point.series.name == "Logoff") ? point.series.name + ': ' + Highcharts.numberFormat(point.y, 0) : ''
+                                        return s + '<br/>' + tooltip;
+                                    }, '<b>' + this.x + '</b>');
+                                },
+                                shared: true
+                            },
+                            series: [{
+                                type: 'line',
+                                name:'Signin',
+                                data: dta.topConnect.signin
+                            },
+                                {
+                                    type: 'line',
+                                    name:'Logoff',
+                                    data: dta.topConnect.logoff
+                                }]
+                        });
+                        /* add regression line dynamically */
+                        monthTrend3.addSeries({
+                            type: 'line',
+                            marker: { enabled: false },
+                            /* function returns data for trend-line */
+                            data: (function() {
+                                return fitOneDimensionalData(dta.topConnect.dataAvg);
+                            })()
+                        });
+                        // Outliers Of BRAS By Month
+                        var monthTrend1 = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'month-trend1'
+                            },
+                            title: '',
+                            xAxis: [{
+                                categories: dta.topBras.categories
+                            }],
+                            legend: {
+                                enabled: false
+                            },
+                            colors: ['#1ABB9C', '#d62855'],
+                            tooltip: {
+                                formatter: function () {
+                                    var tooltip = (this.series.name == 'No outliers')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
+                                    return tooltip
+                                }
+                            },
+                            series: [{
+                                type: 'line',
+                                name:'No outliers',
+                                data: dta.topBras.data
+                            }]
+                        });
+                        /* add regression line dynamically */
+                        monthTrend1.addSeries({
+                            type: 'line',
+                            marker: { enabled: false },
+                            /* function returns data for trend-line */
+                            data: (function() {
+                                return fitOneDimensionalData(dta.topBras.data);
+                            })()
+                        });
+                        // Outliers Of OLT By Mont
+                        var monthTrend2 = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'month-trend2'
+                            },
+                            title: '',
+                            xAxis: [{
+                                categories: dta.topOlt.categories
+                            }],
+                            legend: {
+                                enabled: false
+                            },
+                            colors: ['#1ABB9C', '#d62855'],
+                            tooltip: {
+                                formatter: function () {
+                                    var tooltip = (this.series.name == 'Total outliers')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
+                                    return tooltip
+                                }
+                            },
+                            series: [{
+                                type: 'line',
+                                name:'Total outliers',
+                                data: dta.topOlt.data
+                            }]
+                        });
+                        /* add regression line dynamically */
+                        monthTrend2.addSeries({
+                            type: 'line',
+                            marker: { enabled: false },
+                            /* function returns data for trend-line */
+                            data: (function() {
+                                return fitOneDimensionalData(dta.topOlt.data);
+                            })()
+                        });
+                        // Inf error By Month
+                        var monthTrend4 = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'month-trend4'
+                            },
+                            title: '',
+                            xAxis: [{
+                                categories: dta.topInf.categories
+                            }],
+                            legend: {
+                                enabled: false
+                            },
+                            colors: ['#1ABB9C', '#d62855'],
+                            tooltip: {
+                                formatter: function () {
+                                    var tooltip = (this.series.name == 'Total inf')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
+                                    return tooltip
+                                }
+                            },
+                            series: [{
+                                type: 'line',
+                                name:'Total inf',
+                                data: dta.topInf.data
+                            }]
+                        });
+                        /* add regression line dynamically */
+                        monthTrend4.addSeries({
+                            type: 'line',
+                            marker: { enabled: false },
+                            /* function returns data for trend-line */
+                            data: (function() {
+                                return fitOneDimensionalData(dta.topInf.data);
+                            })()
+                        });
+                        // BRAS Error By Month
+                        var monthTrend5 = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'month-trend5'
+                            },
+                            title: '',
+                            xAxis: [{
+                                categories: dta.topBrasErr.categories
+                            }],
+                            legend: {
+                                enabled: false
+                            },
+                            colors: ['#1ABB9C', '#d62855'],
+                            tooltip: {
+                                formatter: function () {
+                                    var tooltip = (this.series.name == 'Total kibana')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
+                                    return tooltip
+                                }
+                            },
+                            series: [{
+                                type: 'line',
+                                name:'Total kibana',
+                                data: dta.topBrasErr.data
+                            }]
+                        });
+                        /* add regression line dynamically */
+                        monthTrend5.addSeries({
+                            type: 'line',
+                            marker: { enabled: false },
+                            /* function returns data for trend-line */
+                            data: (function() {
+                                return fitOneDimensionalData(dta.topBrasErr.data);
+                            })()
+                        });
+                        // Service Monitoring By Month
+                        var monthTrend6 = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'month-trend6'
+                            },
+                            title: '',
+                            xAxis: [{
+                                categories: dta.topService.categories
+                            }],
+                            legend: {
+                                enabled: false
+                            },
+                            colors: ['#1ABB9C', '#d62855'],
+                            tooltip: {
+                                formatter: function () {
+                                    var tooltip = (this.series.name == 'Total opsview')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
+                                    return tooltip
+                                }
+                            },
+                            series: [{
+                                type: 'line',
+                                name:'Total opsview',
+                                data: dta.topService.data
+                            }]
+                        });
+                        /* add regression line dynamically */
+                        monthTrend6.addSeries({
+                            type: 'line',
+                            marker: { enabled: false },
+                            /* function returns data for trend-line */
+                            data: (function() {
+                                return fitOneDimensionalData(dta.topService.data);
+                            })()
+                        });
+                        // sparkline Severity Of BRAS Error By Month
+                        $('#tbSparkline1 tr').each(function (i, value) {
+                            $(this).find('.maxValue').text(dta.servBrasErr.maxSparkline[i])
+                        })
+                        Highcharts.setOptions({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 0,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            }
+                        });
+                        $("#tbAlert").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Alert count',
+                                data: parseDataSparkline(dta.servBrasErr.alert)
+                            }]
+                        });
+                        $("#tbCrit").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Crit count',
+                                data: parseDataSparkline(dta.servBrasErr.crit)
+                            }]
+                        });
+                        $("#tbEmerg").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Emerg count',
+                                data: parseDataSparkline(dta.servBrasErr.emerg)
+                            }]
+                        });
+                        $("#tbErr").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Err count',
+                                data: parseDataSparkline(dta.servBrasErr.err)
+                            }]
+                        });
+                        $("#tbNotie").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Notice count',
+                                data: parseDataSparkline(dta.servBrasErr.notice)
+                            }]
+                        });
+                        $("#tbWarn").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Warning count',
+                                data: parseDataSparkline(dta.servBrasErr.warn)
+                            }]
+                        });
+
+                        // sparkline Status Of Service Monitoring By Month
+                        $('#tbSparkline2 tr').each(function (i, value) {
+                            $(this).find('.maxValue').text(dta.servOpsview.maxSparkline[i])
+                        })
+                        $("#tbCritOps").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Crit opsview',
+                                data: parseDataSparkline(dta.servOpsview.crit)
+                            }]
+                        });
+                        $("#tbOkOps").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Ok opsview',
+                                data: parseDataSparkline(dta.servOpsview.ok)
+                            }]
+                        });
+                        $("#tbWarnOps").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Warn opsview',
+                                data: parseDataSparkline(dta.servOpsview.warn)
+                            }]
+                        });
+                        $("#tbUnknownOps").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Unknown opsview',
+                                data: parseDataSparkline(dta.servOpsview.unknown)
+                            }]
+                        });
+                        // sparkline Detail Of INF Error By Month
+                        $('#tbSparkline3 tr').each(function (i, value) {
+                            $(this).find('.maxValue').text(dta.servInfError.maxSparkline[i])
+                        })
+                        $("#tbInfDown").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Inf down',
+                                data: parseDataSparkline(dta.servInfError.infDown)
+                            }]
+                        });
+                        $("#tbUserDown").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'User down',
+                                data: parseDataSparkline(dta.servInfError.userDown)
+                            }]
+                        });
+                        $("#tbSfError").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Sf error',
+                                data: parseDataSparkline(dta.servInfError.sf)
+                            }]
+                        });
+                        $("#tbLofiErr").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Lofi error',
+                                data: parseDataSparkline(dta.servInfError.lofi)
+                            }]
+                        });
+                        $("#tbLost").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Lost signal',
+                                data: parseDataSparkline(dta.servInfError.lost)
+                            }]
+                        });
+                        $("#tbRouge").highcharts({
+                            series: [{
+                                type: 'line',
+                                name: 'Rouge error',
+                                data: parseDataSparkline(dta.servInfError.rouge)
+                            }]
+                        });
+
+                        function fitOneDimensionalData(source_data) {
+                            var trend_source_data = [];
+                            for(var i = source_data.length; i-->0;) {
+                                trend_source_data[i] = [i, source_data[i]]
+                            }
+                            var regression_data = fitData(trend_source_data).data
+                            var trend_line_data = [];
+                            for(var i = regression_data.length; i-->0;) {
+                                trend_line_data[i] = regression_data[i][1];
+                            }
+                            return trend_line_data;
+                        }
+                    }
+                    else{
+                        alert('Error when execute query. Please check again your system!')
+                    }
+                },
+                complete: function () {
+                    $('#divTabTrend').waitMe("hide");
+                },
+            });
+        }
+
+        function parseDataSparkline(dta){
+            var rs = [], min = getMinMaxOf2DIndex(dta, 1).min, max= getMinMaxOf2DIndex(dta, 1).max
+            for(var i=0;i<dta.length;i++){
+                var color = '#115296', makerRadius = 2
+                if(min == dta[i][1]) {
+                    color = 'red'
+                    makerRadius = 4
+                }
+                else if(max == dta[i][1]) {
+                    makerRadius = 4
+                    color = '#0b9027'
+                }
+                rs.push({
+                    name: dta[i][0],
+                    y: dta[i][1],
+                    color: color,
+                    marker: {
+                        radius: makerRadius
+                    }
+                })
+            }
+            return rs
+        }
+
+        function getMinMaxOf2DIndex (arr, idx) {
+            return {
+                min: Math.min.apply(null, arr.map(function (e) { return e[idx]})),
+                max: Math.max.apply(null, arr.map(function (e) { return e[idx]}))
+            }
+        }
+
         // for page Tab Compare
         function callAjaxCompare(month){
             $.ajax({
-                url: "/compare-json?month="+month,
+                url: "/monthly/getCompare?month="+month,
                 cache: false,
                 beforeSend: function () {
                     $('#divTabCpe').waitMe({
@@ -204,7 +678,7 @@
             var _typeOLTpoor = $('#typeOLTpoor').val()
             var _typeInftoperr = $('#typeInftoperr').val()
             $.ajax({
-                url: "/topN-json?month="+month+"&_typeError="+_typeError+"&_typeService="+_typeService+'&_typeOLTpoor='+_typeOLTpoor+'&_typeInftoperr='+_typeInftoperr,
+                url: "/monthly/getTopN?month="+month+"&_typeError="+_typeError+"&_typeService="+_typeService+'&_typeOLTpoor='+_typeOLTpoor+'&_typeInftoperr='+_typeInftoperr,
                 cache: false,
                 beforeSend: function () {
                     $('#divTabTop').waitMe({

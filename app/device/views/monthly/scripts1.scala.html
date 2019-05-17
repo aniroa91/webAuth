@@ -1171,12 +1171,20 @@
                         $(this).addClass("active")
                 }
                 // for tab Compare
-                else{
+                else if($(this).attr("name") == "tabCompare"){
                         $('#divTopN').show();
                         $('#monthTab1').hide()
                         $(this).addClass("active")
                         if(active == 0 && $('#isClickedTab3').val()==0)
                                 callAjaxCompare($('#month').val())
+                }
+                // tab Trend
+                else {
+                        $('#divTopN').hide();
+                        $('#monthTab1').hide()
+                        $(this).addClass("active")
+                        if(active == 0 && $('#isClickedTab4').val()==0)
+                                callAjaxTrending()
                 }
         });
 

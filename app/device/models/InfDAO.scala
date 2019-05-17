@@ -293,7 +293,7 @@ object InfDAO {
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
       sql"""select tb.* from
-            ((select 'ticket' device_type, created_date as time from dwh_ticket
+            ((select 'ticket_Code: ' || ticket_code || '_Issue: ' || issue || '_Reason: ' || reason_name device_type, created_date as time from dwh_ticket
               where device_name like $hostName AND created_date >= $fromDay::TIMESTAMP AND created_date < $nextDay::TIMESTAMP)
             union all
              (select 'outlier' device_type, date_time as time from dwh_inf_module

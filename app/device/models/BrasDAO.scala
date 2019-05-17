@@ -40,6 +40,86 @@ object BrasDAO {
         .as[(String, Int, Int)])
   }
 
+  def getTopBrasOutMonthly() = {
+    dbConfig.db.run(
+      sql"""select month, sum(no_outliers)
+            from dmt_overview_bras_outlier
+            group by month
+            order by month
+                  """
+        .as[(String, Long)])
+  }
+
+  def getTopConnectMonthly() = {
+    dbConfig.db.run(
+      sql"""select month, sum(signin), sum(logoff)
+            from dmt_overview_conn
+            group by month
+            order by month
+                  """
+        .as[(String, Long, Long)])
+  }
+
+  def getTopInfErrMonthly() = {
+    dbConfig.db.run(
+      sql"""select month, sum(total_inf)
+            from dmt_overview_inf
+            group by month
+            order by month
+                  """
+        .as[(String, Long)])
+  }
+
+  def getTopOltMonthly() = {
+    dbConfig.db.run(
+      sql"""select month, sum(total_outliers)
+            from dmt_overview_inf_outlier
+            group by month
+            order by month
+                  """
+        .as[(String, Long)])
+  }
+
+  def getTopServBrasErrMonthly() = {
+    dbConfig.db.run(
+      sql"""select month, sum(alert_count),sum(crit_count),sum(emerg_count),sum(err_count),sum(notice_count),sum(warning_count)
+            from dmt_overview_noc
+            group by month
+            order by month
+                  """
+        .as[(String, Long, Long, Long, Long, Long, Long)])
+  }
+
+  def getTopServOpsviewMonthly() = {
+    dbConfig.db.run(
+      sql"""select month, sum(crit_opsview),sum(ok_opsview),sum(warn_opsview),sum(unknown_opsview)
+            from dmt_overview_noc
+            group by month
+            order by month
+                  """
+        .as[(String, Long, Long, Long, Long)])
+  }
+
+  def getTopServInfErrMonthly() = {
+    dbConfig.db.run(
+      sql"""select month, sum(inf_down),sum(user_down),sum(sf_error),sum(lofi_error), sum(lost_signal), sum(rouge_error)
+            from dmt_overview_inf
+            group by month
+            order by month
+                  """
+        .as[(String, Long, Long, Long, Long, Long, Long)])
+  }
+
+  def getTopOverviewNocMonthly(col: String) = {
+    dbConfig.db.run(
+      sql"""select month, sum(#$col)
+            from dmt_overview_noc
+            group by month
+            order by month
+                  """
+        .as[(String, Long)])
+  }
+
   def getSuyhaoByMonth(month: String): Future[Seq[(String, Int, Int)]] = {
     val currMonth = month+"-01"
     val prevMonth = CommonService.getPreviousMonth(month)+"-01"
@@ -1277,7 +1357,7 @@ object BrasDAO {
     val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
     dbConfig.db.run(
       sql"""select tb.* from
-            ((select 'ticket' device_type, created_date as time from dwh_ticket
+            ((select 'ticket_Code: ' || ticket_code || '_Issue: ' || issue || '_Reason: ' || reason_name device_type, created_date as time from dwh_ticket
               where device_name= $bras AND created_date >= $fromDay::TIMESTAMP AND created_date < $nextDay::TIMESTAMP)
             union all
              (select 'outlier' device_type, date_time as time from dwh_conn_bras_detail

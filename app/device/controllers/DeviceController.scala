@@ -739,6 +739,102 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
+  // tab trending
+  def trendByMonth() = Action { implicit request =>
+    try{
+      val month = CommonService.getPreviousMonth()
+      // get Outliers Of BRAS By Month
+      val topBrasOutlier = Await.result(BrasService.getTopBrasOutMonthly(), Duration.Inf).map(x=> x._1.substring(0, x._1.lastIndexOf("-")) -> x._2)
+      val brasObj = Json.obj(
+        "data"       -> topBrasOutlier.map(x=> x._2),
+        "categories" -> topBrasOutlier.map(x=> x._1)
+      )
+      // get Connectivity By Month
+      val topConnect = Await.result(BrasService.getTopConnectMonthly(), Duration.Inf).map(x=> (x._1.substring(0, x._1.lastIndexOf("-")), x._2, x._3))
+      val connectObj = Json.obj(
+        "categories" -> topConnect.map(x=> x._1),
+        "signin" -> topConnect.map(x=> x._2),
+        "logoff" -> topConnect.map(x=> x._3),
+        "dataAvg" -> topConnect.map(x=> (x._2+x._3) / 2)
+      )
+      // get Outliers Of OLT By Month
+      val topOlt = Await.result(BrasService.getTopOltMonthly(), Duration.Inf).map(x=> x._1.substring(0, x._1.lastIndexOf("-")) -> x._2)
+      val oltObj = Json.obj(
+        "data"       -> topOlt.map(x=> x._2),
+        "categories" -> topOlt.map(x=> x._1)
+      )
+      // get INF Error By Month
+      val topInfErr = Await.result(BrasService.getTopInfErrMonthly(), Duration.Inf).map(x=> x._1.substring(0, x._1.lastIndexOf("-")) -> x._2)
+      val infObj = Json.obj(
+        "data"       -> topInfErr.map(x=> x._2),
+        "categories" -> topInfErr.map(x=> x._1)
+      )
+      // get BRAS Error By Month
+      val topBrasErr = Await.result(BrasService.getTopOverviewNocMonthly("total_kibana"), Duration.Inf).map(x=> x._1.substring(0, x._1.lastIndexOf("-")) -> x._2)
+      val brasErrObj = Json.obj(
+        "data"       -> topBrasErr.map(x=> x._2),
+        "categories" -> topBrasErr.map(x=> x._1)
+      )
+      // get Service Monitoring By Month
+      val topSevice = Await.result(BrasService.getTopOverviewNocMonthly("total_opsview"), Duration.Inf).map(x=> x._1.substring(0, x._1.lastIndexOf("-")) -> x._2)
+      val serviceObj = Json.obj(
+        "data"       -> topSevice.map(x=> x._2),
+        "categories" -> topSevice.map(x=> x._1)
+      )
+      // get Severity Of BRAS Error By Month
+      val topServBrasErr = Await.result(BrasService.getTopServBrasErrMonthly(), Duration.Inf).map(x=> (x._1.substring(0, x._1.lastIndexOf("-")), x._2, x._3, x._4, x._5, x._6, x._7))
+      val servBrasErrObj = Json.obj(
+        "alert" -> topServBrasErr.map(x=> x._1 -> x._2),
+        "crit" -> topServBrasErr.map(x=> x._1 -> x._3),
+        "emerg" -> topServBrasErr.map(x=> x._1 -> x._4),
+        "err" -> topServBrasErr.map(x=> x._1 -> x._5),
+        "notice" -> topServBrasErr.map(x=> x._1 -> x._6),
+        "warn" -> topServBrasErr.map(x=> x._1 -> x._7),
+        "maxSparkline" -> (CommonService.formatPattern(topServBrasErr.map(x=> x._2).last.toInt), CommonService.formatPattern(topServBrasErr.map(x=> x._3).last.toInt), CommonService.formatPattern(topServBrasErr.map(x=> x._4).last.toInt),
+          CommonService.formatPattern(topServBrasErr.map(x=> x._5).last.toInt), CommonService.formatPattern(topServBrasErr.map(x=> x._6).last.toInt),CommonService.formatPattern(topServBrasErr.map(x=> x._7).last.toInt))
+      )
+      // get Severity Of BRAS Error By Month
+      val topServOpsview = Await.result(BrasService.getTopServOpsviewMonthly(), Duration.Inf).map(x=> (x._1.substring(0, x._1.lastIndexOf("-")), x._2, x._3, x._4, x._5))
+      val servOpsviewObj = Json.obj(
+        "crit" -> topServOpsview.map(x=> x._1 -> x._2),
+        "ok" -> topServOpsview.map(x=> x._1 -> x._3),
+        "warn" -> topServOpsview.map(x=> x._1 -> x._4),
+        "unknown" -> topServOpsview.map(x=> x._1 -> x._5),
+        "maxSparkline" -> (CommonService.formatNumber(topServOpsview.map(x=> x._2).last.toInt), CommonService.formatNumber(topServOpsview.map(x=> x._3).last.toInt), CommonService.formatNumber(topServOpsview.map(x=> x._4).last.toInt),
+          CommonService.formatNumber(topServOpsview.map(x=> x._5).last.toInt))
+      )
+      // get Detail Of INF Error By Month
+      val topServInfErr = Await.result(BrasService.getTopServInfErrMonthly(), Duration.Inf).map(x=> (x._1.substring(0, x._1.lastIndexOf("-")), x._2, x._3, x._4, x._5, x._6, x._7))
+      val servInfErrObj = Json.obj(
+        "infDown" -> topServInfErr.map(x=> x._1 -> x._2),
+        "userDown" -> topServInfErr.map(x=> x._1 -> x._3),
+        "sf" -> topServInfErr.map(x=> x._1 -> x._4),
+        "lofi" -> topServInfErr.map(x=> x._1 -> x._5),
+        "lost" -> topServInfErr.map(x=> x._1 -> x._6),
+        "rouge" -> topServInfErr.map(x=> x._1 -> x._7),
+        "maxSparkline" -> (CommonService.formatNumber(topServInfErr.map(x=> x._2).last.toInt), CommonService.formatNumber(topServInfErr.map(x=> x._3).last.toInt), CommonService.formatNumber(topServInfErr.map(x=> x._4).last.toInt),
+          CommonService.formatNumber(topServInfErr.map(x=> x._5).last.toInt), CommonService.formatNumber(topServInfErr.map(x=> x._6).last.toInt),CommonService.formatNumber(topServInfErr.map(x=> x._7).last.toInt))
+      )
+
+      val rs = Json.obj(
+        "month"      -> month,
+        "topConnect" -> connectObj,
+        "topBras"    -> brasObj,
+        "topInf"     -> infObj,
+        "topOlt"     -> oltObj,
+        "topBrasErr" -> brasErrObj,
+        "topService" -> serviceObj,
+        "servBrasErr" -> servBrasErrObj,
+        "servOpsview" -> servOpsviewObj,
+        "servInfError"  -> servInfErrObj
+      )
+      Ok(Json.toJson(rs))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
   // Tab Compare
   def compareByMonth(month: String) = Action{ implicit request =>
     try{
