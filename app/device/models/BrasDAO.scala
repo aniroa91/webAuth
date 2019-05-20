@@ -43,7 +43,7 @@ object BrasDAO {
   def getTopBrasOutMonthly() = {
     dbConfig.db.run(
       sql"""select month, sum(no_outliers)
-            from dmt_overview_bras_outlier
+            from dmt_overview_bras_outlier where month >='2018-06-01'::TIMESTAMP
             group by month
             order by month
                   """
@@ -53,7 +53,7 @@ object BrasDAO {
   def getTopConnectMonthly() = {
     dbConfig.db.run(
       sql"""select month, sum(signin), sum(logoff)
-            from dmt_overview_conn
+            from dmt_overview_conn where month >='2018-06-01'::TIMESTAMP
             group by month
             order by month
                   """
@@ -63,7 +63,7 @@ object BrasDAO {
   def getTopInfErrMonthly() = {
     dbConfig.db.run(
       sql"""select month, sum(total_inf)
-            from dmt_overview_inf
+            from dmt_overview_inf where month >='2018-06-01'::TIMESTAMP
             group by month
             order by month
                   """
@@ -73,7 +73,7 @@ object BrasDAO {
   def getTopOltMonthly() = {
     dbConfig.db.run(
       sql"""select month, sum(total_outliers)
-            from dmt_overview_inf_outlier
+            from dmt_overview_inf_outlier where month >='2018-06-01'::TIMESTAMP
             group by month
             order by month
                   """
@@ -113,7 +113,7 @@ object BrasDAO {
   def getTopOverviewNocMonthly(col: String) = {
     dbConfig.db.run(
       sql"""select month, sum(#$col)
-            from dmt_overview_noc
+            from dmt_overview_noc where month >='2018-06-01'::TIMESTAMP
             group by month
             order by month
                   """
