@@ -28,16 +28,10 @@
                                 categories: dta.topConnect.categories
                             }],
                             legend: {
-                                enabled: false
+                                enabled: true
                             },
                             colors: ['#1ABB9C', '#5A738E', '#d62855'],
                             tooltip: {
-                                formatter: function () {
-                                    return this.points.reduce(function (s, point) {
-                                        var tooltip = (point.series.name == "Signin" || point.series.name == "Logoff") ? point.series.name + ': ' + Highcharts.numberFormat(point.y, 0) : ''
-                                        return s + '<br/>' + tooltip;
-                                    }, '<b>' + this.x + '</b>');
-                                },
                                 shared: true
                             },
                             series: [{
@@ -55,6 +49,8 @@
                         monthTrend3.addSeries({
                             type: 'line',
                             dashStyle: 'shortdash',
+                            showInLegend: false,
+                            enableMouseTracking: false,
                             marker: { enabled: false },
                             /* function returns data for trend-line */
                             data: (function() {
@@ -74,12 +70,6 @@
                                 enabled: false
                             },
                             colors: ['#1ABB9C', '#d62855'],
-                            tooltip: {
-                                formatter: function () {
-                                    var tooltip = (this.series.name == 'No outliers')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
-                                    return tooltip
-                                }
-                            },
                             series: [{
                                 type: 'line',
                                 name:'No outliers',
@@ -91,6 +81,7 @@
                             type: 'line',
                             dashStyle: 'shortdash',
                             marker: { enabled: false },
+                            enableMouseTracking: false,
                             /* function returns data for trend-line */
                             data: (function() {
                                 return fitOneDimensionalData(dta.topBras.data);
@@ -109,12 +100,6 @@
                                 enabled: false
                             },
                             colors: ['#1ABB9C', '#d62855'],
-                            tooltip: {
-                                formatter: function () {
-                                    var tooltip = (this.series.name == 'Total outliers')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
-                                    return tooltip
-                                }
-                            },
                             series: [{
                                 type: 'line',
                                 name:'Total outliers',
@@ -126,6 +111,7 @@
                             type: 'line',
                             dashStyle: 'shortdash',
                             marker: { enabled: false },
+                            enableMouseTracking: false,
                             /* function returns data for trend-line */
                             data: (function() {
                                 return fitOneDimensionalData(dta.topOlt.data);
@@ -144,12 +130,6 @@
                                 enabled: false
                             },
                             colors: ['#1ABB9C', '#d62855'],
-                            tooltip: {
-                                formatter: function () {
-                                    var tooltip = (this.series.name == 'Total inf')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
-                                    return tooltip
-                                }
-                            },
                             series: [{
                                 type: 'line',
                                 name:'Total inf',
@@ -161,6 +141,7 @@
                             type: 'line',
                             dashStyle: 'shortdash',
                             marker: { enabled: false },
+                            enableMouseTracking: false,
                             /* function returns data for trend-line */
                             data: (function() {
                                 return fitOneDimensionalData(dta.topInf.data);
@@ -179,12 +160,6 @@
                                 enabled: false
                             },
                             colors: ['#1ABB9C', '#d62855'],
-                            tooltip: {
-                                formatter: function () {
-                                    var tooltip = (this.series.name == 'Total kibana')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
-                                    return tooltip
-                                }
-                            },
                             series: [{
                                 type: 'line',
                                 name:'Total kibana',
@@ -196,6 +171,7 @@
                             type: 'line',
                             dashStyle: 'shortdash',
                             marker: { enabled: false },
+                            enableMouseTracking: false,
                             /* function returns data for trend-line */
                             data: (function() {
                                 return fitOneDimensionalData(dta.topBrasErr.data);
@@ -214,12 +190,6 @@
                                 enabled: false
                             },
                             colors: ['#1ABB9C', '#d62855'],
-                            tooltip: {
-                                formatter: function () {
-                                    var tooltip = (this.series.name == 'Total opsview')? '<p>'+this.x+'<p><br><p>' + this.series.name + ': ' + Highcharts.numberFormat(this.y, 0) + '</p>': false
-                                    return tooltip
-                                }
-                            },
                             series: [{
                                 type: 'line',
                                 name:'Total opsview',
@@ -230,6 +200,7 @@
                         monthTrend6.addSeries({
                             type: 'line',
                             dashStyle: 'shortdash',
+                            enableMouseTracking: false,
                             marker: { enabled: false },
                             /* function returns data for trend-line */
                             data: (function() {
