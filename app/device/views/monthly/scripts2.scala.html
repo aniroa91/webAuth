@@ -211,7 +211,7 @@
                         $('#tbSparkline1 tr').each(function (i, value) {
                             $(this).find('.maxValue').text(dta.servBrasErr.maxSparkline[i])
                         })
-                        Highcharts.setOptions({
+                        $("#tbAlert").highcharts({
                             chart: {
                                 margin: [0, 0, 0, 0],
                                 style: {
@@ -252,7 +252,7 @@
                                 shadow: false,
                                 useHTML: true,
                                 hideDelay: 0,
-                                padding: 0,
+                                padding: 5,
                                 positioner: function (w, h, point) {
                                     return {
                                         x: point.plotX - w / 2,
@@ -274,9 +274,7 @@
                                         radius: 2
                                     }
                                 }
-                            }
-                        });
-                        $("#tbAlert").highcharts({
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Alert count',
@@ -284,6 +282,69 @@
                             }]
                         });
                         $("#tbCrit").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Crit count',
@@ -291,6 +352,69 @@
                             }]
                         });
                         $("#tbEmerg").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Emerg count',
@@ -298,6 +422,69 @@
                             }]
                         });
                         $("#tbErr").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Err count',
@@ -305,6 +492,69 @@
                             }]
                         });
                         $("#tbNotie").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Notice count',
@@ -312,6 +562,69 @@
                             }]
                         });
                         $("#tbWarn").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Warning count',
@@ -324,6 +637,69 @@
                             $(this).find('.maxValue').text(dta.servOpsview.maxSparkline[i])
                         })
                         $("#tbCritOps").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Crit opsview',
@@ -331,6 +707,69 @@
                             }]
                         });
                         $("#tbOkOps").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Ok opsview',
@@ -338,6 +777,69 @@
                             }]
                         });
                         $("#tbWarnOps").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Warn opsview',
@@ -345,6 +847,69 @@
                             }]
                         });
                         $("#tbUnknownOps").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Unknown opsview',
@@ -356,6 +921,69 @@
                             $(this).find('.maxValue').text(dta.servInfError.maxSparkline[i])
                         })
                         $("#tbInfDown").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Inf down',
@@ -363,6 +991,69 @@
                             }]
                         });
                         $("#tbUserDown").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'User down',
@@ -370,6 +1061,69 @@
                             }]
                         });
                         $("#tbSfError").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Sf error',
@@ -377,6 +1131,69 @@
                             }]
                         });
                         $("#tbLofiErr").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Lofi error',
@@ -384,6 +1201,69 @@
                             }]
                         });
                         $("#tbLost").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Lost signal',
@@ -391,6 +1271,69 @@
                             }]
                         });
                         $("#tbRouge").highcharts({
+                            chart: {
+                                margin: [0, 0, 0, 0],
+                                style: {
+                                    overflow: 'visible'
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            colors:['#115296'],
+                            xAxis: {
+                                labels: {
+                                    enabled: false
+                                },
+                                tickLength: 0
+                            },
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                maxPadding: 0,
+                                minPadding: 0,
+                                gridLineWidth: 0,
+                                ticks: false,
+                                endOnTick: false,
+                                labels: {
+                                    enabled: false
+                                }
+                            },
+                            tooltip: {
+                                borderWidth: 1,
+                                shadow: false,
+                                useHTML: true,
+                                hideDelay: 0,
+                                padding: 5,
+                                positioner: function (w, h, point) {
+                                    return {
+                                        x: point.plotX - w / 2,
+                                        y: point.plotY - h
+                                    };
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    enableMouseTracking: true,
+                                    lineWidth: 1,
+                                    shadow: false,
+                                    states: {
+                                        hover: {
+                                            lineWidth: 1
+                                        }
+                                    },
+                                    marker: {
+                                        radius: 2
+                                    }
+                                }
+                            },
                             series: [{
                                 type: 'line',
                                 name: 'Rouge error',
@@ -670,7 +1613,7 @@
                     if(dta != "Error"){
                         var monthStr = dta.month
                         $("#monthPickerTop").datepicker("update", monthStr)
-                        $('#isClickedTab1').val(1)
+                        $('#isClickedTab2').val(1)
                         // right click event
                         fntRightClick()
                         // top 10 sigin
