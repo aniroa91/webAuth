@@ -592,6 +592,18 @@ object BrasDAO {
     )
   }
 
+  def getTicketIssue(day: String) = {
+    dbConfig.db.run(
+      sql"""select issue_group, province, issue, count(*) from dwh_ticket
+            where date_trunc('day', created_date) = $day::TIMESTAMP
+            and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access') and province <> ''
+            group by issue_group, province, issue
+            order by issue_group, province, issue
+            """
+        .as[(String, String, String, Int)]
+    )
+  }
+
   def getBrasOutlierDaily(day: String) = {
     val nextDay = CommonService.getNextDay(day)
       dbConfig.db.run(

@@ -22,71 +22,84 @@ GET      /login                        controllers.LoginController.login
 GET      /logout                       controllers.LoginController.logout
 
 #######################################################################
-### DEVICE
-GET      /device                       controllers.DeviceController.overview
-
-GET      /daily                        controllers.DeviceController.getDaily
-POST     /daily                        controllers.DeviceController.getFormDayPicker
-GET      /getInfErrHourly              controllers.DeviceController.getErrInfHourly(_type: String ?= "", id: String ?= "", day: String ?= "", bras: String ?= "")
-GET      /drilldownSigLogDaily         controllers.DeviceController.drilldownSigLogDaily(id: String ?= "",day: String ?= "")
-GET      /drilldownErrorDevice         controllers.DeviceController.drilldownErrorDevice(id: String ?= "",day: String ?= "",err: String ?= "")
-GET      /getServNoticeByType          controllers.DeviceController.getServNoticeByType(noti: String ?= "",day: String ?= "")
-GET      /drilldownInferrorDaily       controllers.DeviceController.drilldownInfErrorsDaily(id: String ?= "",day: String ?= "",err: String ?= "")
-GET      /getDailyByBrasLocation       controllers.DeviceController.getDailyByBrasLocation(id: String ?= "",day: String ?= "")
-GET      /drilldownBrasOutlier         controllers.DeviceController.drilldownBrasOutlier(id: String ?= "",day: String ?= "")
-GET      /drilldownInfOutlier          controllers.DeviceController.drilldownInfOutlier(id: String ?= "",day: String ?= "")
-
-GET      /ddOutlierByMonth             controllers.DeviceController.drilldownOutlierMonth(id: String ?= "",fromMonth: String ?= "",toMonth: String ?= "", db: String ?= "")
-
-GET      /noc                          controllers.DeviceController.dashboard
-GET      /inf                          controllers.DeviceController.inf(id: String ?= "")
-GET      /inf-json                     controllers.DeviceController.getSigLogInfjson(id: String ?= "")
-GET      /inf/exportCSV                controllers.DeviceController.exportCSV(date: String ?= "")
-GET      /inf/getHostMonitor           controllers.DeviceController.getHostMonitor(host: String ?= "")
-GET      /drilldownNoticeByStatus      controllers.DeviceController.drilldownNoticeByStatus(id: String ?= "",month: String ?= "")
-GET      /drillUpNoticeByStatus        controllers.DeviceController.drillUpNoticeByStatus(id: String ?= "",month: String ?= "")
-GET      /drillUpTotalInf              controllers.DeviceController.drillUpTotalInf(id: String ?= "",month: String ?= "")
-GET      /drilldownTotalInf            controllers.DeviceController.drilldownTotalInf(id: String ?= "",month: String ?= "")
-GET      /drillUpSigLogmonth           controllers.DeviceController.drillUpSigLogmonth(id: String ?= "",month: String ?= "")
-GET      /drilldownSigLogMonth         controllers.DeviceController.drilldownSigLogMonth(id: String ?= "",month: String ?= "")
-GET      /groupRegionByMonth           controllers.DeviceController.groupRegionByMonth(month: String ?= "",_typeNoc: String ?= "",_typeError: String ?= "")
-
-GET      /region-countType             controllers.DeviceController.getcountType(id: String ?= "",month: String ?= "")
-GET      /region-errorType             controllers.DeviceController.geterrorType(id: String ?= "",month: String ?= "")
-GET      /region-errorKibana           controllers.DeviceController.getErrorKibana(id: String ?= "",month: String ?= "")
-GET      /region-serviceStatus         controllers.DeviceController.getserviceStatus(id: String ?= "",month: String ?= "")
-GET      /region-OltPoorconn           controllers.DeviceController.getOltPoorconn(id: String ?= "",month: String ?= "")
-GET      /region-InfTopErr             controllers.DeviceController.getInfTopErr(id: String ?= "",month: String ?= "")
-GET      /monthly/getCompare           controllers.DeviceController.compareByMonth(month: String ?= "")
-GET      /monthly/getTrend             controllers.DeviceController.trendByMonth
-GET      /monthly/getTopN              controllers.DeviceController.topNJson(month: String ?= "",_typeError: String ?= "",_typeService: String ?= "",_typeOLTpoor: String ?= "",_typeInftoperr: String ?="")
-GET      /inf/rejectLabel              controllers.DeviceController.rejectLabel(host: String ?= "",module: String ?= "",time: String ?= "")
-GET      /inf/confirmLabel             controllers.DeviceController.confirmLabel(host: String ?= "",module: String ?= "",time: String ?= "")
-
+### ---DASHBOARD---
+## tab Monthly-Overview
 POST     /searchMonthOverview          controllers.DeviceController.getFormMonthPicker
 GET      /searchMonthOverview          controllers.DeviceController.overview
+GET      /monthly                      controllers.DeviceController.overview
+GET      /monthly/region-countType     controllers.DeviceController.getcountType(id: String ?= "",month: String ?= "")
+GET      /monthly/region-errorType     controllers.DeviceController.geterrorType(id: String ?= "",month: String ?= "")
+GET      /monthly/groupRegionByMonth   controllers.DeviceController.groupRegionByMonth(month: String ?= "",_typeNoc: String ?= "",_typeError: String ?= "")
+GET      /monthly/ddownNoticeByStatus  controllers.DeviceController.drilldownNoticeByStatus(id: String ?= "",month: String ?= "")
+GET      /monthly/dUpNoticeByStatus    controllers.DeviceController.drillUpNoticeByStatus(id: String ?= "",month: String ?= "")
+GET      /monthly/ddOutlierByMonth     controllers.DeviceController.drilldownOutlierMonth(id: String ?= "",fromMonth: String ?= "",toMonth: String ?= "", db: String ?= "")
+GET      /monthly/drilldownTotalInf    controllers.DeviceController.drilldownTotalInf(id: String ?= "",month: String ?= "")
+GET      /monthly/drillUpTotalInf      controllers.DeviceController.drillUpTotalInf(id: String ?= "",month: String ?= "")
+GET      /monthly/ddownSigLogMonth     controllers.DeviceController.drilldownSigLogMonth(id: String ?= "",month: String ?= "")
+GET      /monthly/dUpSigLogmonth       controllers.DeviceController.drillUpSigLogmonth(id: String ?= "",month: String ?= "")
+## tab Monthly-Top Province
+GET      /monthly/getTopN              controllers.DeviceController.topNJson(month: String ?= "",_typeError: String ?= "",_typeService: String ?= "",_typeOLTpoor: String ?= "",_typeInftoperr: String ?="")
+GET      /topN/region-errorKibana      controllers.DeviceController.getErrorKibana(id: String ?= "",month: String ?= "")
+GET      /topN/region-serviceStatus    controllers.DeviceController.getserviceStatus(id: String ?= "",month: String ?= "")
+GET      /topN/region-OltPoorconn      controllers.DeviceController.getOltPoorconn(id: String ?= "",month: String ?= "")
+GET      /topN/region-InfTopErr        controllers.DeviceController.getInfTopErr(id: String ?= "",month: String ?= "")
+## tab Monthly-Compare
+GET      /monthly/getCompare           controllers.DeviceController.compareByMonth(month: String ?= "")
+## tab Monthly-Trending
+GET      /monthly/getTrend             controllers.DeviceController.trendByMonth
 
-GET      /suggest                      controllers.DeviceController.suggest(ct: String ?= "")
-GET      /fwdRequest                   controllers.DeviceController.fwdRequest(bras: String)
+## PAGE DAILY
+GET      /daily                        controllers.DailyController.getDaily
+POST     /daily                        controllers.DailyController.getFormDayPicker
+GET      /daily/ddBrasOutlier          controllers.DailyController.drilldownBrasOutlier(id: String ?= "",day: String ?= "")
+GET      /daily/ddSigLogDaily          controllers.DailyController.drilldownSigLogDaily(id: String ?= "",day: String ?= "")
+GET      /daily/ddErrorDevice          controllers.DailyController.drilldownErrorDevice(id: String ?= "",day: String ?= "",err: String ?= "")
+GET      /daily/ddInfOutlier           controllers.DailyController.drilldownInfOutlier(id: String ?= "",day: String ?= "")
+GET      /daily/ddInferrorDaily        controllers.DailyController.drilldownInfErrorsDaily(id: String ?= "",day: String ?= "",err: String ?= "")
+GET      /daily/getInfErrHourly        controllers.DailyController.getErrInfHourly(_type: String ?= "", id: String ?= "", day: String ?= "", bras: String ?= "")
+GET      /daily/getServNoticeByType    controllers.DailyController.getServNoticeByType(noti: String ?= "",day: String ?= "")
+GET      /daily/getDailyBrasLocation   controllers.DailyController.getDailyByBrasLocation(id: String ?= "",day: String ?= "")
 
-GET      /searchBras                   controllers.DeviceController.search
-POST     /searchBrasHost               controllers.DeviceController.getFormBras
-GET      /bras                         controllers.BrasController.index
-GET      /brasInfo                     controllers.BrasDetailController.index
-GET      /device/realtime-bras         controllers.DeviceController.realtimeBras
-GET      /host-json                    controllers.DeviceController.getHostJson(id: String ?= "")
-GET      /confirmLabel                 controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
-GET      /rejectLabel                  controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
-
+## PAGE WEEKLY
+# tab Problem
 GET       /weekly                      controllers.ProblemController.index
 POST      /weekly/getJsonProblem       controllers.ProblemController.getJsonProblem
 POST      /weekly/getJsonByDevType     controllers.ProblemController.getJsonByDevType
-
+# tab KPI
 GET       /kpi                         controllers.KpiController.index
 POST      /kpi/getJsonKpi              controllers.KpiController.getJsonKpi
 POST      /kpi/getKpiTimeSeries        controllers.KpiController.getKpiTimeSeries
+### ---END DASHBOARD---
 
+### ---PAGE NOC---
+GET      /noc                          controllers.BrasController.dashboard
+GET      /noc/realtime-bras            controllers.BrasController.realtimeBras
+GET      /noc/host-json                controllers.BrasController.getHostJson(id: String ?= "")
+GET      /noc/confirmLabel             controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
+GET      /noc/rejectLabel              controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
+### ---END PAGE NOC---
+
+### ---PAGE INF---
+GET      /inf                          controllers.InfController.inf(id: String ?= "")
+GET      /inf/inf-json                 controllers.InfController.getSigLogInfjson(id: String ?= "")
+GET      /inf/exportCSV                controllers.InfController.exportCSV(date: String ?= "")
+GET      /inf/getHostMonitor           controllers.InfController.getHostMonitor(host: String ?= "")
+GET      /inf/rejectLabel              controllers.InfController.rejectLabel(host: String ?= "",module: String ?= "",time: String ?= "")
+GET      /inf/confirmLabel             controllers.InfController.confirmLabel(host: String ?= "",module: String ?= "",time: String ?= "")
+### ---END PAGE INF---
+
+### ---PAGE SEARCH---
+GET      /searchBras                   controllers.DeviceController.search
+POST     /searchBrasHost               controllers.DeviceController.getFormBras
+GET      /suggest                      controllers.DeviceController.suggest(ct: String ?= "")
+### ---END PAGE SEARCH---
+
+### ---PAGE EXPORT---
 GET       /export                      controllers.ExportController.index
 POST      /exportData                  controllers.ExportController.exportData
+### ---END PAGE EXPORT---
+
+### right click request
+GET      /fwdRequest                   controllers.DeviceController.fwdRequest(bras: String)
 
 #######################################################################

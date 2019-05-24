@@ -1767,6 +1767,16 @@
                                         format: '{point.name}: {point.percentage:.2f}%'
                                     },
                                     showInLegend: false
+                                },
+                                series: {
+                                    point:{
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if(e.target.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             colors : ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#1ABB9C', '#832d1d', '#09006d', '#cccccc', '#669999', '#e6e600'],
@@ -1820,6 +1830,16 @@
                                         format: '{point.name}: {point.percentage:.2f}%'
                                     },
                                     showInLegend: false
+                                },
+                                series: {
+                                    point:{
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if(e.target.point.name.indexOf('-') >=0)
+                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             colors : ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#1ABB9C', '#832d1d', '#09006d', '#cccccc', '#669999', '#e6e600'],
@@ -2180,7 +2200,7 @@
         //drilldown heat map Inf Outliers
         function callDrilldownOutlier(cates, _type, db){
             $.ajax({
-                url: "/ddOutlierByMonth?id=" + cates+"&fromMonth="+$('#startMonth').val()+"&toMonth="+$('#endMonth').val()+"&db="+db,
+                url: "/monthly/ddOutlierByMonth?id=" + cates+"&fromMonth="+$('#startMonth').val()+"&toMonth="+$('#endMonth').val()+"&db="+db,
                 cache: false,
                 success: function (dta) {
                     if(dta != "Error" && dta.data.length >0){

@@ -15,6 +15,8 @@ case class JsonInf(dateTime: String, host: String, user_down: Long, inf_down: Do
 
 case class JsonSuyhao(dateTime: String, province: String, host: String, module: String, not_pass_suyhao: String, pass_suyhao: String)
 
+case class JsonPortPonDown(dateTime: String, errorName: String, host: String, module: String, index: String, text: String)
+
 object ExportService extends AbstractService{
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
@@ -67,6 +69,16 @@ object ExportService extends AbstractService{
             from dmt_portpon_suyhao where host like $bras AND date >= $fromDate::TIMESTAMP AND date < $toDate::TIMESTAMP order by date desc
             """
         .as[JsonSuyhao])
+  }
+
+  def exportByportPon(fromDate: String, toDate: String, device: String, module: Int)= {
+    val bras = "%"+device+"%"
+    implicit val getUserResult = GetResult(r =>
+      JsonPortPonDown(r.nextString, r.nextString, r.nextString, r.nextString, r.nextString, r.nextString))
+    dbConfig.db.run(
+      sql"""select * from dwh_inf_error where host like $bras AND module =$module AND date_time >= $fromDate::TIMESTAMP AND date_time < $toDate::TIMESTAMP order by date_time desc
+            """
+        .as[JsonPortPonDown])
   }
 
 }

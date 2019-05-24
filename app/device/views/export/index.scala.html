@@ -82,7 +82,7 @@
                             <h4>Device Name</h4>
                             <input class="form-control hight-light autocomplete" type="text" id="device" placeholder="Search device name...">
                         </div>
-                        <div class="col-lg-6 col-xs-12 disInline">
+                        <div class="col-lg-6 col-xs-12 disInline" id="divSubmit">
                             <a id="export" class="btn btn-success"><i class="fa fa-download" aria-hidden="true"></i> Export</a>
                             <a href="/export" class="btn btn-secondary"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
                         </div>
@@ -200,9 +200,17 @@
                         $('#slSrc').append('<option value="Kibana">Kibana</option><option value="Opsview">Opsview</option>')
                     }
                     else{
-                        $('#slSrc').append('<option value="Opsview">Opsview</option><option value="Inf">Inf</option><option value="Suyhao">Suyhao</option>')
+                        $('#slSrc').append('<option value="Opsview">Opsview</option><option value="Inf">Inf</option><option value="Suyhao">Suyhao</option><option value="PortPonDown">Check port pon down</option>')
                     }
                 });
+                // change select box datasource
+                $('#slSrc').on('change', function () {
+                  var element = document.getElementById("module")
+                  if(element) element.parentNode.removeChild(element);
+                  if($(this).val() == "PortPonDown"){
+                      $('#divSubmit').prepend('<input class="form-control hight-light" style="margin-right: 10px;width: 135px" type="number" id="module" placeholder="check port pon down...">')
+                  }
+                })
                 // review click data
                 $('#review').on('click', function () {
                     ajaxExport(@CommonService.MIN_RECORD, 'review')
@@ -218,6 +226,14 @@
                         return false
                     }
                     $('#device').addClass('hight-light').removeClass('error')
+                    // exist element module
+                    if(document.getElementById("module")) {
+                        if ($('#module').val().trim() == "") {
+                            $('#module').addClass('error').removeClass('hight-light')
+                            return false
+                        }
+                        $('#module').addClass('hight-light').removeClass('error')
+                    }
                     var fields = getParamFields(document.querySelector('input[name=csrfToken]').value, colRow)
                     $.ajax({
                         url: "/exportData",
@@ -273,7 +289,8 @@
                     "device"     : $('#device').val(),
                     "fromDate"   : $('#startDate').val(),
                     "toDate"     : $('#endDate').val(),
-                    "dataSource" : $('#slSrc').val()
+                    "dataSource" : $('#slSrc').val(),
+                    "module"     : (document.getElementById("module")) ? $('#module').val(): "0"
                 }
                 return obj
             }

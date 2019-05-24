@@ -445,6 +445,10 @@ object BrasService extends AbstractService{
     BrasDAO.getInfAccessOutlierDaily(day)
   }
 
+  def getTicketIssue(day: String) = {
+    BrasDAO.getTicketIssue(day)
+  }
+
   def getBrasOutlierDaily(day: String) = {
     BrasDAO.getBrasOutlierDaily(day)
   }

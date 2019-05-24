@@ -970,7 +970,7 @@
                 }
                 $('#'+_type+'' + _index).collapse('show');
                 $.ajax({
-                    url: "/inf-json?id=" + id,
+                    url: "/inf/inf-json?id=" + id,
                     cache: false,
                     success: function (dta) {
                         if(dta != "Error"){

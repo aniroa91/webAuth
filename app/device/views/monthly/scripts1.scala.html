@@ -64,7 +64,7 @@
                         var id =$(this).val()
                         $('#typeNocCount').val(id)
                         $.ajax({
-                                url: "/region-countType?id=" + id.trim()+"&month="+$('#monthGroup').val(),
+                                url: "/monthly/region-countType?id=" + id.trim()+"&month="+$('#monthGroup').val(),
                                 cache: false,
                                 success: function (dta) {
                                         if(dta != "Error"){
@@ -135,7 +135,7 @@
                         var id =$(this).val()
                         $('#typeInfError').val(id)
                         $.ajax({
-                                url: "/region-errorType?id=" + id.trim()+"&month="+$('#monthGroup').val(),
+                                url: "/monthly/region-errorType?id=" + id.trim()+"&month="+$('#monthGroup').val(),
                                 cache: false,
                                 success: function (dta) {
                                         if(dta != "Error"){
@@ -210,7 +210,7 @@
                         var id =$(this).val()
                         $('#typeKibanaError').val(id)
                         $.ajax({
-                                url: "/region-errorKibana?id=" + id.trim()+"&month="+$('#month').val(),
+                                url: "/topN/region-errorKibana?id=" + id.trim()+"&month="+$('#month').val(),
                                 cache: false,
                                 success: function (dta) {
                                         if(dta != "Error"){
@@ -295,7 +295,7 @@
                         var id =$(this).val()
                         $('#typeServiceStatus').val(id)
                         $.ajax({
-                                url: "/region-serviceStatus?id=" + id.trim()+"&month="+$('#month').val(),
+                                url: "/topN/region-serviceStatus?id=" + id.trim()+"&month="+$('#month').val(),
                                 cache: false,
                                 success: function (dta) {
                                         if(dta != "Error"){
@@ -380,7 +380,7 @@
                         var id =$(this).val()
                         $('#typeOLTpoor').val(id)
                         $.ajax({
-                                url: "/region-OltPoorconn?id=" + id.trim()+"&month="+$('#month').val(),
+                                url: "/topN/region-OltPoorconn?id=" + id.trim()+"&month="+$('#month').val(),
                                 cache: false,
                                 success: function (dta) {
                                         if(dta != "Error"){
@@ -453,7 +453,7 @@
                         var id =$(this).val()
                         $('#typeInftoperr').val(id)
                         $.ajax({
-                                url: "/region-InfTopErr?id=" + id.trim()+"&month="+$('#month').val(),
+                                url: "/topN/region-InfTopErr?id=" + id.trim()+"&month="+$('#month').val(),
                                 cache: false,
                                 success: function (dta) {
                                         if(dta != "Error"){
@@ -1276,7 +1276,7 @@
                 $(el).removeClass('btnDefault')
                 $(el).addClass('btn-success')
                 $.ajax({
-                        url: "/groupRegionByMonth?month=" + newDate+"&_typeNoc="+$('#typeNocCount').val()+"&_typeError="+$('#typeInfError').val(),
+                        url: "/monthly/groupRegionByMonth?month=" + newDate+"&_typeNoc="+$('#typeNocCount').val()+"&_typeError="+$('#typeInfError').val(),
                         cache: false,
                         success: function (dta) {
                                 if(dta != "Error"){
@@ -1500,7 +1500,7 @@
                         id = "*"
                 }
                 $.ajax({
-                        url: "/drillUpTotalInf?id="+id+"&month="+$('#monthGroup').val(),
+                        url: "/monthly/drillUpTotalInf?id="+id+"&month="+$('#monthGroup').val(),
                         cache: false,
                         success: function (dta) {
                                 if (dta != "Error") {
@@ -1599,7 +1599,7 @@
                         id = "*"
                 }
                 $.ajax({
-                        url: "/drillUpNoticeByStatus?id="+id+"&month="+$('#monthGroup').val(),
+                        url: "/monthly/dUpNoticeByStatus?id="+id+"&month="+$('#monthGroup').val(),
                         cache: false,
                         success: function (dta) {
                                 if (dta != "Error") {
@@ -1682,7 +1682,7 @@
 
         function callDrilldownNoticeByStatus(id){
                 $.ajax({
-                        url: "/drilldownNoticeByStatus?id=" + id+"&month="+$('#monthGroup').val(),
+                        url: "/monthly/ddownNoticeByStatus?id=" + id+"&month="+$('#monthGroup').val(),
                         cache: false,
                         success: function (dta) {
                                 if(dta != "Error"){
@@ -1783,7 +1783,7 @@
 
         function callDrilldownTotalInf(id){
                 $.ajax({
-                        url: "/drilldownTotalInf?id=" + id+"&month="+$('#monthGroup').val(),
+                        url: "/monthly/drilldownTotalInf?id=" + id+"&month="+$('#monthGroup').val(),
                         cache: false,
                         success: function (dta) {
                                 if(dta != "Error"){
@@ -1902,7 +1902,7 @@
                         id = "*"
                 }
                 $.ajax({
-                        url: "/drillUpSigLogmonth?id="+id+"&month="+$('#monthGroup').val(),
+                        url: "/monthly/dUpSigLogmonth?id="+id+"&month="+$('#monthGroup').val(),
                         cache: false,
                         success: function (dta) {
                                 if (dta != "Error") {
@@ -1972,7 +1972,7 @@
 
         function callDrilldownSigLog(id){
                 $.ajax({
-                        url: "/drilldownSigLogMonth?id=" + id+"&month="+$('#monthGroup').val(),
+                        url: "/monthly/ddownSigLogMonth?id=" + id+"&month="+$('#monthGroup').val(),
                         cache: false,
                         success: function (dta) {
                                 if(dta != "Error"){

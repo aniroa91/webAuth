@@ -3,8 +3,6 @@ package controllers
 import javax.inject.Inject
 import javax.inject.Singleton
 
-import device.models.KpiResponse
-import device.utils.{CommonUtils, LocationUtils}
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 
@@ -33,6 +31,7 @@ class ExportController @Inject()(cc: ControllerComponents) extends AbstractContr
       val fromDate = request.body.asFormUrlEncoded.get("fromDate").head
       val toDate = request.body.asFormUrlEncoded.get("toDate").head
       val dataSource = request.body.asFormUrlEncoded.get("dataSource").head
+      val module = request.body.asFormUrlEncoded.get("module").head.toInt
       val device = request.body.asFormUrlEncoded.get("device").head.trim().toUpperCase
       val colRow = request.body.asFormUrlEncoded.get("colRow").head.toInt
       val nextDate = if(colRow == 5) CommonService.getNextDay(fromDate) else CommonService.getNextDay(toDate)
@@ -69,6 +68,14 @@ class ExportController @Inject()(cc: ControllerComponents) extends AbstractContr
           Json.obj(
             "fileName" -> fileName,
             "data" -> suyhao
+          )
+        }
+        case "PortPonDown" => {
+          implicit val contractFormat = Json.format[JsonPortPonDown]
+          val portPon = Await.result(ExportService.exportByportPon(fromDate, nextDate, device, module), Duration.Inf).slice(0,colRow)
+          Json.obj(
+            "fileName" -> fileName,
+            "data" -> portPon
           )
         }
       }

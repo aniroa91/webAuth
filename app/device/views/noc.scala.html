@@ -314,7 +314,7 @@
                 });
                 setInterval(function () {
                     $.ajax({
-                        url: "/device/realtime-bras",
+                        url: "/noc/realtime-bras",
                         cache: false,
                         success: function (dta) {
                             if(dta != "Error"){
@@ -615,7 +615,7 @@
                         var brasId = $(this).find('.brasText').val();
                         var times = brasId.split('/')[1]
                         $.ajax({
-                            url: "/host-json?id=" + brasId,
+                            url: "/noc/host-json?id=" + brasId,
                             cache: false,
                             beforeSend: function () {
                                 $('.activeBox').waitMe({
@@ -950,7 +950,7 @@
                 var id = strId.split("/")[0]
                 var time = strId.split("/")[1]
                 $.ajax({
-                    url: "/rejectLabel?id="+id+"&time="+time,
+                    url: "/noc/rejectLabel?id="+id+"&time="+time,
                     success: function (data) {
                         if(data!= "error") {
                             $(element).attr('disabled', 'disabled');
@@ -973,7 +973,7 @@
                 var id = strId.split("/")[0].trim()
                 var time = strId.split("/")[1].trim()
                 $.ajax({
-                    url: "/confirmLabel?id="+id+"&time="+time,
+                    url: "/noc/confirmLabel?id="+id+"&time="+time,
                     success: function (data) {
                         if(data!= "error"){
                             $(element).attr('disabled','disabled');

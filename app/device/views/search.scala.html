@@ -1162,7 +1162,7 @@
                             // _type: 0 hourly time
                             // _type: 1 frame time
                             $.ajax({
-                                url: "/getInfErrHourly?_type=1&id=" + $(this).attr('name')+"&day="+$('#date').val()+"&bras="+$('#bras').val(),
+                                url: "/daily/getInfErrHourly?_type=1&id=" + $(this).attr('name')+"&day="+$('#date').val()+"&bras="+$('#bras').val(),
                                 cache: false,
                                 success: function (dta) {
                                     if(dta != "Error"){
