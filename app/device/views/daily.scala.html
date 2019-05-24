@@ -1243,8 +1243,6 @@
                                             series: getDrillDown2Level(dta.data, dta.cates)
                                         }
                                     });
-                                    //bar_notice.series[0].setData(getDrildownStackBar(dta.data, dta.cates))
-                                    //bar_notice.options.drilldown.series[0] = getDrillDown2Level(dta.data, dta.cates)
                                 }
                                 else{
                                     console.log("Error when execute query. Please check again your system!")
@@ -1732,6 +1730,13 @@
                             z:'No device: '+Number(arrProvinceBras[k].noDevice),
                             k:'Poor conn: '+Number(arrProvinceBras[k].poorconn)
                         })
+                        if(arrProvinceBras.length == 1){
+                            jsArray.push({
+                                id: nameOld,
+                                name: nameOld,
+                                data: dtaProvince
+                            })
+                        }
                     }
                     if(isMoreProv ==0){
                         dtaRegion.push({

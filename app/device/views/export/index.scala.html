@@ -51,7 +51,7 @@
                         <div class="col-lg-6 col-xs-12 disInline">
                             <h4>Device Type</h4>
                             <select class="form-control selectBox" id="slDevType">
-                                <option value="0">Core</option>
+                                <option value="0" selected="true">Core</option>
                                 <option value="1">Access</option>
                             </select>
                         </div>
@@ -82,7 +82,8 @@
                             <h4>Device Name</h4>
                             <input class="form-control hight-light autocomplete" type="text" id="device" placeholder="Search device name...">
                         </div>
-                        <div class="col-lg-6 col-xs-12 disInline" id="divSubmit">
+                        <div class="col-lg-6 col-xs-12 disInline">
+                            <input class="form-control hight-light" style="margin-right: 10px;width: 124px;display: none" type="number" id="module" placeholder="Module">
                             <a id="export" class="btn btn-success"><i class="fa fa-download" aria-hidden="true"></i> Export</a>
                             <a href="/export" class="btn btn-secondary"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
                         </div>
@@ -129,6 +130,7 @@
     <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
+                $('#slDevType').val(0)
                 // datepicker for tab Overview
                 $('#startDate').datepicker({
                     autoclose: true,
@@ -197,6 +199,7 @@
                 $('#slDevType').on('change', function () {
                     $('#slSrc').html("")
                     if($(this).val() == 0){
+                        $('#module').hide()
                         $('#slSrc').append('<option value="Kibana">Kibana</option><option value="Opsview">Opsview</option>')
                     }
                     else{
@@ -205,10 +208,11 @@
                 });
                 // change select box datasource
                 $('#slSrc').on('change', function () {
-                  var element = document.getElementById("module")
-                  if(element) element.parentNode.removeChild(element);
                   if($(this).val() == "PortPonDown"){
-                      $('#divSubmit').prepend('<input class="form-control hight-light" style="margin-right: 10px;width: 135px" type="number" id="module" placeholder="check port pon down...">')
+                      $('#module').show()
+                  }
+                  else{
+                      $('#module').hide()
                   }
                 })
                 // review click data
@@ -227,7 +231,7 @@
                     }
                     $('#device').addClass('hight-light').removeClass('error')
                     // exist element module
-                    if(document.getElementById("module")) {
+                    if($("#module").is(":visible")) {
                         if ($('#module').val().trim() == "") {
                             $('#module').addClass('error').removeClass('hight-light')
                             return false
@@ -290,7 +294,7 @@
                     "fromDate"   : $('#startDate').val(),
                     "toDate"     : $('#endDate').val(),
                     "dataSource" : $('#slSrc').val(),
-                    "module"     : (document.getElementById("module")) ? $('#module').val(): "0"
+                    "module"     : ($("#module").is(":visible")) ? $('#module').val(): "0"
                 }
                 return obj
             }
