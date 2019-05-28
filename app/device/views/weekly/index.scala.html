@@ -122,10 +122,35 @@
         </div>
         <div class="row mg-t-15">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div id="pie-broken" style="height: 300px"></div>
+                <div id="pie-broken" style="height: 310px"></div>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div id="bubble-suyhao" style="height: 300px"></div>
+                <div class="x_panel tile">
+                    <div class="x_title" style="padding: 0px">
+                        <h2> Devices Get Problem With Suy Hao Index <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề với tỷ lệ suy hao không đạt trong tuần"></i></h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <table class="data table table-bordered tbScroll" id="tbSuyhao">
+                            <thead >
+                                <tr>
+                                    <th>Host</th>
+                                    <th>Pass</th>
+                                    <th>Not pass</th>
+                                    <th>Rate</th>
+                                </tr>
+                            </thead>
+                            @for(i <- 0 until response.suyhao.length) {
+                                <tr>
+                                    <th>@response.suyhao(i)._1</th>
+                                    <td>@response.suyhao(i)._2</td>
+                                    <td>@response.suyhao(i)._3</td>
+                                    <td>@response.suyhao(i)._4</td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row mg-t-15">
@@ -207,9 +232,20 @@
     <script src="../assets/javascripts/jsTree.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
+                console.time("time")
                 var tbOLt = $('#tbOlt').DataTable( {
                     dom: 'Bfrtip',
                     "scrollY":        "350px",
+                    "scrollCollapse": true,
+                    "paging":         false,
+                    "info":     false,
+                    "searching":     false,
+                    "sort":     false,
+                    destroy: true
+                });
+                var tbSuyhao = $('#tbSuyhao').DataTable( {
+                    dom: 'Bfrtip',
+                    "scrollY":        "200px",
                     "scrollCollapse": true,
                     "paging":         false,
                     "info":     false,
@@ -470,58 +506,7 @@
                     }]
                 });
                 }
-                @if(response.suyhao != null){
-                Highcharts.chart('bubble-suyhao', {
 
-                    chart: {
-                        type: 'bubble'
-                    },
-                    title: {
-                        useHTML: true,
-                        text: 'Devices Get Problem With Suy Hao Index <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề với tỷ lệ suy hao không đạt trong tuần"></i>'
-                    },
-                    xAxis: {
-                        gridLineWidth: 1,
-                        title: {
-                            text: 'Pass'
-                        }
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Not Pass'
-                        }
-                    },
-                    legend: {
-                        layout: 'vertical',
-                        align: 'right',
-                        verticalAlign: 'top',
-                        y: 30,
-                        navigation: {
-                            activeColor: '#3E576F',
-                            animation: true,
-                            arrowSize: 12,
-                            inactiveColor: '#CCC',
-                            style: {
-                                fontWeight: 'bold',
-                                color: '#333',
-                                fontSize: '12px'
-                            }
-                        }
-                    },
-                    tooltip: {
-                        useHTML: true,
-                        headerFormat: '<table>',
-                        pointFormat:
-                        '<tr><th>Host: </th><td>{point.name}</td></tr>'+
-                        '<tr><th>Pass:</th><td> {point.x}</td></tr>' +
-                        '<tr><th>Not Pass:</th><td> {point.y}</td></tr>' +
-                        '<tr><th>Rate:</th><td> {point.k}</td></tr>',
-                        footerFormat: '</table>',
-                        followPointer: true
-                    },
-                    series: getJsonBubleChart(@Html(Json.stringify(Json.toJson(response.suyhao))))
-                });
-                }
                 @if(response.broken != null){
                 var pieBroken = Highcharts.chart('pie-broken', {
                     chart: {
@@ -555,6 +540,7 @@
                     }]
                 });
                 }
+                console.timeEnd("time")
                 // click device type
                 $('#tbDevType').on("click", "a.devType", function(){
                     $('#tbDevType .pointer').removeClass('onClick')
@@ -618,6 +604,7 @@
                 })
                 // ajax filter
                 function callAjaxProblem(_type){
+                    console.time("time")
                     var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
                     $.ajax({
                         url: "/weekly/getJsonProblem",
@@ -674,59 +661,13 @@
                                 chartWarnAlert.xAxis[0].setExtremes(0, Number(dta.probWarnAlert.cates.length) > 10 ? 10 : Number(dta.probWarnAlert.cates.length) -1);
                                 //update chart pie broken
                                 pieBroken.series[0].setData(parsePieJson(dta.broken), true)
-                                // update chart bubble
-                                Highcharts.chart('bubble-suyhao', {
-
-                                    chart: {
-                                        type: 'bubble'
-                                    },
-                                    title: {
-                                        text: 'Devices Get Problem With Suy Hao Index'
-                                    },
-                                    xAxis: {
-                                        gridLineWidth: 1,
-                                        title: {
-                                            text: 'Pass'
-                                        }
-                                    },
-                                    yAxis: {
-                                        title: {
-                                            text: 'Not Pass'
-                                        }
-                                    },
-                                    legend: {
-                                        layout: 'vertical',
-                                        align: 'right',
-                                        verticalAlign: 'top',
-                                        y: 30,
-                                        navigation: {
-                                            activeColor: '#3E576F',
-                                            animation: true,
-                                            arrowSize: 12,
-                                            inactiveColor: '#CCC',
-                                            style: {
-                                                fontWeight: 'bold',
-                                                color: '#333',
-                                                fontSize: '12px'
-                                            }
-                                        }
-                                    },
-                                    tooltip: {
-                                        useHTML: true,
-                                        headerFormat: '<table>',
-                                        pointFormat:
-                                        '<tr><th>Host: </th><td>{point.name}</td></tr>'+
-                                        '<tr><th>Pass:</th><td> {point.x}</td></tr>' +
-                                        '<tr><th>Not Pass:</th><td> {point.y}</td></tr>' +
-                                        '<tr><th>Rate:</th><td> {point.k}</td></tr>',
-                                        footerFormat: '</table>',
-                                        followPointer: true
-                                    },
-                                    series: getJsonBubleChart(dta.suyhao)
-                                });
+                                // update table suyhao
+                                tbSuyhao.clear()
+                                tbSuyhao.rows.add($(dta.suyhao)).draw( );
                                 // update table olts
                                 tbOLt.clear()
                                 tbOLt.rows.add($(dta.olt)).draw( );
+                                console.timeEnd("time")
                             }
                             else{
                                 alert("Error when execute query. Please check again your system!")
