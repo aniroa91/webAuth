@@ -1,4 +1,4 @@
-@( email: String, postUrl: Call)(implicit request: RequestHeader)
+@( email: String, province: String, postUrl: Call)(implicit request: RequestHeader)
 
 @import services.domain.CommonService
 
@@ -44,6 +44,7 @@
         <!-- page content -->
     <div class="right_col" role="main">
         @helper.CSRF.formField
+        <input type="hidden" id="isAuthor" value="@if(province.equals("")){0} else {1}">
         <div class="row top_tiles">
             <div class="x_panel">
                 <div class="col-lg-6 col-md-8 col-sm-8 col-xs-12">
@@ -51,15 +52,27 @@
                         <div class="col-lg-6 col-xs-12 disInline">
                             <h4>Device Type</h4>
                             <select class="form-control selectBox" id="slDevType">
-                                <option value="0" selected="true">Core</option>
-                                <option value="1">Access</option>
+                                @if(province.equals("")) {
+                                    <option value="0" selected="true">Core</option>
+                                    <option value="1">Access</option>
+                                }else{
+                                    <option value="1" selected="true">Access</option>
+                                }
                             </select>
                         </div>
                         <div class="col-lg-6 col-xs-12 disInline">
                             <h4>Data Source</h4>
+
                             <select class="form-control selectBox" id="slSrc">
-                                <option value="Kibana">Kibana</option>
-                                <option value="Opsview">Opsview</option>
+                                @if(province.equals("")) {
+                                    <option value="Kibana">Kibana</option>
+                                    <option value="Opsview">Opsview</option>
+                                }else{
+                                    <option value="Opsview">Opsview</option>
+                                    <option value="Inf">Inf</option>
+                                    <option value="Suyhao">Suyhao</option>
+                                    <option value="PortPonDown">Check port pon down</option>
+                                }
                             </select>
                         </div>
                         <div class="col-lg-6 col-xs-12 disInline">
@@ -130,7 +143,7 @@
     <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
-                $('#slDevType').val(0)
+                $('#slDevType').val($('#isAuthor').val())
                 // datepicker for tab Overview
                 $('#startDate').datepicker({
                     autoclose: true,
@@ -173,7 +186,8 @@
                         $.ajax({
                             url: "/suggest",
                             data: {
-                                ct: $("#device").val()
+                                ct: $("#device").val(),
+                                _type: $('#slDevType').val()
                             }
                         }).done(function(dta) {
                             response($.map(dta.data, function(obj) {

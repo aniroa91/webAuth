@@ -81,7 +81,7 @@
                                             <p>Time: @mapBrasOutlier(i)._1</p>
                                             <p><span style="margin-right: 10px">Signin: @mapBrasOutlier(i)._3</span><span>Logoff: @mapBrasOutlier(i)._4</span></p>
                                         </div>
-                                    @if(email == "noc" || email == "admin") {
+                                    @*if(email == "noc" || email == "admin") {*@
                                         @if(mapBrasOutlier(i)._5 != "0" && mapBrasOutlier(i)._5 != "1") {
                                             <p class="disInline">
                                                 <span style="padding-top: 5px">
@@ -102,7 +102,7 @@
                                                 </span>
                                             </p>
                                         }
-                                    }
+                                    @*}*@
                                     </div>
                                 </div>
                             }

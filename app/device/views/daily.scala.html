@@ -1,4 +1,4 @@
-@(response: model.device.DailyResponse, day: String, email: String)(implicit request: RequestHeader)
+@(response: model.device.DailyResponse, day: String, email: String, province: String)(implicit request: RequestHeader)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatPattern
 @import play.api.libs.json.Json
@@ -60,129 +60,136 @@
         <!-- page content -->
     <div class="right_col" role="main">
         @if(response != null){
+            <input type="hidden" id="provinceRole" value="@province">
             <input type="hidden" id="bras" value="*">
-            <div class="row top_tiles">
-                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
-                @if(response.ticketIssue._1.length >0) {
-                    <div class="x_panel tile">
-                        <div class="x_title">
-                            <h2 style="font-weight: 500;
-                                font-size: 24px"> Ticket at Core Group</h2>
-                            <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống core theo ngày, vị trí địa lý và loại sự cố"></i>
-                            <div class="clearfix"></div>
+            @if(province == ""){
+                <div class="row top_tiles">
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    @if(response.ticketIssue._1.length >0) {
+                        <div class="x_panel tile">
+                            <div class="x_title">
+                                <h2 style="font-weight: 500;
+                                    font-size: 24px"> Ticket at Core Group</h2>
+                                <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống core theo ngày, vị trí địa lý và loại sự cố"></i>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content" style="text-align: center">
+                                <div id="col-core" style="height: 350px;"></div>
+                            </div>
                         </div>
-                        <div class="x_content" style="text-align: center">
-                            <div id="col-core" style="height: 350px;"></div>
-                        </div>
+                    }
                     </div>
-                }
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
-                @if(response.ticketIssue._2.length >0) {
-                    <div class="x_panel tile">
-                        <div class="x_title">
-                            <h2 style="font-weight: 500;
-                                font-size: 24px"> Ticket at Access Group</h2>
-                            <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống access và ngoại vị theo ngày, vị trí địa lý và loại sự cố"></i>
-                            <div class="clearfix"></div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    @if(response.ticketIssue._2.length >0) {
+                        <div class="x_panel tile">
+                            <div class="x_title">
+                                <h2 style="font-weight: 500;
+                                    font-size: 24px"> Ticket at Access Group</h2>
+                                <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống access và ngoại vị theo ngày, vị trí địa lý và loại sự cố"></i>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content" style="text-align: center">
+                                <div id="col-noneCore" style="height: 350px;"></div>
+                            </div>
                         </div>
-                        <div class="x_content" style="text-align: center">
-                            <div id="col-noneCore" style="height: 350px;"></div>
-                        </div>
+                    }
                     </div>
-                }
-                </div>
 
-            </div>
-            <div class="row top_tiles">
-                <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
-                    <div class="x_panel tile">
-                        <div class="x_title">
-                            <h2 style="font-weight: 500;
-                                font-size: 24px"> Total Outliers Bras Device</h2>
-                            <i class="fa fa-info-circle toolTipText" title="Thống kê số lượng bất thường nhận diện được từ hoạt động kết nối của KHG trên BRAS theo ngày và vị trí địa lý"></i>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content" style="text-align: center">
-                            <input type="hidden" id="textBrasOutlier">
-                            <input type="hidden" id="isRegionBrasOutlier">
-                            <input type="hidden" id="isProvinceBrasOutlier">
-                        @if(response.brasOutlier.length >0) {
-                            <div id="bras-outlier" style="height: 375px;"></div>
-                        }else{
-                            <span style="font-size: 13px">Not find data on @day</span>
-                        }
-                        </div>
-                    </div>
                 </div>
-                <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
-                    <div class="x_panel tile">
-                        <input type="hidden" id="regionSigLog">
-                        <input type="hidden" id="isRegionSigLog">
-                        <input type="hidden" id="isProvinceSigLog">
-                        <div class="x_title">
-                            <h2 style="font-weight: 500;
-                                font-size: 24px"> Total SignIn & LogOff Daily</h2>
-                            <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần ra/vào mạng của người dùng, đi kèm là số lượng người dùng tương ứng, theo ngày và vị trí địa lý"></i>
-                            <a class="btn btn-success" id="backSigLog" style="display: none;float: right"></a>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content" style="text-align: center">
-                            @if(response.siglogRegion._1.length >0 || response.siglogRegion._2.length >0) {
-                                <div id="region-siglog-bar" style="height: 375px;"></div>
+                <div class="row top_tiles">
+                    <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
+                        <div class="x_panel tile">
+                            <div class="x_title">
+                                <h2 style="font-weight: 500;
+                                    font-size: 24px"> Total Outliers Bras Device</h2>
+                                <i class="fa fa-info-circle toolTipText" title="Thống kê số lượng bất thường nhận diện được từ hoạt động kết nối của KHG trên BRAS theo ngày và vị trí địa lý"></i>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content" style="text-align: center">
+                                <input type="hidden" id="textBrasOutlier">
+                                <input type="hidden" id="isRegionBrasOutlier">
+                                <input type="hidden" id="isProvinceBrasOutlier">
+                            @if(response.brasOutlier.length >0) {
+                                <div id="bras-outlier" style="height: 375px;"></div>
                             }else{
                                 <span style="font-size: 13px">Not find data on @day</span>
                             }
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
-                    <div class="x_panel tile">
-                        <input type="hidden" id="regionDeviceErr">
-                        <input type="hidden" id="isRegionDeviceErr">
-                        <input type="hidden" id="isProvinceDeviceErr">
-                        <div class="x_title">
-                            <h2 style="font-weight: 500;font-size: 24px"> Device Errors By Location</h2>
-                            <a class="btn btn-success" id="backDeviceErr" style="display: none;float: right"></a>
-                            <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi trên thiết bị BRAS theo ngày và vị trí địa lý"></i>
-                            <div class="clearfix"></div>
+                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                        <div class="x_panel tile">
+                            <input type="hidden" id="regionSigLog">
+                            <input type="hidden" id="isRegionSigLog">
+                            <input type="hidden" id="isProvinceSigLog">
+                            <div class="x_title">
+                                <h2 style="font-weight: 500;
+                                    font-size: 24px"> Total SignIn & LogOff Daily</h2>
+                                <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần ra/vào mạng của người dùng, đi kèm là số lượng người dùng tương ứng, theo ngày và vị trí địa lý"></i>
+                                <a class="btn btn-success" id="backSigLog" style="display: none;float: right"></a>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content" style="text-align: center">
+                                @if(response.siglogRegion._1.length >0 || response.siglogRegion._2.length >0) {
+                                    <div id="region-siglog-bar" style="height: 375px;"></div>
+                                }else{
+                                    <span style="font-size: 13px">Not find data on @day</span>
+                                }
+                            </div>
                         </div>
-                        <div class="x_content" style="text-align: center">
-                            @if(response.errorsDevice.length >0){
-                                <div id="tree-map" style="height: 350px;"></div>
-                                <form id="frmDeviceErr" style="text-align: center;font-size: 11px">
-                                    <input type="hidden" id="typeDeviceErr" value="*">
-                                    <label class="radio-inline radioText">
-                                        <input type="radio" value="*" name="optradio" checked>All
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" value="alert" name="optradio">AlertCount
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" value="crit" name="optradio">CritCount
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" value="warning" name="optradio">WarningCount
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" value="notice" name="optradio">NoticeCount
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" value="err" name="optradio">ErrCount
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" value="emerg" name="optradio">EmergCount
-                                    </label>
-                                </form>
-                            }else{
-                                <span style="font-size: 13px">Not find data on @day</span>
-                            }
-                        </div>
-                     </div>
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
+                        <div class="x_panel tile">
+                            <input type="hidden" id="regionDeviceErr">
+                            <input type="hidden" id="isRegionDeviceErr">
+                            <input type="hidden" id="isProvinceDeviceErr">
+                            <div class="x_title">
+                                <h2 style="font-weight: 500;font-size: 24px"> Device Errors By Location</h2>
+                                <a class="btn btn-success" id="backDeviceErr" style="display: none;float: right"></a>
+                                <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi trên thiết bị BRAS theo ngày và vị trí địa lý"></i>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content" style="text-align: center">
+                                @if(response.errorsDevice.length >0){
+                                    <div id="tree-map" style="height: 350px;"></div>
+                                    <form id="frmDeviceErr" style="text-align: center;font-size: 11px">
+                                        <input type="hidden" id="typeDeviceErr" value="*">
+                                        <label class="radio-inline radioText">
+                                            <input type="radio" value="*" name="optradio" checked>All
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="alert" name="optradio">AlertCount
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="crit" name="optradio">CritCount
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="warning" name="optradio">WarningCount
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="notice" name="optradio">NoticeCount
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="err" name="optradio">ErrCount
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="emerg" name="optradio">EmergCount
+                                        </label>
+                                    </form>
+                                }else{
+                                    <span style="font-size: 13px">Not find data on @day</span>
+                                }
+                            </div>
+                         </div>
+                    </div>
                 </div>
-            </div>
+            }
             <div class="row top_tiles">
+                @if(province != ""){
+                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                } else{
                 <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
+                }
                     <div class="x_panel tile">
                         <div class="x_title">
                             <h2 style="font-weight: 500;
@@ -202,6 +209,7 @@
                         </div>
                     </div>
                 </div>
+                @if(province == ""){
                 <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                     <div class="x_panel tile">
                         <input type="hidden" id="regionServiceNotice">
@@ -238,7 +246,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
+                    <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
+                } else{
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                }
                     <div class="x_panel tile">
                         <input type="hidden" id="regionInfErr">
                         <input type="hidden" id="isRegionInfErr">
@@ -283,50 +294,52 @@
                     </div>
                 </div>
             </div>
-            <div class="row top_tiles">
-                <div class="col-xs-12" style="margin-bottom: 10px">
-                @if(response.noticeOpsview.length >0) {
-                    <span class="hvr-pulse titDropdown">Bras:</span>
-                    <ul class="slBras">
-                        <li>All</li>
-                        @for(region <- response.noticeOpsview.map(x => x._1).distinct.sorted) {
-                            <li data-dropdown-text="@region">
-                                <ul>
-                                @for(province <- response.noticeOpsview.filter(x => x._1 == region).map(x => x._2).distinct.sorted) {
-                                    <li data-dropdown-text="@province">
-                                        <ul>
-                                        @for(bras <- response.noticeOpsview.filter(x => x._1 == region && x._2 == province).map(x => x._3)) {
-                                            <li>@bras</li>
-                                        }
-                                        </ul>
-                                    </li>
-                                }
-                                </ul>
-                            </li>
-                        }
-                    </ul>
-                }
+                <div class="row top_tiles">
+                    <div class="col-xs-12" style="margin-bottom: 10px">
+                    @if(response.lstProBras.length > 0) {
+                        <span class="hvr-pulse titDropdown">Bras:</span>
+                        <ul class="slBras">
+                            <li>All</li>
+                            @for(region <- response.lstProBras.map(x => x._1).distinct.sorted) {
+                                <li data-dropdown-text="@region">
+                                    <ul>
+                                    @for(province <- response.lstProBras.filter(x => x._1 == region).map(x => x._2).distinct.sorted) {
+                                        <li data-dropdown-text="@province">
+                                            <ul>
+                                            @for(bras <- response.lstProBras.filter(x => x._1 == region && x._2 == province).map(x => x._3)) {
+                                                <li>@bras</li>
+                                            }
+                                            </ul>
+                                        </li>
+                                    }
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    </div>
                 </div>
-            </div>
-            <div class="row top_tiles">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="x_panel tile">
-                        <div class="x_title">
-                            <h2 style="font-weight: 500;
-                                font-size: 24px">  Signin & Logoff By Time</h2>
-                            <i class="fa fa-info-circle toolTipText" title="Thống kê hoạt động kết nối ra vào mạng của KHG theo từng BRAS, ngày và vị trí địa lý"></i>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content" style="text-align: center">
-                        @if(response.sigLogByHourly.signin.length >0 || response.sigLogByHourly.logoff.length >0) {
-                            <div id="col-lineSigLog" style="height: 250px;"></div>
-                        }else{
-                            <span style="font-size: 13px">Not find data on @day</span>
-                        }
+            @if(province == "") {
+                <div class="row top_tiles">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel tile">
+                            <div class="x_title">
+                                <h2 style="font-weight: 500;
+                                    font-size: 24px">  Signin & Logoff By Time</h2>
+                                <i class="fa fa-info-circle toolTipText" title="Thống kê hoạt động kết nối ra vào mạng của KHG theo từng BRAS, ngày và vị trí địa lý"></i>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content" style="text-align: center">
+                            @if(response.sigLogByHourly.signin.length >0 || response.sigLogByHourly.logoff.length >0) {
+                                <div id="col-lineSigLog" style="height: 250px;"></div>
+                            }else{
+                                <span style="font-size: 13px">Not find data on @day</span>
+                            }
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
             <div class="row top_tiles">
                 <div class="col-xs-12">
                     <div class="x_panel tile">
@@ -338,7 +351,7 @@
                         <div class="x_content" style="text-align: center">
                         @if(response.rsErrorHostDaily.length >0) {
                             <div class="container">
-                                <ul class="nav nav-pills nav-stacked col-md-2" style="margin-top: 40px">
+                                <ul class="nav nav-pills nav-stacked col-md-2" id="frameTime" style="margin-top: 40px">
                                     <li name="0" style="cursor: pointer" class="active"><a data-toggle="pill" style="width: 50%">HOURLY</a></li>
                                     <li name="1" style="cursor: pointer"><a data-toggle="pill" style="width: 50%">FRAME TIME</a></li>
                                 </ul>
@@ -353,24 +366,27 @@
                     </div>
                 </div>
             </div>
-            <div class="row top_tiles">
-                <div class="col-xs-12">
-                    <div class="x_panel tile">
-                        <div class="x_title">
-                            <h2 style="font-weight: 500;font-size: 24px"> Nerror (kibana & opview) By Time</h2>
-                            <i class="fa fa-info-circle toolTipText" title="Thống kê số lần lỗi thiết bị BRAS (kibana) và số lần thay đổi trạng thái của các service quản lý (opsview) trên từng BRAS theo ngày giờ"></i>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content" style="text-align: center">
-                        @if(response.kibanaOpsview._1.length > 0 || response.kibanaOpsview._1.length >0) {
-                            <div id="int-col-hourly" style="height: 250px;"></div>
-                        }else{
-                            <span style="font-size: 13px">Not find data on @day</span>
-                        }
+                @if(province == "") {
+                    <div class="row top_tiles">
+                        <div class="col-xs-12">
+                            <div class="x_panel tile">
+                                <div class="x_title">
+                                    <h2 style="font-weight: 500;
+                                        font-size: 24px"> Nerror (kibana & opview) By Time</h2>
+                                    <i class="fa fa-info-circle toolTipText" title="Thống kê số lần lỗi thiết bị BRAS (kibana) và số lần thay đổi trạng thái của các service quản lý (opsview) trên từng BRAS theo ngày giờ"></i>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content" style="text-align: center">
+                                @if(response.kibanaOpsview._1.length > 0 || response.kibanaOpsview._1.length > 0) {
+                                    <div id="int-col-hourly" style="height: 250px;"></div>
+                                } else {
+                                    <span style="font-size: 13px">Not find data on @day</span>
+                                }
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                }
         }else{
             <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
         }
@@ -631,7 +647,7 @@
                             // _type: 0 hourly time
                             // _type: 1 frame time
                             $.ajax({
-                                url: "/daily/getInfErrHourly?_type=0&id=" + $(this).attr('name')+"&day="+$('#day').val()+"&bras="+$('#bras').val(),
+                                url: "/daily/getInfErrHourly?_type=0&id=" + $(this).attr('name')+"&day="+$('#day').val()+"&bras="+$('#bras').val()+"&province="+$('#provinceRole').val(),
                                 cache: false,
                                 success: function (dta) {
                                     if(dta != "Error"){
@@ -768,7 +784,7 @@
                             ]
                         });
                     }
-                    @if(response.kibanaOpsview._1.length > 0 || response.kibanaOpsview._1.length >0){
+                    @if(response.kibanaOpsview._1.length > 0 || response.kibanaOpsview._2.length >0){
                         var kiba_opsv_hourly = Highcharts.chart('int-col-hourly', {
                             chart: {
                                 zoomType: 'xy'
@@ -1117,17 +1133,21 @@
                         var brasId = $(this).find('.dropdown-text').text()
                         $('#bras').val((brasId == "All") ? "*" : brasId)
                         $.ajax({
-                            url: "/daily/getDailyBrasLocation?id=" + brasId+"&day="+$('#day').val(),
+                            url: "/daily/getDailyBrasLocation?id=" + brasId+"&day="+$('#day').val()+ "&province="+$('#provinceRole').val()+"&_type="+$('#frameTime').find('.active').attr("name"),
                             cache: false,
                             success: function (dta) {
                                 if(dta != "Error"){
-                                    line_siglog.series[0].setData(dta.sigLogBytime.signin)
-                                    line_siglog.series[1].setData(dta.sigLogBytime.logoff)
-                                    line_siglog.series[2].setData(dta.sigLogBytime.signin_clients)
-                                    line_siglog.series[3].setData(dta.sigLogBytime.logoff_clients)
-                                    kiba_opsv_hourly.series[0].setData(dta.kibanaOpsview.kibana)
-                                    kiba_opsv_hourly.series[1].setData(dta.kibanaOpsview.opsview)
-                                    heat_mapInfTab.series[0].setData(getErrorHourlyHeatmap(dta.errorHourly),true,true,false)
+                                    // for author role
+                                    if($('#provinceRole').val() == ""){
+                                        line_siglog.series[0].setData(dta.sigLogBytime.signin)
+                                        line_siglog.series[1].setData(dta.sigLogBytime.logoff)
+                                        line_siglog.series[2].setData(dta.sigLogBytime.signin_clients)
+                                        line_siglog.series[3].setData(dta.sigLogBytime.logoff_clients)
+                                        kiba_opsv_hourly.series[0].setData(dta.kibanaOpsview.kibana)
+                                        kiba_opsv_hourly.series[1].setData(dta.kibanaOpsview.opsview)
+                                    }
+                                    heat_mapInfTab.xAxis[0].update({categories: dta.errorHourly.cates})
+                                    heat_mapInfTab.series[0].setData(getErrorHourlyHeatmap(dta.errorHourly.data), true,true,false)
                                 }
                             }
                         })
@@ -1325,7 +1345,7 @@
                     // for inf errors funnel charts
                     function callDrillDownInfErrors(cates, _type) {
                         $.ajax({
-                            url: "/daily/ddInferrorDaily?id=" + cates+"&day="+$('#day').val()+"&err="+$('#typeInfErr').val(),
+                            url: "/daily/ddInferrorDaily?id=" + cates+"&day="+$('#day').val()+"&err="+$('#typeInfErr').val()+"&province="+$('#provinceRole').val(),
                             cache: false,
                             success: function (dta) {
                                 if(dta != "Error" && dta.data.length >0){
@@ -1533,7 +1553,7 @@
                     //drilldown heat map Inf Outliers
                     function callDrilldownInfOutlier(cates, _type){
                         $.ajax({
-                            url: "/daily/ddInfOutlier?id=" + cates+"&day="+$('#day').val(),
+                            url: "/daily/ddInfOutlier?id=" + cates+"&day="+$('#day').val()+"&province="+$('#provinceRole').val(),
                             cache: false,
                             success: function (dta) {
                                 if(dta != "Error" && dta.data.length >0){

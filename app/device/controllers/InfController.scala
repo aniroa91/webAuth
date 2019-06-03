@@ -5,6 +5,7 @@ import controllers.Secured
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import device.utils.LocationUtils
 import model.device.InfResponse
 import play.api.Logger
 import play.api.libs.json.Json
@@ -27,23 +28,26 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
 
   def inf(id: String) =  withAuth { username => implicit request =>
     try {
+      val province = if(request.session.get("verifiedLocation").get.equals("1")){
+        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      } else ""
       val t01 = System.currentTimeMillis()
-      val infDown = Await.result(BrasService.getInfDownMudule("*"),Duration.Inf)
+      val infDown = Await.result(BrasService.getInfDownMudule(province),Duration.Inf)
       logger.info("t01: " + (System.currentTimeMillis() - t01))
       val t02 = System.currentTimeMillis()
-      val userDown = Await.result(BrasService.getUserDownMudule("*"),Duration.Inf)
+      val userDown = Await.result(BrasService.getUserDownMudule(province),Duration.Inf)
       logger.info("t02: " + (System.currentTimeMillis() - t02))
       val t03 = System.currentTimeMillis()
-      val spliter = Await.result(BrasService.getSpliterMudule("*"),Duration.Inf)
+      val spliter = Await.result(BrasService.getSpliterMudule(province),Duration.Inf)
       logger.info("t03: " + (System.currentTimeMillis() - t03))
       val t04 = System.currentTimeMillis()
-      val sfLofi = Await.result(BrasService.getSflofiMudule("*"),Duration.Inf)
+      val sfLofi = Await.result(BrasService.getSflofiMudule("*", province),Duration.Inf)
       logger.info("t04: " + (System.currentTimeMillis() - t04))
       val t05 = System.currentTimeMillis()
-      val indexRouge = BrasService.getIndexRougeMudule("*")
+      val indexRouge = BrasService.getIndexRougeMudule(province)
       logger.info("t05: " + (System.currentTimeMillis() - t05))
       val t06 = System.currentTimeMillis()
-      val totalOutlier = Await.result(BrasService.getTotalOutlier(), Duration.Inf).sum
+      val totalOutlier = Await.result(BrasService.getTotalOutlier(province), Duration.Inf).sum
       logger.info("t06: " + (System.currentTimeMillis() - t06))
       logger.info("time: " + (System.currentTimeMillis() - t01))
       Ok(device.views.html.inf(username,InfResponse(userDown,infDown,spliter,sfLofi,indexRouge,totalOutlier),id))
@@ -55,8 +59,11 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
 
   def getSigLogInfjson(id: String) = Action { implicit request =>
     try{
+      val province = if(request.session.get("verifiedLocation").get.equals("1")){
+        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      } else ""
       val resSiglog = BrasService.getSigLogInfjson(id.trim())
-      val resError =  Await.result(BrasService.getErrorHistory(id.trim()),Duration.Inf)
+      val resError =  Await.result(BrasService.getErrorHistory(id.trim(), province),Duration.Inf)
       val jsError = Json.obj(
         "time" -> resError.map(x=>x._1.substring(0,x._1.indexOf("."))),
         "error" -> resError.map({ x =>x._2})
@@ -80,13 +87,14 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
 
   def exportCSV(date: String) = Action { implicit request =>
     try{
-      //println(date)
-      var status = "Ok"
-      val t01 = System.currentTimeMillis()
-      val sfLofi = Await.result(BrasService.getSflofiMudule(date), Duration.Inf)
+      println(date)
+      val province = if(request.session.get("verifiedLocation").get.equals("1")){
+        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      } else ""
+      val t0 = System.currentTimeMillis()
+      val sfLofi = Await.result(BrasService.getSflofiMudule(date, province), Duration.Inf)
         .map(x => (x._1, x._2, x._3, x._7, x._8, x._4, x._5, x._9, x._10)).toArray
-      logger.info("timSf: " + (System.currentTimeMillis() - t01))
-      //val data = Array(("Date Time", "Module", "Host", "User Down", "Inf Down", "Sf Error", "Lofi Error", "Rouge Error", "Lost Signal")) ++: sfLofi
+      logger.info("timSf: " + (System.currentTimeMillis() - t0))
       val rs = Json.obj(
         "data" -> sfLofi
       )
@@ -99,21 +107,31 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
 
   def getHostMonitor(host: String) = Action { implicit request =>
     try{
-      //val t02 = System.currentTimeMillis()
-      val rsHost =  Await.result(BrasService.getHostMonitor(host),Duration.Inf)
-      val rsGraph = BrasService.getSiglogContract(host)
-      val sigLog = rsHost.map(x=> (x._1,x._2,x._3,CommonService.getSigLogByNameContract(x._3,rsGraph)))
-      val jsInf = Json.obj(
-        "host" -> sigLog,
-        "module" -> rsHost.map(x=> x._1).distinct,
-        "totalClient"-> rsHost.map(x=> x._3).distinct.length,
-        "totalSpliter"-> rsHost.map(x=> x._2).distinct.length,
-        "totalModule"-> rsHost.map(x=> x._1).distinct.length,
-        "totalSignin" -> sigLog.filter(x=> x._4 == "SignIn").length,
-        "totalLogoff" -> sigLog.filter(x=> x._4 == "LogOff").length
-      )
-      //println("time: "+(System.currentTimeMillis() - t02))
-      Ok(Json.toJson(jsInf))
+      val province = if(request.session.get("verifiedLocation").get.equals("1")){
+        // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
+        // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
+        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      } else ""
+      if(province.equals("") || host.substring(0,3).equals(province)) {
+        val t02 = System.currentTimeMillis()
+        val rsHost = Await.result(BrasService.getHostMonitor(host), Duration.Inf)
+        val rsGraph = BrasService.getSiglogContract(host)
+        val sigLog = rsHost.map(x => (x._1, x._2, x._3, CommonService.getSigLogByNameContract(x._3, rsGraph)))
+        val jsInf = Json.obj(
+          "host" -> sigLog,
+          "module" -> rsHost.map(x => x._1).distinct,
+          "totalClient" -> rsHost.map(x => x._3).distinct.length,
+          "totalSpliter" -> rsHost.map(x => x._2).distinct.length,
+          "totalModule" -> rsHost.map(x => x._1).distinct.length,
+          "totalSignin" -> sigLog.filter(x => x._4 == "SignIn").length,
+          "totalLogoff" -> sigLog.filter(x => x._4 == "LogOff").length
+        )
+        println("time: " + (System.currentTimeMillis() - t02))
+        Ok(Json.toJson(jsInf))
+      }
+      else{
+        Ok("permission")
+      }
     }
     catch{
       case e: Exception => Ok("error")

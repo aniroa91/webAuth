@@ -106,7 +106,8 @@ case class DailyResponse(
                         rsErrorHostDaily: Array[(String, Double, Double, Double, Double,Double,Double,Double)],
                         brasOutlier:   Array[(String, Int)],
                         infOutlier :   Array[(String, Int)],
-                        ticketIssue: (Seq[(String, String, String, Int)], Seq[(String, String, String, Int)])
+                        ticketIssue: (Seq[(String, String, String, Int)], Seq[(String, String, String, Int)]),
+                        lstProBras: Array[(String, String,String)]
                         )
 
 case class BrasResponse(

@@ -3,6 +3,7 @@ package controllers
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import device.utils.LocationUtils
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 
@@ -21,7 +22,12 @@ import services.domain.CommonService
 class ExportController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
   def index =  withAuth { username => implicit request =>
-    Ok(device.views.html.export.index(username, controllers.routes.ExportController.index()))
+    val province = if(request.session.get("verifiedLocation").get.equals("1")){
+      // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
+      // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+    } else ""
+    Ok(device.views.html.export.index(username, province, controllers.routes.ExportController.index()))
   }
 
   def exportData() = withAuth {username => implicit request =>

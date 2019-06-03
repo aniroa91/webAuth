@@ -22,10 +22,10 @@ object ProblemService extends AbstractService{
         .as[(String, String)])
   }
 
-  def listProvinceByWeek(week: String): Future[Seq[(String, String, Long)]] = {
+  def listProvinceByWeek(week: String, province: String): Future[Seq[(String, String, Long)]] = {
     val startDate = week.split("->")(0).trim
     dbConfig.db.run(
-      sql"""select province, device_type, sum(n_prob_device) from dmt_weekly_mapping where week = $startDate::TIMESTAMP
+      sql"""select province, device_type, sum(n_prob_device) from dmt_weekly_mapping where week = $startDate::TIMESTAMP and province ~* $province
             group by province, device_type having sum(n_prob_device) >0
             """
         .as[(String, String, Long)])

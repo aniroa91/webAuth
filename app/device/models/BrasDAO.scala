@@ -50,20 +50,20 @@ object BrasDAO {
         .as[(String, Long)])
   }
 
-  def getTopConnectMonthly() = {
+  def getTopConnectMonthly(province: String) = {
     dbConfig.db.run(
       sql"""select month, sum(signin), sum(logoff)
-            from dmt_overview_conn where month >='2018-06-01'::TIMESTAMP
+            from dmt_overview_conn where month >='2018-06-01'::TIMESTAMP and province ~* $province
             group by month
             order by month
                   """
         .as[(String, Long, Long)])
   }
 
-  def getTopInfErrMonthly() = {
+  def getTopInfErrMonthly(province: String) = {
     dbConfig.db.run(
       sql"""select month, sum(total_inf)
-            from dmt_overview_inf where month >='2018-06-01'::TIMESTAMP
+            from dmt_overview_inf where month >='2018-06-01'::TIMESTAMP and province ~* $province
             group by month
             order by month
                   """
@@ -100,10 +100,10 @@ object BrasDAO {
         .as[(String, Long, Long, Long, Long)])
   }
 
-  def getTopServInfErrMonthly() = {
+  def getTopServInfErrMonthly(province: String) = {
     dbConfig.db.run(
       sql"""select month, sum(inf_down),sum(user_down),sum(sf_error),sum(lofi_error), sum(lost_signal), sum(rouge_error)
-            from dmt_overview_inf
+            from dmt_overview_inf where province ~* $province
             group by month
             order by month
                   """
@@ -120,13 +120,13 @@ object BrasDAO {
         .as[(String, Long)])
   }
 
-  def getSuyhaoByMonth(month: String): Future[Seq[(String, Int, Int)]] = {
+  def getSuyhaoByMonth(month: String, province: String): Future[Seq[(String, Int, Int)]] = {
     val currMonth = month+"-01"
     val prevMonth = CommonService.getPreviousMonth(month)+"-01"
     dbConfig.db.run(
       sql"""select month, sum(passed_suyhao), sum(not_passed_suyhao)
             from dmt_overview_suyhao
-            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP and province ~* $province
             group by month
             order by month desc
                   """
@@ -146,39 +146,39 @@ object BrasDAO {
         .as[(String, Int, Int)])
   }
 
-  def getInfOutlierByMonth(month: String): Future[Seq[(String, Int, Int, Int, Int,Int, Int, Int, Int, Int, Int)]] = {
+  def getInfOutlierByMonth(month: String,province: String): Future[Seq[(String, Int, Int, Int, Int,Int, Int, Int, Int, Int, Int)]] = {
     val currMonth = month+"-01"
     val prevMonth = CommonService.getPreviousMonth(month)+"-01"
     dbConfig.db.run(
       sql"""select month, sum(total_outliers), sum(total_clients), sum(inf_down_clients), sum(inf_down_outliers), sum(user_down_clients), sum(user_down_outliers), sum(sf_clients), sum(sf_outliers), sum(lost_signal_clients), sum(lost_signal_outliers)
             from dmt_overview_inf_outlier
-            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP and province ~* $province
             group by month
             order by month desc
                   """
         .as[(String, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)])
   }
 
-  def getDeviceByMonth(month: String): Future[Seq[(String, Int, Int, Int, Int)]] = {
+  def getDeviceByMonth(month: String,province: String): Future[Seq[(String, Int, Int, Int, Int)]] = {
     val currMonth = month+"-01"
     val prevMonth = CommonService.getPreviousMonth(month)+"-01"
     dbConfig.db.run(
       sql"""select month, sum(no_contract), sum(no_device), sum(not_poor_conn), sum(poor_conn)
             from dmt_overview_device
-            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP and province ~* $province
             group by month
             order by month desc
                   """
         .as[(String, Int, Int, Int, Int)])
   }
 
-  def getInfErrorByMonth(month: String): Future[Seq[(String, Int, Int, Int, Int, Int, Int, Int)]] = {
+  def getInfErrorByMonth(month: String,province: String): Future[Seq[(String, Int, Int, Int, Int, Int, Int, Int)]] = {
     val currMonth = month+"-01"
     val prevMonth = CommonService.getPreviousMonth(month)+"-01"
     dbConfig.db.run(
       sql"""select month, sum(total_inf), sum(inf_down), sum(user_down), sum(lost_signal), sum(sf_error), sum(lofi_error), sum(rouge_error)
             from dmt_overview_inf
-            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP
+            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP and province ~* $province
             group by month
             order by month desc
                   """
@@ -240,14 +240,14 @@ object BrasDAO {
         .as[(String,String,String)])
   }
 
-  def getSpliterMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+  def getSpliterMudule(province: String): Future[Seq[(String,String,String,Int)]] = {
     val dt = new DateTime();
     val aDay = dt.minusHours(12);
     val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""select date_time,host,splitter,sum(lost_signal)
             from dwh_inf_splitter
-            where date_time >= $aDayTime::TIMESTAMP AND lost_signal>0
+            where date_time >= $aDayTime::TIMESTAMP AND lost_signal>0 and bras_id ~* $province
             group by date_time,host,splitter
             order by date_time desc
                   """
@@ -274,7 +274,7 @@ object BrasDAO {
     )
   }
 
-  def getErrorHistory(id: String): Future[Seq[(String,Int)]] = {
+  def getErrorHistory(id: String, province: String): Future[Seq[(String,Int)]] = {
     val time = id.split("/")(0)
     val host = id.split("/")(1)
     val module = id.split("/")(2)
@@ -282,7 +282,7 @@ object BrasDAO {
     dbConfig.db.run(
       sql"""select date_time,(sum(user_down)+sum(inf_down)+sum(sf_error)+sum(lofi_error)) errors
             from dwh_inf_module
-            where host = $host and module = $module and date_time <$time::TIMESTAMP and date_time >= $nowDay::TIMESTAMP and label = 1
+            where host = $host and module = $module and date_time <$time::TIMESTAMP and date_time >= $nowDay::TIMESTAMP and label = 1 and bras_id ~* $province
             group by date_time
             order by date_time desc
                   """
@@ -365,19 +365,19 @@ object BrasDAO {
         .as[(String,Int,Int,Int,Int)])
   }
 
-  def getTotalOutlier(): Future[Seq[(Int)]] = {
+  def getTotalOutlier(province: String): Future[Seq[(Int)]] = {
     val dt = new DateTime();
     val currentTime = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     val nowDay = CommonService.getCurrentDay()
     dbConfig.db.run(
       sql"""select count(*)
             from dwh_inf_module
-            where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP AND label =1
+            where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP AND label =1 and bras_id ~* $province
                   """
         .as[(Int)])
   }
 
-  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int,Int,String)]] = {
+  def getSflofiMudule(queries: String, province: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int,Int,String)]] = {
     val dt = new DateTime();
     var currentTime = dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     if(!queries.equals("*")) currentTime = CommonService.getNextDay(queries)
@@ -389,12 +389,13 @@ object BrasDAO {
                   from
                        (select date_time,host,module,sum(sf_error) sf_error,sum(lofi_error) lofi_error,sum(cast(confirm as int)) confirm,sum(user_down) user_down,sum(inf_down) inf_down,sum(rouge_error) rouge_error
                         from dwh_inf_module
-                        where date_time >= $nowDay::TIMESTAMP and date_time < $currentTime::TIMESTAMP AND label =1
+                        where date_time >= $nowDay::TIMESTAMP and date_time < $currentTime::TIMESTAMP AND label =1 and bras_id ~* $province
                         group by date_time,host,module
                         order by date_time desc) A
                    left join
-                   (select distinct x.host, x.splitter, x.module, y.date_time from dwh_user_info x, dwh_inf_splitter y where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP and x.host = y.host and x.splitter = y.splitter) B
-                   on A.host = B.host and A.module = B.module and B.date_time between A.date_time - interval '15 minutes' and A.date_time
+                   (select distinct x.host, x.splitter, x.module, y.date_time from dwh_user_info x, dwh_inf_splitter y
+                    where date_time >= $nowDay::TIMESTAMP and date_time <= $currentTime::TIMESTAMP and bras_id ~* $province and x.host = y.host and x.splitter = y.splitter) B
+                    on A.host = B.host and A.module = B.module and B.date_time between A.date_time - interval '15 minutes' and A.date_time
             ) tb
             group by tb.date_time,tb.host,tb.module
             order by tb.date_time desc
@@ -411,12 +412,11 @@ object BrasDAO {
         .as[(String,String,String,Int,Int,Int,Int,Int)])*/
   }
 
-  def getIndexRougeMudule(userInf_down: String): Array[(String,String,String,String,Int)] = {
+  def getIndexRougeMudule(province: String): Array[(String,String,String,String,Int)] = {
     val dt = CommonService.getCurrentDay()
-
     val rs = client.execute(
       search(s"infra_dwh_inf_index_*" / "docs")
-        query { must(rangeQuery("rouge_error").gt(0),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(dt))) }
+        query { must(rangeQuery("rouge_error").gt(0),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(dt)), prefixQuery("bras_id", s"$province")) }
         aggregations (
         termsAggregation("date_time")
           .field("date_time")
@@ -435,11 +435,10 @@ object BrasDAO {
                   )
             )
          )
-      )
+      ) size 0
     ).await
 
     val mapRouge = CommonService.getMultiAggregationsAndSum(rs.aggregations.get("date_time"),"host","module","index")
-
     mapRouge.flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 , x._2._1,x._2._2))
       .flatMap(x => x._3.map(y => (x._1,x._2) -> y))
@@ -447,39 +446,30 @@ object BrasDAO {
       .flatMap(x => x._4.map(y => (x._1,x._2,x._3) -> y))
       .map(x => (CommonService.formatUTC(x._1._1), x._1._2, x._1._3 , x._2._1, x._2._2.toInt))
       .sortWith((x,y)=> x._1>y._1)
-
-   /* dbConfig.db.run(
-      sql"""select date_time,host,module,index,sum(rouge_error)
-            from dwh_inf_index
-            where date_time >= $dt::TIMESTAMP AND rouge_error >0
-            group by date_time,host,module,index
-            order by date_time desc
-                  """
-        .as[(String,String,String,String,Int)])*/
   }
 
-  def getUserDownMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+  def getUserDownMudule(province: String): Future[Seq[(String,String,String,Int)]] = {
     val dt = new DateTime();
     val aDay = dt.minusHours(12);
     val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""select date_time,host,module,sum(user_down)
             from dwh_inf_module
-            where date_time >= $aDayTime::TIMESTAMP AND user_down>0
+            where date_time >= $aDayTime::TIMESTAMP AND user_down>0 and bras_id ~* $province
             group by date_time,host,module
             order by date_time desc
                   """
         .as[(String,String,String,Int)])
   }
 
-  def getInfDownMudule(userInf_down: String): Future[Seq[(String,String,String,Int)]] = {
+  def getInfDownMudule(province: String): Future[Seq[(String,String,String,Int)]] = {
     val dt = new DateTime();
     val aDay = dt.minusHours(12);
     val aDayTime = aDay.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"))
     dbConfig.db.run(
       sql"""select date_time,host,module,sum(inf_down)
             from dwh_inf_module
-            where date_time >= $aDayTime::TIMESTAMP AND inf_down>0
+            where date_time >= $aDayTime::TIMESTAMP AND inf_down>0 and bras_id ~* $province
             group by date_time,host,module
             order by date_time desc
                   """
@@ -497,24 +487,24 @@ object BrasDAO {
         .as[(String,String,String,Int)])
   }
 
-  def getOutlierMonthly(fromMonth: String,toMonth: String, name: String) = {
+  def getOutlierMonthly(fromMonth: String,toMonth: String, name: String,province: String) = {
     val colSum = if(name == "bras") "no_outliers" else "total_outliers"
     val db = s"dmt_overview_${name}_outlier"
     dbConfig.db.run(
       sql"""select bras_id, sum(#$colSum)
             from #$db
-            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP AND province ~* $province
             group by bras_id
             """
         .as[(String, Int)]
     )
   }
 
-  def getProvinceContract(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int,Int)]] = {
+  def getProvinceContract(fromMonth: String,toMonth: String,province: String): Future[Seq[(String,String,String,Int,Int,Int)]] = {
     dbConfig.db.run(
       sql"""select month,province,host,sum(no_contract) as no_contract,sum(no_device) as no_device,sum(poor_conn) as poor_conn
             from dmt_overview_device
-            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP and province ~* $province
             group by month,province,host
             order by month desc, province
                   """
@@ -544,11 +534,11 @@ object BrasDAO {
         .as[(String,String,Double,Double)])
   }
 
-  def getProvinceTotalInf(fromMonth: String,toMonth: String): Future[Seq[(String,String,Double)]] = {
+  def getProvinceTotalInf(fromMonth: String,toMonth: String, province: String): Future[Seq[(String,String,Double)]] = {
     dbConfig.db.run(
       sql"""select month,province,sum(total_inf) as total_inf
             from dmt_overview_inf
-            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP AND province ~* $province
             group by month,province
             order by month desc
                   """
@@ -556,12 +546,12 @@ object BrasDAO {
   }
 
   // for daily data
-  def getInfErrorsDaily(day: String, _type: String) = {
+  def getInfErrorsDaily(day: String, province: String) = {
     val nextDay = CommonService.getNextDay(day)
     dbConfig.db.run(
       sql"""select bras_id,host, sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error), sum(rouge_error), sum(lost_signal)
             from dwh_inf_host
-            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and bras_id ~* $province
             group by bras_id,host
             """
         .as[(String, String, Double, Double, Double, Double,Double, Double)]
@@ -580,12 +570,12 @@ object BrasDAO {
     )
   }
 
-  def getInfAccessOutlierDaily(day: String) = {
+  def getInfAccessOutlierDaily(day: String, province: String) = {
     val nextDay = CommonService.getNextDay(day)
     dbConfig.db.run(
       sql"""select bras_id, host,count(*)
             from dwh_inf_module
-            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label = 1
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label = 1 and bras_id ~* $province
             group by bras_id,host
             """
         .as[(String, String, Int)]
@@ -616,13 +606,13 @@ object BrasDAO {
       )
   }
 
-  def getErrorHostdaily(bras: String, day: String) = {
+  def getErrorHostdaily(bras: String, day: String, province: String) = {
     val nextDay = CommonService.getNextDay(day)
     if(bras.equals("*")){
       dbConfig.db.run(
         sql"""select extract(hour from  date_time) as hourly, sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error),sum(rouge_error),sum(lost_signal),sum(jumper_error)
             from dwh_inf_host
-            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and bras_id ~* $province
             group by hourly
             order by hourly
             """
@@ -633,7 +623,7 @@ object BrasDAO {
       dbConfig.db.run(
         sql"""select extract(hour from  date_time) as hourly, sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error),sum(rouge_error),sum(lost_signal),sum(jumper_error)
             from dwh_inf_host
-            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and bras_id = $bras
+            where date_time >= $day::TIMESTAMP and date_time < $nextDay::TIMESTAMP and bras_id ~* $province and bras_id = $bras
             group by hourly
             order by hourly
             """
@@ -719,11 +709,11 @@ object BrasDAO {
         .as[(String,String,Double)])
   }
 
-  def getProvinceSuyhao(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int)]] = {
+  def getProvinceSuyhao(fromMonth: String,toMonth: String, province: String): Future[Seq[(String,String,String,Int,Int)]] = {
     dbConfig.db.run(
       sql"""select month,province,host,sum(not_passed_suyhao) as not_passed_suyhao,sum(not_passed_suyhao_clients) as not_passed_suyhao_clients
             from dmt_overview_suyhao
-            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
+            where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP AND province ~* $province
             group by month,province,host
             order by month desc, province
                   """
@@ -807,27 +797,25 @@ object BrasDAO {
     }
   }
 
-  def getProvinceInfDownError(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]] = {
+  def getProvinceInfDownError(month: String,province:String): Future[Seq[(String,String,Int,Int,Int,Int)]] = {
     if(month.indexOf("/")>=0) {
       val fromMonth = month.split("/")(0)
       val toMonth = month.split("/")(1)
       dbConfig.db.run(
-        sql"""select province,bras_id,sum(inf_down) as inf_down,sum(user_down) as user_down,sum(rouge_error) as rouge_error,
-                                   sum(lost_signal) as lost_signal
-                           from dmt_overview_inf
-                           where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP
-                           group by province,bras_id
+        sql"""select province,bras_id,sum(inf_down) as inf_down,sum(user_down) as user_down,sum(rouge_error) as rouge_error, sum(lost_signal) as lost_signal
+              from dmt_overview_inf
+              where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP AND province ~* $province
+              group by province,bras_id
               order by province,bras_id
                   """
           .as[(String,String,Int,Int,Int,Int)])
     } else{
       val query = month + "-01"
       dbConfig.db.run(
-        sql"""select province,bras_id,sum(inf_down) as inf_down,sum(user_down) as user_down,sum(rouge_error) as rouge_error,
-                                   sum(lost_signal) as lost_signal
-                           from dmt_overview_inf
-                           where month =  $query::TIMESTAMP
-                           group by province,bras_id
+        sql"""select province,bras_id,sum(inf_down) as inf_down,sum(user_down) as user_down,sum(rouge_error) as rouge_error,sum(lost_signal) as lost_signal
+              from dmt_overview_inf
+              where month =  $query::TIMESTAMP AND province ~* $province
+              group by province,bras_id
               order by province,bras_id
                   """
           .as[(String,String,Int,Int,Int,Int)])
@@ -880,7 +868,7 @@ object BrasDAO {
         .as[(String,String,Int,Int)])
   }
 
-  def topInfOut(month: String): Future[Seq[(String,String,Int)]] = {
+  def topInfOut(month: String, province: String): Future[Seq[(String,String,Int)]] = {
     val query = month + "-01"
     dbConfig.db.run(
       sql"""select d.province,d.bras_id,d.total_outliers from(
@@ -890,7 +878,7 @@ object BrasDAO {
                        from dmt_overview_inf_outlier a,
                             (select province
                              from dmt_overview_inf_outlier
-                             where month = $query::TIMESTAMP
+                             where month = $query::TIMESTAMP and province ~* $province
                              group by province
                              having sum(total_outliers) >0
                              order by sum(total_outliers) desc
@@ -972,7 +960,7 @@ object BrasDAO {
         .as[(String,String,Int)])
   }
 
-  def getTopInf(month: String,typeInferr: String): Future[Seq[(String,String, String,Int)]] = {
+  def getTopInf(month: String,typeInferr: String, province: String): Future[Seq[(String,String, String,Int)]] = {
     val query = month + "-01"
     dbConfig.db.run(
       sql"""select d.province,d.bras_id,d.host,d.total_inf from(
@@ -982,7 +970,7 @@ object BrasDAO {
                        from dmt_overview_inf a,
                             (select province
                              from dmt_overview_inf
-                             where month = $query::TIMESTAMP
+                             where month = $query::TIMESTAMP and province ~* $province
                              group by province
                              order by sum(#$typeInferr) desc
                              limit 20) b
@@ -995,7 +983,7 @@ object BrasDAO {
         .as[(String,String,String,Int)])
   }
 
-  def getTopnotSuyhao(month: String): Future[Seq[(String,String,Int,Int)]] = {
+  def getTopnotSuyhao(month: String, province: String): Future[Seq[(String,String,Int,Int)]] = {
     val query = month + "-01"
     dbConfig.db.run(
       sql"""select d.province,d.host,d.suyhao,d.suy_clients from(
@@ -1005,7 +993,7 @@ object BrasDAO {
                        from dmt_overview_suyhao a,
                             (select province
                              from dmt_overview_suyhao
-                             where month = $query::TIMESTAMP
+                             where month = $query::TIMESTAMP and province ~* $province
                              group by province
                              having sum(not_passed_suyhao) >0
                              order by sum(not_passed_suyhao) desc
@@ -1018,7 +1006,7 @@ object BrasDAO {
         .as[(String,String,Int,Int)])
   }
 
-  def getTopPoorconn(month: String,typeOLTpoor:String): Future[Seq[(String,String,Int)]] = {
+  def getTopPoorconn(month: String,typeOLTpoor:String,province: String): Future[Seq[(String,String,Int)]] = {
     val query = month + "-01"
     dbConfig.db.run(
       sql"""select d.province,d.host,d.conn from(
@@ -1028,7 +1016,7 @@ object BrasDAO {
                        from dmt_overview_device a,
                             (select province
                              from dmt_overview_device
-                             where month = $query::TIMESTAMP
+                             where month = $query::TIMESTAMP and province ~* $province
                              group by province
                              having sum(#$typeOLTpoor) >0
                              order by sum(#$typeOLTpoor) desc

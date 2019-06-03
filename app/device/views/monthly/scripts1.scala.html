@@ -1,4 +1,4 @@
-@(response: model.device.RegionOverview )
+@(response: model.device.RegionOverview, province: String)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.getEndDate
 @import services.domain.CommonService.getStartDate
@@ -517,6 +517,288 @@
 
                 @if(response != null){
                 fntRightClick()
+                @if(province.equals("")){
+                        // Bar Logoff and Signin
+                        var categoriesSigLog = ["Vung 1", "Vung 2", "Vung 3", "Vung 4", "Vung 5", "Vung 6", "Vung 7"]
+                        Highcharts.chart('region-siglog-bar', {
+                                chart: {
+                                        type: 'bar'
+                                },
+                                title: {
+                                        text: ''
+                                },
+                                subtitle: {
+                                        text: ''
+                                },
+                                xAxis: [{
+                                        categories: categoriesSigLog,
+                                        reversed: false,
+                                }, { // mirror axis on right side
+                                        opposite: true,
+                                        reversed: false,
+                                        categories: categoriesSigLog,
+                                        linkedTo: 0,
+                                }],
+                                yAxis: {
+                                        title: {
+                                                text: null
+                                        },
+                                        labels: {
+                                                formatter: function () {
+                                                        return Math.abs(this.value);
+                                                }
+                                        },
+                                },
+
+                                plotOptions: {
+                                        series: {
+                                                events: {
+                                                        click: function (event) {
+                                                                callDrilldownSigLog(event.point.category)
+                                                        }
+                                                },
+                                                cursor: 'pointer',
+                                                stacking: 'normal'
+                                        }
+                                },
+
+                                tooltip: {
+                                        formatter: function () {
+                                                return '<b>' + this.series.name + '</b><br/><b>Region: ' + this.point.category + '</b><br/>'
+                                                        + '<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0) + '</b><br/>Total clients: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0);
+                                        }
+                                },
+
+                                series: getSigLogByRegionStacked(@Html(Json.stringify(Json.toJson(response.sigLogRegion.signin))), @Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff))), @Html(Json.stringify(Json.toJson(response.sigLogRegion.signin_clients))), @Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff_clients))), 0)
+                                /*[{
+                                    name: 'Signin',
+                                    color:'#669999',
+                                    data: Html(Json.stringify(Json.toJson(response.sigLogRegion.signin.map(x=> -x._2))))
+                                }, {
+                                    name: 'Logoff',
+                                    color:'#832d1d',
+                                    data: Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff.map(x=>x._2))))
+                                }]*/
+                        });
+                        // Total Opsview by Region
+                        Highcharts.chart('region-opsview', {
+                                chart: {
+                                        type: 'bar'
+                                },
+                                title: {
+                                        text: ''
+                                },
+                                xAxis: {
+                                        type:'category'
+                                },
+                                yAxis: {
+                                        min: 0,
+                                        title: {
+                                                text: ''
+                                        }
+                                },
+                                legend: {
+                                        reversed: true
+                                },
+                                plotOptions: {
+                                        series: {
+                                                stacking: 'normal',
+                                                point:{
+                                                        events:{
+                                                                contextmenu: function (e) {
+                                                                        if(e.target.point.name.indexOf('-') >=0)
+                                                                                window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                },
+                                series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),0),
+                                drilldown:{
+                                        drillUpButton:{
+                                                relativeTo: 'spacingBox',
+                                                position:{
+                                                        align:"right",
+                                                        verticalAlign:"top",
+                                                        x:10,
+                                                        y:-10
+                                                }
+                                        },
+                                        series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),'normal')
+                                }
+                        });
+                        // Total Opsview by Region
+                        Highcharts.chart('region-kibana', {
+                        chart: {
+                                type: 'bar'
+                        },
+                        title: {
+                                text: ''
+                        },
+                        xAxis: {
+                                type:'category'
+                        },
+                        yAxis: {
+                                min: 0,
+                                title: {
+                                        text: ''
+                                }
+                        },
+                        legend: {
+                                reversed: true
+                        },
+                        plotOptions: {
+                                series: {
+                                        stacking: 'normal',
+                                        point:{
+                                                events: {
+                                                        contextmenu: function (e) {
+                                                                if(e.target.point.name.indexOf('-') >=0)
+                                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                        }
+                                                }
+                                        }
+                                }
+                        },
+                        series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct))),1),
+                        drilldown:{
+                                drillUpButton:{
+                                        relativeTo: 'spacingBox',
+                                        position:{
+                                                align:"right",
+                                                verticalAlign:"top",
+                                                x:10,
+                                                y:-10
+                                        }
+                                },
+                                series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct))),'normal')}
+                });
+                        // Heatmap Opsview Types
+                        Highcharts.chart('region-opsview-heatmap', {
+                                chart: {
+                                        type: 'heatmap',
+                                        marginTop: 40,
+                                        marginBottom: 80,
+                                        plotBorderWidth: 1
+                                },
+
+                                title: {
+                                        text: ''
+                                },
+
+                                xAxis: {
+                                        categories: @Html(Json.stringify(Json.toJson(response.opsviewType.map(x=>x._1))))
+                                },
+
+                                yAxis: {
+                                        categories: ['ok_opsview','warn_opsview','unknown_opsview','crit_opsview'],
+                                        title: null
+                                },
+
+                                colorAxis: {
+                                        min: 0,
+                                        minColor: '#FFFFFF',
+                                        maxColor: '#1ABB9C'
+                                },
+
+                                legend: {
+                                        align: 'right',
+                                        layout: 'vertical',
+                                        margin: 0,
+                                        verticalAlign: 'top',
+                                        y: 25,
+                                        symbolHeight: 280
+                                },
+
+                                tooltip: {
+                                        formatter: function () {
+                                                return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                        this.point.value + '</b> ';
+                                        }
+                                },
+
+                                plotOptions: {
+                                        series: {
+                                                events: {
+                                                        click: function (event) {
+                                                                callDrilldownNoticeByStatus(event.point.series.xAxis.categories[event.point.x])
+                                                        }
+                                                },
+                                                dataLabels:{
+                                                        formatter:function(){
+                                                                var nf = new Intl.NumberFormat();
+                                                                return nf.format(this.point.value);
+                                                        }
+                                                },
+                                                cursor: 'pointer'
+                                        }
+                                },
+
+                                series: [{
+                                        name: 'Opsview types',
+                                        borderWidth: 1,
+                                        data: getDataHeatMap(@Html(Json.stringify(Json.toJson(response.opsviewType)))),
+                                        dataLabels: {
+                                                enabled: true,
+                                                color: '#000000'
+                                        }
+                                }]
+
+                        });
+                        // Noc Count alert By Region
+                        Highcharts.chart('region-nocCount', {
+
+                        legend: {
+                                enabled: true
+                        },
+                        title: {
+                                text: ''
+                        },
+                        yAxis: {
+                                title: {
+                                        text: 'Counts'
+                                }
+                        },
+                        xAxis: {
+                                type: 'category'
+                        },
+                        colors:['#f60'],
+
+                        plotOptions: {
+                                series: {
+                                        point: {
+                                                events: {
+                                                        contextmenu: function (e) {
+                                                                if($('#brasRighClick').val().indexOf('-') >=0)
+                                                                        window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
+                                                        },
+                                                        mouseOver: function () {
+                                                                if(this.name.indexOf('-')>=0)
+                                                                        $('#brasRighClick').val(this.name)
+                                                        }
+                                                }
+                                        }
+                                }
+                        },
+
+                        series: [{
+                                name:'Alert count',
+                                data: getDrillDownStackedAndLine( @Html(Json.stringify(Json.toJson(response.nocCount.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray))))
+                        }],
+                        drilldown:{
+                                drillUpButton:{
+                                        relativeTo: 'spacingBox',
+                                        position:{
+                                                align:"right",
+                                                verticalAlign:"top",
+                                                x:10,
+                                                y:-10
+                                        }
+                                },
+                                series: getDrillDownNotStacked2Level(@Html(Json.stringify(Json.toJson(response.nocCount.alertCount))),@Html(Json.stringify(Json.toJson(response.nocCount.alertCount.map(x=> x._1).toSeq.distinct.sorted.toArray))))
+                        }
+                });
+                }
                 Highcharts.chart('inf-outlier', {
                         chart: {
                                 type: 'heatmap',
@@ -656,99 +938,6 @@
                         }]
 
                 });
-                // Total Opsview by Region
-                Highcharts.chart('region-opsview', {
-                        chart: {
-                                type: 'bar'
-                        },
-                        title: {
-                                text: ''
-                        },
-                        xAxis: {
-                                type:'category'
-                        },
-                        yAxis: {
-                                min: 0,
-                                title: {
-                                        text: ''
-                                }
-                        },
-                        legend: {
-                                reversed: true
-                        },
-                        plotOptions: {
-                                series: {
-                                        stacking: 'normal',
-                                        point:{
-                                            events:{
-                                                    contextmenu: function (e) {
-                                                            if(e.target.point.name.indexOf('-') >=0)
-                                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
-                                                    }
-                                            }
-                                        }
-                                }
-                        },
-                        series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),0),
-                        drilldown:{
-                                drillUpButton:{
-                                        relativeTo: 'spacingBox',
-                                        position:{
-                                                align:"right",
-                                                verticalAlign:"top",
-                                                x:10,
-                                                y:-10
-                                        }
-                                },
-                                series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.opsviews))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.opsviews.map(x=> x._1).toSeq.distinct))),'normal')
-                        }
-                });
-                // Total Opsview by Region
-                Highcharts.chart('region-kibana', {
-                        chart: {
-                                type: 'bar'
-                        },
-                        title: {
-                                text: ''
-                        },
-                        xAxis: {
-                                type:'category'
-                        },
-                        yAxis: {
-                                min: 0,
-                                title: {
-                                        text: ''
-                                }
-                        },
-                        legend: {
-                                reversed: true
-                        },
-                        plotOptions: {
-                                series: {
-                                        stacking: 'normal',
-                                        point:{
-                                                events: {
-                                                        contextmenu: function (e) {
-                                                                if(e.target.point.name.indexOf('-') >=0)
-                                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
-                                                        }
-                                                }
-                                        }
-                                }
-                        },
-                        series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct))),1),
-                        drilldown:{
-                                drillUpButton:{
-                                        relativeTo: 'spacingBox',
-                                        position:{
-                                                align:"right",
-                                                verticalAlign:"top",
-                                                x:10,
-                                                y:-10
-                                        }
-                                },
-                                series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.kibana))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.kibana.map(x=> x._1).toSeq.distinct))),'normal')}
-                });
                 // Suyhao not passed
                 Highcharts.chart('region-suyhao', {
                         chart: {
@@ -788,121 +977,6 @@
                                         }
                                 },
                                 series: getDrillDown2LevelForSuyhao(@Html(Json.stringify(Json.toJson(response.suyhao))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.suyhao.map(x=> x._1).toSeq.distinct.sorted))))}
-                });
-                // Bar Logoff and Signin
-                var categoriesSigLog = ["Vung 1","Vung 2","Vung 3","Vung 4","Vung 5","Vung 6","Vung 7"]
-                Highcharts.chart('region-siglog-bar', {
-                        chart: {
-                                type: 'bar'
-                        },
-                        title: {
-                                text: ''
-                        },
-                        subtitle: {
-                                text: ''
-                        },
-                        xAxis: [{
-                                categories: categoriesSigLog,
-                                reversed: false,
-                        }, { // mirror axis on right side
-                                opposite: true,
-                                reversed: false,
-                                categories: categoriesSigLog,
-                                linkedTo: 0,
-                        }],
-                        yAxis: {
-                                title: {
-                                        text: null
-                                },
-                                labels: {
-                                        formatter: function () {
-                                                return Math.abs(this.value);
-                                        }
-                                },
-                        },
-
-                        plotOptions: {
-                                series: {
-                                        events: {
-                                                click: function (event) {
-                                                        callDrilldownSigLog(event.point.category)
-                                                }
-                                        },
-                                        cursor: 'pointer',
-                                        stacking: 'normal'
-                                }
-                        },
-
-                        tooltip: {
-                                formatter: function () {
-                                        return '<b>' + this.series.name + '</b><br/><b>Region: ' + this.point.category + '</b><br/>'
-                                                +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b><br/>Total clients: '+Highcharts.numberFormat(Math.abs(this.point.k), 0);
-                                }
-                        },
-
-                        series: getSigLogByRegionStacked(@Html(Json.stringify(Json.toJson(response.sigLogRegion.signin))),@Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff))),@Html(Json.stringify(Json.toJson(response.sigLogRegion.signin_clients))),@Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff_clients))),0)
-                        /*[{
-                            name: 'Signin',
-                            color:'#669999',
-                            data: Html(Json.stringify(Json.toJson(response.sigLogRegion.signin.map(x=> -x._2))))
-                        }, {
-                            name: 'Logoff',
-                            color:'#832d1d',
-                            data: Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff.map(x=>x._2))))
-                        }]*/
-                });
-                // Noc Count alert By Region
-                Highcharts.chart('region-nocCount', {
-
-                        legend: {
-                                enabled: true
-                        },
-                        title: {
-                                text: ''
-                        },
-                        yAxis: {
-                                title: {
-                                        text: 'Counts'
-                                }
-                        },
-                        xAxis: {
-                                type: 'category'
-                        },
-                        colors:['#f60'],
-
-                        plotOptions: {
-                                series: {
-                                        point: {
-                                                events: {
-                                                        contextmenu: function (e) {
-                                                                if($('#brasRighClick').val().indexOf('-') >=0)
-                                                                        window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
-                                                        },
-                                                        mouseOver: function () {
-                                                                if(this.name.indexOf('-')>=0)
-                                                                        $('#brasRighClick').val(this.name)
-                                                        }
-                                                }
-                                        }
-                                }
-                        },
-
-                        series: [{
-                                name:'Alert count',
-                                data: getDrillDownStackedAndLine( @Html(Json.stringify(Json.toJson(response.nocCount.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray))))
-                        }],
-                        drilldown:{
-                                drillUpButton:{
-                                        relativeTo: 'spacingBox',
-                                        position:{
-                                                align:"right",
-                                                verticalAlign:"top",
-                                                x:10,
-                                                y:-10
-                                        }
-                                },
-                                series: getDrillDownNotStacked2Level(@Html(Json.stringify(Json.toJson(response.nocCount.alertCount))),@Html(Json.stringify(Json.toJson(response.nocCount.alertCount.map(x=> x._1).toSeq.distinct.sorted.toArray))))
-                        }
                 });
                 // Total Contract Device by Region
                 Highcharts.chart('region-contract', {
@@ -946,78 +1020,6 @@
                                         }
                                 },
                                 series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.contracts))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._3).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.contracts.map(x=> x._1).toSeq.distinct))),'contract')}
-                });
-                // Heatmap Opsview Types
-                Highcharts.chart('region-opsview-heatmap', {
-                        chart: {
-                                type: 'heatmap',
-                                marginTop: 40,
-                                marginBottom: 80,
-                                plotBorderWidth: 1
-                        },
-
-                        title: {
-                                text: ''
-                        },
-
-                        xAxis: {
-                                categories: @Html(Json.stringify(Json.toJson(response.opsviewType.map(x=>x._1))))
-                        },
-
-                        yAxis: {
-                                categories: ['ok_opsview','warn_opsview','unknown_opsview','crit_opsview'],
-                                title: null
-                        },
-
-                        colorAxis: {
-                                min: 0,
-                                minColor: '#FFFFFF',
-                                maxColor: '#1ABB9C'
-                        },
-
-                        legend: {
-                                align: 'right',
-                                layout: 'vertical',
-                                margin: 0,
-                                verticalAlign: 'top',
-                                y: 25,
-                                symbolHeight: 280
-                        },
-
-                        tooltip: {
-                                formatter: function () {
-                                        return '<b>' + this.series.xAxis.categories[this.point.x] +' & '+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
-                                                this.point.value + '</b> ';
-                                }
-                        },
-
-                        plotOptions: {
-                                series: {
-                                        events: {
-                                                click: function (event) {
-                                                        callDrilldownNoticeByStatus(event.point.series.xAxis.categories[event.point.x])
-                                                }
-                                        },
-                                        dataLabels:{
-                                                formatter:function(){
-                                                        var nf = new Intl.NumberFormat();
-                                                        return nf.format(this.point.value);
-                                                }
-                                        },
-                                        cursor: 'pointer'
-                                }
-                        },
-
-                        series: [{
-                                name: 'Opsview types',
-                                borderWidth: 1,
-                                data: getDataHeatMap(@Html(Json.stringify(Json.toJson(response.opsviewType)))),
-                                dataLabels: {
-                                        enabled: true,
-                                        color: '#000000'
-                                }
-                        }]
-
                 });
                 // Inf down error by Region
                 Highcharts.chart('region-infError', {
@@ -1280,65 +1282,7 @@
                         cache: false,
                         success: function (dta) {
                                 if(dta != "Error"){
-                                        // Inf down error by Region
-                                        Highcharts.chart('region-infError', {
-                                                chart: {
-                                                        type: 'areaspline'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        type: 'category'
-                                                },
-                                                legend: {
-                                                        enabled: true
-                                                },
-                                                yAxis: {
-                                                        title: {
-                                                                text: ''
-                                                        }
-                                                },
-                                                tooltip: {
-                                                        formatter: function () {
-                                                                return 'Region: ' + this.point.name + '<br/>'+this.series.name + '<br/>Month: '+newDate+'<br/>'
-                                                                        +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
-                                                        }
-                                                },
-                                                plotOptions: {
-                                                        series: {
-                                                                point: {
-                                                                        events: {
-                                                                                contextmenu: function (e) {
-                                                                                        if($('#brasRighClick').val().indexOf('-') >=0)
-                                                                                                window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
-                                                                                },
-                                                                                mouseOver: function () {
-                                                                                        if(this.name.indexOf('-')>=0)
-                                                                                                $('#brasRighClick').val(this.name)
-                                                                                }
-                                                                        }
-                                                                }
-                                                        }
-                                                },
-                                                colors: ['#5A738E'],
-                                                series: [{
-                                                        name: $('#typeInfError').val(),
-                                                        data: getDrillDownStackedAndLine(dta.infTypeObj.dataSeries)
-                                                }],
-                                                drilldown:{
-                                                        drillUpButton:{
-                                                                relativeTo: 'spacingBox',
-                                                                position:{
-                                                                        align:"right",
-                                                                        verticalAlign:"top",
-                                                                        x:10,
-                                                                        y:-10
-                                                                }
-                                                        },
-                                                        series: getDrillDownNotStacked2Level(dta.infTypeObj.data,dta.infTypeObj.categories)
-                                                }
-                                        });
+                                    @if(province.equals("")){
                                         // Noc Count alert By Region
                                         Highcharts.chart('region-nocCount', {
 
@@ -1356,11 +1300,11 @@
                                                 xAxis: {
                                                         type: 'category'
                                                 },
-                                                colors:['#f60'],
+                                                colors: ['#f60'],
                                                 tooltip: {
                                                         formatter: function () {
-                                                                return 'Region: ' + this.point.name + '<br/>'+this.series.name + '<br/>Month: '+newDate+'<br/>'
-                                                                        +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b>';
+                                                                return 'Region: ' + this.point.name + '<br/>' + this.series.name + '<br/>Month: ' + newDate + '<br/>'
+                                                                        + '<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0) + '</b>';
                                                         }
                                                 },
                                                 plotOptions: {
@@ -1368,11 +1312,11 @@
                                                                 point: {
                                                                         events: {
                                                                                 contextmenu: function (e) {
-                                                                                        if($('#brasRighClick').val().indexOf('-') >=0)
+                                                                                        if ($('#brasRighClick').val().indexOf('-') >= 0)
                                                                                                 window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
                                                                                 },
                                                                                 mouseOver: function () {
-                                                                                        if(this.name.indexOf('-')>=0)
+                                                                                        if (this.name.indexOf('-') >= 0)
                                                                                                 $('#brasRighClick').val(this.name)
                                                                                 }
                                                                         }
@@ -1380,20 +1324,20 @@
                                                         }
                                                 },
                                                 series: [{
-                                                        name:$('#typeNocCount').val(),
+                                                        name: $('#typeNocCount').val(),
                                                         data: getDrillDownStackedAndLine(dta.nocCountObj.dataSeries)
                                                 }],
-                                                drilldown:{
-                                                        drillUpButton:{
+                                                drilldown: {
+                                                        drillUpButton: {
                                                                 relativeTo: 'spacingBox',
-                                                                position:{
-                                                                        align:"right",
-                                                                        verticalAlign:"top",
-                                                                        x:10,
-                                                                        y:-10
+                                                                position: {
+                                                                        align: "right",
+                                                                        verticalAlign: "top",
+                                                                        x: 10,
+                                                                        y: -10
                                                                 }
                                                         },
-                                                        series: getDrillDownNotStacked2Level(dta.nocCountObj.data,dta.nocCountObj.categories)
+                                                        series: getDrillDownNotStacked2Level(dta.nocCountObj.data, dta.nocCountObj.categories)
                                                 }
                                         });
                                         // Heatmap Opsview Types
@@ -1467,6 +1411,66 @@
                                                         }
                                                 }]
 
+                                        });
+                                    }
+                                        // Inf down error by Region
+                                        Highcharts.chart('region-infError', {
+                                                chart: {
+                                                        type: 'areaspline'
+                                                },
+                                                title: {
+                                                        text: ''
+                                                },
+                                                xAxis: {
+                                                        type: 'category'
+                                                },
+                                                legend: {
+                                                        enabled: true
+                                                },
+                                                yAxis: {
+                                                        title: {
+                                                                text: ''
+                                                        }
+                                                },
+                                                tooltip: {
+                                                        formatter: function () {
+                                                                return 'Region: ' + this.point.name + '<br/>' + this.series.name + '<br/>Month: ' + newDate + '<br/>'
+                                                                        + '<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0) + '</b>';
+                                                        }
+                                                },
+                                                plotOptions: {
+                                                        series: {
+                                                                point: {
+                                                                        events: {
+                                                                                contextmenu: function (e) {
+                                                                                        if ($('#brasRighClick').val().indexOf('-') >= 0)
+                                                                                                window.open("/fwdRequest?bras=" + $('#brasRighClick').val(), "_blank")
+                                                                                },
+                                                                                mouseOver: function () {
+                                                                                        if (this.name.indexOf('-') >= 0)
+                                                                                                $('#brasRighClick').val(this.name)
+                                                                                }
+                                                                        }
+                                                                }
+                                                        }
+                                                },
+                                                colors: ['#5A738E'],
+                                                series: [{
+                                                        name: $('#typeInfError').val(),
+                                                        data: getDrillDownStackedAndLine(dta.infTypeObj.dataSeries)
+                                                }],
+                                                drilldown: {
+                                                        drillUpButton: {
+                                                                relativeTo: 'spacingBox',
+                                                                position: {
+                                                                        align: "right",
+                                                                        verticalAlign: "top",
+                                                                        x: 10,
+                                                                        y: -10
+                                                                }
+                                                        },
+                                                        series: getDrillDownNotStacked2Level(dta.infTypeObj.data, dta.infTypeObj.categories)
+                                                }
                                         });
                                 }
                         },

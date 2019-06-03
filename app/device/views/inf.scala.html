@@ -124,13 +124,13 @@
                                                                     <td>@response.sfLofi(i)._9</td>
                                                                     <td>@response.sfLofi(i)._10</td>
                                                                     <th style="text-align: center">
-                                                                    @if(email == "inf" || email == "admin") {
+                                                                    @*if(email == "inf" || email == "admin") {*@
                                                                         @if(response.sfLofi(i)._6 > 0) {
                                                                             <a onclick="rejectOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a>
                                                                         } else {
                                                                             <a onclick="confirmOutlier(this)" name="@response.sfLofi(i)._6" class="btn btn-success btn-xs"><i class="fa fa-check"></i></a>
                                                                         }
-                                                                    }
+                                                                     @*}*@
                                                                     </th>
                                                                 </tr>
                                                             }
@@ -565,17 +565,22 @@
                                 });
                             },
                             success: function (dta) {
-                                if (dta != "Error") {
-                                    $('.boxCss').removeClass("flipInY")
-                                    $('#divTotal').show()
-                                    var nf = new Intl.NumberFormat()
-                                    $('.boxCss').addClass("flipInY")
-                                    $('#totalClient').text(nf.format(dta.totalClient))
-                                    $('#totalSplitter').text(dta.totalSpliter)
-                                    $('#totalModule').text(dta.totalModule)
-                                    $('#totalSignin').text(dta.totalSignin)
-                                    $('#totalLogoff').text(dta.totalLogoff)
-                                    drawHost(dta, $('#hostSearch').val())
+                                if(dta == "permission"){
+                                    alert("You don't have permission to view this host. Please choose another host!")
+                                }
+                                else{
+                                    if (dta != "Error") {
+                                        $('.boxCss').removeClass("flipInY")
+                                        $('#divTotal').show()
+                                        var nf = new Intl.NumberFormat()
+                                        $('.boxCss').addClass("flipInY")
+                                        $('#totalClient').text(nf.format(dta.totalClient))
+                                        $('#totalSplitter').text(dta.totalSpliter)
+                                        $('#totalModule').text(dta.totalModule)
+                                        $('#totalSignin').text(dta.totalSignin)
+                                        $('#totalLogoff').text(dta.totalLogoff)
+                                        drawHost(dta, $('#hostSearch').val())
+                                    }
                                 }
                             },
                             complete: function () {
@@ -603,18 +608,23 @@
                                         });
                                     },
                                     success: function (dta) {
-                                        if (dta != "Error") {
-                                            $("#hostSearch").val(host)
-                                            $('.boxCss').removeClass("flipInY")
-                                            $('#divTotal').show()
-                                            var nf = new Intl.NumberFormat()
-                                            $('.boxCss').addClass("flipInY")
-                                            $('#totalClient').text(nf.format(dta.totalClient))
-                                            $('#totalSplitter').text(dta.totalSpliter)
-                                            $('#totalModule').text(dta.totalModule)
-                                            $('#totalSignin').text(dta.totalSignin)
-                                            $('#totalLogoff').text(dta.totalLogoff)
-                                            drawHost(dta, host)
+                                        if(dta == "permission"){
+                                            alert("You don't have permission to view this host. Please choose another host!")
+                                        }
+                                        else{
+                                            if (dta != "Error") {
+                                                $("#hostSearch").val(host)
+                                                $('.boxCss').removeClass("flipInY")
+                                                $('#divTotal').show()
+                                                var nf = new Intl.NumberFormat()
+                                                $('.boxCss').addClass("flipInY")
+                                                $('#totalClient').text(nf.format(dta.totalClient))
+                                                $('#totalSplitter').text(dta.totalSpliter)
+                                                $('#totalModule').text(dta.totalModule)
+                                                $('#totalSignin').text(dta.totalSignin)
+                                                $('#totalLogoff').text(dta.totalLogoff)
+                                                drawHost(dta, host)
+                                            }
                                         }
                                     },
                                     complete: function () {

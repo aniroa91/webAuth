@@ -19,13 +19,15 @@ import scala.concurrent.duration.Duration
 
 object BrasService extends AbstractService{
 
-  def getSuggestions(prefix: String) = {
+  def getSuggestions(prefix: String, _type: String) = {
+    val index = if(_type.equals("1")) "olt-name" else "bras-name"
+    val field = if(_type.equals("1")) "olt_id" else "bras_id"
     val response = client.execute(
-      search(s"bras-name") query
-        matchPhrasePrefixQuery("bras_id", prefix.toUpperCase) limit(10)
+      search(s"$index") query
+        matchPhrasePrefixQuery(s"$field", prefix.toUpperCase) limit(10)
     ).await
     response.hits.hits.map(x => x.sourceAsMap)
-      .map(x => x.getOrElse("bras_id", "??").asInstanceOf[String])
+      .map(x => x.getOrElse(s"$field", "??").asInstanceOf[String])
   }
 
   def getSigLogByMonth(month: String) = {
@@ -36,8 +38,8 @@ object BrasService extends AbstractService{
     BrasDAO.getTopBrasOutMonthly()
   }
 
-  def getTopConnectMonthly() = {
-    BrasDAO.getTopConnectMonthly()
+  def getTopConnectMonthly(province: String) = {
+    BrasDAO.getTopConnectMonthly(province)
   }
 
   def getTopOltMonthly() = {
@@ -52,40 +54,40 @@ object BrasService extends AbstractService{
     BrasDAO.getTopServOpsviewMonthly()
   }
 
-  def getTopServInfErrMonthly() = {
-    BrasDAO.getTopServInfErrMonthly()
+  def getTopServInfErrMonthly(province: String) = {
+    BrasDAO.getTopServInfErrMonthly(province)
   }
 
   def getTopOverviewNocMonthly(col: String) = {
     BrasDAO.getTopOverviewNocMonthly(col)
   }
 
-  def getTopInfErrMonthly() = {
-    BrasDAO.getTopInfErrMonthly()
+  def getTopInfErrMonthly(province: String) = {
+    BrasDAO.getTopInfErrMonthly(province)
   }
 
-  def getSuyhaoByMonth(month: String) = {
-    BrasDAO.getSuyhaoByMonth(month)
+  def getSuyhaoByMonth(month: String, province: String) = {
+    BrasDAO.getSuyhaoByMonth(month, province)
   }
 
   def getBrasOutlierByMonth(month: String) = {
     BrasDAO.getBrasOutlierByMonth(month)
   }
 
-  def getInfOutlierByMonth(month: String) = {
-    BrasDAO.getInfOutlierByMonth(month)
+  def getInfOutlierByMonth(month: String,province: String) = {
+    BrasDAO.getInfOutlierByMonth(month,province)
   }
 
-  def getDeviceByMonth(month: String) = {
-    BrasDAO.getDeviceByMonth(month)
+  def getDeviceByMonth(month: String,province: String) = {
+    BrasDAO.getDeviceByMonth(month,province)
   }
 
   def getKibaOpsByMonth(month: String) = {
     BrasDAO.getKibaOpsByMonth(month)
   }
 
-  def getInfErrorByMonth(month: String) = {
-    BrasDAO.getInfErrorByMonth(month)
+  def getInfErrorByMonth(month: String,province: String) = {
+    BrasDAO.getInfErrorByMonth(month,province)
   }
 
   def getErrorMetric(bras: String, time: String) = {
@@ -120,20 +122,20 @@ object BrasService extends AbstractService{
     BrasDAO.getProvinceOpsview(fromMonth,toMonth)
   }
 
-  def getOutlierMonthly(fromMonth: String,toMonth: String,db: String) ={
-    BrasDAO.getOutlierMonthly(fromMonth,toMonth,db)
+  def getOutlierMonthly(fromMonth: String,toMonth: String,db: String, province: String) ={
+    BrasDAO.getOutlierMonthly(fromMonth,toMonth,db, province)
   }
 
-  def getProvinceContract(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int,Int)]]   ={
-    BrasDAO.getProvinceContract(fromMonth,toMonth)
+  def getProvinceContract(fromMonth: String,toMonth: String, province: String): Future[Seq[(String,String,String,Int,Int,Int)]]   ={
+    BrasDAO.getProvinceContract(fromMonth,toMonth,province)
   }
 
   def getProvinceKibana(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int)]]   ={
     BrasDAO.getProvinceKibana(fromMonth,toMonth)
   }
 
-  def getProvinceSuyhao(fromMonth: String,toMonth: String): Future[Seq[(String,String,String,Int,Int)]]   ={
-    BrasDAO.getProvinceSuyhao(fromMonth,toMonth)
+  def getProvinceSuyhao(fromMonth: String,toMonth: String, province: String): Future[Seq[(String,String,String,Int,Int)]]   ={
+    BrasDAO.getProvinceSuyhao(fromMonth,toMonth, province)
   }
 
   def getProvinceCount(month: String): Future[Seq[(String,String,Int,Int,Int,Int,Int,Int)]]   ={
@@ -148,12 +150,12 @@ object BrasService extends AbstractService{
     BrasDAO.getBrasOpsviewType(month,id)
   }
 
-  def getProvinceInfDownError(month: String): Future[Seq[(String,String,Int,Int,Int,Int)]]   ={
-    BrasDAO.getProvinceInfDownError(month)
+  def getProvinceInfDownError(month: String,province: String): Future[Seq[(String,String,Int,Int,Int,Int)]]   ={
+    BrasDAO.getProvinceInfDownError(month,province)
   }
 
-  def getProvinceTotalInf(fromMonth: String,toMonth: String): Future[Seq[(String,String,Double)]]   ={
-    BrasDAO.getProvinceTotalInf(fromMonth,toMonth)
+  def getProvinceTotalInf(fromMonth: String,toMonth: String, province: String): Future[Seq[(String,String,Double)]]   ={
+    BrasDAO.getProvinceTotalInf(fromMonth,toMonth, province)
   }
 
   def getProvinceSigLogoff(): Future[Seq[(String,String,Double,Double)]]   ={
@@ -184,8 +186,8 @@ object BrasService extends AbstractService{
     BrasDAO.getTopLogoff(month)
   }
 
-  def topInfOut(month: String): Future[Seq[(String,String,Int)]]   ={
-    BrasDAO.topInfOut(month)
+  def topInfOut(month: String, province: String): Future[Seq[(String,String,Int)]]   ={
+    BrasDAO.topInfOut(month,province)
   }
 
   def topBrasOut(month: String): Future[Seq[(String,String,Int)]]   ={
@@ -224,16 +226,16 @@ object BrasService extends AbstractService{
     BrasDAO.getTopOpsview(month,_typeService)
   }
 
-  def getTopInf(month: String,_typeInferr: String): Future[Seq[(String, String, String, Int)]]   ={
-    BrasDAO.getTopInf(month,_typeInferr)
+  def getTopInf(month: String,_typeInferr: String, province: String): Future[Seq[(String, String, String, Int)]]   ={
+    BrasDAO.getTopInf(month,_typeInferr, province)
   }
 
-  def getTopnotSuyhao(month: String): Future[Seq[(String,String,Int,Int)]]   ={
-    BrasDAO.getTopnotSuyhao(month)
+  def getTopnotSuyhao(month: String, province: String): Future[Seq[(String,String,Int,Int)]]   ={
+    BrasDAO.getTopnotSuyhao(month, province)
   }
 
-  def getTopPoorconn(month: String,_typeOLTpoor: String): Future[Seq[(String,String,Int)]]   ={
-    BrasDAO.getTopPoorconn(month,_typeOLTpoor)
+  def getTopPoorconn(month: String,_typeOLTpoor: String,province: String): Future[Seq[(String,String,Int)]]   ={
+    BrasDAO.getTopPoorconn(month,_typeOLTpoor,province)
   }
 
   def rejectLabelInf(host: String,module: String,time: String) ={
@@ -244,28 +246,28 @@ object BrasService extends AbstractService{
     BrasDAO.confirmLabelInf(host,module,time)
   }
 
-  def getUserDownMudule(day: String): Future[Seq[(String,String,String,Int)]]   ={
-    BrasDAO.getUserDownMudule(day)
+  def getUserDownMudule(province: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getUserDownMudule(province)
   }
 
-  def getSpliterMudule(day: String): Future[Seq[(String,String,String,Int)]]   ={
-    BrasDAO.getSpliterMudule(day)
+  def getSpliterMudule(province: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getSpliterMudule(province)
   }
 
-  def getSflofiMudule(queries: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int,Int,String)]]   ={
-    BrasDAO.getSflofiMudule(queries)
+  def getSflofiMudule(queries: String, province: String): Future[Seq[(String,String,String,Int,Int,Int,Int,Int,Int,String)]]   ={
+    BrasDAO.getSflofiMudule(queries, province)
   }
 
-  def getTotalOutlier(): Future[Seq[(Int)]] = {
-    BrasDAO.getTotalOutlier()
+  def getTotalOutlier(province: String): Future[Seq[(Int)]] = {
+    BrasDAO.getTotalOutlier(province)
   }
 
   def getIndexRougeMudule(day: String): Array[(String,String,String,String,Int)]   ={
     BrasDAO.getIndexRougeMudule(day)
   }
 
-  def getInfDownMudule(day: String): Future[Seq[(String,String,String,Int)]]   ={
-    BrasDAO.getInfDownMudule(day)
+  def getInfDownMudule(province: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.getInfDownMudule(province)
   }
 
   def getSigLogByDaily(bras: String, day: String): SigLogClientsDaily = {
@@ -390,8 +392,8 @@ object BrasService extends AbstractService{
   }*/
 
   //for daily inf errors
-  def getInfErrorsDaily(day: String, _type: String) = {
-    val rs = Await.result(BrasDAO.getInfErrorsDaily(day, _type), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+  def getInfErrorsDaily(day: String, _type: String, province: String) = {
+    val rs = Await.result(BrasDAO.getInfErrorsDaily(day, province), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
     val mapErrs = _type match {
       case _type if(_type.equals("*")) => {
         rs.map(x=> (x._1, x._2,(x._3+x._4+x._5+x._6+x._7+x._8))).map(x=> (LocationUtils.getRegion(x._1.substring(0, 3)), LocationUtils.getNameProvincebyCode(x._1.substring(0, 3)), x._1, x._2, x._3)).toArray.sorted
@@ -441,8 +443,8 @@ object BrasService extends AbstractService{
     mapRs
   }
 
-  def getInfAccessOutlierDaily(day: String) = {
-    BrasDAO.getInfAccessOutlierDaily(day)
+  def getInfAccessOutlierDaily(day: String, province: String) = {
+    BrasDAO.getInfAccessOutlierDaily(day, province)
   }
 
   def getTicketIssue(day: String) = {
@@ -453,8 +455,8 @@ object BrasService extends AbstractService{
     BrasDAO.getBrasOutlierDaily(day)
   }
 
-  def getErrorHostdaily(id: String,day: String) = {
-    BrasDAO.getErrorHostdaily(id, day)
+  def getErrorHostdaily(id: String,day: String, province: String) = {
+    BrasDAO.getErrorHostdaily(id, day, province)
   }
 
   // for daily device errors
@@ -625,8 +627,8 @@ object BrasService extends AbstractService{
       .map(x => (x._1 -> x._2._1) -> x._2._2)/*.filter(x=> x._1._1 != "-1").filter(x=> x._1._2 != "-1")*/
   }
 
-  def getErrorHistory(id: String): Future[Seq[(String,Int)]] = {
-    BrasDAO.getErrorHistory(id)
+  def getErrorHistory(id: String, province: String): Future[Seq[(String,Int)]] = {
+    BrasDAO.getErrorHistory(id, province)
   }
 
   def getSigLogInfjson(id: String): (Array[(String, Int)], Array[(String, Int)]) = {

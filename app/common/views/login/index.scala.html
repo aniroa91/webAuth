@@ -1,4 +1,4 @@
-@(form: Form[(String,String)])(implicit flash: Flash)
+@(form: Form[Option[Account]])(implicit flash: Flash)
 
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -46,7 +46,7 @@
                     <div class="controls">
                         <div class="input-icon left">
                             <i class="fa fa-user"></i>
-                            <input class="m-wrap placeholder-no-fix submit_on_enter" type="text" autocomplete="off" placeholder="Email"  name="email"/>
+                            <input class="m-wrap placeholder-no-fix submit_on_enter" type="text" autocomplete="off" placeholder="Email"  name="user"/>
                         </div>
                     </div>
                 </div>
@@ -120,7 +120,7 @@
             <!-- END LOGIN -->
             <!-- BEGIN COPYRIGHT -->
         <div class="copyright">
-		2017 &copy; Login Admin System
+		2018 &copy; Login Admin System
 	</div>
             <!-- END COPYRIGHT -->
             <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->

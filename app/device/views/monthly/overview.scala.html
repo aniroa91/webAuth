@@ -1,4 +1,4 @@
-@(email: String,response: model.device.RegionOverview)(implicit request: RequestHeader)
+@(email: String, province: String, response: model.device.RegionOverview)(implicit request: RequestHeader)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatPattern
 
@@ -96,6 +96,7 @@
                         @if(response != null){
                             <div class="col-xs-12" id="divTabOverview">
                                 <div class="col-lg-12" style="padding:0px;">
+                                    @if(province.equals("")){
                                     <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                                         <div class="x_panel tile">
                                             <div class="x_title">
@@ -121,6 +122,9 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                                    } else {
+                                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                    }
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;font-size: 19px"> Statistic Of Connections By CPE Signal (Access)</h2>
@@ -132,8 +136,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-12" style="padding:0px;">
+                                    @if(province.equals("")){
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <input type="hidden" id="regionSigLog">
@@ -152,6 +155,9 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                    } else {
+                                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                    }
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
@@ -224,6 +230,7 @@
                                         }
                                     </div>
                                 </div>
+                                @if(province.equals("")){
                                 <div class="col-lg-12" style="padding:0px;">
                                     <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
                                         <div class="x_panel tile">
@@ -244,8 +251,10 @@
                                         </div>
                                     </div>
                                 </div>
+                                }
                                 <div class="col-lg-12" style="padding:0px;">
                                     <input type="hidden" id="brasRighClick">
+                                    @if(province.equals("")){
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
@@ -281,6 +290,9 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                    } else{
+                                    <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
+                                    }
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
@@ -320,19 +332,22 @@
                             <input type="hidden" id="isClickedTab4" value="0">
                             <div class="col-xs-12" id="divTabTop">
                                 <div class="col-lg-12" style="padding:0px;">
-                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
-                                        <div class="x_panel tile">
-                                            <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px">Top 10 Province By Outliers Bras Device</h2>
-                                                <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần bất thường tại thiết bị BRAS nhiều nhất"></i>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            <div class="x_content">
-                                                <div id="pie-bras" style="height: 350px;"></div>
+                                    @if(province.equals("")) {
+                                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                            <div class="x_panel tile">
+                                                <div class="x_title">
+                                                    <h2 style="font-weight: 500;
+                                                        font-size: 24px">Top 10 Province By Outliers Bras Device</h2>
+                                                    <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần bất thường tại thiết bị BRAS nhiều nhất"></i>
+                                                    <div class="clearfix"></div>
+                                                </div>
+                                                <div class="x_content">
+                                                    <div id="pie-bras" style="height: 350px;"></div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                    }
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
@@ -345,9 +360,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-12" style="padding:0px;">
-                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                    @if(province.equals("")) {
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;font-size: 24px">Top 10 Province By SignIn</h2>
@@ -359,7 +373,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
@@ -372,10 +386,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="col-lg-12" style="padding:0px;">
-                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;font-size: 24px"> Top 10 Province By Device Errors</h2>
@@ -408,7 +419,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
@@ -436,9 +447,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-12" style="padding:0px;">
                                     <div class="col-xs-12">
+                                    } else{
+                                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                    }
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;font-size: 24px"> Top 20 Province By INF Errors</h2>
@@ -470,7 +482,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-12" style="padding:0px;">
-                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;font-size: 24px"> Top 10 Province By SuyHao Not Pass</h2>
@@ -482,7 +494,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;
@@ -514,50 +526,52 @@
                             <div class="col-xs-12" id="divTabCpe">
                                 <div class="col-xs-12">
                                     <div class="col-lg-2 col-xs-12 col-md-2 col-sm-2">
-                                        <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
-                                            <div class="panel-heading noborder" id="divSignin">
-                                                <div class="panel-icon" style="color: #43A047"><i class="fa fa-sign-in" aria-hidden="true"></i>
-                                                </div>
-                                                <div class="media-body">
-                                                    <h4 class="md-title topLi">Signin</h4>
-                                                    <h1 class="mt5 signin"></h1>
-                                                </div><!-- media-body -->
-                                                <div class="line"></div>
-                                                <div class="clearfix mt20">
-                                                    <div class="pull-left">
-                                                        <h5 class="md-title nomargin titprevSign"></h5>
-                                                        <h4 class="nomargin mb5 prevSignin"></h4>
+                                        @if(province.equals("")) {
+                                            <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
+                                                <div class="panel-heading noborder" id="divSignin">
+                                                    <div class="panel-icon" style="color: #43A047"><i class="fa fa-sign-in" aria-hidden="true"></i>
                                                     </div>
-                                                    <div class="pull-right">
-                                                        <h5 class="md-title nomargin">Signin Change</h5>
-                                                        <div class="changeSig"></div>
+                                                    <div class="media-body">
+                                                        <h4 class="md-title topLi">Signin</h4>
+                                                        <h1 class="mt5 signin"></h1>
+                                                    </div><!-- media-body -->
+                                                    <div class="line"></div>
+                                                    <div class="clearfix mt20">
+                                                        <div class="pull-left">
+                                                            <h5 class="md-title nomargin titprevSign"></h5>
+                                                            <h4 class="nomargin mb5 prevSignin"></h4>
+                                                        </div>
+                                                        <div class="pull-right">
+                                                            <h5 class="md-title nomargin">Signin Change</h5>
+                                                            <div class="changeSig"></div>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                            </div><!-- panel-body -->
-                                        </div>
-                                        <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #fe7096, #ffbf96)">
-                                            <div class="panel-heading noborder" id="divLogoff">
-                                                <div class="panel-icon" style="color: #fe7096"><i class="fa fa-sign-out" aria-hidden="true"></i>
-                                                </div>
-                                                <div class="media-body">
-                                                    <h4 class="md-title topLi">Logoff</h4>
-                                                    <h1 class="mt5 logoff"></h1>
-                                                </div><!-- media-body -->
-                                                <div class="line"></div>
-                                                <div class="clearfix mt20">
-                                                    <div class="pull-left">
-                                                        <h5 class="md-title nomargin titprevLog"></h5>
-                                                        <h4 class="nomargin mb5 prevLog"></h4>
+                                                </div><!-- panel-body -->
+                                            </div>
+                                            <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #fe7096, #ffbf96)">
+                                                <div class="panel-heading noborder" id="divLogoff">
+                                                    <div class="panel-icon" style="color: #fe7096"><i class="fa fa-sign-out" aria-hidden="true"></i>
                                                     </div>
-                                                    <div class="pull-right">
-                                                        <h5 class="md-title nomargin">Logoff Change</h5>
-                                                        <div class="changeLog"></div>
+                                                    <div class="media-body">
+                                                        <h4 class="md-title topLi">Logoff</h4>
+                                                        <h1 class="mt5 logoff"></h1>
+                                                    </div><!-- media-body -->
+                                                    <div class="line"></div>
+                                                    <div class="clearfix mt20">
+                                                        <div class="pull-left">
+                                                            <h5 class="md-title nomargin titprevLog"></h5>
+                                                            <h4 class="nomargin mb5 prevLog"></h4>
+                                                        </div>
+                                                        <div class="pull-right">
+                                                            <h5 class="md-title nomargin">Logoff Change</h5>
+                                                            <div class="changeLog"></div>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                            </div><!-- panel-body -->
-                                        </div>
+                                                </div><!-- panel-body -->
+                                            </div>
+                                        }
                                         <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
                                             <div class="panel-heading noborder" id="divSuy">
                                                 <div class="panel-icon" style="color: #43A047"><i class="fa fa-cogs" aria-hidden="true"></i>
@@ -605,41 +619,45 @@
                                     </div>
                                     <div class="col-lg-10 col-xs-12 col-md-10 col-sm-10">
                                         <div class="col-xs-12">
-                                            <div class="col-xs-12">
-                                                <div class="x-content">
-                                                    <div class="profile-title">
-                                                        <div class="col-xs-12">
-                                                            <span class="service-title">Comparison Of No. Outlier Of Bras By Month</span>
-                                                            <i class="fa fa-info-circle toolTipText" title="So sánh số lượng bất thường tại thiết bị BRAS của tháng hiện tại và tháng trước đó kèm số KHG bị ảnh hưởng bởi bất thường"></i>
+                                            @if(province.equals("")) {
+                                                <div class="col-xs-12">
+                                                    <div class="x-content">
+                                                        <div class="profile-title">
+                                                            <div class="col-xs-12">
+                                                                <span class="service-title">
+                                                                    Comparison Of No. Outlier Of Bras By Month</span>
+                                                                <i class="fa fa-info-circle toolTipText" title="So sánh số lượng bất thường tại thiết bị BRAS của tháng hiện tại và tháng trước đó kèm số KHG bị ảnh hưởng bởi bất thường"></i>
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <table class="table no-wrap p-tableInf" style="background: #fff">
-                                                        <thead class="bg-light" style="background: #f9f9ff !important">
-                                                            <tr class="border-0">
-                                                                <th class="border-0" style="width: 44%"></th>
-                                                                <th class="border-0 currMonth currTd titCol">Month</th>
-                                                                <th class="border-0 prevMonth prevId titCol">Last month</th>
-                                                                <th class="border-0 titCol">Change(%)</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td><span class="titTd">No Outliers</span></td>
-                                                                <td><p class="excerpt currBras currTd"> </p></td>
-                                                                <td><p class="excerpt prevBras prevId"></p></td>
-                                                                <td><p class="excerpt changeBras"> </p></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td><span class="titTd">Affected Clients</span></td>
-                                                                <td><p class="excerpt currAffect currTd"> </p></td>
-                                                                <td><p class="excerpt prevAffect prevId"> </p></td>
-                                                                <td><p class="excerpt changeAffect"> </p></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                        <table class="table no-wrap p-tableInf" style="background: #fff">
+                                                            <thead class="bg-light" style="background: #f9f9ff !important">
+                                                                <tr class="border-0">
+                                                                    <th class="border-0" style="width: 44%"></th>
+                                                                    <th class="border-0 currMonth currTd titCol">Month</th>
+                                                                    <th class="border-0 prevMonth prevId titCol">
+                                                                        Last month</th>
+                                                                    <th class="border-0 titCol">Change(%)</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td><span class="titTd">No Outliers</span></td>
+                                                                    <td><p class="excerpt currBras currTd"> </p></td>
+                                                                    <td><p class="excerpt prevBras prevId"></p></td>
+                                                                    <td><p class="excerpt changeBras"> </p></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><span class="titTd">Affected Clients</span></td>
+                                                                    <td><p class="excerpt currAffect currTd"> </p></td>
+                                                                    <td><p class="excerpt prevAffect prevId"> </p></td>
+                                                                    <td><p class="excerpt changeAffect"> </p></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            }
                                             <div class="col-xs-12">
                                                 <div class="x-content">
                                                     <div class="profile-title">
@@ -795,8 +813,14 @@
                                             <div class="x-content">
                                                 <div class="profile-title">
                                                     <div class="col-xs-12">
-                                                        <span class="service-title">Comparison Of No. BRAS Errors And No. Status Change By Month</span>
-                                                        <i class="fa fa-info-circle toolTipText" title="So sánh số lượng lỗi tại thiết bị BRAS và số lần thay đổi trạng thái của các service quản lý của tháng hiện tại và tháng trước đó"></i>
+                                                        @if(province.equals("")) {
+                                                            <span class="service-title">
+                                                                Comparison Of No. BRAS Errors And No. Status Change By Month</span>
+                                                            <i class="fa fa-info-circle toolTipText" title="So sánh số lượng lỗi tại thiết bị BRAS và số lần thay đổi trạng thái của các service quản lý của tháng hiện tại và tháng trước đó"></i>
+                                                        } else{
+                                                            <span class="service-title">Comparison Of Device Activities At Clients By Month</span>
+                                                            <i class="fa fa-info-circle toolTipText" title="So sánh số hợp đồng, số thiết bị và số kết nối kém của các thiết bị nhà KHG của tháng hiện tại và tháng trước đó"></i>
+                                                        }
                                                     </div>
                                                 </div>
                                                 <table class="table no-wrap p-table" style="background: #fff">
@@ -809,24 +833,28 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td><span class="titTd">Total Kibana</span></td>
-                                                            <td><span class="excerpt currKiba currTd"> </span></td>
-                                                            <td><span class="excerpt prevKiba prevId"></span></td>
-                                                            <td><span class="excerpt changeKiba"> </span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><span class="titTd">Total Opsview</span></td>
-                                                            <td><span class="excerpt currOps currTd"> </span></td>
-                                                            <td><span class="excerpt prevOps prevId"> </span></td>
-                                                            <td><span class="excerpt changeOps"> </span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="4" class="profile-title" style="display: table-cell;padding: 6px 8px 6px 8px">
-                                                                <span style="line-height: 1.6" class="service-title">Comparison Of Device Activities At Clients By Month</span>
-                                                                <i class="fa fa-info-circle toolTipText" title="So sánh số hợp đồng, số thiết bị và số kết nối kém của các thiết bị nhà KHG của tháng hiện tại và tháng trước đó"></i>
-                                                            </td>
-                                                        </tr>
+                                                        @if(province.equals("")) {
+                                                            <tr>
+                                                                <td><span class="titTd">Total Kibana</span></td>
+                                                                <td><span class="excerpt currKiba currTd"> </span></td>
+                                                                <td><span class="excerpt prevKiba prevId"></span></td>
+                                                                <td><span class="excerpt changeKiba"> </span></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><span class="titTd">Total Opsview</span></td>
+                                                                <td><span class="excerpt currOps currTd"> </span></td>
+                                                                <td><span class="excerpt prevOps prevId"> </span></td>
+                                                                <td><span class="excerpt changeOps"> </span></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="4" class="profile-title" style="display: table-cell;
+                                                                    padding: 6px 8px 6px 8px">
+                                                                    <span style="line-height: 1.6" class="service-title">
+                                                                        Comparison Of Device Activities At Clients By Month</span>
+                                                                    <i class="fa fa-info-circle toolTipText" title="So sánh số hợp đồng, số thiết bị và số kết nối kém của các thiết bị nhà KHG của tháng hiện tại và tháng trước đó"></i>
+                                                                </td>
+                                                            </tr>
+                                                        }
                                                         <tr>
                                                             <td><span class="titTd">No Contract</span></td>
                                                             <td><span class="excerpt currCt currTd"> </span></td>
@@ -861,30 +889,34 @@
                         </div>
                         <div id="tabTrend" class="tab-slider--body">
                             <div class="col-xs-12" id="divTabTrend">
-                                <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
-                                    <div class="x_panel tile">
-                                        <div class="x_title">
-                                            <h2 style="font-weight: 500;font-size: 24px"> Outliers Of BRAS By Month</h2>
-                                            <i class="fa fa-info-circle toolTipText" title="Xu hướng sự cố bất thường tại thiết bị BRAS theo từng tháng"></i>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
-                                            <div id="month-trend1" style="height: 350px;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
-                                    <div class="x_panel tile">
-                                        <div class="x_title">
-                                            <h2 style="font-weight: 500;font-size: 24px"> Outliers Of OLT By Month</h2>
-                                            <i class="fa fa-info-circle toolTipText" title="Xu hướng sự cố bất thường tại thiết bị OLT theo từng tháng"></i>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
-                                            <div id="month-trend2" style="height: 350px;"></div>
+                                @if(province.equals("")) {
+                                    <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Outliers Of BRAS By Month</h2>
+                                                <i class="fa fa-info-circle toolTipText" title="Xu hướng sự cố bất thường tại thiết bị BRAS theo từng tháng"></i>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="month-trend1" style="height: 350px;"></div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Outliers Of OLT By Month</h2>
+                                                <i class="fa fa-info-circle toolTipText" title="Xu hướng sự cố bất thường tại thiết bị OLT theo từng tháng"></i>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="month-trend2" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                                 <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                     <div class="x_panel tile">
                                         <div class="x_title">
@@ -909,130 +941,138 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
-                                    <div class="x_panel tile">
-                                        <div class="x_title">
-                                            <h2 style="font-weight: 500;font-size: 24px"> BRAS Error By Month</h2>
-                                            <i class="fa fa-info-circle toolTipText" title="Xu hướng lỗi tại thiết bị BRAS theo từng tháng"></i>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
-                                            <div id="month-trend5" style="height: 350px;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
-                                    <div class="x_panel tile">
-                                        <div class="x_title">
-                                            <h2 style="font-weight: 500;font-size: 24px"> Service Monitoring By Month</h2>
-                                            <i class="fa fa-info-circle toolTipText" title="Xu hướng cảnh báo service theo từng tháng"></i>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
-                                            <div id="month-trend6" style="height: 350px;"></div>
+                                @if(province.equals("")) {
+                                    <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> BRAS Error By Month</h2>
+                                                <i class="fa fa-info-circle toolTipText" title="Xu hướng lỗi tại thiết bị BRAS theo từng tháng"></i>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="month-trend5" style="height: 350px;"></div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
-                                    <div class="x_panel tile">
-                                        <div class="x_title">
-                                            <h2 style="font-weight: 500;font-size: 24px"> Severity Of BRAS Error By Month</h2>
-                                            <i class="fa fa-info-circle toolTipText" title="Xu hướng chi tiết của từng mức độ lỗi tại thiết bị BRAS theo từng tháng"></i>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
-                                            <table class="table no-wrap sparkline" id="tbSparkline1">
-                                                <tbody>
-                                                    <tr>
-                                                        <td style="width: 10%">alert_count</td>
-                                                        <td style="width: 80%">
-                                                            <div id="tbAlert" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left;width:10%" class="maxValue"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>crit_count</td>
-                                                        <td>
-                                                            <div id="tbCrit" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left" class="maxValue"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>emerg_count</td>
-                                                        <td>
-                                                            <div id="tbEmerg" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left" class="maxValue"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>err_count</td>
-                                                        <td>
-                                                            <div id="tbErr" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left" class="maxValue"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>notice_count</td>
-                                                        <td>
-                                                            <div id="tbNotie" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left" class="maxValue"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>warning_count</td>
-                                                        <td>
-                                                            <div id="tbWarn" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left" class="maxValue"></th>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                    <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Service Monitoring By Month</h2>
+                                                <i class="fa fa-info-circle toolTipText" title="Xu hướng cảnh báo service theo từng tháng"></i>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="month-trend6" style="height: 350px;"></div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
-                                    <div class="x_panel tile">
-                                        <div class="x_title">
-                                            <h2 style="font-weight: 500;font-size: 24px"> Status Of Service Monitoring By Month</h2>
-                                            <i class="fa fa-info-circle toolTipText" title="Xu hướng chi tiết của từng mức độ cảnh báo service theo từng tháng"></i>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
-                                            <table class="table no-wrap sparkline" id="tbSparkline2">
-                                                <tbody>
-                                                    <tr>
-                                                        <td style="width:10%">crit_opsview</td>
-                                                        <td style="width: 80%">
-                                                            <div id="tbCritOps" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left;width:10%" class="maxValue"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>ok_opsview</td>
-                                                        <td>
-                                                            <div id="tbOkOps" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left" class="maxValue"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>warn_opsview</td>
-                                                        <td>
-                                                            <div id="tbWarnOps" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left" class="maxValue"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>unknown_opsview</td>
-                                                        <td>
-                                                            <div id="tbUnknownOps" class="spark-cont"></div>
-                                                        </td>
-                                                        <th style="text-align: left" class="maxValue"></th>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                    <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Severity Of BRAS Error By Month</h2>
+                                                <i class="fa fa-info-circle toolTipText" title="Xu hướng chi tiết của từng mức độ lỗi tại thiết bị BRAS theo từng tháng"></i>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <table class="table no-wrap sparkline" id="tbSparkline1">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="width: 10%">alert_count</td>
+                                                            <td style="width: 80%">
+                                                                <div id="tbAlert" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left;
+                                                                width: 10%" class="maxValue"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>crit_count</td>
+                                                            <td>
+                                                                <div id="tbCrit" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left" class="maxValue"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>emerg_count</td>
+                                                            <td>
+                                                                <div id="tbEmerg" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left" class="maxValue"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>err_count</td>
+                                                            <td>
+                                                                <div id="tbErr" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left" class="maxValue"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>notice_count</td>
+                                                            <td>
+                                                                <div id="tbNotie" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left" class="maxValue"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>warning_count</td>
+                                                            <td>
+                                                                <div id="tbWarn" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left" class="maxValue"></th>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px"> Status Of Service Monitoring By Month</h2>
+                                                <i class="fa fa-info-circle toolTipText" title="Xu hướng chi tiết của từng mức độ cảnh báo service theo từng tháng"></i>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <table class="table no-wrap sparkline" id="tbSparkline2">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="width: 10%">crit_opsview</td>
+                                                            <td style="width: 80%">
+                                                                <div id="tbCritOps" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left;
+                                                                width: 10%" class="maxValue"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>ok_opsview</td>
+                                                            <td>
+                                                                <div id="tbOkOps" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left" class="maxValue"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>warn_opsview</td>
+                                                            <td>
+                                                                <div id="tbWarnOps" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left" class="maxValue"></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>unknown_opsview</td>
+                                                            <td>
+                                                                <div id="tbUnknownOps" class="spark-cont"></div>
+                                                            </td>
+                                                            <th style="text-align: left" class="maxValue"></th>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                                 <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                     <div class="x_panel tile">
                                         <div class="x_title">
@@ -1146,7 +1186,7 @@
         <!--  Datepicker -->
     <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script src="../assets/javascripts/common.js"></script>
-    @scripts1(response)
-    @scripts2(response)
+    @scripts1(response, province)
+    @scripts2(response, province)
     </body>
 </html>

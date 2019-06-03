@@ -1,4 +1,4 @@
-@(response: model.device.RegionOverview )
+@(response: model.device.RegionOverview, province: String)
 
 <script type="text/javascript">
         // for page Tab Trend
@@ -18,835 +18,767 @@
                 success: function (dta) {
                     if(dta != "Error"){
                         $('#isClickedTab4').val(1)
-                        // Connectivity By Month
-                        var monthTrend3 = new Highcharts.Chart({
-                            chart: {
-                                renderTo: 'month-trend3'
-                            },
-                            title: '',
-                            xAxis: [{
-                                categories: dta.topConnect.categories
-                            }],
-                            legend: {
-                                enabled: true
-                            },
-                            colors: ['#1ABB9C', '#5A738E', '#d62855'],
-                            tooltip: {
-                                shared: true
-                            },
-                            series: [{
-                                type: 'line',
-                                name:'Signin',
-                                data: dta.topConnect.signin
-                            },
-                                {
+                        @if(province.equals("")){
+                            // Outliers Of BRAS By Month
+                            var monthTrend1 = new Highcharts.Chart({
+                                chart: {
+                                    renderTo: 'month-trend1'
+                                },
+                                title: '',
+                                xAxis: [{
+                                    categories: dta.topBras.categories
+                                }],
+                                legend: {
+                                    enabled: false
+                                },
+                                colors: ['#1ABB9C', '#d62855'],
+                                series: [{
                                     type: 'line',
-                                    name:'Logoff',
-                                    data: dta.topConnect.logoff
+                                    name:'No outliers',
+                                    data: dta.topBras.data
                                 }]
-                        });
-                        /* add regression line dynamically */
-                        monthTrend3.addSeries({
-                            type: 'line',
-                            dashStyle: 'shortdash',
-                            showInLegend: false,
-                            enableMouseTracking: false,
-                            marker: { enabled: false },
-                            /* function returns data for trend-line */
-                            data: (function() {
-                                return fitOneDimensionalData(dta.topConnect.dataAvg);
-                            })()
-                        });
-                        // Outliers Of BRAS By Month
-                        var monthTrend1 = new Highcharts.Chart({
-                            chart: {
-                                renderTo: 'month-trend1'
-                            },
-                            title: '',
-                            xAxis: [{
-                                categories: dta.topBras.categories
-                            }],
-                            legend: {
-                                enabled: false
-                            },
-                            colors: ['#1ABB9C', '#d62855'],
-                            series: [{
+                            });
+                            /* add regression line dynamically */
+                            monthTrend1.addSeries({
                                 type: 'line',
-                                name:'No outliers',
-                                data: dta.topBras.data
-                            }]
-                        });
-                        /* add regression line dynamically */
-                        monthTrend1.addSeries({
-                            type: 'line',
-                            dashStyle: 'shortdash',
-                            marker: { enabled: false },
-                            enableMouseTracking: false,
-                            /* function returns data for trend-line */
-                            data: (function() {
-                                return fitOneDimensionalData(dta.topBras.data);
-                            })()
-                        });
-                        // Outliers Of OLT By Mont
-                        var monthTrend2 = new Highcharts.Chart({
-                            chart: {
-                                renderTo: 'month-trend2'
-                            },
-                            title: '',
-                            xAxis: [{
-                                categories: dta.topOlt.categories
-                            }],
-                            legend: {
-                                enabled: false
-                            },
-                            colors: ['#1ABB9C', '#d62855'],
-                            series: [{
-                                type: 'line',
-                                name:'Total outliers',
-                                data: dta.topOlt.data
-                            }]
-                        });
-                        /* add regression line dynamically */
-                        monthTrend2.addSeries({
-                            type: 'line',
-                            dashStyle: 'shortdash',
-                            marker: { enabled: false },
-                            enableMouseTracking: false,
-                            /* function returns data for trend-line */
-                            data: (function() {
-                                return fitOneDimensionalData(dta.topOlt.data);
-                            })()
-                        });
-                        // Inf error By Month
-                        var monthTrend4 = new Highcharts.Chart({
-                            chart: {
-                                renderTo: 'month-trend4'
-                            },
-                            title: '',
-                            xAxis: [{
-                                categories: dta.topInf.categories
-                            }],
-                            legend: {
-                                enabled: false
-                            },
-                            colors: ['#1ABB9C', '#d62855'],
-                            series: [{
-                                type: 'line',
-                                name:'Total inf',
-                                data: dta.topInf.data
-                            }]
-                        });
-                        /* add regression line dynamically */
-                        monthTrend4.addSeries({
-                            type: 'line',
-                            dashStyle: 'shortdash',
-                            marker: { enabled: false },
-                            enableMouseTracking: false,
-                            /* function returns data for trend-line */
-                            data: (function() {
-                                return fitOneDimensionalData(dta.topInf.data);
-                            })()
-                        });
-                        // BRAS Error By Month
-                        var monthTrend5 = new Highcharts.Chart({
-                            chart: {
-                                renderTo: 'month-trend5'
-                            },
-                            title: '',
-                            xAxis: [{
-                                categories: dta.topBrasErr.categories
-                            }],
-                            legend: {
-                                enabled: false
-                            },
-                            colors: ['#1ABB9C', '#d62855'],
-                            series: [{
-                                type: 'line',
-                                name:'Total kibana',
-                                data: dta.topBrasErr.data
-                            }]
-                        });
-                        /* add regression line dynamically */
-                        monthTrend5.addSeries({
-                            type: 'line',
-                            dashStyle: 'shortdash',
-                            marker: { enabled: false },
-                            enableMouseTracking: false,
-                            /* function returns data for trend-line */
-                            data: (function() {
-                                return fitOneDimensionalData(dta.topBrasErr.data);
-                            })()
-                        });
-                        // Service Monitoring By Month
-                        var monthTrend6 = new Highcharts.Chart({
-                            chart: {
-                                renderTo: 'month-trend6'
-                            },
-                            title: '',
-                            xAxis: [{
-                                categories: dta.topService.categories
-                            }],
-                            legend: {
-                                enabled: false
-                            },
-                            colors: ['#1ABB9C', '#d62855'],
-                            series: [{
-                                type: 'line',
-                                name:'Total opsview',
-                                data: dta.topService.data
-                            }]
-                        });
-                        /* add regression line dynamically */
-                        monthTrend6.addSeries({
-                            type: 'line',
-                            dashStyle: 'shortdash',
-                            enableMouseTracking: false,
-                            marker: { enabled: false },
-                            /* function returns data for trend-line */
-                            data: (function() {
-                                return fitOneDimensionalData(dta.topService.data);
-                            })()
-                        });
-                        // sparkline Severity Of BRAS Error By Month
-                        $('#tbSparkline1 tr').each(function (i, value) {
-                            $(this).find('.maxValue').text(dta.servBrasErr.maxSparkline[i])
-                        })
-                        $("#tbAlert").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
+                                dashStyle: 'shortdash',
+                                marker: { enabled: false },
+                                enableMouseTracking: false,
+                                /* function returns data for trend-line */
+                                data: (function() {
+                                    return fitOneDimensionalData(dta.topBras.data);
+                                })()
+                            });
+                            // Outliers Of OLT By Mont
+                            var monthTrend2 = new Highcharts.Chart({
+                                chart: {
+                                    renderTo: 'month-trend2'
+                                },
+                                title: '',
+                                xAxis: [{
+                                    categories: dta.topOlt.categories
+                                }],
+                                legend: {
                                     enabled: false
                                 },
-                                tickLength: 0
-                            },
-                            yAxis: {
-                                title: {
-                                    text: null
+                                colors: ['#1ABB9C', '#d62855'],
+                                series: [{
+                                    type: 'line',
+                                    name:'Total outliers',
+                                    data: dta.topOlt.data
+                                }]
+                            });
+                            /* add regression line dynamically */
+                            monthTrend2.addSeries({
+                                type: 'line',
+                                dashStyle: 'shortdash',
+                                marker: { enabled: false },
+                                enableMouseTracking: false,
+                                /* function returns data for trend-line */
+                                data: (function() {
+                                    return fitOneDimensionalData(dta.topOlt.data);
+                                })()
+                            });
+                            // BRAS Error By Month
+                            var monthTrend5 = new Highcharts.Chart({
+                                chart: {
+                                    renderTo: 'month-trend5'
                                 },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
+                                title: '',
+                                xAxis: [{
+                                    categories: dta.topBrasErr.categories
+                                }],
+                                legend: {
                                     enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
-                                    },
-                                    marker: {
-                                        radius: 2
+                                },
+                                colors: ['#1ABB9C', '#d62855'],
+                                series: [{
+                                    type: 'line',
+                                    name:'Total kibana',
+                                    data: dta.topBrasErr.data
+                                }]
+                            });
+                            /* add regression line dynamically */
+                            monthTrend5.addSeries({
+                                type: 'line',
+                                dashStyle: 'shortdash',
+                                marker: { enabled: false },
+                                enableMouseTracking: false,
+                                /* function returns data for trend-line */
+                                data: (function() {
+                                    return fitOneDimensionalData(dta.topBrasErr.data);
+                                })()
+                            });
+                            // Service Monitoring By Month
+                            var monthTrend6 = new Highcharts.Chart({
+                                chart: {
+                                    renderTo: 'month-trend6'
+                                },
+                                title: '',
+                                xAxis: [{
+                                    categories: dta.topService.categories
+                                }],
+                                legend: {
+                                    enabled: false
+                                },
+                                colors: ['#1ABB9C', '#d62855'],
+                                series: [{
+                                    type: 'line',
+                                    name:'Total opsview',
+                                    data: dta.topService.data
+                                }]
+                            });
+                            /* add regression line dynamically */
+                            monthTrend6.addSeries({
+                                type: 'line',
+                                dashStyle: 'shortdash',
+                                enableMouseTracking: false,
+                                marker: { enabled: false },
+                                /* function returns data for trend-line */
+                                data: (function() {
+                                    return fitOneDimensionalData(dta.topService.data);
+                                })()
+                            });
+                            // sparkline Severity Of BRAS Error By Month
+                            $('#tbSparkline1 tr').each(function (i, value) {
+                                $(this).find('.maxValue').text(dta.servBrasErr.maxSparkline[i])
+                            })
+                            $("#tbAlert").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
                                     }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Alert count',
-                                data: parseDataSparkline(dta.servBrasErr.alert)
-                            }]
-                        });
-                        $("#tbCrit").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
-                                    enabled: false
                                 },
-                                tickLength: 0
-                            },
-                            yAxis: {
                                 title: {
-                                    text: null
+                                    text: ''
                                 },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
+                                credits: {
                                     enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
                                     },
-                                    marker: {
-                                        radius: 2
-                                    }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Crit count',
-                                data: parseDataSparkline(dta.servBrasErr.crit)
-                            }]
-                        });
-                        $("#tbEmerg").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
-                                    enabled: false
+                                    tickLength: 0
                                 },
-                                tickLength: 0
-                            },
-                            yAxis: {
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
+                                    }
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Alert count',
+                                    data: parseDataSparkline(dta.servBrasErr.alert)
+                                }]
+                            });
+                            $("#tbCrit").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
+                                    }
+                                },
                                 title: {
-                                    text: null
+                                    text: ''
                                 },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
+                                credits: {
                                     enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
                                     },
-                                    marker: {
-                                        radius: 2
-                                    }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Emerg count',
-                                data: parseDataSparkline(dta.servBrasErr.emerg)
-                            }]
-                        });
-                        $("#tbErr").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
-                                    enabled: false
+                                    tickLength: 0
                                 },
-                                tickLength: 0
-                            },
-                            yAxis: {
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
+                                    }
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Crit count',
+                                    data: parseDataSparkline(dta.servBrasErr.crit)
+                                }]
+                            });
+                            $("#tbEmerg").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
+                                    }
+                                },
                                 title: {
-                                    text: null
+                                    text: ''
                                 },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
+                                credits: {
                                     enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
                                     },
-                                    marker: {
-                                        radius: 2
-                                    }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Err count',
-                                data: parseDataSparkline(dta.servBrasErr.err)
-                            }]
-                        });
-                        $("#tbNotie").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
-                                    enabled: false
+                                    tickLength: 0
                                 },
-                                tickLength: 0
-                            },
-                            yAxis: {
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
+                                    }
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Emerg count',
+                                    data: parseDataSparkline(dta.servBrasErr.emerg)
+                                }]
+                            });
+                            $("#tbErr").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
+                                    }
+                                },
                                 title: {
-                                    text: null
+                                    text: ''
                                 },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
+                                credits: {
                                     enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
                                     },
-                                    marker: {
-                                        radius: 2
-                                    }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Notice count',
-                                data: parseDataSparkline(dta.servBrasErr.notice)
-                            }]
-                        });
-                        $("#tbWarn").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
-                                    enabled: false
+                                    tickLength: 0
                                 },
-                                tickLength: 0
-                            },
-                            yAxis: {
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
+                                    }
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Err count',
+                                    data: parseDataSparkline(dta.servBrasErr.err)
+                                }]
+                            });
+                            $("#tbNotie").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
+                                    }
+                                },
                                 title: {
-                                    text: null
+                                    text: ''
                                 },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
+                                credits: {
                                     enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
                                     },
-                                    marker: {
-                                        radius: 2
+                                    tickLength: 0
+                                },
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
                                     }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Warning count',
-                                data: parseDataSparkline(dta.servBrasErr.warn)
-                            }]
-                        });
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Notice count',
+                                    data: parseDataSparkline(dta.servBrasErr.notice)
+                                }]
+                            });
+                            $("#tbWarn").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
+                                    }
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                credits: {
+                                    enabled: false
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
+                                    },
+                                    tickLength: 0
+                                },
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
+                                    }
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Warning count',
+                                    data: parseDataSparkline(dta.servBrasErr.warn)
+                                }]
+                            });
 
-                        // sparkline Status Of Service Monitoring By Month
-                        $('#tbSparkline2 tr').each(function (i, value) {
-                            $(this).find('.maxValue').text(dta.servOpsview.maxSparkline[i])
-                        })
-                        $("#tbCritOps").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
-                                    enabled: false
-                                },
-                                tickLength: 0
-                            },
-                            yAxis: {
-                                title: {
-                                    text: null
-                                },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
-                                    enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
-                                    },
-                                    marker: {
-                                        radius: 2
+                            // sparkline Status Of Service Monitoring By Month
+                            $('#tbSparkline2 tr').each(function (i, value) {
+                                $(this).find('.maxValue').text(dta.servOpsview.maxSparkline[i])
+                            })
+                            $("#tbCritOps").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
                                     }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Crit opsview',
-                                data: parseDataSparkline(dta.servOpsview.crit)
-                            }]
-                        });
-                        $("#tbOkOps").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
-                                    enabled: false
                                 },
-                                tickLength: 0
-                            },
-                            yAxis: {
                                 title: {
-                                    text: null
+                                    text: ''
                                 },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
+                                credits: {
                                     enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
                                     },
-                                    marker: {
-                                        radius: 2
-                                    }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Ok opsview',
-                                data: parseDataSparkline(dta.servOpsview.ok)
-                            }]
-                        });
-                        $("#tbWarnOps").highcharts({
-                            chart: {
-                                margin: [0, 0, 0, 0],
-                                style: {
-                                    overflow: 'visible'
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            credits: {
-                                enabled: false
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            colors:['#115296'],
-                            xAxis: {
-                                labels: {
-                                    enabled: false
+                                    tickLength: 0
                                 },
-                                tickLength: 0
-                            },
-                            yAxis: {
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
+                                    }
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Crit opsview',
+                                    data: parseDataSparkline(dta.servOpsview.crit)
+                                }]
+                            });
+                            $("#tbOkOps").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
+                                    }
+                                },
                                 title: {
-                                    text: null
+                                    text: ''
                                 },
-                                maxPadding: 0,
-                                minPadding: 0,
-                                gridLineWidth: 0,
-                                ticks: false,
-                                endOnTick: false,
-                                labels: {
+                                credits: {
                                     enabled: false
-                                }
-                            },
-                            tooltip: {
-                                borderWidth: 1,
-                                shadow: false,
-                                useHTML: true,
-                                hideDelay: 0,
-                                padding: 5,
-                                positioner: function (w, h, point) {
-                                    return {
-                                        x: point.plotX - w / 2,
-                                        y: point.plotY - h
-                                    };
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    enableMouseTracking: true,
-                                    lineWidth: 1,
-                                    shadow: false,
-                                    states: {
-                                        hover: {
-                                            lineWidth: 1
-                                        }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
                                     },
-                                    marker: {
-                                        radius: 2
+                                    tickLength: 0
+                                },
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
                                     }
-                                }
-                            },
-                            series: [{
-                                type: 'line',
-                                name: 'Warn opsview',
-                                data: parseDataSparkline(dta.servOpsview.warn)
-                            }]
-                        });
-                        $("#tbUnknownOps").highcharts({
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Ok opsview',
+                                    data: parseDataSparkline(dta.servOpsview.ok)
+                                }]
+                            });
+                            $("#tbWarnOps").highcharts({
+                                chart: {
+                                    margin: [0, 0, 0, 0],
+                                    style: {
+                                        overflow: 'visible'
+                                    }
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                credits: {
+                                    enabled: false
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                colors:['#115296'],
+                                xAxis: {
+                                    labels: {
+                                        enabled: false
+                                    },
+                                    tickLength: 0
+                                },
+                                yAxis: {
+                                    title: {
+                                        text: null
+                                    },
+                                    maxPadding: 0,
+                                    minPadding: 0,
+                                    gridLineWidth: 0,
+                                    ticks: false,
+                                    endOnTick: false,
+                                    labels: {
+                                        enabled: false
+                                    }
+                                },
+                                tooltip: {
+                                    borderWidth: 1,
+                                    shadow: false,
+                                    useHTML: true,
+                                    hideDelay: 0,
+                                    padding: 5,
+                                    positioner: function (w, h, point) {
+                                        return {
+                                            x: point.plotX - w / 2,
+                                            y: point.plotY - h
+                                        };
+                                    }
+                                },
+                                plotOptions: {
+                                    series: {
+                                        enableMouseTracking: true,
+                                        lineWidth: 1,
+                                        shadow: false,
+                                        states: {
+                                            hover: {
+                                                lineWidth: 1
+                                            }
+                                        },
+                                        marker: {
+                                            radius: 2
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name: 'Warn opsview',
+                                    data: parseDataSparkline(dta.servOpsview.warn)
+                                }]
+                            });
+                            $("#tbUnknownOps").highcharts({
                             chart: {
                                 margin: [0, 0, 0, 0],
                                 style: {
@@ -915,6 +847,76 @@
                                 name: 'Unknown opsview',
                                 data: parseDataSparkline(dta.servOpsview.unknown)
                             }]
+                        });
+                        }
+                        // Connectivity By Month
+                        var monthTrend3 = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'month-trend3'
+                            },
+                            title: '',
+                            xAxis: [{
+                                categories: dta.topConnect.categories
+                            }],
+                            legend: {
+                                enabled: true
+                            },
+                            colors: ['#1ABB9C', '#5A738E', '#d62855'],
+                            tooltip: {
+                                shared: true
+                            },
+                            series: [{
+                                type: 'line',
+                                name:'Signin',
+                                data: dta.topConnect.signin
+                            },
+                                {
+                                    type: 'line',
+                                    name:'Logoff',
+                                    data: dta.topConnect.logoff
+                                }]
+                        });
+                        /* add regression line dynamically */
+                        monthTrend3.addSeries({
+                            type: 'line',
+                            dashStyle: 'shortdash',
+                            showInLegend: false,
+                            enableMouseTracking: false,
+                            marker: { enabled: false },
+                            /* function returns data for trend-line */
+                            data: (function() {
+                                return fitOneDimensionalData(dta.topConnect.dataAvg);
+                            })()
+                        });
+                        // Inf error By Month
+                        var monthTrend4 = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'month-trend4'
+                            },
+                            title: '',
+                            xAxis: [{
+                                categories: dta.topInf.categories
+                            }],
+                            legend: {
+                                enabled: false
+                            },
+                            colors: ['#1ABB9C', '#d62855'],
+                            series: [{
+                                type: 'line',
+                                name:'Total inf',
+                                data: dta.topInf.data
+                            }]
+                        });
+                        /* add regression line dynamically */
+                        monthTrend4.addSeries({
+                            type: 'line',
+                            dashStyle: 'shortdash',
+                            marker: { enabled: false },
+                            enableMouseTracking: false,
+                            /* function returns data for trend-line */
+                            data: (function() {
+                                return fitOneDimensionalData(dta.topInf.data);
+                            })()
                         });
                         // sparkline Detail Of INF Error By Month
                         $('#tbSparkline3 tr').each(function (i, value) {
@@ -1415,42 +1417,42 @@
                         var currMonth = dta.currMonth
                         $("#monthPickerTop").datepicker("update", currMonth)
                         $('#isClickedTab3').val(1)
-                        /* BOX SIGNIN */
-                        $('#divSignin .signin').text(Number(dta.signin.currSignin).toLocaleString())
-                        $('#divSignin .prevSignin').text(Number(dta.signin.prevSignin).toLocaleString())
-                        var percSignin = (Number(dta.signin.percent) >=0)? '<h5 style="color: #11fd11"> <i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.signin.percent+' % </h5>' : '<h5 style="color: #f30606"> <i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.signin.percent+' % </h5>'
-                        $('#divSignin .changeSig').html(percSignin)
-                        $('#divSignin .titprevSign').text(dta.prevMonth)
-                        /* BOX LOGOFF */
-                        $('#divLogoff .logoff').text(Number(dta.logoff.currLogoff).toLocaleString())
-                        $('#divLogoff .prevLog').text(Number(dta.logoff.prevLogoff).toLocaleString())
-                        var percLogoff = (Number(dta.logoff.percent) >=0)? '<h5 style="color: #11fd11"> <i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.logoff.percent+' % </h5>' : '<h5 style="color: #f30606"> <i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.logoff.percent+' % </h5>'
-                        $('#divLogoff .changeLog').html(percLogoff)
-                        $('#divLogoff .titprevLog').text(dta.prevMonth)
-                        /* BOX SUYHAO */
-                        $('#divSuy .suyhao').text(Number(dta.suyhao.currSuyhao).toLocaleString())
-                        $('#divSuy .prevSuy').text(Number(dta.suyhao.prevSuyhao).toLocaleString())
-                        var percSuy = (Number(dta.suyhao.percent) >=0)? '<h5 style="color: #11fd11"> <i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.suyhao.percent+' % </h5>' : '<h5 style="color: #f30606"> <i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.suyhao.percent+' % </h5>'
-                        $('#divSuy .changeSuy').html(percSuy)
-                        $('#divSuy .titprevSuy').text(dta.prevMonth)
-                        /* BOX NOT PASSED SUYHAO */
-                        $('#divNotsuy .notSuy').text(Number(dta.notSuyhao.currNotsuyhao).toLocaleString())
-                        $('#divNotsuy .prevNotsuy').text(Number(dta.notSuyhao.prevNotsuyhao).toLocaleString())
-                        var percNotsuy = (Number(dta.notSuyhao.percent) >=0)? '<h5 style="color: #11fd11"> <i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.notSuyhao.percent+' % </h5>' : '<h5 style="color: #f30606"> <i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.notSuyhao.percent+' % </h5>'
-                        $('#divNotsuy .changeNotsuy').html(percNotsuy)
-                        $('#divNotsuy .titprevNotSuy').text(dta.prevMonth)
-                        /* BOX BRAS OUTLIER*/
-                        $('.currBras').text(Number(dta.bras.currBras).toLocaleString())
-                        $('.prevBras').text(Number(dta.bras.prevBras).toLocaleString())
-                        var percBras = (Number(dta.bras.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.bras.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.bras.percent+' % </span>'
-                        $('.changeBras').html(percBras)
-                        $('.titprevBras').text('No Outlier '+dta.prevMonth)
+                        if(dta.province == ""){
+                            /* BOX SIGNIN */
+                            $('#divSignin .signin').text(Number(dta.signin.currSignin).toLocaleString())
+                            $('#divSignin .prevSignin').text(Number(dta.signin.prevSignin).toLocaleString())
+                            var percSignin = (Number(dta.signin.percent) >=0)? '<h5 style="color: #11fd11"> <i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.signin.percent+' % </h5>' : '<h5 style="color: #f30606"> <i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.signin.percent+' % </h5>'
+                            $('#divSignin .changeSig').html(percSignin)
+                            $('#divSignin .titprevSign').text(dta.prevMonth)
+                            /* BOX LOGOFF */
+                            $('#divLogoff .logoff').text(Number(dta.logoff.currLogoff).toLocaleString())
+                            $('#divLogoff .prevLog').text(Number(dta.logoff.prevLogoff).toLocaleString())
+                            var percLogoff = (Number(dta.logoff.percent) >=0)? '<h5 style="color: #11fd11"> <i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.logoff.percent+' % </h5>' : '<h5 style="color: #f30606"> <i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.logoff.percent+' % </h5>'
+                            $('#divLogoff .changeLog').html(percLogoff)
+                            $('#divLogoff .titprevLog').text(dta.prevMonth)
+                            /* BOX BRAS OUTLIER*/
+                            $('.currBras').text(Number(dta.bras.currBras).toLocaleString())
+                            $('.prevBras').text(Number(dta.bras.prevBras).toLocaleString())
+                            var percBras = (Number(dta.bras.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.bras.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.bras.percent+' % </span>'
+                            $('.changeBras').html(percBras)
+                            $('.titprevBras').text('No Outlier '+dta.prevMonth)
 
-                        $('.currAffect').text(Number(dta.affected.currAffect).toLocaleString())
-                        $('.prevAffect').text(Number(dta.affected.prevAffect).toLocaleString())
-                        var percAff = (Number(dta.affected.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.affected.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.affected.percent+' % </span>'
-                        $('.changeAffect').html(percAff)
-                        $('.titprevAffect').text('Affected Clients '+dta.prevMonth)
+                            $('.currAffect').text(Number(dta.affected.currAffect).toLocaleString())
+                            $('.prevAffect').text(Number(dta.affected.prevAffect).toLocaleString())
+                            var percAff = (Number(dta.affected.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.affected.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.affected.percent+' % </span>'
+                            $('.changeAffect').html(percAff)
+                            $('.titprevAffect').text('Affected Clients '+dta.prevMonth)
+                            /* BOX Kibana & Opsview */
+                            $('.currKiba').text(Number(dta.kibana.currKiba).toLocaleString())
+                            $('.prevKiba').text(Number(dta.kibana.prevKiba).toLocaleString())
+                            var percKiba = (Number(dta.kibana.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.kibana.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.kibana.percent+' % </span>'
+                            $('.changeKiba').html(percKiba)
+
+                            $('.currOps').text(Number(dta.opsview.currOps).toLocaleString())
+                            $('.prevOps').text(Number(dta.opsview.prevOps).toLocaleString())
+                            var percOps = (Number(dta.opsview.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.opsview.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.opsview.percent+' % </span>'
+                            $('.changeOps').html(percOps)
+                        }
                         /* BOX INF OUTLIER */
                         $('.currOutInf').text(Number(dta.outliInf.currOut).toLocaleString())
                         $('.prevOutInf').text(Number(dta.outliInf.prevOut).toLocaleString())
@@ -1511,7 +1513,18 @@
                         var percSigout = (Number(dta.signalOut.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.signalOut.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.signalOut.percent+' % </span>'
                         $('.changeSigOut').html(percSigout)
                         $('.titprevSigOut').text('Lost Signal Outlier '+dta.prevMonth)
-
+                        /* BOX SUYHAO */
+                        $('#divSuy .suyhao').text(Number(dta.suyhao.currSuyhao).toLocaleString())
+                        $('#divSuy .prevSuy').text(Number(dta.suyhao.prevSuyhao).toLocaleString())
+                        var percSuy = (Number(dta.suyhao.percent) >=0)? '<h5 style="color: #11fd11"> <i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.suyhao.percent+' % </h5>' : '<h5 style="color: #f30606"> <i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.suyhao.percent+' % </h5>'
+                        $('#divSuy .changeSuy').html(percSuy)
+                        $('#divSuy .titprevSuy').text(dta.prevMonth)
+                        /* BOX NOT PASSED SUYHAO */
+                        $('#divNotsuy .notSuy').text(Number(dta.notSuyhao.currNotsuyhao).toLocaleString())
+                        $('#divNotsuy .prevNotsuy').text(Number(dta.notSuyhao.prevNotsuyhao).toLocaleString())
+                        var percNotsuy = (Number(dta.notSuyhao.percent) >=0)? '<h5 style="color: #11fd11"> <i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.notSuyhao.percent+' % </h5>' : '<h5 style="color: #f30606"> <i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.notSuyhao.percent+' % </h5>'
+                        $('#divNotsuy .changeNotsuy').html(percNotsuy)
+                        $('#divNotsuy .titprevNotSuy').text(dta.prevMonth)
                         /* BOX Contract & Device */
                         $('.prevMonth').text(dta.prevMonth)
                         $('.currMonth').text(dta.currMonth)
@@ -1534,16 +1547,6 @@
                         $('.prevPoor').text(Number(dta.poor.prevPoor).toLocaleString())
                         var percConn = (Number(dta.poor.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.poor.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.poor.percent+' % </span>'
                         $('.changePoor').html(percConn)
-                        /* BOX Kibana & Opsview */
-                        $('.currKiba').text(Number(dta.kibana.currKiba).toLocaleString())
-                        $('.prevKiba').text(Number(dta.kibana.prevKiba).toLocaleString())
-                        var percKiba = (Number(dta.kibana.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.kibana.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.kibana.percent+' % </span>'
-                        $('.changeKiba').html(percKiba)
-
-                        $('.currOps').text(Number(dta.opsview.currOps).toLocaleString())
-                        $('.prevOps').text(Number(dta.opsview.prevOps).toLocaleString())
-                        var percOps = (Number(dta.opsview.percent) >=0)? '<span class="changeUp"><i class="fa fa-arrow-up" aria-hidden="true"></i> '+dta.opsview.percent+' % </span>' : '<span class="changeDown"><i class="fa fa-arrow-down" aria-hidden="true"></i> '+dta.opsview.percent+' % </span>'
-                        $('.changeOps').html(percOps)
                         /* BOX Inf Error */
                         $('#divInfErr .currTotal').text(Number(dta.totalInf.currTotal).toLocaleString())
                         $('#divInfErr .prevTotal').text(Number(dta.totalInf.prevTotal).toLocaleString())
@@ -1616,199 +1619,337 @@
                         $('#isClickedTab2').val(1)
                         // right click event
                         fntRightClick()
-                        // top 10 sigin
-                        Highcharts.chart('bar-signin', {
-                            chart: {
-                                type: 'bar'
-                            },
-                            title: {
-                                text: ''
-                            },
-                            xAxis: {
-                                type: 'category'
-                            },
-                            yAxis: {
-                                min: 0,
+                        if(dta.province == "") {
+                            // top 10 sigin
+                            Highcharts.chart('bar-signin', {
+                                chart: {
+                                    type: 'bar'
+                                },
                                 title: {
                                     text: ''
-                                }
-                            },
-                            legend: {
-                                reversed: true
-                            },
-                            plotOptions: {
-                                series: {
-                                    stacking: 'normal',
-                                    point:{
-                                        events: {
-                                            contextmenu: function (e) {
-                                                if(e.target.point.name.indexOf('-') >=0)
-                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
-                                            }
-                                        }
+                                },
+                                xAxis: {
+                                    type: 'category'
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
                                     }
-                                }
-                            },
-                            tooltip : {
-                                headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
-                                pointFormat: '<b>{point.name}: {point.y}</b><br/>Total signin clients: {point.k}'
-                            },
-                            series: [{
-                                name: 'Province',
-                                data: getJsonDrillParenthaveClients(dta.topSignin.dataProvince, dta.topSignin.dataClients),
-                                color: '#1ABB9C'
-                            }],
-                            drilldown: {
-                                drillUpButton: {
-                                    relativeTo: 'spacingBox',
-                                    position: {
-                                        y: 0,
-                                        x: 0
-                                    },
-                                    theme: {
-                                        fill: '#85d088',
-                                        'stroke-width': 1,
-                                        stroke: 'silver',
-                                        r: 0,
-                                        states: {
-                                            hover: {
-                                                fill: '#85d088',
+                                },
+                                legend: {
+                                    reversed: true,
+                                    enabled: false
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal',
+                                        point: {
+                                            events: {
+                                                contextmenu: function (e) {
+                                                    if (e.target.point.name.indexOf('-') >= 0)
+                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                }
                                             }
                                         }
                                     }
                                 },
-                                series: getJsonDrillChildren(dta.topSignin.data,dta.topSignin.categories)
-                            }
-                        });
-                        // top 10 Logoff
-                        Highcharts.chart('bar-logoff', {
-                            chart: {
-                                type: 'bar'
-                            },
-                            title: {
-                                text: ''
-                            },
-                            xAxis: {
-                                type: 'category'
-                            },
-                            yAxis: {
-                                min: 0,
+                                tooltip: {
+                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>' + monthStr + '<br>',
+                                    pointFormat: '<b>{point.name}: {point.y}</b><br/>Total signin clients: {point.k}'
+                                },
+                                series: [{
+                                    name: 'Province',
+                                    data: getJsonDrillParenthaveClients(dta.topSignin.dataProvince, dta.topSignin.dataClients),
+                                    color: '#1ABB9C'
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
+                                            }
+                                        }
+                                    },
+                                    series: getJsonDrillChildren(dta.topSignin.data, dta.topSignin.categories)
+                                }
+                            });
+                            // top 10 Logoff
+                            Highcharts.chart('bar-logoff', {
+                                chart: {
+                                    type: 'bar'
+                                },
                                 title: {
                                     text: ''
-                                }
-                            },
-                            tooltip : {
-                                headerFormat: '<span style = "font-size:11px">{series.name}</span><br>'+monthStr+'<br>',
-                                pointFormat: '<b>{point.name}: {point.y}</b><br/>Total logoff clients: {point.k}'
-                            },
-                            legend: {
-                                reversed: true
-                            },
-                            plotOptions: {
-                                series: {
-                                    stacking: 'normal',
-                                    point:{
-                                        events: {
-                                            contextmenu: function (e) {
-                                                if(e.target.point.name.indexOf('-') >=0)
-                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
-                                            }
-                                        }
+                                },
+                                xAxis: {
+                                    type: 'category'
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
                                     }
-                                }
-                            },
-                            series: [{
-                                name: 'Province',
-                                data: getJsonDrillParenthaveClients(dta.topLogoff.dataProvince, dta.topLogoff.dataClients),
-                                color: '#d9534f'
-                            }],
-                            drilldown: {
-                                drillUpButton: {
-                                    relativeTo: 'spacingBox',
-                                    position: {
-                                        y: 0,
-                                        x: 0
-                                    },
-                                    theme: {
-                                        fill: '#85d088',
-                                        'stroke-width': 1,
-                                        stroke: 'silver',
-                                        r: 0,
-                                        states: {
-                                            hover: {
-                                                fill: '#85d088',
+                                },
+                                tooltip: {
+                                    headerFormat: '<span style = "font-size:11px">{series.name}</span><br>' + monthStr + '<br>',
+                                    pointFormat: '<b>{point.name}: {point.y}</b><br/>Total logoff clients: {point.k}'
+                                },
+                                legend: {
+                                    reversed: true,
+                                    enabled: false
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal',
+                                        point: {
+                                            events: {
+                                                contextmenu: function (e) {
+                                                    if (e.target.point.name.indexOf('-') >= 0)
+                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                }
                                             }
                                         }
                                     }
                                 },
-                                series: getJsonDrillChildren(dta.topLogoff.data,dta.topLogoff.categories)
-                            }
-                        });
-
-                        // top 10 bras outliers
-                        // Create the chart
-                        Highcharts.chart('pie-bras', {
-                            chart: {
-                                type: 'pie',
-                                options3d: {
-                                    enabled: false,
-                                    alpha: 45
-                                }
-                            },
-                            title: {
-                                text: ''
-                            },
-                            plotOptions: {
-                                pie: {
-                                    allowPointSelect: false,
-                                    cursor: 'pointer',
-                                    dataLabels: {
-                                        enabled: true,
-                                        format: '{point.name}: {point.percentage:.2f}%'
-                                    },
-                                    showInLegend: false
-                                },
-                                series: {
-                                    point:{
-                                        events: {
-                                            contextmenu: function (e) {
-                                                if(e.target.point.name.indexOf('-') >=0)
-                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                series: [{
+                                    name: 'Province',
+                                    data: getJsonDrillParenthaveClients(dta.topLogoff.dataProvince, dta.topLogoff.dataClients),
+                                    color: '#d9534f'
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
                                             }
                                         }
-                                    }
-                                }
-                            },
-                            colors : ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#1ABB9C', '#832d1d', '#09006d', '#cccccc', '#669999', '#e6e600'],
-                            tooltip: {
-                                pointFormat: 'Total Bras Outliers: <b>{point.y} ({point.percentage:.2f}%)</b>'
-                            },
-                            series: [{
-                                name: 'Province',
-                                data: getJsonDrillParenthaveClients(dta.topBrasOut.dataProvince, dta.topBrasOut.dataClients)
-                            }],
-                            drilldown: {
-                                drillUpButton: {
-                                    relativeTo: 'spacingBox',
-                                    position: {
-                                        y: 0,
-                                        x: 0
                                     },
-                                    theme: {
-                                        fill: '#85d088',
-                                        'stroke-width': 1,
-                                        stroke: 'silver',
-                                        r: 0,
-                                        states: {
-                                            hover: {
-                                                fill: '#85d088',
+                                    series: getJsonDrillChildren(dta.topLogoff.data, dta.topLogoff.categories)
+                                }
+                            });
+                            // top 10 bras outliers
+                            Highcharts.chart('pie-bras', {
+                                chart: {
+                                    type: 'pie',
+                                    options3d: {
+                                        enabled: false,
+                                        alpha: 45
+                                    }
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                plotOptions: {
+                                    pie: {
+                                        allowPointSelect: false,
+                                        cursor: 'pointer',
+                                        dataLabels: {
+                                            enabled: true,
+                                            format: '{point.name}: {point.percentage:.2f}%'
+                                        },
+                                        showInLegend: false
+                                    },
+                                    series: {
+                                        point: {
+                                            events: {
+                                                contextmenu: function (e) {
+                                                    if (e.target.point.name.indexOf('-') >= 0)
+                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                }
                                             }
                                         }
                                     }
                                 },
-                                series: getJsonDrillChildren(dta.topBrasOut.data,dta.topBrasOut.categories)
-                            }
-                        });
+                                colors: ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#1ABB9C', '#832d1d', '#09006d', '#cccccc', '#669999', '#e6e600'],
+                                tooltip: {
+                                    pointFormat: 'Total Bras Outliers: <b>{point.y} ({point.percentage:.2f}%)</b>'
+                                },
+                                series: [{
+                                    name: 'Province',
+                                    data: getJsonDrillParenthaveClients(dta.topBrasOut.dataProvince, dta.topBrasOut.dataClients)
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
+                                            }
+                                        }
+                                    },
+                                    series: getJsonDrillChildren(dta.topBrasOut.data, dta.topBrasOut.categories)
+                                }
+                            });
+                            // top 10 Kibana
+                            Highcharts.chart('bar-kibana', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    type: 'category'
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal',
+                                        point:{
+                                            events: {
+                                                contextmenu: function (e) {
+                                                    if(e.target.point.name.indexOf('-') >=0)
+                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                }
+                                            }
+                                        },
+                                        dataLabels: {
+                                            enabled: true,
+                                            align: 'top',
+                                            color: '#FFFFFF',
+                                            x: -10
+                                        },
+                                        pointPadding: 0.1,
+                                        groupPadding: 0
+                                    }
+                                },
+                                series: [{
+                                    name: 'Province',
+                                    data: getJsonDrillParenthaveClients(dta.topKibana.dataProvince, []),
+                                    color: '#f1b53d'
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
+                                            }
+                                        }
+                                    },
+                                    series: getJsonDrillChildren(dta.topKibana.data, dta.topKibana.categories)
+                                }
+                            });
+                            // top 10 Opsview
+                            Highcharts.chart('bar-opsview', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    type: 'category'
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: ''
+                                    }
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal',
+                                        point:{
+                                            events: {
+                                                contextmenu: function (e) {
+                                                    if(e.target.point.name.indexOf('-') >=0)
+                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                }
+                                            }
+                                        },
+                                        dataLabels: {
+                                            enabled: true,
+                                            align: 'top',
+                                            color: '#FFFFFF',
+                                            x: -10
+                                        },
+                                        pointPadding: 0.1,
+                                        groupPadding: 0
+                                    }
+                                },
+                                series: [{
+                                    name: 'Province',
+                                    data: getJsonDrillParenthaveClients(dta.topOpsview.dataProvince, []),
+                                    color: '#73879C'
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
+                                            }
+                                        }
+                                    },
+                                    series: getJsonDrillChildren(dta.topOpsview.data, dta.topOpsview.categories)
+                                }
+                            });
+                        }
                         // top 10 inf outliers
                         Highcharts.chart('pie-inf', {
                             chart: {
@@ -1872,143 +2013,7 @@
                                 series: getJsonDrillChildren(dta.topInfOut.data,dta.topInfOut.categories)
                             }
                         });
-                        // top 10 Kibana
-                        Highcharts.chart('bar-kibana', {
-                            chart: {
-                                type: 'bar'
-                            },
-                            title: {
-                                text: ''
-                            },
-                            xAxis: {
-                                type: 'category'
-                            },
-                            yAxis: {
-                                min: 0,
-                                title: {
-                                    text: ''
-                                }
-                            },
-                            legend: {
-                                reversed: true
-                            },
-                            plotOptions: {
-                                series: {
-                                    stacking: 'normal',
-                                    point:{
-                                        events: {
-                                            contextmenu: function (e) {
-                                                if(e.target.point.name.indexOf('-') >=0)
-                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
-                                            }
-                                        }
-                                    },
-                                    dataLabels: {
-                                        enabled: true,
-                                        align: 'top',
-                                        color: '#FFFFFF',
-                                        x: -10
-                                    },
-                                    pointPadding: 0.1,
-                                    groupPadding: 0
-                                }
-                            },
-                            series: [{
-                                name: 'Province',
-                                data: getJsonDrillParenthaveClients(dta.topKibana.dataProvince, []),
-                                color: '#f1b53d'
-                            }],
-                            drilldown: {
-                                drillUpButton: {
-                                    relativeTo: 'spacingBox',
-                                    position: {
-                                        y: 0,
-                                        x: 0
-                                    },
-                                    theme: {
-                                        fill: '#85d088',
-                                        'stroke-width': 1,
-                                        stroke: 'silver',
-                                        r: 0,
-                                        states: {
-                                            hover: {
-                                                fill: '#85d088',
-                                            }
-                                        }
-                                    }
-                                },
-                                series: getJsonDrillChildren(dta.topKibana.data, dta.topKibana.categories)
-                            }
-                        });
-                        // top 10 Opsview
-                        Highcharts.chart('bar-opsview', {
-                            chart: {
-                                type: 'bar'
-                            },
-                            title: {
-                                text: ''
-                            },
-                            xAxis: {
-                                type: 'category'
-                            },
-                            yAxis: {
-                                min: 0,
-                                title: {
-                                    text: ''
-                                }
-                            },
-                            legend: {
-                                reversed: true
-                            },
-                            plotOptions: {
-                                series: {
-                                    stacking: 'normal',
-                                    point:{
-                                        events: {
-                                            contextmenu: function (e) {
-                                                if(e.target.point.name.indexOf('-') >=0)
-                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
-                                            }
-                                        }
-                                    },
-                                    dataLabels: {
-                                        enabled: true,
-                                        align: 'top',
-                                        color: '#FFFFFF',
-                                        x: -10
-                                    },
-                                    pointPadding: 0.1,
-                                    groupPadding: 0
-                                }
-                            },
-                            series: [{
-                                name: 'Province',
-                                data: getJsonDrillParenthaveClients(dta.topOpsview.dataProvince, []),
-                                color: '#73879C'
-                            }],
-                            drilldown: {
-                                drillUpButton: {
-                                    relativeTo: 'spacingBox',
-                                    position: {
-                                        y: 0,
-                                        x: 0
-                                    },
-                                    theme: {
-                                        fill: '#85d088',
-                                        'stroke-width': 1,
-                                        stroke: 'silver',
-                                        r: 0,
-                                        states: {
-                                            hover: {
-                                                fill: '#85d088',
-                                            }
-                                        }
-                                    }
-                                },
-                                series: getJsonDrillChildren(dta.topOpsview.data, dta.topOpsview.categories)
-                            }
-                        });
-                        // top 10 Inf
+                        // top 20 Inf
                         Highcharts.chart('bar-inf', {
                             chart: {
                                 type: 'column'
@@ -2030,7 +2035,8 @@
                                 pointFormat: '<span style = "color:{point.color}">{point.name}</span>: <b>{point.y}</b>'
                             },
                             legend: {
-                                reversed: true
+                                reversed: true,
+                                enabled: false
                             },
                             plotOptions: {
                                 series: {
@@ -2077,7 +2083,8 @@
                                 }
                             },
                             legend: {
-                                reversed: true
+                                reversed: true,
+                                enabled: false
                             },
                             tooltip: {
                                 formatter: function () {

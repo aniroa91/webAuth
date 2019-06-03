@@ -1,4 +1,4 @@
-@(form: Form[BrasOutlier],email: String,rsInfhost: model.device.HostResponse,response: model.device.BrasResponse,day: String,bras: String,_typeS: String, postUrl: Call)(implicit request: RequestHeader)
+@(form: Form[BrasOutlier],email: String,province:String,rsInfhost: model.device.HostResponse,response: model.device.BrasResponse,day: String,bras: String,_typeS: String, postUrl: Call)(implicit request: RequestHeader)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatPattern
 @import play.api.libs.json.Json
@@ -32,20 +32,26 @@
                         @helper.CSRF.formField
                         <input type="hidden" id="_typeS" name="_typeS" value="@_typeS">
                         <input type="hidden" id="date" name="date" value="@day">
-                        <input type="text" style="height: 36px" class="form-control autocomplete search" required id="bras" name="bras" placeholder="Search bras..." value="@bras">
+                        @if(province.equals("")) {
+                            <input type="text" style="height: 36px" class="form-control autocomplete search" required id="bras" name="bras" placeholder="Search bras..." value="@bras">
+                        } else{
+                            <input type="text" style="border-radius: 0px;height: 36px" class="form-control autocomplete search" required id="bras" name="bras" placeholder="Search inf host..." value="@bras">
+                        }
                     </form>
 
                 </div>
                 <div class="col-lg-2 col-sm-2 col-xs-12 radioBtn">
                     <div class="input-group">
                         <div id="radioBtn" class="btn-group">
-                            @if(_typeS.equals("B")) {
-                                <a class="btn btn-primary btn-sm active" data-toggle="search" style="height: 33px" data-title="B">BRAS</a>
-                                <a class="btn btn-primary btn-sm notActive" data-toggle="search" style="height: 33px" data-title="I">HOST</a>
-                            }else{
+                        @if(_typeS.equals("B")) {
+                            <a class="btn btn-primary btn-sm active" data-toggle="search" style="height: 33px" data-title="B">BRAS</a>
+                            <a class="btn btn-primary btn-sm notActive" data-toggle="search" style="height: 33px" data-title="I">HOST</a>
+                        } else {
+                            @if(province.equals("")) {
                                 <a class="btn btn-primary btn-sm notActive" data-toggle="search" style="height: 33px" data-title="B">BRAS</a>
-                                <a class="btn btn-primary btn-sm active" data-toggle="search" style="height: 33px" data-title="I">HOST</a>
                             }
+                            <a class="btn btn-primary btn-sm active" data-toggle="search" style="height: 33px" data-title="I">HOST</a>
+                        }
                         </div>
                     </div>
                 </div>
@@ -844,10 +850,11 @@
                             $.ajax({
                                 url: "/suggest",
                                 data: {
-                                    ct: $("#bras").val()
+                                    ct: $("#bras").val(),
+                                    _type: "0"
                                 }
                             }).done(function(dta) {
-                                console.log(dta.data)
+                                //console.log(dta.data)
                                 response($.map(dta.data, function(obj) {
                                     return {
                                         value: obj
@@ -1162,7 +1169,7 @@
                             // _type: 0 hourly time
                             // _type: 1 frame time
                             $.ajax({
-                                url: "/daily/getInfErrHourly?_type=1&id=" + $(this).attr('name')+"&day="+$('#date').val()+"&bras="+$('#bras').val(),
+                                url: "/daily/getInfErrHourly?_type=1&id=" + $(this).attr('name')+"&day="+$('#date').val()+"&bras="+$('#bras').val()+"&province="+$('#provinceRole').val(),
                                 cache: false,
                                 success: function (dta) {
                                     if(dta != "Error"){

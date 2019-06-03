@@ -1,4 +1,4 @@
-@(response: device.models.ProblemResponse, email: String, postUrl: Call)(implicit request: RequestHeader)
+@(response: device.models.ProblemResponse, email: String, province: String, postUrl: Call)(implicit request: RequestHeader)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -50,7 +50,8 @@
         @if(response != null){
         @helper.CSRF.formField
         <input type="hidden" id="date" value="@response.weekly(0)._2">
-        <input type="hidden" id="province">
+        <input type="hidden" id="checkProvince" value="@province">
+        <input type="hidden" id="province" value="@province">
         <input type="hidden" id="isDevType" value="*">
         <div class="row mg-t-15">
             <div class="col-xs-12">
@@ -72,11 +73,15 @@
             </div>
         </div>
         <div class="row mg-t-15">
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                <div class="region"></div>
-                <a class="apply btn btn-xs btn-success"><i class="fa fa-check-circle"></i> Apply</a>
-            </div>
-            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+            @if(province.equals("")){
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <div class="region"></div>
+                    <a class="apply btn btn-xs btn-success"><i class="fa fa-check-circle"></i> Apply</a>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+            } else{
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            }
                 <div class="col-xs-12" style="padding: 0px 20px 0px 20px">
                     <div class="x_panel tile ">
                         <div class="">
@@ -101,15 +106,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-12">
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <div id="bar-connect" style="height: 600px"></div>
+                @if(province == "") {
+                    <div class="col-xs-12">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div id="bar-connect" style="height: 600px"></div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 divTypeDev">
+                            <div id="bar-error" style="height: 300px"></div>
+                            <div id="bar-warn" style="height: 300px"></div>
+                        </div>
                     </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 divTypeDev">
-                        <div id="bar-error" style="height: 300px"></div>
-                        <div id="bar-warn" style="height: 300px"></div>
-                    </div>
-                </div>
+                }
             </div>
         </div>
         <div class="row mg-t-15">
@@ -126,7 +133,7 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="x_panel tile">
-                    <div class="x_title" style="padding: 0px">
+                    <div class="x_title" style="border-bottom: none;margin-bottom:2px;padding: 0px">
                         <h2> Devices Get Problem With Suy Hao Index <i class="fa fa-info-circle" title="Các thiết bị gặp vấn đề với tỷ lệ suy hao không đạt trong tuần"></i></h2>
                         <div class="clearfix"></div>
                     </div>
@@ -245,7 +252,7 @@
                 });
                 var tbSuyhao = $('#tbSuyhao').DataTable( {
                     dom: 'Bfrtip',
-                    "scrollY":        "200px",
+                    "scrollY":        "210px",
                     "scrollCollapse": true,
                     "paging":         false,
                     "info":     false,
@@ -264,7 +271,7 @@
                         }
                     }
                 });
-                if(@Html(Json.stringify(Json.toJson(response.location))) != null){
+                if(@Html(Json.stringify(Json.toJson(response.location))) != null && @province.equals("")){
                     // jsTree Region and province
                     $('.region').jstree({
                         "plugins": ["checkbox"],
@@ -305,7 +312,7 @@
                     callAjaxProblem("date")
                 })
                 //Chart: Devices Get Problem With Connectivity
-                @if(response.probConnectivity != null){
+                @if(response.probConnectivity.length >0){
                 var chartConn = Highcharts.chart('bar-connect', {
                     chart: {
                         type: 'bar',
@@ -351,7 +358,7 @@
                 });
                 }
                 //Chart: Devices Get Warn Problem
-                @if(response.probError != null){
+                @if(response.probError.length >0){
                 var chartError = Highcharts.chart('bar-error', {
                     chart: {
                         type: 'bar',
@@ -390,7 +397,7 @@
                 });
                 }
                 //Chart: Devices Get Error Problem
-                @if(response.probWarn != null){
+                @if(response.probWarn.length >0){
                 var chartWarn = Highcharts.chart('bar-warn', {
                     chart: {
                         type: 'bar',
@@ -568,14 +575,16 @@
                         success: function (dta) {
                             if(dta != "Error"){
                                 $('#isDevType').val(($('#isDevType').val() == devType)? "*" : devType)
-                                // update series charts Error
-                                chartError.xAxis[0].update({categories: dta.probErr.cates})
-                                updateChartStack(chartError, getJsonStackSeries(dta.probErr, 1))
-                                chartError.xAxis[0].setExtremes(0, Number(dta.probErr.cates.length) > 1 ? (Number(dta.probErr.cates.length) > 10 ? 10: Number(dta.probErr.cates.length) - 1) : 1 )
-                                // update series charts Warn
-                                chartWarn.xAxis[0].update({categories: dta.probWarn.cates})
-                                updateChartStack(chartWarn, getJsonStackSeries(dta.probWarn, 1))
-                                chartWarn.xAxis[0].setExtremes(0, Number(dta.probWarn.cates.length) > 1 ? (Number(dta.probWarn.cates.length) > 10 ? 10: Number(dta.probWarn.cates.length) - 1) : 1 )
+                                if($('#checkProvince').val() == "") {
+                                    // update series charts Error
+                                    chartError.xAxis[0].update({categories: dta.probErr.cates})
+                                    updateChartStack(chartError, getJsonStackSeries(dta.probErr, 1))
+                                    chartError.xAxis[0].setExtremes(0, Number(dta.probErr.cates.length) > 1 ? (Number(dta.probErr.cates.length) > 10 ? 10 : Number(dta.probErr.cates.length) - 1) : 1)
+                                    // update series charts Warn
+                                    chartWarn.xAxis[0].update({categories: dta.probWarn.cates})
+                                    updateChartStack(chartWarn, getJsonStackSeries(dta.probWarn, 1))
+                                    chartWarn.xAxis[0].setExtremes(0, Number(dta.probWarn.cates.length) > 1 ? (Number(dta.probWarn.cates.length) > 10 ? 10 : Number(dta.probWarn.cates.length) - 1) : 1)
+                                }
                                 // update series charts Crit Alerts
                                 chartCrit.xAxis[0].update({categories: dta.probCrit.cates})
                                 updateChartStack(chartCrit, getJsonStackSeries(dta.probCrit, 1))
@@ -639,18 +648,20 @@
                                 }
                                 tbody += '<th style="border-left: 1px solid #ddd;color: #337ab7">'+dta.deviceType.sum+'</th></tr>'
                                 $('#tbDevType').append(tbody)
-                                // update series charts Connect
-                                chartConn.xAxis[0].update({categories: dta.probConn.cates})
-                                updateChartStack(chartConn, getJsonStackSeries(dta.probConn, 0))
-                                chartConn.xAxis[0].setExtremes(0, Number(dta.probConn.cates.length) > 10 ? 10 : Number(dta.probConn.cates.length) -1)
-                                // update series charts Error
-                                chartError.xAxis[0].update({categories: dta.probErr.cates})
-                                updateChartStack(chartError, getJsonStackSeries(dta.probErr, 1))
-                                chartError.xAxis[0].setExtremes(0, Number(dta.probErr.cates.length) > 10 ? 10 : Number(dta.probErr.cates.length) -1);
-                                // update series charts Warn
-                                chartWarn.xAxis[0].update({categories: dta.probWarn.cates})
-                                updateChartStack(chartWarn, getJsonStackSeries(dta.probWarn, 1))
-                                chartWarn.xAxis[0].setExtremes(0, Number(dta.probWarn.cates.length) > 10 ? 10 : Number(dta.probWarn.cates.length) -1);
+                                if($('#checkProvince').val() == "") {
+                                    // update series charts Connect
+                                    chartConn.xAxis[0].update({categories: dta.probConn.cates})
+                                    updateChartStack(chartConn, getJsonStackSeries(dta.probConn, 0))
+                                    chartConn.xAxis[0].setExtremes(0, Number(dta.probConn.cates.length) > 10 ? 10 : Number(dta.probConn.cates.length) - 1)
+                                    // update series charts Error
+                                    chartError.xAxis[0].update({categories: dta.probErr.cates})
+                                    updateChartStack(chartError, getJsonStackSeries(dta.probErr, 1))
+                                    chartError.xAxis[0].setExtremes(0, Number(dta.probErr.cates.length) > 10 ? 10 : Number(dta.probErr.cates.length) - 1);
+                                    // update series charts Warn
+                                    chartWarn.xAxis[0].update({categories: dta.probWarn.cates})
+                                    updateChartStack(chartWarn, getJsonStackSeries(dta.probWarn, 1))
+                                    chartWarn.xAxis[0].setExtremes(0, Number(dta.probWarn.cates.length) > 10 ? 10 : Number(dta.probWarn.cates.length) - 1);
+                                }
                                 // update series charts Crit Alerts
                                 chartCrit.xAxis[0].update({categories: dta.probCrit.cates})
                                 updateChartStack(chartCrit, getJsonStackSeries(dta.probCrit, 1))

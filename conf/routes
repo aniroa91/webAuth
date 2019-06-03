@@ -54,21 +54,21 @@ POST     /daily                        controllers.DailyController.getFormDayPic
 GET      /daily/ddBrasOutlier          controllers.DailyController.drilldownBrasOutlier(id: String ?= "",day: String ?= "")
 GET      /daily/ddSigLogDaily          controllers.DailyController.drilldownSigLogDaily(id: String ?= "",day: String ?= "")
 GET      /daily/ddErrorDevice          controllers.DailyController.drilldownErrorDevice(id: String ?= "",day: String ?= "",err: String ?= "")
-GET      /daily/ddInfOutlier           controllers.DailyController.drilldownInfOutlier(id: String ?= "",day: String ?= "")
-GET      /daily/ddInferrorDaily        controllers.DailyController.drilldownInfErrorsDaily(id: String ?= "",day: String ?= "",err: String ?= "")
-GET      /daily/getInfErrHourly        controllers.DailyController.getErrInfHourly(_type: String ?= "", id: String ?= "", day: String ?= "", bras: String ?= "")
+GET      /daily/ddInfOutlier           controllers.DailyController.drilldownInfOutlier(id: String ?= "",day: String ?= "",province: String ?= "")
+GET      /daily/ddInferrorDaily        controllers.DailyController.drilldownInfErrorsDaily(id: String ?= "",day: String ?= "",err: String ?= "",province: String ?= "")
+GET      /daily/getInfErrHourly        controllers.DailyController.getErrInfHourly(_type: String ?= "", id: String ?= "", day: String ?= "", bras: String ?= "", province: String ?= "")
 GET      /daily/getServNoticeByType    controllers.DailyController.getServNoticeByType(noti: String ?= "",day: String ?= "")
-GET      /daily/getDailyBrasLocation   controllers.DailyController.getDailyByBrasLocation(id: String ?= "",day: String ?= "")
+GET      /daily/getDailyBrasLocation   controllers.DailyController.getDailyByBrasLocation(id: String ?= "",day: String ?= "", province: String ?= "", _type: String ?= "")
 
 ## PAGE WEEKLY
 # tab Problem
-GET       /weekly                      controllers.ProblemController.index
+GET       /weekly/problem              controllers.ProblemController.index
 POST      /weekly/getJsonProblem       controllers.ProblemController.getJsonProblem
 POST      /weekly/getJsonByDevType     controllers.ProblemController.getJsonByDevType
 # tab KPI
-GET       /kpi                         controllers.KpiController.index
-POST      /kpi/getJsonKpi              controllers.KpiController.getJsonKpi
-POST      /kpi/getKpiTimeSeries        controllers.KpiController.getKpiTimeSeries
+GET       /weekly/kpi                  controllers.KpiController.index
+POST      /weekly/kpi/getJsonKpi       controllers.KpiController.getJsonKpi
+POST      /weekly/kpi/getKpiTimeSeries  controllers.KpiController.getKpiTimeSeries
 ### ---END DASHBOARD---
 
 ### ---PAGE NOC---
@@ -91,7 +91,7 @@ GET      /inf/confirmLabel             controllers.InfController.confirmLabel(ho
 ### ---PAGE SEARCH---
 GET      /searchBras                   controllers.DeviceController.search
 POST     /searchBrasHost               controllers.DeviceController.getFormBras
-GET      /suggest                      controllers.DeviceController.suggest(ct: String ?= "")
+GET      /suggest                      controllers.DeviceController.suggest(ct: String ?= "", _type: String ?= "")
 ### ---END PAGE SEARCH---
 
 ### ---PAGE EXPORT---
@@ -101,5 +101,7 @@ POST      /exportData                  controllers.ExportController.exportData
 
 ### right click request
 GET      /fwdRequest                   controllers.DeviceController.fwdRequest(bras: String)
+
+GET      /error/permission             controllers.ErrorController.index
 
 #######################################################################

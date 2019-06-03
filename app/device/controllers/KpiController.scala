@@ -23,20 +23,24 @@ import services.domain.CommonService
 class KpiController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
   def index =  withAuth { username => implicit request =>
+    val province = if(request.session.get("verifiedLocation").get.equals("1")){
+      // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
+      // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+    } else "All"
     try {
       val t0 = System.currentTimeMillis()
-
       val weekly = Await.result(ProblemService.listWeekly(), Duration.Inf)
-      val lstProvince = Await.result(ProblemService.listProvinceByWeek(weekly(0)._2), Duration.Inf)
+      val lstProvince = Await.result(ProblemService.listProvinceByWeek(weekly(0)._2, if(province.equals("All")) "" else province), Duration.Inf)
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
-      val kpi = Await.result(KpiService.listKpi(weekly(0)._2), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2),
+      val kpi = Await.result(KpiService.listKpi(weekly(0)._2, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2),
         CommonService.format2DecimalDouble(x._3), CommonService.percentDouble(x._2, x._3)))
 
       println("time:"+(System.currentTimeMillis() -t0))
-      Ok(device.views.html.kpi.index(KpiResponse(weekly, location, kpi), username, controllers.routes.KpiController.index()))
+      Ok(device.views.html.kpi.index(KpiResponse(weekly, location, if(!province.equals("All")) kpi.filter(x=> CommonUtils.checkExistIndex(x._1) != "") else kpi), username, province, controllers.routes.KpiController.index()))
     }
     catch{
-      case e: Exception => Ok(device.views.html.kpi.index(null, username, controllers.routes.KpiController.index()))
+      case e: Exception => Ok(device.views.html.kpi.index(null, username, province, controllers.routes.KpiController.index()))
     }
   }
 
@@ -45,12 +49,13 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val time = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
       var province = LocationUtils.getCodeProvWorld(request.body.asFormUrlEncoded.get("province").head)
-      println(province)
       if(province == "BRU") province = "BRA"
-      val kpi = Await.result(KpiService.listKpiJson(date, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2), CommonService.format2DecimalDouble(x._3),
+      val kpi = Await.result(KpiService.listKpi(date, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2), CommonService.format2DecimalDouble(x._3),
             CommonService.percentDouble(x._2, x._3), CommonUtils.getTitleIndex(x._1), CommonUtils.getDescriptIndex(x._1))).toArray.sorted
+      val rsKpi = if(request.body.asFormUrlEncoded.get("isAuthor").head == "1") kpi.filter(x=> CommonUtils.checkExistIndex(x._1) != "") else kpi
+
       val rs = Json.obj(
-        "kpi" -> kpi
+        "kpi" -> rsKpi
       )
       println("timeJson:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))

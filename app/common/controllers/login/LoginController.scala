@@ -7,43 +7,45 @@ import play.api.data.Forms._
 import views._
 import javax.inject.Inject
 import javax.inject.Singleton
+
+import common.auth
+import common.auth.LDAP
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
+
+case class Account(user: String, password: String, regex: String, location: String, verifiedLocation: String)
 
 @Singleton
 class LoginController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
-  val loginForm = Form(
+  /*val loginForm = Form(
     tuple(
       "email" -> text,
       "password" -> text
     ) verifying ("Invalid email or password", result => result match {
       case (email, password) => check(email, password)
     })
-  )
+  )*/
 
-  def check(username: String, password: String) = {
-    ((username == "inf" && password == "inf123") || (username == "noc" && password == "noc123") || (username == "admin" && password == "admin123"))
+  val loginForm = Form {
+    mapping("user" -> text, "password" -> text)(LDAP.authenticate)(_.map(u => (u.user, "")))
+      .verifying("Invalid email or password", result => result.isDefined)
   }
+
+  /*def check(username: String, password: String) = {
+    ((username == "inf" && password == "inf123") || (username == "noc" && password == "noc123") || (username == "admin" && password == "admin123"))
+  }*/
 
   def index = Action { implicit request =>
     val ssId = request.session.get("username").toString
     if(ssId != "None") {
-      val username = request.session.get("username").get.toString
-      username match {
-        case "inf" =>
-          Redirect("/daily")
-        case "noc" =>
-          Redirect("/daily")
-        case "admin" =>
-          Redirect("/daily")
-      }
+      Redirect("/daily")
     }
     else
        Ok(common.views.html.login.index(loginForm))
   }
 
-  def login = Action { implicit request =>
+  /*def login = Action { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors => Redirect(routes.LoginController.index),
       user =>{
@@ -56,6 +58,14 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
             Redirect("/daily").withSession(Security.username -> user._1)
         }
       }
+    )
+  }*/
+
+  def login = Action { implicit request =>
+    loginForm.bindFromRequest.fold(
+      formWithErrors => Redirect(routes.LoginController.index),
+      user => Redirect("/daily").withSession(Security.username -> user.get.user, "regex" -> user.get.regex, "location" -> user.get.location,
+      "verifiedLocation" -> user.get.verifiedLocation)
     )
   }
 

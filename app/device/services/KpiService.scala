@@ -21,20 +21,20 @@ object KpiService extends AbstractService{
         .as[(String, String)])
   }
 
-  def listKpi(week: String): Future[Seq[(String, Double, Double)]] = {
+  def listKpi(week: String, prov: String): Future[Seq[(String, Double, Double)]] = {
     val startDate = week.split("->")(0).trim
     dbConfig.db.run(
       sql"""select  week.kpi_index, week.vlWeek, quarter.vlQuarter
-            from (select kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP AND province ='All'
+            from (select kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP AND province = $prov
             group by kpi_index) week
-            join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date) AND province ='All'
+            join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date) AND province = $prov
             group by kpi_index) quarter on week.kpi_index = quarter.kpi_index
             order by week.kpi_index
             """
         .as[(String, Double, Double)])
   }
 
-  def listKpiJson(week: String, prov: String): Future[Seq[(String, Double, Double)]] = {
+  /*def listKpiJson(week: String, prov: String): Future[Seq[(String, Double, Double)]] = {
     val startDate = week.split("->")(0).trim
     dbConfig.db.run(
       sql"""select week.kpi_index, week.vlWeek, quarter.vlQuarter
@@ -44,7 +44,7 @@ object KpiService extends AbstractService{
             group by kpi_index) quarter on week.kpi_index = quarter.kpi_index
             """
         .as[(String, Double, Double)])
-  }
+  }*/
 
   def listKpiTimeSeries(week: String, prov: String, index: String): Future[Seq[(String, Double)]] = {
     val startDate = week.split("->")(0).trim

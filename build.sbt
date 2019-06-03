@@ -19,7 +19,9 @@ libraryDependencies ++= Seq(
   "org.scalaj" % "scalaj-http_2.11" % "2.3.0",
   "org.jsoup" % "jsoup" % "1.8.3",
   "net.debasishg" %% "redisclient" % "3.4" exclude("io.netty", "netty"),
-  "org.postgresql" % "postgresql" % "9.3-1100-jdbc4"
+  "org.postgresql" % "postgresql" % "9.3-1100-jdbc4",
+  // LDAP
+  "com.unboundid"  % "unboundid-ldapsdk"  % "2.3.6"
   )
 libraryDependencies += "com.h2database" % "h2" % "1.4.194"
 
