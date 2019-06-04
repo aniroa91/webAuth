@@ -1,44 +1,21 @@
 package services.domain
 
 import java.text.DecimalFormat
-import java.time.format.DateTimeFormatter
 
-import com.ftel.bigdata.utils.DateTimeUtil
-import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.{DateTime, Days}
+import utils.DateTimeUtil
+import org.joda.time.Days
 
-import scala.collection.mutable
 import scala.util.control.Breaks.{break, breakable}
-
-//import com.ftel.bigdata.dns.parameters.Label
-import com.ftel.bigdata.utils.DateTimeUtil
-import com.ftel.bigdata.utils.WhoisUtil
-import com.ftel.bigdata.whois.Whois
-import com.sksamuel.elastic4s.http.ElasticDsl.IndexHttpExecutable
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.sksamuel.elastic4s.searches.SearchDefinition
+import org.elasticsearch.search.sort.SortOrder
 
 import scala.util.Try
-import services.Configure
-import services.Bucket2
-import com.ftel.bigdata.utils.FileUtil
-import com.ftel.bigdata.utils.HttpUtil
-import org.elasticsearch.search.aggregations.bucket.terms.Terms
-import org.apache.http.HttpHost
-import scalaj.http.Http
-import play.api.libs.json.Json
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
-
-import java.util.concurrent.TimeUnit
-import org.jsoup.Jsoup
-import org.jsoup.select.Elements
-import play.api.libs.json.JsObject
-import com.ftel.bigdata.utils.StringUtil
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
-import org.joda.time.Months;
-import java.time.format.DateTimeFormatter
+import org.joda.time.Months
 
 object CommonService extends AbstractService {
 
@@ -591,45 +568,10 @@ object CommonService extends AbstractService {
     val dateTime = DateTime.parse(date, formatter)
     dateTime.getHourOfDay
   }
-
-  /**
-   * Create html tag
-   */
-  def getImageTag(domain: String): String = {
-    val logo = getLogo(domain, false)
-    //"<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
-    //<img id="currentPhoto" src="SomeImage.jpg" onerror="this.src='Default.jpg'" width="100" height="120">
-    "<a href=\"/search?ct=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='/assets/images/logo/default.png'\" width=\"30\" height=\"30\"></a>"
-  }
-  
-  def getImageTag2(domain: String): String = {
-    val logo = getLogo(domain, false)
-    //"<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
-    //<img id="currentPhoto" src="SomeImage.jpg" onerror="this.src='Default.jpg'" width="100" height="120">
-    "<a href=\"/search?ct=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='/assets/images/logo/default.png'\" width=\"20\" height=\"20\"></a>"
-  }
   
   def getLinkTag(domain: String): String = {
     "<a href=\"/search?ct=" + domain + "\" class=\"titDomain\">" + domain + "</a>"
   }
-
-  def getLogo(secondDomain: String, download: Boolean): String = {
-    val logoUrl = Configure.LOGO_API_URL + secondDomain
-    val path = Configure.LOGO_PATH + secondDomain + ".png"
-    val logo = "/extassets/" + secondDomain + ".png"
-    if (download) {
-      if (!FileUtil.isExist(path)) {
-        println("Download logo to " + path)
-        Try(HttpUtil.download(logoUrl, path, Configure.PROXY_HOST, Configure.PROXY_PORT))
-      }
-    }
-    if (FileUtil.isExist(path)) {
-      logo
-    } else {
-      Configure.LOGO_DEFAULT
-    }
-  }
-
 
   def backgroupJob(f: => Unit, msg: String) {
     val thread = new Thread {

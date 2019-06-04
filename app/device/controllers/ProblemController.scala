@@ -5,6 +5,7 @@ import javax.inject.Singleton
 
 import device.models.ProblemResponse
 import device.utils.LocationUtils
+import play.api.Logger
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 
@@ -21,6 +22,7 @@ import services.domain.CommonService
   */
 @Singleton
 class ProblemController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
+  val logger: Logger = Logger(this.getClass())
 
   def index =  withAuth { username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
@@ -49,11 +51,11 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val olts = Await.result(ProblemService.listOLT(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
                 .map(x=> (x._1, x._2, CommonService.formatPattern(x._3), CommonService.formatPattern(x._4), CommonService.formatPattern(x._5),
                   CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
-      println("t0:"+(System.currentTimeMillis() -t0))
-      Ok(device.views.html.weekly.index(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts), username,province, controllers.routes.ProblemController.index()))
+      logger.info("Time:"+(System.currentTimeMillis() -t0))
+      Ok(device.views.html.weekly.problem(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts), username,province, controllers.routes.ProblemController.index()))
     }
     catch{
-      case e: Exception => Ok(device.views.html.weekly.index(null, username,province, controllers.routes.ProblemController.index()))
+      case e: Exception => Ok(device.views.html.weekly.problem(null, username,province, controllers.routes.ProblemController.index()))
     }
   }
 
@@ -124,7 +126,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
         "broken"     -> broken,
         "olt"        -> olts
       )
-      println("t0:"+(System.currentTimeMillis() -t0))
+      logger.info("TimeJson:"+(System.currentTimeMillis() -t0))
       Ok(Json.toJson(rs))
     }
     catch{
@@ -172,7 +174,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
         "probCrit"   -> objCrit,
         "probWarnAlert"   -> objWarnAlert
       )
-      println("t0:"+(System.currentTimeMillis() -t0))
+      logger.info("TimeJson:"+(System.currentTimeMillis() -t0))
       Ok(Json.toJson(rs))
     }
     catch{

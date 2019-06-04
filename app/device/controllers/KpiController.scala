@@ -5,6 +5,7 @@ import javax.inject.Singleton
 
 import device.models.KpiResponse
 import device.utils.{CommonUtils, LocationUtils}
+import play.api.Logger
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 
@@ -21,6 +22,7 @@ import services.domain.CommonService
   */
 @Singleton
 class KpiController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
+  val logger: Logger = Logger(this.getClass())
 
   def index =  withAuth { username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
@@ -36,11 +38,11 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val kpi = Await.result(KpiService.listKpi(weekly(0)._2, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2),
         CommonService.format2DecimalDouble(x._3), CommonService.percentDouble(x._2, x._3)))
 
-      println("time:"+(System.currentTimeMillis() -t0))
-      Ok(device.views.html.kpi.index(KpiResponse(weekly, location, if(!province.equals("All")) kpi.filter(x=> CommonUtils.checkExistIndex(x._1) != "") else kpi), username, province, controllers.routes.KpiController.index()))
+      logger.info("time:"+(System.currentTimeMillis() -t0))
+      Ok(device.views.html.weekly.kpi(KpiResponse(weekly, location, if(!province.equals("All")) kpi.filter(x=> CommonUtils.checkExistIndex(x._1) != "") else kpi), username, province, controllers.routes.KpiController.index()))
     }
     catch{
-      case e: Exception => Ok(device.views.html.kpi.index(null, username, province, controllers.routes.KpiController.index()))
+      case e: Exception => Ok(device.views.html.weekly.kpi(null, username, province, controllers.routes.KpiController.index()))
     }
   }
 
@@ -57,7 +59,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val rs = Json.obj(
         "kpi" -> rsKpi
       )
-      println("timeJson:"+(System.currentTimeMillis() -time))
+      logger.info("timeJson:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{
@@ -77,7 +79,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
         "cate" -> kpiWeekly.map(x=> CommonService.formatStringYYMMDD(x._1)),
         "data" -> kpiWeekly.map(x=> CommonService.format2Decimal(x._2))
       )
-      println("timeJson:"+(System.currentTimeMillis() -time))
+      logger.info("timeJson:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{

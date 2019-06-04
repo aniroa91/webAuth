@@ -1,6 +1,5 @@
 package services.domain
 
-//import com.ftel.bigdata.dns.parameters.Label
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import services.Configure
 

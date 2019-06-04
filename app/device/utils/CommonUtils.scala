@@ -1,6 +1,6 @@
 package device.utils
 
-import com.ftel.bigdata.utils.FileUtil
+import utils.FileUtil
 
 object CommonUtils {
 

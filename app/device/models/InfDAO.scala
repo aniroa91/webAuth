@@ -1,24 +1,17 @@
 package model.device
 
 import play.api.Play
-import play.api.data.Form
-import play.api.data.Forms._
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.Future
 import slick.driver.JdbcProfile
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import slick.driver.PostgresDriver.api._
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
 import services.Configure
 import services.domain.CommonService
-import services.domain.CommonService.getAggregations
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
-import com.ftel.bigdata.utils.DateTimeUtil
-import org.elasticsearch.search.sort.SortOrder
-import service.BrasService.{client, getValueAsInt, getValueAsString}
+import utils.DateTimeUtil
 
 object InfDAO {
 
@@ -27,8 +20,8 @@ object InfDAO {
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
   def getInfHostDailyResponse(host: String,nowDay: String): Array[(String,Int,Int,Int,Int,Int,Int,Int)] = {
-    val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
+    /*val fromDay = nowDay.split("/")(0)
+    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))*/
 
     val res = client.execute(
       search(s"infra_dwh_inf_index_*" / "docs")

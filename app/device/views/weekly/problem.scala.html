@@ -313,13 +313,14 @@
                 })
                 //Chart: Devices Get Problem With Connectivity
                 @if(response.probConnectivity.length >0){
+                var maxAxis = (Number(@response.probConnectivity.map(x=> x._1).length) > 10)? 10 : Number(@response.probConnectivity.map(x=> x._1).length -1)
                 var chartConn = Highcharts.chart('bar-connect', {
                     chart: {
                         type: 'bar',
                             zoomType: 'x',
                             events: {
                                 load: function () {
-                                    this.xAxis[0].setExtremes(0 , 10);
+                                    this.xAxis[0].setExtremes(0 , maxAxis);
                                 }
                             }
                     },
@@ -365,7 +366,7 @@
                         zoomType: 'x',
                         events: {
                             load: function () {
-                                this.xAxis[0].setExtremes(0 , 10);
+                                this.xAxis[0].setExtremes(0 , (@response.probError.map(x=> x._1).length >10)? 10: Number(@response.probError.map(x=> x._1).length -1));
                             }
                         }
                     },
@@ -404,7 +405,7 @@
                         zoomType: 'x',
                         events: {
                             load: function () {
-                                this.xAxis[0].setExtremes(0 , 10);
+                                this.xAxis[0].setExtremes(0 , (@response.probWarn.map(x=> x._1).length>10)? 10: Number(@response.probWarn.map(x=> x._1).length -1));
                             }
                         }
                     },
@@ -443,7 +444,7 @@
                         zoomType: 'x',
                         events: {
                             load: function () {
-                                this.xAxis[0].setExtremes(0 , 10);
+                                this.xAxis[0].setExtremes(0 , (@response.critAlert.map(x=> x._1).length> 10)? 10:Number(@response.critAlert.map(x=> x._1).length-1));
                             }
                         }
                     },
@@ -482,7 +483,7 @@
                         zoomType: 'x',
                         events: {
                             load: function () {
-                                this.xAxis[0].setExtremes(0 , 10);
+                                this.xAxis[0].setExtremes(0 , (@response.warnAlert.map(x=> x._1).length>10) ? 10 : Number(@response.warnAlert.map(x=> x._1).length-1));
                             }
                         }
                     },

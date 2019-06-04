@@ -1,6 +1,6 @@
 package device.utils
 
-import com.ftel.bigdata.utils.FileUtil
+import utils.FileUtil
 
 object LocationUtils {
   val MAP = FileUtil.readResource("/resources/location.csv")

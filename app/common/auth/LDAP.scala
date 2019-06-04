@@ -15,7 +15,7 @@ object LDAP {
         val bindRequest = new SimpleBindRequest(DN, password)
         val bindResult = ldapConn.bind(bindRequest)
         if (bindResult.getResultCode == ResultCode.SUCCESS) {
-          val account = new Account(email, password, "(?!.*noc.*).*", "Ha Noi", "0")
+          val account = new Account(email, password, "(?!.*noc.*).*", "Ha Noi", "1")
           return toOption(account)
         }
       }

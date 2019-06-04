@@ -8,11 +8,10 @@ import scala.concurrent.{Await, Future}
 import org.elasticsearch.search.sort.SortOrder
 import services.domain.CommonService.formatUTC
 import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import org.joda.time.DateTimeZone
-import com.ftel.bigdata.utils.DateTimeUtil
+import utils.DateTimeUtil
 import device.utils.LocationUtils
 
 import scala.concurrent.duration.Duration

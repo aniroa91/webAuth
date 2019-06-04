@@ -20,7 +20,6 @@ import services.domain.CommonService
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
