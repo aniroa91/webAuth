@@ -39,6 +39,8 @@ pipeline {
                 script {
                     docker.withRegistry('https://bigdata-registry.local:5043', '010ed969-34b5-473b-bcd9-01a207e7e382') {
                         sh "ssh -o StrictHostKeyChecking=no root@172.27.11.153 '/bin/sh /root/deploy_docker.sh ${env.JOB_NAME} ${DOCKER_IMAGE} ${EXPOSE_PORT} ${CONTAINER_PORT}'"
+                        sh "ssh -o StrictHostKeyChecking=no root@172.27.11.150 '/bin/sh /root/deploy_docker.sh ${env.JOB_NAME} ${DOCKER_IMAGE} ${EXPOSE_PORT} ${CONTAINER_PORT}'"
+                        sh "ssh -o StrictHostKeyChecking=no root@172.27.11.161 '/bin/sh /root/deploy_docker.sh ${env.JOB_NAME} ${DOCKER_IMAGE} ${EXPOSE_PORT} ${CONTAINER_PORT}'"
                     }
                 }
             }
