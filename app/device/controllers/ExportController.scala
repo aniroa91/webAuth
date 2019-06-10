@@ -31,6 +31,11 @@ class ExportController @Inject()(cc: ControllerComponents) extends AbstractContr
   }
 
   def exportData() = withAuth {username => implicit request =>
+    val province = if(request.session.get("verifiedLocation").get.equals("1")){
+      // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
+      // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+    } else ""
     try{
       val time = System.currentTimeMillis()
       println("Start export data....")
@@ -38,55 +43,72 @@ class ExportController @Inject()(cc: ControllerComponents) extends AbstractContr
       val toDate = request.body.asFormUrlEncoded.get("toDate").head
       val dataSource = request.body.asFormUrlEncoded.get("dataSource").head
       val module = request.body.asFormUrlEncoded.get("module").head.toInt
-      val device = request.body.asFormUrlEncoded.get("device").head.trim().toUpperCase
+      var device = request.body.asFormUrlEncoded.get("device").head.trim().toUpperCase
       val colRow = request.body.asFormUrlEncoded.get("colRow").head.toInt
       val nextDate = if(colRow == 5) CommonService.getNextDay(fromDate) else CommonService.getNextDay(toDate)
-
-      val fileName = if(fromDate.equals(toDate)) dataSource.toUpperCase()+"_"+CommonService.formatDateYYMMDD(fromDate)+".csv" else dataSource.toUpperCase()+"_"+CommonService.formatDateYYMMDD(fromDate)+"_"+CommonService.formatDateYYMMDD(toDate)+".csv"
-      val rs = dataSource match {
-        case "Kibana" => {
-          implicit val contractFormat = Json.format[JsonKibana]
-          val kibana = Await.result(ExportService.exportByKibana(fromDate, nextDate, device), Duration.Inf).slice(0,colRow)
-          Json.obj(
-            "fileName" -> fileName,
-            "data" -> kibana
-          )
-        }
-        case "Opsview" => {
-          implicit val contractFormat = Json.format[JsonOpsview]
-          val opsview = Await.result(ExportService.exportByOpsview(fromDate, nextDate, device), Duration.Inf).slice(0,colRow)
-          Json.obj(
-            "fileName" -> fileName,
-            "data" -> opsview
-          )
-        }
-        case "Inf" => {
-          implicit val contractFormat = Json.format[JsonInf]
-          val inf = Await.result(ExportService.exportByInf(fromDate, nextDate, device), Duration.Inf).slice(0,colRow)
-          Json.obj(
-            "fileName" -> fileName,
-            "data" -> inf
-          )
-        }
-        case "Suyhao" => {
-          implicit val contractFormat = Json.format[JsonSuyhao]
-          val suyhao = Await.result(ExportService.exportBySuyhao(fromDate, nextDate, device), Duration.Inf).slice(0,colRow)
-          Json.obj(
-            "fileName" -> fileName,
-            "data" -> suyhao
-          )
-        }
-        case "PortPonDown" => {
-          implicit val contractFormat = Json.format[JsonPortPonDown]
-          val portPon = Await.result(ExportService.exportByportPon(fromDate, nextDate, device, module), Duration.Inf).slice(0,colRow)
-          Json.obj(
-            "fileName" -> fileName,
-            "data" -> portPon
-          )
+      var isMatch = 0
+      if(province.length>device.length){
+        if(province.indexOf(device) >=0) {
+          isMatch = 1
+          device = province
         }
       }
-      println("End export data:"+(System.currentTimeMillis() -time))
-      Ok(Json.toJson(rs))
+      else{
+        if(device.indexOf(province) >=0) {
+          isMatch = 1
+          device = device
+        }
+      }
+      if(province.equals("") ||isMatch == 1){
+        val fileName = if(fromDate.equals(toDate)) dataSource.toUpperCase()+"_"+CommonService.formatDateYYMMDD(fromDate)+".csv" else dataSource.toUpperCase()+"_"+CommonService.formatDateYYMMDD(fromDate)+"_"+CommonService.formatDateYYMMDD(toDate)+".csv"
+        val rs = dataSource match {
+          case "Kibana" => {
+            implicit val contractFormat = Json.format[JsonKibana]
+            val kibana = Await.result(ExportService.exportByKibana(fromDate, nextDate, device), Duration.Inf).slice(0,colRow)
+            Json.obj(
+              "fileName" -> fileName,
+              "data" -> kibana
+            )
+          }
+          case "Opsview" => {
+            implicit val contractFormat = Json.format[JsonOpsview]
+            val opsview = Await.result(ExportService.exportByOpsview(fromDate, nextDate, device), Duration.Inf).slice(0,colRow)
+            Json.obj(
+              "fileName" -> fileName,
+              "data" -> opsview
+            )
+          }
+          case "Inf" => {
+            implicit val contractFormat = Json.format[JsonInf]
+            val inf = Await.result(ExportService.exportByInf(fromDate, nextDate, device), Duration.Inf).slice(0,colRow)
+            Json.obj(
+              "fileName" -> fileName,
+              "data" -> inf
+            )
+          }
+          case "Suyhao" => {
+            implicit val contractFormat = Json.format[JsonSuyhao]
+            val suyhao = Await.result(ExportService.exportBySuyhao(fromDate, nextDate, device), Duration.Inf).slice(0,colRow)
+            Json.obj(
+              "fileName" -> fileName,
+              "data" -> suyhao
+            )
+          }
+          case "PortPonDown" => {
+            implicit val contractFormat = Json.format[JsonPortPonDown]
+            val portPon = Await.result(ExportService.exportByportPon(fromDate, nextDate, device, module), Duration.Inf).slice(0,colRow)
+            Json.obj(
+              "fileName" -> fileName,
+              "data" -> portPon
+            )
+          }
+        }
+        println("End export data:"+(System.currentTimeMillis() -time))
+        Ok(Json.toJson(rs))
+      }
+      else{
+        Ok("permission")
+      }
     }
     catch{
       case e: Exception => Ok("Error")

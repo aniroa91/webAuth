@@ -45,10 +45,10 @@ object BrasDAO {
         .as[(String, Long)])
   }
 
-  def getTopConnectMonthly(province: String) = {
+  def getTopConnectMonthly() = {
     dbConfig.db.run(
       sql"""select month, sum(signin), sum(logoff)
-            from dmt_overview_conn where month >='2018-06-01'::TIMESTAMP and province ~* $province
+            from dmt_overview_conn where month >='2018-06-01'::TIMESTAMP
             group by month
             order by month
                   """
@@ -65,10 +65,10 @@ object BrasDAO {
         .as[(String, Long)])
   }
 
-  def getTopOltMonthly() = {
+  def getTopOltMonthly(province: String) = {
     dbConfig.db.run(
       sql"""select month, sum(total_outliers)
-            from dmt_overview_inf_outlier where month >='2018-06-01'::TIMESTAMP
+            from dmt_overview_inf_outlier where month >='2018-06-01'::TIMESTAMP and province ~* $province
             group by month
             order by month
                   """
@@ -121,7 +121,7 @@ object BrasDAO {
     dbConfig.db.run(
       sql"""select month, sum(passed_suyhao), sum(not_passed_suyhao)
             from dmt_overview_suyhao
-            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP and province ~* $province
+            where (month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP) and province ~* $province
             group by month
             order by month desc
                   """
@@ -147,7 +147,7 @@ object BrasDAO {
     dbConfig.db.run(
       sql"""select month, sum(total_outliers), sum(total_clients), sum(inf_down_clients), sum(inf_down_outliers), sum(user_down_clients), sum(user_down_outliers), sum(sf_clients), sum(sf_outliers), sum(lost_signal_clients), sum(lost_signal_outliers)
             from dmt_overview_inf_outlier
-            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP and province ~* $province
+            where (month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP) and province ~* $province
             group by month
             order by month desc
                   """
@@ -160,7 +160,7 @@ object BrasDAO {
     dbConfig.db.run(
       sql"""select month, sum(no_contract), sum(no_device), sum(not_poor_conn), sum(poor_conn)
             from dmt_overview_device
-            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP and province ~* $province
+            where (month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP) and province ~* $province
             group by month
             order by month desc
                   """
@@ -173,7 +173,7 @@ object BrasDAO {
     dbConfig.db.run(
       sql"""select month, sum(total_inf), sum(inf_down), sum(user_down), sum(lost_signal), sum(sf_error), sum(lofi_error), sum(rouge_error)
             from dmt_overview_inf
-            where month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP and province ~* $province
+            where (month = $currMonth::TIMESTAMP OR month = $prevMonth::TIMESTAMP) and province ~* $province
             group by month
             order by month desc
                   """

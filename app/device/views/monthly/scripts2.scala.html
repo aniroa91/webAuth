@@ -19,6 +19,45 @@
                     if(dta != "Error"){
                         $('#isClickedTab4').val(1)
                         @if(province.equals("")){
+                            // Connectivity By Month
+                            var monthTrend3 = new Highcharts.Chart({
+                                chart: {
+                                    renderTo: 'month-trend3'
+                                },
+                                title: '',
+                                xAxis: [{
+                                    categories: dta.topConnect.categories
+                                }],
+                                legend: {
+                                    enabled: true
+                                },
+                                colors: ['#1ABB9C', '#5A738E', '#d62855'],
+                                tooltip: {
+                                    shared: true
+                                },
+                                series: [{
+                                    type: 'line',
+                                    name:'Signin',
+                                    data: dta.topConnect.signin
+                                },
+                                    {
+                                        type: 'line',
+                                        name:'Logoff',
+                                        data: dta.topConnect.logoff
+                                    }]
+                            });
+                            /* add regression line dynamically */
+                            monthTrend3.addSeries({
+                                type: 'line',
+                                dashStyle: 'shortdash',
+                                showInLegend: false,
+                                enableMouseTracking: false,
+                                marker: { enabled: false },
+                                /* function returns data for trend-line */
+                                data: (function() {
+                                    return fitOneDimensionalData(dta.topConnect.dataAvg);
+                                })()
+                            });
                             // Outliers Of BRAS By Month
                             var monthTrend1 = new Highcharts.Chart({
                                 chart: {
@@ -49,36 +88,7 @@
                                     return fitOneDimensionalData(dta.topBras.data);
                                 })()
                             });
-                            // Outliers Of OLT By Mont
-                            var monthTrend2 = new Highcharts.Chart({
-                                chart: {
-                                    renderTo: 'month-trend2'
-                                },
-                                title: '',
-                                xAxis: [{
-                                    categories: dta.topOlt.categories
-                                }],
-                                legend: {
-                                    enabled: false
-                                },
-                                colors: ['#1ABB9C', '#d62855'],
-                                series: [{
-                                    type: 'line',
-                                    name:'Total outliers',
-                                    data: dta.topOlt.data
-                                }]
-                            });
-                            /* add regression line dynamically */
-                            monthTrend2.addSeries({
-                                type: 'line',
-                                dashStyle: 'shortdash',
-                                marker: { enabled: false },
-                                enableMouseTracking: false,
-                                /* function returns data for trend-line */
-                                data: (function() {
-                                    return fitOneDimensionalData(dta.topOlt.data);
-                                })()
-                            });
+
                             // BRAS Error By Month
                             var monthTrend5 = new Highcharts.Chart({
                                 chart: {
@@ -849,43 +859,34 @@
                             }]
                         });
                         }
-                        // Connectivity By Month
-                        var monthTrend3 = new Highcharts.Chart({
+                        // Outliers Of OLT By Mont
+                        var monthTrend2 = new Highcharts.Chart({
                             chart: {
-                                renderTo: 'month-trend3'
+                                renderTo: 'month-trend2'
                             },
                             title: '',
                             xAxis: [{
-                                categories: dta.topConnect.categories
+                                categories: dta.topOlt.categories
                             }],
                             legend: {
-                                enabled: true
+                                enabled: false
                             },
-                            colors: ['#1ABB9C', '#5A738E', '#d62855'],
-                            tooltip: {
-                                shared: true
-                            },
+                            colors: ['#1ABB9C', '#d62855'],
                             series: [{
                                 type: 'line',
-                                name:'Signin',
-                                data: dta.topConnect.signin
-                            },
-                                {
-                                    type: 'line',
-                                    name:'Logoff',
-                                    data: dta.topConnect.logoff
-                                }]
+                                name:'Total outliers',
+                                data: dta.topOlt.data
+                            }]
                         });
                         /* add regression line dynamically */
-                        monthTrend3.addSeries({
+                        monthTrend2.addSeries({
                             type: 'line',
                             dashStyle: 'shortdash',
-                            showInLegend: false,
-                            enableMouseTracking: false,
                             marker: { enabled: false },
+                            enableMouseTracking: false,
                             /* function returns data for trend-line */
                             data: (function() {
-                                return fitOneDimensionalData(dta.topConnect.dataAvg);
+                                return fitOneDimensionalData(dta.topOlt.data);
                             })()
                         });
                         // Inf error By Month

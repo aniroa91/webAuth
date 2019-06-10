@@ -384,7 +384,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "categories" -> topBrasOutlier.map(x=> x._1)
       )
       // get Connectivity By Month
-      val topConnect = Await.result(BrasService.getTopConnectMonthly(province), Duration.Inf).map(x=> (x._1.substring(0, x._1.lastIndexOf("-")), x._2, x._3))
+      val topConnect =  if(province.equals("")) Await.result(BrasService.getTopConnectMonthly(), Duration.Inf).map(x=> (x._1.substring(0, x._1.lastIndexOf("-")), x._2, x._3))
+      else Seq[(String, Long, Long)]()
       val connectObj = Json.obj(
         "categories" -> topConnect.map(x=> x._1),
         "signin" -> topConnect.map(x=> x._2),
@@ -392,8 +393,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "dataAvg" -> topConnect.map(x=> (x._2+x._3) / 2)
       )
       // get Outliers Of OLT By Month
-      val topOlt = if(province.equals("")) Await.result(BrasService.getTopOltMonthly(), Duration.Inf).map(x=> x._1.substring(0, x._1.lastIndexOf("-")) -> x._2)
-                   else Seq[(String, Long)]()
+      val topOlt = Await.result(BrasService.getTopOltMonthly(province), Duration.Inf).map(x=> x._1.substring(0, x._1.lastIndexOf("-")) -> x._2)
       val oltObj = Json.obj(
         "data"       -> topOlt.map(x=> x._2),
         "categories" -> topOlt.map(x=> x._1)

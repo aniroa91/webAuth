@@ -37,12 +37,12 @@ object BrasService extends AbstractService{
     BrasDAO.getTopBrasOutMonthly()
   }
 
-  def getTopConnectMonthly(province: String) = {
-    BrasDAO.getTopConnectMonthly(province)
+  def getTopConnectMonthly() = {
+    BrasDAO.getTopConnectMonthly()
   }
 
-  def getTopOltMonthly() = {
-    BrasDAO.getTopOltMonthly()
+  def getTopOltMonthly(province: String) = {
+    BrasDAO.getTopOltMonthly(province)
   }
 
   def getTopServBrasErrMonthly() = {

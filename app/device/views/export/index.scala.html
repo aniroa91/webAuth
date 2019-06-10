@@ -268,29 +268,34 @@
                             });
                         },
                         success: function (dta) {
-                            if(dta != "Error"){
-                                if(dta.data.length >0){
-                                    // for review data table
-                                    if(colRow == 5) {
-                                        $('#divSample').addClass('animated zoomIn')
-                                        $('#divSample').show()
-                                        parseSampleData(dta.data)
+                            if(dta == "permission"){
+                                alert("You don't have permission to view this device. Please choose another device name!")
+                            }
+                            else {
+                                if(dta != "Error"){
+                                    if(dta.data.length >0){
+                                        // for review data table
+                                        if(colRow == 5) {
+                                            $('#divSample').addClass('animated zoomIn')
+                                            $('#divSample').show()
+                                            parseSampleData(dta.data)
+                                        }
+                                        // for export csv
+                                        else{
+                                            $('#divSample').hide()
+                                            exportToCsv(dta.fileName, addHeaderToArray(dta.data))
+                                        }
                                     }
-                                    // for export csv
                                     else{
+                                        $('#tbSample thead').html("")
+                                        $('#tbSample tbody').html("")
                                         $('#divSample').hide()
-                                        exportToCsv(dta.fileName, addHeaderToArray(dta.data))
+                                        alert("Data empty. Please choose other filter!")
                                     }
                                 }
                                 else{
-                                    $('#tbSample thead').html("")
-                                    $('#tbSample tbody').html("")
-                                    $('#divSample').hide()
-                                    alert("Data empty. Please choose other filter!")
+                                    alert("Error when execute query. Please check again your system!")
                                 }
-                            }
-                            else{
-                                alert("Error when execute query. Please check again your system!")
                             }
                         },
                         complete: function () {
