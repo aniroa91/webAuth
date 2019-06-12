@@ -17,9 +17,13 @@ GET     /assets/*file                  controllers.Assets.versioned(path="/publi
 #######################################################################
 
 ### LOGIN , LOGOUT
-GET      /                             controllers.LoginController.index
-GET      /login                        controllers.LoginController.login
-GET      /logout                       controllers.LoginController.logout
+GET      /                           controllers.LoginController.index
+
+GET     /version                     controllers.HomeController.version()
+GET     /login/request               controllers.HomeController.oidcIndex()
+GET     /login/callback              controllers.CallbackController.callback()
+GET     /logout                      @org.pac4j.play.LogoutController.logout()
+GET     /centralLogout               controllers.CentralLogoutController.logout()
 
 #######################################################################
 ### ---DASHBOARD---

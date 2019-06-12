@@ -15,9 +15,8 @@ object Configure {
   val ES_HOST = ConfigFactory.load().getString("es.dns.host")
   val ES_PORT = ConfigFactory.load().getString("es.dns.port").toInt
 
-  val LDAP_HOST  = ConfigFactory.load().getString("ldap.host")
-  val LDAP_PORT  = ConfigFactory.load().getString("ldap.port").toInt
-  val LDAP_DN    = ConfigFactory.load().getString("ldap.dn")
+  val SVC_USER_HOST  = ConfigFactory.load().getString("SVC_USER.host")
+  val SVC_USER_PORT  = ConfigFactory.load().getString("SVC_USER.port")
 
   val LOGO_DEFAULT = "../assets/images/logo/domain.png"
 
