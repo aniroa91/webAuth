@@ -18,7 +18,7 @@ GET     /assets/*file                  controllers.Assets.versioned(path="/publi
 
 ### LOGIN , LOGOUT
 GET      /                           controllers.LoginController.index
-
+GET     /logout                     controllers.LoginController.logout
 GET     /version                     controllers.HomeController.version()
 GET     /login/request               controllers.HomeController.oidcIndex()
 GET     /login/callback              controllers.CallbackController.callback()
