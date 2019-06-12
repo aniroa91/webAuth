@@ -134,6 +134,8 @@
                         $(this).parent().addClass('radioText')
                         var id =$(this).val()
                         $('#typeInfError').val(id)
+                        $('#divallMonth a.month').removeClass('btn-success')
+                        $('#divallMonth a.month').addClass('btnDefault')
                         $.ajax({
                                 url: "/monthly/region-errorType?id=" + id.trim()+"&month="+$('#monthGroup').val(),
                                 cache: false,
@@ -141,7 +143,7 @@
                                         if(dta != "Error"){
                                                 Highcharts.chart('region-infError', {
                                                         chart: {
-                                                                type: 'areaspline'
+                                                                type:  @province.equals("") ? 'areaspline' : 'bar'
                                                         },
                                                         title: {
                                                                 text: ''
@@ -941,7 +943,7 @@
                 // Suyhao not passed
                 Highcharts.chart('region-suyhao', {
                         chart: {
-                                type: 'area'
+                                type:  @province.equals("") ? 'area' : 'bar'
                         },
                         xAxis: {
                                 type:'category'
@@ -1024,7 +1026,7 @@
                 // Inf down error by Region
                 Highcharts.chart('region-infError', {
                         chart: {
-                                type: 'areaspline'
+                                type:  @province.equals("") ? 'areaspline' : 'bar'
                         },
                         title: {
                                 text: ''
@@ -1416,7 +1418,7 @@
                                         // Inf down error by Region
                                         Highcharts.chart('region-infError', {
                                                 chart: {
-                                                        type: 'areaspline'
+                                                        type:  @province.equals("") ? 'areaspline' : 'bar'
                                                 },
                                                 title: {
                                                         text: ''
