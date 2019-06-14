@@ -36,6 +36,8 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(weekly(0)._2, province), Duration.Inf)
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
       val deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
+      if(!province.equals("")) deviceType.filter(x=> x._1 == "switch" || x._1 == "host" || x._1 == "power")
+
       val probConnectivity = if(province.equals("")) Await.result(ProblemService.listProbconnectivity(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf) else Seq[(String, Long, Long)]()
       val probError = if(province.equals("")) Await.result(ProblemService.listProbError(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray, "*"), Duration.Inf) else Seq[(String, Long)]()
       val probWarn = if(province.equals("")) Await.result(ProblemService.listProbWarning(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray, "*"), Duration.Inf) else Seq[(String, Long)]()
@@ -70,6 +72,8 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(date, ""), Duration.Inf).filter(x=> arrProv.indexOf(x._1) >=0)
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
       val deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
+      if(!province.equals("")) deviceType.filter(x=> x._1 == "switch" || x._1 == "host" || x._1 == "power")
+
       val probConnect = Await.result(ProblemService.listProbconnectivity(date, arrProv), Duration.Inf)
       val probError = Await.result(ProblemService.listProbError(date, arrProv, "*"), Duration.Inf)
       val probWarn = Await.result(ProblemService.listProbWarning(date, arrProv, "*"), Duration.Inf)

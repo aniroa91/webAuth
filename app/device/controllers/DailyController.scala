@@ -103,11 +103,11 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
       logger.info("t8:"+(System.currentTimeMillis() -t8))
       val t9 = System.currentTimeMillis()
       // Ticket at Core & Access Group
-      val ticketIssues = if(province.equals("")) Await.result(BrasService.getTicketIssue(day), Duration.Inf) else Seq[(String, String, String, Int)]()
+      val ticketIssues = Await.result(BrasService.getTicketIssue(day, province), Duration.Inf)
       val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (LocationUtils.getRegionByProvWorld(x._2),LocationUtils.getNameProvWorld(x._2), x._3, x._4)).sorted
                       else Seq[(String, String, String, Int)]()
-      val noneCoreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (LocationUtils.getRegionByProvWorld(x._2),LocationUtils.getNameProvWorld(x._2), x._3, x._4)).sorted
-                          else Seq[(String, String, String, Int)]()
+      val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (LocationUtils.getRegionByProvWorld(x._2),LocationUtils.getNameProvWorld(x._2), x._3, x._4)).sorted
+
       val lstProvBras = if(province.equals("")) rsNoticeOpsview.map(x=> (x._1, x._2, x._3))
           else BrasService.getServiceNoticeRegionDaily(day, "*").filter(x=> request.session.get("location").get.indexOf(x._2) >=0).map(x=> (x._1, x._2, x._3))
 

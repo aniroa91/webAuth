@@ -186,7 +186,25 @@
             }
             <div class="row top_tiles">
                 @if(province != ""){
-                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    @if(response.ticketIssue._2.length >0) {
+                        <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                            <div class="x_panel tile">
+                                <div class="x_title">
+                                    <h2 style="font-weight: 500;
+                                        font-size: 24px"> Ticket at Access Group</h2>
+                                    <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống access và ngoại vị theo ngày, vị trí địa lý và loại sự cố"></i>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content" style="text-align: center">
+                                    <div id="col-noneCore" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                    } else {
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    }
+
                 } else{
                 <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
                 }
@@ -248,7 +266,11 @@
                 </div>
                     <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
                 } else{
-                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    @if(response.ticketIssue._2.length >0) {
+                       <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                    } else {
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    }
                 }
                     <div class="x_panel tile">
                         <input type="hidden" id="regionInfErr">
@@ -1015,7 +1037,7 @@
                             }
                         });
                     }
-                    @if(response.ticketIssue._1.length > 0){
+                    @if(response.ticketIssue._2.length > 0){
                         var noneCoreIssue = Highcharts.chart('col-noneCore', {
                             chart: {
                                 type: 'column'

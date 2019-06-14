@@ -577,11 +577,11 @@ object BrasDAO {
     )
   }
 
-  def getTicketIssue(day: String) = {
+  def getTicketIssue(day: String, province: String) = {
     dbConfig.db.run(
       sql"""select issue_group, province, issue, count(*) from dwh_ticket
             where date_trunc('day', created_date) = $day::TIMESTAMP
-            and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access') and province <> ''
+            and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access') and province ~* $province
             group by issue_group, province, issue
             order by issue_group, province, issue
             """
