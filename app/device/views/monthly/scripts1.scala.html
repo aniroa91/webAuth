@@ -520,6 +520,73 @@
                 @if(response != null){
                 fntRightClick()
                 @if(province.equals("")){
+                        //Total Outliers Bras Device
+                        Highcharts.chart('bras-outlier', {
+                        chart: {
+                                type: 'heatmap',
+                                marginTop: 10,
+                                marginBottom: 60,
+                                plotBorderWidth: 1
+                        },
+                        title: {text: ''},
+                        xAxis: {categories: ["Outliers"]},
+                        yAxis: {
+                                categories: @Html(Json.stringify(Json.toJson(response.brasOutlier.map(x=> x._1).distinct.sorted))),
+                                title: null,
+                                labels: {
+                                        style: {
+                                                'min-width': '125px'
+                                        },
+                                        useHTML : true
+                                }
+                        },
+
+                        legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                y: 20,
+                                x: 50
+                        },
+
+                        colorAxis: {
+                                min: 0,
+                                minColor: '#FFFFFF',
+                                maxColor: '#1ABB9C'
+                        },
+
+                        tooltip: {
+                                formatter: function () {
+                                        return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                this.point.value + ' outliers</b> ';
+                                }
+                        },
+                        plotOptions: {
+                                series: {
+                                        events: {
+                                                click: function (event) {
+                                                        callDrilldownOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown','bras')
+                                                }
+                                        },
+                                        dataLabels:{
+                                                formatter:function(){
+                                                        var nf = new Intl.NumberFormat();
+                                                        return nf.format(this.point.value);
+                                                }
+                                        },
+                                        cursor: 'pointer'
+                                }
+                        },
+                        series: [{
+                                name: 'Outliers',
+                                borderWidth: 1,
+                                data: getHeatmapBrasOutlier(@Html(Json.stringify(Json.toJson(response.brasOutlier))), @Html(Json.stringify(Json.toJson(response.brasOutlier.map(x=> x._1).distinct.sorted)))),
+                                dataLabels: {
+                                        enabled: true,
+                                        color: '#000000'
+                                }
+                        }]
+
+                });
                         // Bar Logoff and Signin
                         var categoriesSigLog = ["Vung 1", "Vung 2", "Vung 3", "Vung 4", "Vung 5", "Vung 6", "Vung 7"]
                         Highcharts.chart('region-siglog-bar', {
@@ -866,73 +933,6 @@
                                 name: 'Outliers',
                                 borderWidth: 1,
                                 data: getHeatmapBrasOutlier(@Html(Json.stringify(Json.toJson(response.infOutlier))), @Html(Json.stringify(Json.toJson(response.infOutlier.map(x=> x._1).distinct.sorted)))),
-                                dataLabels: {
-                                        enabled: true,
-                                        color: '#000000'
-                                }
-                        }]
-
-                });
-
-                Highcharts.chart('bras-outlier', {
-                        chart: {
-                                type: 'heatmap',
-                                marginTop: 10,
-                                marginBottom: 60,
-                                plotBorderWidth: 1
-                        },
-                        title: {text: ''},
-                        xAxis: {categories: ["Outliers"]},
-                        yAxis: {
-                                categories: @Html(Json.stringify(Json.toJson(response.brasOutlier.map(x=> x._1).distinct.sorted))),
-                                title: null,
-                                labels: {
-                                        style: {
-                                                'min-width': '125px'
-                                        },
-                                        useHTML : true
-                                }
-                        },
-
-                        legend: {
-                                align: 'center',
-                                verticalAlign: 'bottom',
-                                y: 20,
-                                x: 50
-                        },
-
-                        colorAxis: {
-                                min: 0,
-                                minColor: '#FFFFFF',
-                                maxColor: '#1ABB9C'
-                        },
-
-                        tooltip: {
-                                formatter: function () {
-                                        return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
-                                                this.point.value + ' outliers</b> ';
-                                }
-                        },
-                        plotOptions: {
-                                series: {
-                                        events: {
-                                                click: function (event) {
-                                                        callDrilldownOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown','bras')
-                                                }
-                                        },
-                                        dataLabels:{
-                                                formatter:function(){
-                                                        var nf = new Intl.NumberFormat();
-                                                        return nf.format(this.point.value);
-                                                }
-                                        },
-                                        cursor: 'pointer'
-                                }
-                        },
-                        series: [{
-                                name: 'Outliers',
-                                borderWidth: 1,
-                                data: getHeatmapBrasOutlier(@Html(Json.stringify(Json.toJson(response.brasOutlier))), @Html(Json.stringify(Json.toJson(response.brasOutlier.map(x=> x._1).distinct.sorted)))),
                                 dataLabels: {
                                         enabled: true,
                                         color: '#000000'
