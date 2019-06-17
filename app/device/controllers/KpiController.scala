@@ -38,7 +38,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val kpi = Await.result(KpiService.listKpi(weekly(0)._2, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2),
         CommonService.format2DecimalDouble(x._3), CommonService.percentDouble(x._2, x._3)))
 
-      logger.info("time:"+(System.currentTimeMillis() -t0))
+      logger.info(s"Page: KPI - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.weekly.kpi(KpiResponse(weekly, location, if(!province.equals("All")) kpi.filter(x=> CommonUtils.checkExistIndex(x._1) != "") else kpi), username, province, controllers.routes.KpiController.index()))
     }
     catch{
@@ -59,7 +59,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val rs = Json.obj(
         "kpi" -> rsKpi
       )
-      logger.info("timeJson:"+(System.currentTimeMillis() -time))
+      logger.info(s"Page: KPI - User: ${username} - Choose Province: ${LocationUtils.getNameProvWorld(province)}, Date: $date - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{
@@ -79,7 +79,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
         "cate" -> kpiWeekly.map(x=> CommonService.formatStringYYMMDD(x._1)),
         "data" -> kpiWeekly.map(x=> CommonService.format2Decimal(x._2))
       )
-      logger.info("timeJson:"+(System.currentTimeMillis() -time))
+      logger.info(s"Page: KPI - User: ${username} - Choose Province: ${LocationUtils.getNameProvWorld(province)}, Date: $date - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{

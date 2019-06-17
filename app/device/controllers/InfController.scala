@@ -49,7 +49,8 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
       val t06 = System.currentTimeMillis()
       val totalOutlier = Await.result(BrasService.getTotalOutlier(province), Duration.Inf).sum
       logger.info("t06: " + (System.currentTimeMillis() - t06))
-      logger.info("time: " + (System.currentTimeMillis() - t01))
+      logger.info(s"Page: Inf - User: ${username} - Time Query:"+(System.currentTimeMillis() -t01))
+
       Ok(device.views.html.inf(username,InfResponse(userDown,infDown,spliter,sfLofi,indexRouge,totalOutlier),id))
     }
     catch{
@@ -57,7 +58,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
     }
   }
 
-  def getSigLogInfjson(id: String) = Action { implicit request =>
+  def getSigLogInfjson(id: String) = withAuth {username => implicit request =>
     try{
       val province = if(request.session.get("verifiedLocation").get.equals("1")){
         request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
@@ -85,9 +86,8 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
     }
   }
 
-  def exportCSV(date: String) = Action { implicit request =>
+  def exportCSV(date: String) = withAuth {username => implicit request =>
     try{
-      println(date)
       val province = if(request.session.get("verifiedLocation").get.equals("1")){
         request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
       } else ""
@@ -105,7 +105,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
     }
   }
 
-  def getHostMonitor(host: String) = Action { implicit request =>
+  def getHostMonitor(host: String) = withAuth {username => implicit request =>
     try{
       val province = if(request.session.get("verifiedLocation").get.equals("1")){
         // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
@@ -113,7 +113,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
         request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
       } else ""
       if(province.equals("") || host.substring(0,3).equals(province)) {
-        val t02 = System.currentTimeMillis()
+        val t0 = System.currentTimeMillis()
         val rsHost = Await.result(BrasService.getHostMonitor(host), Duration.Inf)
         val rsGraph = BrasService.getSiglogContract(host)
         val sigLog = rsHost.map(x => (x._1, x._2, x._3, CommonService.getSigLogByNameContract(x._3, rsGraph)))
@@ -126,7 +126,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
           "totalSignin" -> sigLog.filter(x => x._4 == "SignIn").length,
           "totalLogoff" -> sigLog.filter(x => x._4 == "LogOff").length
         )
-        println("time: " + (System.currentTimeMillis() - t02))
+        logger.info(s"Page: Inf(Tab Host Monitor) - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
         Ok(Json.toJson(jsInf))
       }
       else{
@@ -138,7 +138,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
     }
   }
 
-  def confirmLabel(host: String,module: String,time: String) = Action { implicit request =>
+  def confirmLabel(host: String,module: String,time: String) = withAuth {username => implicit request =>
     try{
       val res =  Await.result(BrasService.confirmLabelInf(host,module,time), Duration.Inf)
       Ok(Json.toJson(res))
@@ -148,7 +148,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
     }
   }
 
-  def rejectLabel(host: String,module: String,time: String) = Action { implicit request =>
+  def rejectLabel(host: String,module: String,time: String) = withAuth {username => implicit request =>
     try{
       val res =  Await.result(BrasService.rejectLabelInf(host,module,time), Duration.Inf)
       Ok(Json.toJson(res))

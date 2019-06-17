@@ -29,7 +29,9 @@ class BrasController @Inject()(cc: ControllerComponents) extends AbstractControl
   // page NOC
   def dashboard =  withAuth { username => implicit request =>
     try {
+      val t0 = System.currentTimeMillis()
       val mapBrasOutlier = Await.result(BrasService.getBrasOutlierCurrent(CommonService.getCurrentDay()),Duration.Inf)
+      logger.info(s"Page: NOC - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.noc(username,mapBrasOutlier))
     }
     catch{
@@ -50,7 +52,7 @@ class BrasController @Inject()(cc: ControllerComponents) extends AbstractControl
     }
   }
 
-  def getHostJson(id: String) = Action { implicit request =>
+  def getHostJson(id: String) = withAuth {username => implicit request =>
     try{
       val t0 = System.currentTimeMillis()
       val rsHost = Await.result(BrasService.getHostBras(id), Duration.Inf)
@@ -144,7 +146,8 @@ class BrasController @Inject()(cc: ControllerComponents) extends AbstractControl
         "userLogoff"   -> userLogoff,
         "devSwitch"    -> devSwt
       )
-      logger.info("Time:"+ (System.currentTimeMillis() -t0))
+      logger.info(s"Page: NOC(Click) - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
+
       Ok(Json.toJson(jsBras))
     }
     catch{
@@ -152,7 +155,7 @@ class BrasController @Inject()(cc: ControllerComponents) extends AbstractControl
     }
   }
 
-  def confirmLabel(id: String,time: String) = Action { implicit request =>
+  def confirmLabel(id: String,time: String) = withAuth {username => implicit request =>
     try{
       val res =  Await.result(BrasService.confirmLabel(id,time), Duration.Inf)
       Ok(Json.toJson(res))
@@ -162,7 +165,7 @@ class BrasController @Inject()(cc: ControllerComponents) extends AbstractControl
     }
   }
 
-  def rejectLabel(id: String,time: String) = Action { implicit request =>
+  def rejectLabel(id: String,time: String) = withAuth {username => implicit request =>
     try{
       val res =  Await.result(BrasService.rejectLabel(id,time), Duration.Inf)
       Ok(Json.toJson(res))

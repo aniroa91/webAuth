@@ -132,6 +132,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val infOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth, toMonth,"inf", province), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
         .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
 
+      logger.info(s"Page: Monthly - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.monthly.overview(username,province,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),
         toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),
         nocCount,contracts,heatmapOpsview,infTypeError,totalInf,brasOutlier,infOutlier)))
@@ -375,6 +376,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""
     try{
+      val time = System.currentTimeMillis()
       val month = CommonService.getPreviousMonth()
       // get Outliers Of BRAS By Month
       val topBrasOutlier = if(province.equals("")) Await.result(BrasService.getTopBrasOutMonthly(), Duration.Inf).map(x=> x._1.substring(0, x._1.lastIndexOf("-")) -> x._2)
@@ -472,6 +474,8 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "servOpsview" -> servOpsviewObj,
         "servInfError"  -> servInfErrObj
       )
+      logger.info(s"Page: Trending - User: ${username} - Time Query:"+(System.currentTimeMillis() -time))
+
       Ok(Json.toJson(rs))
     }
     catch{
@@ -485,6 +489,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""
     try{
+      val time = System.currentTimeMillis()
       val currMonth = if(month.equals("")) CommonService.getPreviousMonth() else month
       val prevMonth = CommonService.getPreviousMonth(currMonth)
       /* Box Signin & Logoff */
@@ -692,6 +697,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "lofi"       -> lofiObj,
         "rouge"      -> rougeObj
       )
+      logger.info(s"Page: Compare - User: ${username} - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch {
@@ -705,6 +711,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""
     try{
+      val time = System.currentTimeMillis()
       val month = if(monthStr.equals("")) CommonService.getPreviousMonth() else monthStr
       // get Top Sigin
       val topSignin = if(province.equals("")) Await.result(BrasService.getTopSignin(month), Duration.Inf).map(x=> (LocationUtils.getNameProvincebyCode(x._1), x._2, x._3, x._4))
@@ -792,6 +799,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "topSuyhao"  ->suyhaoObj,
         "topPoor"    -> poorObj
       )
+      logger.info(s"Page: topN - User: ${username} - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{
@@ -1220,7 +1228,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
             val ticketOutlier = Await.result(HostService.getTicketOutlierByHost(brasId, day), Duration.Inf)
             logger.info("tTicket: " + (System.currentTimeMillis() - t7))
 
-            logger.info("timeHost:"+ (System.currentTimeMillis() - t00))
+            logger.info(s"Page: Search Host - User: ${username} - Time Query:"+(System.currentTimeMillis() -t00))
             Ok(device.views.html.search(form,username,province,HostResponse(ticketOutlier,noOutlierModule,errHost,errorHourly,sigLogModule,arrSiglogModuleIndex,suyhaoModule,sigLogByHourly,splitterByHost,ErrModuleIndex(arrModule,arrIndex,errModuleIndex),sfContract),null,day,brasId,"I",routes.DeviceController.search))
           }
           // for result BRAS
@@ -1339,7 +1347,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
             val ticketOutlier = Await.result(BrasService.getTicketOutlierByBrasId(brasId, day), Duration.Inf)
             logger.info("tTicket: " + (System.currentTimeMillis() - t13))
 
-            logger.info("timeAll: " + (System.currentTimeMillis() - timeStart))
+            logger.info(s"Page: Search Bras - User: ${username} - Time Query:"+(System.currentTimeMillis() -timeStart))
             Ok(device.views.html.search(form, username,province,null ,BrasResponse(ticketOutlier, BrasInfor(noOutlierByhost,numOutlier, (sigLog._1, sigLog._2),(sigLogClients._1,sigLogClients._2)), KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime),
               infErrorBytime, serviceByTime, infModuleBytime, opServiceName, ServiceNameStatus(servName, servStatus, opServByStt), linecardhost,
               KibanaOverview(kibanaSeverity, kibanaErrorType, kibanaFacility, kibanaDdos, severityValue), siglogByhost, sankeyService,

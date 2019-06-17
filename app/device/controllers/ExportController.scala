@@ -4,6 +4,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 import device.utils.LocationUtils
+import play.api.Logger
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 
@@ -20,6 +21,8 @@ import services.domain.CommonService
   */
 @Singleton
 class ExportController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
+
+  val logger: Logger = Logger(this.getClass())
 
   def index =  withAuth { username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
@@ -103,7 +106,7 @@ class ExportController @Inject()(cc: ControllerComponents) extends AbstractContr
             )
           }
         }
-        println("End export data:"+(System.currentTimeMillis() -time))
+        logger.info(s"Page: KPI - User: ${username} - Time Query:"+(System.currentTimeMillis() -time))
         Ok(Json.toJson(rs))
       }
       else{

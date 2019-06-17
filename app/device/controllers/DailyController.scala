@@ -112,7 +112,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
           else BrasService.getServiceNoticeRegionDaily(day, "*").filter(x=> request.session.get("location").get.indexOf(x._2) >=0).map(x=> (x._1, x._2, x._3))
 
       logger.info("t9:"+(System.currentTimeMillis() -t9))
-      logger.info("tAll:"+(System.currentTimeMillis() -t0))
+      logger.info(s"Page: DAILY - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       logger.info("======END SERVICE DAILY PAGE======")
       Ok(device.views.html.daily(DailyResponse((rsSiglog._1, rsSiglog._2), rsErrorsDevice, rsNoticeOpsview,(kibanaBytime, opviewBytime), rsLogsigBytime, rsErrorsInf, rsErrorHostDaily, brasOutlier, infOutlier, (coreIssue, noneCoreIssue), lstProvBras), day, username, province))
     }

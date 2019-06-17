@@ -53,7 +53,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val olts = Await.result(ProblemService.listOLT(weekly(0)._2, lstProvince.map(x=> x._1).distinct.toArray), Duration.Inf)
                 .map(x=> (x._1, x._2, CommonService.formatPattern(x._3), CommonService.formatPattern(x._4), CommonService.formatPattern(x._5),
                   CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
-      logger.info("Time:"+(System.currentTimeMillis() -t0))
+      logger.info(s"Page: Problem - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.weekly.problem(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts), username,province, controllers.routes.ProblemController.index()))
     }
     catch{
@@ -130,6 +130,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
         "broken"     -> broken,
         "olt"        -> olts
       )
+      logger.info(s"Page: Problem(Click Location) - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       logger.info("TimeJson:"+(System.currentTimeMillis() -t0))
       Ok(Json.toJson(rs))
     }
@@ -178,7 +179,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
         "probCrit"   -> objCrit,
         "probWarnAlert"   -> objWarnAlert
       )
-      logger.info("TimeJson:"+(System.currentTimeMillis() -t0))
+      logger.info(s"Page: Problem(Click dev Type) - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       Ok(Json.toJson(rs))
     }
     catch{
