@@ -72,7 +72,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""
     try {
-      //val minMaxMonth = CommonService.getRangeCurrentMonth()
+      val t0 = System.currentTimeMillis()
       val minMaxMonth = Await.result(BrasService.getMinMaxMonth(), Duration.Inf)
       val threeMonth = Await.result(BrasService.get3MonthLastest(),Duration.Inf)
       val fromMonth = if(request.flash.get("startMonth").toString != "None") request.flash.get("startMonth").get+"-01" else threeMonth(threeMonth.length-1)
