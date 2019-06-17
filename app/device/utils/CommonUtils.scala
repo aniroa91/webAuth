@@ -25,7 +25,7 @@ object CommonUtils {
 
   val INDEX_MAP = FileUtil.readResource("/resources/kpiIndex.csv")
     .map(x => x.split(","))
-    .map(x => (x(0),x(1))-> (x(2)+x(3)+x(4)))
+    .map(x => (x(0),x(1))-> x(2))
     .toMap
 
   def getRangeTime(id: Double) = {
@@ -38,5 +38,5 @@ object CommonUtils {
 
   def getTitleIndex(index: String) = INDEX_MAP.find(x=> x._1._1 == index.trim).getOrElse((index,index) -> "")._1._2
 
-  def getDescriptIndex(index: String) = INDEX_MAP.find(x=> x._1._1 == index.trim).getOrElse((index,index) -> "")._2
+  def getDescriptIndex(index: String) = INDEX_MAP.find(x=> x._1._1 == index.trim).getOrElse((index,index) -> "")._2.replaceAll("_", "&#10;")
 }

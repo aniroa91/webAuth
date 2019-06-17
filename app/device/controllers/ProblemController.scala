@@ -62,6 +62,11 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
   }
 
   def getJsonProblem() = withAuth {username => implicit request =>
+    val verifiedLocation = if(request.session.get("verifiedLocation").get.equals("1")){
+      // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
+      // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+    } else ""
     try{
       val t0 = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
@@ -72,7 +77,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(date, ""), Duration.Inf).filter(x=> arrProv.indexOf(x._1) >=0)
       val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
       var deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
-      if(!province.equals("")) deviceType = deviceType.filter(x=> x._1 == "switch" ||  x._1 == "host" || x._1 == "power")
+      if(!verifiedLocation.equals("")) deviceType = deviceType.filter(x=> x._1 == "switch" ||  x._1 == "host" || x._1 == "power")
 
       val probConnect = Await.result(ProblemService.listProbconnectivity(date, arrProv), Duration.Inf)
       val probError = Await.result(ProblemService.listProbError(date, arrProv, "*"), Duration.Inf)
