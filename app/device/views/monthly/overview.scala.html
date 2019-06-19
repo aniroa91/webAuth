@@ -121,10 +121,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
-                                    } else {
-                                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                     }
+                                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 <h2 style="font-weight: 500;font-size: 19px"> Statistic Of Connections By CPE Signal (Access)</h2>
@@ -136,6 +134,37 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    @if(province.equals("")){
+                                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                            <div class="x_panel tile">
+                                                <div class="x_title">
+                                                    <h2 style="font-weight: 500;font-size: 24px">Ticket at Core Group</h2>
+                                                    <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống core theo ngày, vị trí địa lý và loại sự cố"></i>
+                                                    <div class="clearfix"></div>
+                                                </div>
+                                                <div class="x_content">
+                                                    <div id="ticket-core" style="height: 350px;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                    } else{
+                                        <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                                    }
+
+                                            <div class="x_panel tile">
+                                                <div class="x_title">
+                                                    <h2 style="font-weight: 500;font-size: 24px">Ticket at Access Group</h2>
+                                                    <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống access và ngoại vị theo ngày, vị trí địa lý và loại sự cố"></i>
+                                                    <div class="clearfix"></div>
+                                                </div>
+                                                <div class="x_content">
+                                                    <div id="ticket-noneCore" style="height: 350px;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     @if(province.equals("")){
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
@@ -154,14 +183,18 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
-                                    } else {
                                         <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                    } else{
+                                        <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                                     }
+
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total SuyHao Not Pass By Months (Access)</h2>
+                                            @if(province.equals("")) {
+                                                <h2 style="font-weight: 500;font-size: 24px"> Total SuyHao Not Pass By Months (Access)</h2>
+                                            } else{
+                                                <h2 style="font-weight: 500;font-size: 22px"> Total SuyHao Not Pass By Months (Access)</h2>
+                                            }
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần đo được tín hiệu suy hao không đạt chuẩn (rx > -24, 1 < tx <= 3), đi kèm là số lượng người dùng tương ứng, tại thiết bị Access theo tháng và vị trí"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -338,6 +371,34 @@
                             <input type="hidden" id="isClickedTab4" value="0">
                             <div class="col-xs-12" id="divTabTop">
                                 <div class="col-lg-12" style="padding:0px;">
+                                    @if(province.equals("")) {
+                                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                            <div class="x_panel tile">
+                                                <div class="x_title">
+                                                    <h2 style="font-weight: 500;
+                                                        font-size: 24px">Top 10 Province By Ticket at Core Group</h2>
+                                                    <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số ticket core issue nhiều nhất"></i>
+                                                    <div class="clearfix"></div>
+                                                </div>
+                                                <div class="x_content">
+                                                    <div id="pie-coreTicket" style="height: 350px;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                                        <div class="x_panel tile">
+                                            <div class="x_title">
+                                                <h2 style="font-weight: 500;
+                                                    font-size: 24px">Top 10 Province By Ticket at Access Group</h2>
+                                                <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số ticket access issue nhiều nhất"></i>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="x_content">
+                                                <div id="pie-noneTicket" style="height: 350px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     @if(province.equals("")) {
                                         <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                             <div class="x_panel tile">
@@ -731,13 +792,13 @@
                                                                 <td><p class="excerpt changeSfCli"> </p></td>
                                                             </tr>
                                                             <tr>
-                                                                <td><span class="titTd">Lost Signal Outliers</span></td>
+                                                                <td><span class="titTd">Broken Lv2 Cable Outliers</span></td>
                                                                 <td><p class="excerpt currSignalOut currTd"> </p></td>
                                                                 <td><p class="excerpt prevSigOut prevId"></p></td>
                                                                 <td><p class="excerpt changeSigOut"> </p></td>
                                                             </tr>
                                                             <tr>
-                                                                <td><span class="titTd">Lost Signal Clients</span></td>
+                                                                <td><span class="titTd">Broken Lv2 Cable Clients</span></td>
                                                                 <td><p class="excerpt currSignalClient currTd"> </p></td>
                                                                 <td><p class="excerpt prevSigCli prevId"> </p></td>
                                                                 <td><p class="excerpt changeSigCli"> </p></td>
@@ -787,25 +848,25 @@
                                                         <td><span class="excerpt changeDownU"> </span></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><span class="titTd">Lost Signal</span></td>
+                                                        <td><span class="titTd">Broken Lv2 Cable</span></td>
                                                         <td><span class="excerpt currSignal currTd"> </span></td>
                                                         <td><span class="excerpt prevSignal prevId"> </span></td>
                                                         <td><span class="excerpt changeSignal"> </span></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><span class="titTd">Sf Error</span></td>
+                                                        <td><span class="titTd">SF Error</span></td>
                                                         <td><span class="excerpt currSf currTd"> </span></td>
                                                         <td><span class="excerpt prevSf prevId"> </span></td>
                                                         <td><span class="excerpt changeSf"> </span></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><span class="titTd">Lofi Error</span></td>
+                                                        <td><span class="titTd">LOFI Error</span></td>
                                                         <td><span class="excerpt currLofi currTd"> </span></td>
                                                         <td><span class="excerpt prevLofi prevId"> </span></td>
                                                         <td><span class="excerpt changeLofi"> </span></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><span class="titTd">Rouge Error</span></td>
+                                                        <td><span class="titTd">Rogue ONT</span></td>
                                                         <td><span class="excerpt currRouge currTd"> </span></td>
                                                         <td><span class="excerpt prevRouge prevId"> </span></td>
                                                         <td><span class="excerpt changeRouge"> </span></td>
@@ -1090,42 +1151,42 @@
                                             <table class="table no-wrap sparkline" id="tbSparkline3">
                                                 <tbody>
                                                     <tr>
-                                                        <td style="width:10%">inf_down</td>
+                                                        <td style="width:10%">Port Inf Down</td>
                                                         <td style="width: 80%">
                                                             <div id="tbInfDown" class="spark-cont"></div>
                                                         </td>
                                                         <th style="text-align: left;width:10%" class="maxValue"></th>
                                                     </tr>
                                                     <tr>
-                                                        <td>user_down</td>
+                                                        <td>Port PON Down</td>
                                                         <td>
                                                             <div id="tbUserDown" class="spark-cont"></div>
                                                         </td>
                                                         <th style="text-align: left" class="maxValue"></th>
                                                     </tr>
                                                     <tr>
-                                                        <td>sf_error</td>
+                                                        <td>SF Error</td>
                                                         <td>
                                                             <div id="tbSfError" class="spark-cont"></div>
                                                         </td>
                                                         <th style="text-align: left" class="maxValue"></th>
                                                     </tr>
                                                     <tr>
-                                                        <td>lofi_error</td>
+                                                        <td>LOFI Error</td>
                                                         <td>
                                                             <div id="tbLofiErr" class="spark-cont"></div>
                                                         </td>
                                                         <th style="text-align: left" class="maxValue"></th>
                                                     </tr>
                                                     <tr>
-                                                        <td>lost_signal</td>
+                                                        <td>Broken Lv2 Cable</td>
                                                         <td>
                                                             <div id="tbLost" class="spark-cont"></div>
                                                         </td>
                                                         <th style="text-align: left" class="maxValue"></th>
                                                     </tr>
                                                     <tr>
-                                                        <td>rouge_error</td>
+                                                        <td>Rogue ONT</td>
                                                         <td>
                                                             <div id="tbRouge" class="spark-cont"></div>
                                                         </td>
@@ -1192,6 +1253,9 @@
         <!--  Datepicker -->
     <script type="text/javascript" src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script src="../assets/javascripts/common.js"></script>
+            <script type="text/javascript">
+
+            </script>
     @scripts1(response, province)
     @scripts2(response, province)
     </body>

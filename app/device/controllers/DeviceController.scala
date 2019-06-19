@@ -67,7 +67,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   // index page Dashboard Device Monthly
-  def overview =  withAuth { username => implicit request =>
+  def overview =  withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""
@@ -132,10 +132,16 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val infOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth, toMonth,"inf", province), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
         .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
 
-      logger.info(s"Page: Monthly - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
+      // Ticket monthly
+      val ticketIssues = Await.result(BrasService.getTicketMonthly(fromMonth+"/"+toMonth, province), Duration.Inf)
+      val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (x._2,LocationUtils.getRegionByProvWorld(x._3),LocationUtils.getNameProvWorld(x._3), x._4, x._5, x._6)).sorted
+                      else Seq[(String, String, String, String, String, Int)]()
+      val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (x._2,LocationUtils.getRegionByProvWorld(x._3),LocationUtils.getNameProvWorld(x._3), x._4, x._5, x._6)).sorted
+
+      logger.info(s"Page: Monthly - User: ${username}  - Time Query:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.monthly.overview(username,province,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),
         toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),
-        nocCount,contracts,heatmapOpsview,infTypeError,totalInf,brasOutlier,infOutlier)))
+        nocCount,contracts,heatmapOpsview,infTypeError,totalInf,brasOutlier,infOutlier, (coreIssue, noneCoreIssue))))
     }
     catch{
       case e: Exception => Ok(device.views.html.monthly.overview(username,province,null))
@@ -785,6 +791,25 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "dataProvince" -> topPoor.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
         "categories" -> topPoor.map(x=>x._1).asInstanceOf[Seq[String]].distinct
       )
+      // get top province Ticket at Core Group
+      val topTicket = Await.result(BrasService.topTicket(month, province), Duration.Inf).map(x=> (x._1, LocationUtils.getNameProvincebyCode(x._2), x._3, x._4))
+      val topCoreIssue = if(province.equals("")) topTicket.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (x._2, x._3, x._4)).sorted
+                         else Seq[(String, String, Int)]()
+      val topNoneCore = topTicket.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (x._2, x._3, x._4)).sorted
+
+      val coreTicketObj = Json.obj(
+        "data" -> topCoreIssue,
+        "dataProvince" -> topCoreIssue.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "dataClients" -> "",
+        "categories" -> topCoreIssue.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+      )
+      // get top province Ticket at Access Group
+      val noneCoreTicketObj = Json.obj(
+        "data" -> topNoneCore,
+        "dataProvince" -> topNoneCore.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sortWith(_._2 > _._2),
+        "dataClients" -> "",
+        "categories" -> topNoneCore.map(x=>x._1).asInstanceOf[Seq[String]].distinct
+      )
 
       val rs = Json.obj(
         "month"      -> month,
@@ -797,9 +822,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "topOpsview" -> opsviewObj,
         "topInf"     -> infObj,
         "topSuyhao"  ->suyhaoObj,
-        "topPoor"    -> poorObj
+        "topPoor"    -> poorObj,
+        "topCoreObj" -> coreTicketObj,
+        "topNoneCoreObj" -> noneCoreTicketObj
       )
-      logger.info(s"Page: topN - User: ${username} - Time Query:"+(System.currentTimeMillis() -time))
+      logger.info(s"Page: topN - User: ${username}  - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{

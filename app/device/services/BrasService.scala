@@ -153,6 +153,10 @@ object BrasService extends AbstractService{
     BrasDAO.getProvinceInfDownError(month,province)
   }
 
+  def getTicketMonthly(month: String,province: String): Future[Seq[(String,String,String,String,String,Int)]]   ={
+    BrasDAO.getTicketMonthly(month,province)
+  }
+
   def getProvinceTotalInf(fromMonth: String,toMonth: String, province: String): Future[Seq[(String,String,Double)]]   ={
     BrasDAO.getProvinceTotalInf(fromMonth,toMonth, province)
   }
@@ -191,6 +195,10 @@ object BrasService extends AbstractService{
 
   def topBrasOut(month: String): Future[Seq[(String,String,Int)]]   ={
     BrasDAO.topBrasOut(month)
+  }
+
+  def topTicket(month: String,province: String): Future[Seq[(String,String,String,Int)]]   ={
+    BrasDAO.topTicket(month,province)
   }
 
   def getTopKibana(month: String,_typeError: String): Future[Seq[(String,String,Int)]]   ={

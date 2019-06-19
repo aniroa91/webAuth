@@ -12,7 +12,8 @@ case class RegionOverview(
                          infTypeError: InfTypeError,
                          totalInf: Array[(String,String,Double)],
                          brasOutlier:   Array[(String, Int)],
-                         infOutlier :   Array[(String, Int)]
+                         infOutlier :   Array[(String, Int)],
+                         ticketIssue: (Seq[(String, String, String, String, String, Int)], Seq[(String, String, String, String, String, Int)])
                          )
 case class TimePicker(
                      startMonth: String,

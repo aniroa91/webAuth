@@ -110,13 +110,13 @@
                                 <thead>
                                     <tr>
                                         <th>Date</th>
-                                        <th>Sf error</th>
-                                        <th>Lofi error</th>
+                                        <th>SF Error</th>
+                                        <th>LOFI Error</th>
                                         <th>Port PON down</th>
                                         <th>Port INF down</th>
-                                        <th>Rouge error</th>
-                                        <th>Lost signal</th>
-                                        <th>Sf Module</th>
+                                        <th>Rogue ONT</th>
+                                        <th>Broken Lv2 Cable</th>
+                                        <th>SF Module</th>
                                     </tr>
                                 </thead>
                                 @if(rsInfhost.infHostdaily != null) {
@@ -297,7 +297,7 @@
                                     <tr>
                                         <th>Date Time</th>
                                         <th>Splitter</th>
-                                        <th>Lost Signal</th>
+                                        <th>Broken Lv2 Cable</th>
                                     </tr>
                                 </thead>
                                 @if(rsInfhost.splitterByHost != null) {
@@ -1126,7 +1126,7 @@
                             },
 
                             yAxis: {
-                                categories: ['Port PON down','Port INF down','Sf Error','Lofi Error','Rouge Error','Lost Signal','Sf Module'],
+                                categories: ['Port PON down','Port INF down','SF Error','LOFI Error','Rogue ONT','Broken Lv2 Cable','SF Module'],
                                 title: null
                             },
 
@@ -1860,7 +1860,7 @@
                         },
 
                         yAxis: {
-                            categories: ['Port PON down','Port INF down','Sf Error','Lofi Error','Rouge Error','Lost Signal','Sf Module'],
+                            categories: ['Port PON down','Port INF down','SF Error','LOFI Error','Rogue ONT','Broken Lv2 Cable','SF Module'],
                             title: null
                         },
 

@@ -586,7 +586,7 @@
                                 }
                         }]
 
-                });
+                        });
                         // Bar Logoff and Signin
                         var categoriesSigLog = ["Vung 1", "Vung 2", "Vung 3", "Vung 4", "Vung 5", "Vung 6", "Vung 7"]
                         Highcharts.chart('region-siglog-bar', {
@@ -639,15 +639,54 @@
                                 },
 
                                 series: getSigLogByRegionStacked(@Html(Json.stringify(Json.toJson(response.sigLogRegion.signin))), @Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff))), @Html(Json.stringify(Json.toJson(response.sigLogRegion.signin_clients))), @Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff_clients))), 0)
-                                /*[{
-                                    name: 'Signin',
-                                    color:'#669999',
-                                    data: Html(Json.stringify(Json.toJson(response.sigLogRegion.signin.map(x=> -x._2))))
-                                }, {
-                                    name: 'Logoff',
-                                    color:'#832d1d',
-                                    data: Html(Json.stringify(Json.toJson(response.sigLogRegion.logoff.map(x=>x._2))))
-                                }]*/
+                        });
+                        // Ticket at Core Group
+                        Highcharts.chart('ticket-core', {
+                                chart: {
+                                        type: 'bar'
+                                },
+                                title: {
+                                        text: ''
+                                },
+                                xAxis: {
+                                        type:'category'
+                                },
+                                yAxis: {
+                                        min: 0,
+                                        title: {
+                                                text: ''
+                                        }
+                                },
+                                legend: {
+                                        reversed: true
+                                },
+                                plotOptions: {
+                                        series: {
+                                                stacking: 'normal',
+                                                point:{
+                                                        events:{
+                                                                contextmenu: function (e) {
+                                                                        if(e.target.point.name.indexOf('-') >=0)
+                                                                                window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                },
+                                series: getSeries3LevelStackBar(@Html(Json.stringify(Json.toJson(response.ticketIssue._1))),@Html(Json.stringify(Json.toJson(response.ticketIssue._1.map(x=> x._2).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.ticketIssue._1.map(x=> x._1).toSeq.distinct.sortWith(_>_))))),
+                                drilldown:{
+                                        drillUpButton:{
+                                                relativeTo: 'spacingBox',
+                                                position:{
+                                                        align:"right",
+                                                        verticalAlign:"top",
+                                                        x:10,
+                                                        y:-10
+                                                }
+                                        },
+                                        series: getDrillDown3LevelStack(@Html(Json.stringify(Json.toJson(response.ticketIssue._1))),@Html(Json.stringify(Json.toJson(response.ticketIssue._1.map(x=> x._1).toSeq.distinct.sortWith(_>_)))),
+                                                @Html(Json.stringify(Json.toJson(response.ticketIssue._1.map(x=> x._2).toSeq.distinct.sorted))))
+                                }
                         });
                         // Total Opsview by Region
                         Highcharts.chart('region-opsview', {
@@ -816,7 +855,6 @@
                         });
                         // Noc Count alert By Region
                         Highcharts.chart('region-nocCount', {
-
                         legend: {
                                 enabled: true
                         },
@@ -868,6 +906,54 @@
                         }
                 });
                 }
+                // Ticket at Access Group
+                Highcharts.chart('ticket-noneCore', {
+                        chart: {
+                                type: 'bar'
+                        },
+                        title: {
+                                text: ''
+                        },
+                        xAxis: {
+                                type:'category'
+                        },
+                        yAxis: {
+                                min: 0,
+                                title: {
+                                        text: ''
+                                }
+                        },
+                        legend: {
+                                reversed: true
+                        },
+                        plotOptions: {
+                                series: {
+                                        stacking: 'normal',
+                                        point:{
+                                                events:{
+                                                        contextmenu: function (e) {
+                                                                if(e.target.point.name.indexOf('-') >=0)
+                                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                        }
+                                                }
+                                        }
+                                }
+                        },
+                        series: getSeries3LevelStackBar(@Html(Json.stringify(Json.toJson(response.ticketIssue._2))),@Html(Json.stringify(Json.toJson(response.ticketIssue._2.map(x=> x._2).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.ticketIssue._2.map(x=> x._1).toSeq.distinct.sortWith(_>_))))),
+                        drilldown:{
+                                drillUpButton:{
+                                        relativeTo: 'spacingBox',
+                                        position:{
+                                                align:"right",
+                                                verticalAlign:"top",
+                                                x:10,
+                                                y:-10
+                                        }
+                                },
+                                series: getDrillDown3LevelStack(@Html(Json.stringify(Json.toJson(response.ticketIssue._2))),@Html(Json.stringify(Json.toJson(response.ticketIssue._2.map(x=> x._1).toSeq.distinct.sortWith(_>_)))),
+                                        @Html(Json.stringify(Json.toJson(response.ticketIssue._2.map(x=> x._2).toSeq.distinct.sorted))))
+                        }
+                });
                 Highcharts.chart('inf-outlier', {
                         chart: {
                                 type: 'heatmap',
@@ -2381,8 +2467,7 @@
         }
 
         // order by array objects
-        function sortObjectsArray(objectsArray, sortKey)
-        {
+        function sortObjectsArray(objectsArray, sortKey) {
                 // Quick Sort:
                 var retVal;
 
@@ -2435,29 +2520,6 @@
                 return rs
         }
 
-        function getDrildownStackBar1(dta,arrKey){
-                var jsArray = []
-                var arrData = []
-                for(var key=0;key<arrKey.length;key++ ) {
-                        var sumVl =0
-                        for (var i = 0; i < dta.length; i++) {
-                                if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][2]){
-                                        sumVl += dta[i][3]
-                                }
-                        }
-                        arrData.push({
-                                name: arrKey[key],
-                                y: sumVl,
-                                drilldown: arrKey[key]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
-                        })
-                }
-                jsArray.push({
-                        name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
-                        data: arrData
-                })
-                return jsArray
-        }
-
         function getJsonDrillChildren(dta,arrKey){
                 var rs = []
                 for(var i=0;i<arrKey.length;i++){
@@ -2480,40 +2542,9 @@
                 return rs
         }
 
-        function addTitleClients(dta){
-                var rs = []
-                for(var i=0;i<dta.length;i++){
-                        rs.push({
-                                y: dta[i][0],
-                                k: dta[i][1]
-                        })
-                }
-                return rs
-        }
-
         function getDrildownStackBarForsuyhao(dta,arrKey,arrMonth){
                 var jsArray = []
-                var colors = [
-                        '#9B59B6',
-                        '#3498DB',
-                        '#d9534f',
-                        '#f1b53d',
-                        '#E74C3C',
-                        '#73879C',
-                        '#1ABB9C',
-                        '#832d1d',
-                        '#0000cc',
-                        '#09006d',
-                        '#cccccc',
-                        '#669999',
-                        '#f2ccff',
-                        '#e6e600',
-                        '#132639',
-                        '#99cc00',
-                        '#466d6d',
-                        '#ffc6b3',
-                        '#666633',
-                        '#ffff00'];
+                var colors = ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#E74C3C', '#73879C', '#1ABB9C', '#832d1d', '#0000cc', '#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'];
                 for(var month=0;month< arrMonth.length;month++ ){
                         var arrData = []
                         for(var key=0;key<arrKey.length;key++ ) {
@@ -2539,87 +2570,6 @@
                                 color: color
                         })
                 }
-                return jsArray
-        }
-
-        function getBarDrillDown3Level(dta, arrRegion) {
-                var jsArray = []
-                for(var region=0;region< arrRegion.length;region++ ){
-                        // get array provinces and bras by month&region
-                        var arrProvinceBras = [], dtaRegion = []
-                        for(var i=0;i< dta.length;i++){
-                                if (arrRegion[region] == dta[i][0]){
-                                        arrProvinceBras.push({
-                                                province:dta[i][1],
-                                                bras: dta[i][2],
-                                                value:dta[i][3]
-                                        })
-                                }
-                        }
-                        // set array data by province
-                        var nameOld = arrProvinceBras[0].province, sumOld= 0,
-                                isMoreProv =0,dtaProvince = [],sumPoorconn =0,
-                                sumNodevice =0
-                        for(var k=0;k<arrProvinceBras.length;k++){
-                                if(k==(arrProvinceBras.length -1) || nameOld != arrProvinceBras[k].province){
-                                        if(k==(arrProvinceBras.length -1)) sumOld += arrProvinceBras[k].value
-                                        dtaRegion.push({
-                                                name: nameOld,
-                                                y: sumOld,
-                                                drilldown:nameOld
-                                        })
-                                        // set series province& bras
-                                        jsArray.push({
-                                                id: nameOld,
-                                                name: nameOld,
-                                                data: dtaProvince
-                                        })
-                                        dtaProvince = []
-                                        nameOld = arrProvinceBras[k].province
-                                        sumOld = arrProvinceBras[k].value
-                                        isMoreProv =1
-                                }
-                                else{
-                                        sumOld += Number(arrProvinceBras[k].value)
-                                }
-                                dtaProvince.push({
-                                        name: arrProvinceBras[k].bras,
-                                        y:Number(arrProvinceBras[k].value)
-                                })
-                        }
-
-                        // set series regions& province
-                        jsArray.push({
-                                id: arrRegion[region],
-                                name: arrRegion[region],
-                                data: dtaRegion
-                        })
-                }
-                console.log(jsArray)
-                return jsArray
-        }
-
-        function getBarSeries3Level(dta,arrKey){
-                var jsArray = [], data= []
-                for(var key=0;key<arrKey.length;key++ ) {
-                        var sumVl = 0
-                        for (var i = 0; i < dta.length; i++) {
-                                if (arrKey[key] == dta[i][0]){
-                                        sumVl += dta[i][3]
-                                }
-                        }
-                        data.push({
-                                name: arrKey[key],
-                                y: sumVl,
-                                drilldown: arrKey[key]
-                        })
-                }
-                jsArray.push({
-                        name: 'Province',
-                        data: data,
-                        color: '#1ABB9C'
-                })
-                console.log(jsArray)
                 return jsArray
         }
 

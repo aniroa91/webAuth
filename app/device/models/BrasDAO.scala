@@ -579,9 +579,9 @@ object BrasDAO {
 
   def getTicketIssue(day: String, province: String) = {
     dbConfig.db.run(
-      sql"""select issue_group, province, issue, count(*) from dwh_ticket
-            where date_trunc('day', created_date) = $day::TIMESTAMP
-            and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access') and province ~* $province
+      sql"""select issue_group, province, issue, count(*)
+            from dwh_ticket
+            where date_trunc('day', created_date) = $day::TIMESTAMP and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access') and province ~* $province and province <> ''
             group by issue_group, province, issue
             order by issue_group, province, issue
             """
@@ -792,6 +792,34 @@ object BrasDAO {
     }
   }
 
+  def getTicketMonthly(month: String,province:String): Future[Seq[(String,String,String,String,String,Int)]] = {
+    if(month.indexOf("/")>=0) {
+      val fromMonth = month.split("/")(0)
+      val toMonth = month.split("/")(1)
+      dbConfig.db.run(
+        sql"""select issue_group, month, province, issue, reason_name, sum(no_ticket)
+              from dmt_overview_ticket
+              where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP AND province ~* $province and province <> ''
+              and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access')
+              group by issue_group, month, province, issue, reason_name
+              order by issue_group, month, province, issue, reason_name
+                  """
+          .as[(String,String,String,String,String,Int)])
+    }
+    else{
+      val query = month + "-01"
+      dbConfig.db.run(
+        sql"""select issue_group, month, province, issue, reason_name, sum(no_ticket)
+              from dmt_overview_ticket
+              where month = $query::TIMESTAMP and province ~* $province and province <> ''
+              and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access')
+              group by issue_group, month, province, issue, reason_name
+              order by issue_group, month, province, issue, reason_name
+                  """
+          .as[(String,String,String,String, String,Int)])
+    }
+  }
+
   def getProvinceInfDownError(month: String,province:String): Future[Seq[(String,String,Int,Int,Int,Int)]] = {
     if(month.indexOf("/")>=0) {
       val fromMonth = month.split("/")(0)
@@ -884,6 +912,29 @@ object BrasDAO {
               where d.r <= 10
                   """
         .as[(String,String,Int)])
+  }
+
+  def topTicket(month: String, province: String): Future[Seq[(String,String,String,Int)]] = {
+    val query = month + "-01"
+    dbConfig.db.run(
+      sql"""select d.issue_group,d.province,d.issue,d.no_ticket from(
+                  select row_number() OVER (PARTITION BY c.province ORDER BY c.no_ticket desc) AS r , c.*
+                  from(
+                       select a.issue_group,b.province, a.issue, sum(no_ticket) no_ticket
+                       from dmt_overview_ticket a,
+                            (select province
+                             from dmt_overview_ticket
+                             where month = $query::TIMESTAMP AND province ~* $province and province <> '' and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access')
+                             group by province
+                             having sum(no_ticket) >0
+                             order by sum(no_ticket) desc
+                             limit 10) b
+                        where a.province = b.province and month = $query::TIMESTAMP
+                        group by a.issue_group,b.province, a.issue
+                        order by a.issue_group,b.province, a.issue) c) d
+              where d.r <= 10
+                  """
+        .as[(String,String,String,Int)])
   }
 
   def topBrasOut(month: String): Future[Seq[(String,String,Int)]] = {

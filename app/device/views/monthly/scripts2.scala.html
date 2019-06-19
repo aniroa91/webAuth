@@ -989,7 +989,7 @@
                             },
                             series: [{
                                 type: 'line',
-                                name: 'Inf down',
+                                name: 'Port Inf Down',
                                 data: parseDataSparkline(dta.servInfError.infDown)
                             }]
                         });
@@ -1059,7 +1059,7 @@
                             },
                             series: [{
                                 type: 'line',
-                                name: 'User down',
+                                name: 'Port PON Down',
                                 data: parseDataSparkline(dta.servInfError.userDown)
                             }]
                         });
@@ -1129,7 +1129,7 @@
                             },
                             series: [{
                                 type: 'line',
-                                name: 'Sf error',
+                                name: 'SF Error',
                                 data: parseDataSparkline(dta.servInfError.sf)
                             }]
                         });
@@ -1199,7 +1199,7 @@
                             },
                             series: [{
                                 type: 'line',
-                                name: 'Lofi error',
+                                name: 'LOFI Error',
                                 data: parseDataSparkline(dta.servInfError.lofi)
                             }]
                         });
@@ -1269,7 +1269,7 @@
                             },
                             series: [{
                                 type: 'line',
-                                name: 'Lost signal',
+                                name: 'Broken Lv2 Cable',
                                 data: parseDataSparkline(dta.servInfError.lost)
                             }]
                         });
@@ -1339,7 +1339,7 @@
                             },
                             series: [{
                                 type: 'line',
-                                name: 'Rouge error',
+                                name: 'Rogue ONT',
                                 data: parseDataSparkline(dta.servInfError.rouge)
                             }]
                         });
@@ -1950,7 +1950,133 @@
                                     series: getJsonDrillChildren(dta.topOpsview.data, dta.topOpsview.categories)
                                 }
                             });
+                            // top 10 Core Ticket
+                            Highcharts.chart('pie-coreTicket', {
+                                chart: {
+                                    type: 'pie',
+                                    options3d: {
+                                        enabled: false,
+                                        alpha: 45
+                                    }
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                plotOptions: {
+                                    pie: {
+                                        allowPointSelect: false,
+                                        cursor: 'pointer',
+                                        dataLabels: {
+                                            enabled: true,
+                                            format: '{point.name}: {point.percentage:.2f}%'
+                                        },
+                                        showInLegend: false
+                                    },
+                                    series: {
+                                        point: {
+                                            events: {
+                                                contextmenu: function (e) {
+                                                    if (e.target.point.name.indexOf('-') >= 0)
+                                                        window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                colors: ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#1ABB9C', '#832d1d', '#09006d', '#cccccc', '#669999', '#e6e600'],
+                                tooltip: {
+                                    pointFormat: 'Total ticket: <b>{point.y} ({point.percentage:.2f}%)</b>'
+                                },
+                                series: [{
+                                    name: 'Province',
+                                    data: getJsonDrillParenthaveClients(dta.topCoreObj.dataProvince, dta.topCoreObj.dataClients)
+                                }],
+                                drilldown: {
+                                    drillUpButton: {
+                                        relativeTo: 'spacingBox',
+                                        position: {
+                                            y: 0,
+                                            x: 0
+                                        },
+                                        theme: {
+                                            fill: '#85d088',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#85d088',
+                                                }
+                                            }
+                                        }
+                                    },
+                                    series: getJsonDrillChildren(dta.topCoreObj.data, dta.topCoreObj.categories)
+                                }
+                            });
                         }
+                        // top 10 Access Ticket
+                        Highcharts.chart('pie-noneTicket', {
+                            chart: {
+                                type: 'pie',
+                                options3d: {
+                                    enabled: false,
+                                    alpha: 45
+                                }
+                            },
+                            title: {
+                                text: ''
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: false,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '{point.name}: {point.percentage:.2f}%'
+                                    },
+                                    showInLegend: false
+                                },
+                                series: {
+                                    point: {
+                                        events: {
+                                            contextmenu: function (e) {
+                                                if (e.target.point.name.indexOf('-') >= 0)
+                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            colors: ['#9B59B6', '#3498DB', '#d9534f', '#f1b53d', '#1ABB9C', '#832d1d', '#09006d', '#cccccc', '#669999', '#e6e600'],
+                            tooltip: {
+                                pointFormat: 'Total ticket: <b>{point.y} ({point.percentage:.2f}%)</b>'
+                            },
+                            series: [{
+                                name: 'Province',
+                                data: getJsonDrillParenthaveClients(dta.topNoneCoreObj.dataProvince, dta.topNoneCoreObj.dataClients)
+                            }],
+                            drilldown: {
+                                drillUpButton: {
+                                    relativeTo: 'spacingBox',
+                                    position: {
+                                        y: 0,
+                                        x: 0
+                                    },
+                                    theme: {
+                                        fill: '#85d088',
+                                        'stroke-width': 1,
+                                        stroke: 'silver',
+                                        r: 0,
+                                        states: {
+                                            hover: {
+                                                fill: '#85d088',
+                                            }
+                                        }
+                                    }
+                                },
+                                series: getJsonDrillChildren(dta.topNoneCoreObj.data, dta.topNoneCoreObj.categories)
+                            }
+                        });
                         // top 10 inf outliers
                         Highcharts.chart('pie-inf', {
                             chart: {
@@ -2477,5 +2603,136 @@
                     }
                 }
             })
+        }
+
+        function getSeries3LevelStackBar(dta,arrKey,arrMonth){
+            var jsArray = []
+            var colors = ['#d9534f', '#73879C', '#1ABB9C', '#f1b53d', '#E74C3C', '#73879C', '#832d1d', '#0000cc', '#09006d', '#cccccc', '#669999',
+                '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'];
+            for(var month=0;month< arrMonth.length;month++ ){
+                var arrData = []
+                for(var key=0;key<arrKey.length;key++ ) {
+                    var sumVl =0
+                    for (var i = 0; i < dta.length; i++) {
+                        if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][1]){
+                            sumVl += dta[i][5]
+                        }
+                    }
+                    arrData.push({
+                        name: arrKey[key],
+                        y: sumVl,
+                        drilldown: arrKey[key]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
+                    })
+                }
+                var color = colors[month]
+                jsArray.push({
+                    name: arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-")),
+                    data: arrData,
+                    color: color
+                })
+            }
+            return jsArray
+        }
+
+        function getDrillDown3LevelStack(dta, arrMonth, arrRegion){
+            var jsArray = []
+            for(var region=0;region< arrRegion.length;region++ ){
+                for(var month=0;month< arrMonth.length;month++){
+                    var rsProvince = [], rsBras = [], rsHost = []
+                    // get array provinces and bras by month&region
+                    var arr3Level = []
+                    for (var i = 0; i < dta.length; i++) {
+                        if (arrMonth[month] == dta[i][0] && arrRegion[region] == dta[i][1]) {
+                            arr3Level.push({
+                                province: dta[i][2],
+                                bras: dta[i][3],
+                                host: dta[i][4],
+                                value: dta[i][5]
+                            })
+                        }
+                    }
+                    var resultProvinces = []
+                    // level province
+                    arr3Level.reduce(function (res, value) {
+                        if (!res[value.province]) {
+                            res[value.province] = {province: value.province, value: 0};
+                            resultProvinces.push(res[value.province])
+                        }
+                        res[value.province].value += value.value;
+                        return res;
+                    }, {});
+                    resultProvinces.forEach(function (item) {
+                        var resultBras = []
+                        // level bras
+                        var arrBrasLevel = []
+                        arrBrasLevel.push(arr3Level.filter(function (o) {
+                            return o.province === item.province;
+                        }));
+                        arrBrasLevel[0].reduce(function (res, value) {
+                            if (!res[value.bras]) {
+                                res[value.bras] = {bras: value.bras, value: 0};
+                                resultBras.push(res[value.bras])
+                            }
+                            res[value.bras].value += value.value;
+                            return res;
+                        }, {});
+                        resultBras.forEach(function (itemBras) {
+                            var resultHost = []
+                            // level host
+                            var arrHostLevel = []
+                            arrHostLevel.push(arrBrasLevel[0].filter(function (o) {
+                                return o.bras === itemBras.bras;
+                            }));
+                            arrHostLevel[0].reduce(function (res, value) {
+                                if (!res[value.host]) {
+                                    res[value.host] = {host: value.host, value: 0};
+                                    resultHost.push(res[value.host])
+                                }
+                                res[value.host].value += value.value;
+                                return res;
+                            }, {});
+                            resultHost.forEach(function (itemHost) {
+                                rsHost.push({
+                                    name: itemHost.host,
+                                    y: itemHost.value
+                                })
+                            })
+                            // set series bras& host
+                            jsArray.push({
+                                id: item.province + '-'+itemBras.bras + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-")),
+                                name: itemBras.bras + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-")),
+                                data: rsHost
+                            })
+                            rsHost = []
+                            rsBras.push({
+                                name: itemBras.bras,
+                                y: itemBras.value,
+                                drilldown: item.province + '-'+itemBras.bras + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-"))
+                            })
+                        })
+                        // set series province& bras
+                        jsArray.push({
+                            id: item.province + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-")),
+                            name: item.province + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-")),
+                            data: rsBras
+                        })
+                        rsBras = []
+                        rsProvince.push({
+                            name: item.province,
+                            y: item.value,
+                            drilldown: item.province + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-"))
+                        })
+                    });
+                    // set series region & province
+                    jsArray.push({
+                        id: arrRegion[region] + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-")),
+                        name: arrRegion[region] + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-")),
+                        data: rsProvince
+                    })
+                    rsProvince = []
+                }
+
+            }
+            return jsArray
         }
 </script>
