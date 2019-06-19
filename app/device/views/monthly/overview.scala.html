@@ -391,8 +391,11 @@
                                     }
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px">Top 10 Province By Ticket at Access Group</h2>
+                                                @if(province.equals("")){
+                                                    <h2 style="font-weight: 500;font-size: 24px">Top 10 Province By Ticket at Access Group</h2>
+                                                } else{
+                                                    <h2 style="font-weight: 500;font-size: 21px">Top 10 Province By Ticket at Access Group</h2>
+                                                }
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số ticket access issue nhiều nhất"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -529,7 +532,11 @@
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content">
+                                            @if(province.equals("")) {
                                                 <div id="bar-inf" style="height: 350px;"></div>
+                                            } else{
+                                                <div id="bar-inf" style="height: 310px;"></div>
+                                            }
                                                 <form id="frmInfToperr" style="text-align: center">
                                                     <input type="hidden" id="typeInftoperr" value="lofi_error">
                                                     <label class="radio-inline radioText">
