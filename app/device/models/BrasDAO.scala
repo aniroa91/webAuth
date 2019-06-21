@@ -1625,7 +1625,7 @@ object BrasDAO {
           .subaggs(
             sumAgg("sum","value")
           )
-        )
+        ) size 0
     ).await
     CommonService.getTerm(rs, "description", "sum")
   }
@@ -1641,19 +1641,6 @@ object BrasDAO {
         .as[(String,String,Int)])
   }
   def getSeveValueES(bras: String,day: String): Array[(String,String,String,Long)] ={
-    /*val rs = client.execute(
-      search(s"infra_dwh_kibana_*" / "docs")
-        query { must(termQuery("bras_id.keyword",bras),not(termQuery("error_name.keyword","")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
-        aggregations(
-        termsAggregation("severity")
-          .field("severity.keyword")
-          .subAggregations(
-            termsAggregation("error_name")
-              .field("error_name.keyword") size 1000
-          )
-        size 1000
-        ) size 0
-    ).await*/
     val rs = client.execute(search(s"infra_dwh_kibana_*" / "docs")
       query { must(termQuery("bras_id.keyword",bras),not(termQuery("error_name.keyword","")),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(day.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(day.split("/")(1))))) }
       aggregations(
@@ -1673,10 +1660,6 @@ object BrasDAO {
       .map(x => (x._1 , x._2._1) -> x._2._2)
       .flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1._1, x._1._2 , x._2._1, x._2._2))
-    /*val mapSevErr = CommonService.getSecondAggregations(rs.aggregations.get("severity"),"error_name")
-
-    mapSevErr.flatMap(x => x._2.map(y => x._1 -> y))
-      .map(x => (x._1, x._2._1) -> x._2._2)*/
   }
 
   def getSigLogByHost(bras: String,nowDay: String): SigLogByHost = {

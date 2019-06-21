@@ -1,4 +1,5 @@
-@(form: Form[BrasOutlier],email: String,province:String,rsInfhost: model.device.HostResponse,response: model.device.BrasResponse,day: String,bras: String,_typeS: String, postUrl: Call)(implicit request: RequestHeader)
+@(form: Form[BrasOutlier],email: String,province:String,rsInfhost: model.device.HostResponse,
+        response: model.device.BrasResponse,day: String,bras: String,_typeS: String, postUrl: Call)(implicit request: RequestHeader)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.formatPattern
 @import play.api.libs.json.Json
@@ -85,6 +86,7 @@
         <!-- /top navigation -->
         <!-- page content -->
     <div class="right_col" role="main">
+        @helper.CSRF.formField
         <!-- PAGE INF SEARCH -->
         @if(rsInfhost != null){
             <div class="row top_tiles">
@@ -325,6 +327,9 @@
         }
         <!-- PAGE BRAS SEARCH -->
         @if(response != null) {
+            <input type="hidden" id="isClickedTab1" value="0">
+            <input type="hidden" id="isClickedTab2" value="0">
+            <input type="hidden" id="isClickedTab3" value="0">
             <div class="row top_tiles">
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_title">
@@ -434,282 +439,239 @@
             </div>
 
             <div class="row top_tiles">
-                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                <div>
                     <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#tab_inf" id="inf-tab" role="tab" data-toggle="tab" aria-expanded="true">
-                            INF</a>
+                        <li name="tab_inf">
+                            <a style="cursor: pointer">INF</a>
                         </li>
-                        <li role="presentation" class=""><a href="#tab_kibana" id="kibana-tab" role="tab" data-toggle="tab" aria-expanded="true">
-                            Kibana</a>
+                        <li name="tab_kibana">
+                            <a style="cursor: pointer">Kibana</a>
                         </li>
-                        <li id="tabOp" role="presentation" class=""><a href="#tab_opview" id="opview-tab" role="tab" data-toggle="tab" aria-expanded="true">
-                            Opview</a>
+                        <li name="tab_opsview">
+                            <a style="cursor: pointer">Opsview</a>
                         </li>
                     </ul>
                     <div id="myTabContent" class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade" id="tab_kibana" aria-labelledby="kibana-tab">
+                        <div class="tab-slider--body" id="tab_kibana">
+                            <div class="col-xs-12" id="div_tab_kibana">
+                                <div class="col-lg-4 col-sm-4 col-md-4 col-xs-12">
+                                    <div class="x_panel tile fixed_height_320" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Nerror By Severity <i class="fa fa-info-circle toolTipText" title="Thống kê số lỗi thiết bị BRAS theo mức độ lỗi"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="pie-severity" style="height: 250px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-sm-4 col-md-4 col-xs-12">
+                                    <div class="x_panel tile fixed_height_320" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Nerror By Error Type <i class="fa fa-info-circle toolTipText" title="Thống kê số lỗi thiết bị BRAS theo phân loại lỗi"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="bar-error" style="height: 250px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-sm-4 col-md-4 col-xs-12">
+                                    <div class="x_panel tile fixed_height_320" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Nerror By Facility <i class="fa fa-info-circle toolTipText" title="Thống kê số lỗi thiết bị BRAS theo bộ phận thiết bị"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="pie-facility" style="height: 250px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            <div class="col-lg-4 col-sm-4 col-md-4 col-xs-12">
-                                <div class="x_panel tile fixed_height_320" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Nerror By Severity <i class="fa fa-info-circle toolTipText" title="Thống kê số lỗi thiết bị BRAS theo mức độ lỗi"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="pie-severity" style="height: 250px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-sm-4 col-md-4 col-xs-12">
-                                <div class="x_panel tile fixed_height_320" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Nerror By Error Type <i class="fa fa-info-circle toolTipText" title="Thống kê số lỗi thiết bị BRAS theo phân loại lỗi"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="bar-error" style="height: 250px;"></div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="x_panel tile" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Ntime By Ddos <i class="fa fa-info-circle toolTipText" title="Thống kê số lần bị DDOS theo từng giao thức"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="col-ddos" style="height: 318px;"></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-4 col-sm-4 col-md-4 col-xs-12">
-                                <div class="x_panel tile fixed_height_320" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Nerror By Facility <i class="fa fa-info-circle toolTipText" title="Thống kê số lỗi thiết bị BRAS theo bộ phận thiết bị"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="pie-facility" style="height: 250px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Ntime By Ddos <i class="fa fa-info-circle toolTipText" title="Thống kê số lần bị DDOS theo từng giao thức"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="col-ddos" style="height: 318px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                <div class="x_panel tile fixed_height_350" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Nerror By Error And Severity <i class="fa fa-info-circle toolTipText" title="Thống kê số lỗi thiết bị BRAS theo từng lỗi"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <table class="data table table-bordered" style="margin-bottom: 0px">
-                                            <thead>
-                                                <th class="thTop" style="width: 14.5%">Type</th>
-                                                <th class="thTop" style="width: 16.5%">Severity</th>
-                                                <th class="thTop" style="width:58%;">Error_name</th>
-                                                <th class="thTop">Nerror</th>
-                                            </thead>
-                                        </table>
-                                        <div  style="height: 283px;overflow: auto">
-                                        <table class="data table table-bordered">
-                                            <tbody>
-                                            @for(i <- 0 until response.kibanaOverview.arrSevValue.length) {
-                                                <tr>
-                                                    <td style="width: 10%">@response.kibanaOverview.arrSevValue(i)._1</td>
-                                                    <td style="width: 18%">@response.kibanaOverview.arrSevValue(i)._2</td>
-                                                    <td style="width: 60%">@response.kibanaOverview.arrSevValue(i)._3</td>
-                                                    <td>@response.kibanaOverview.arrSevValue(i)._4</td>
-                                                </tr>
-                                            }
-                                            </tbody>
-                                        </table>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <div class="x_panel tile fixed_height_350" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Nerror By Error And Severity <i class="fa fa-info-circle toolTipText" title="Thống kê số lỗi thiết bị BRAS theo từng lỗi"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <table class="data table table-bordered" style="margin-bottom: 0px">
+                                                <thead>
+                                                    <th class="thTop" style="width: 14.5%">Type</th>
+                                                    <th class="thTop" style="width: 16.5%">Severity</th>
+                                                    <th class="thTop" style="width:58%;">Error_name</th>
+                                                    <th class="thTop">Nerror</th>
+                                                </thead>
+                                            </table>
+                                            <div style="height: 283px;overflow: auto">
+                                                <table class="data table table-bordered" id="tbKibana">
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-                        <div role="tabpanel" class="tab-pane fade" id="tab_opview" aria-labelledby="opview-tab">
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Nerror By Status <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái của service quản lý theo từng trạng thái"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="tree-map" style="height: 300px;"></div>
+                        <div class="tab-slider--body" id="tab_opsview">
+                            <div class="col-xs-12" id="div_tab_opsview">
+                                <div class="col-lg-6 col-sm-6 col-md-6">
+                                    <div class="x_panel tile" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Nerror By Status <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái của service quản lý theo từng trạng thái"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="tree-map" style="height: 300px"></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Nerror By Service And Status <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái theo từng service quản lý và trạng thái"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div>
-                                        <table class="data table table-bordered" style="margin-bottom: 0px">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 50%" class="thTop">Service name</th>
-                                                    @for(i <- 0 until response.servNameStt.arrStatus.length) {
-                                                        <th style="width: @(40/response.servNameStt.arrStatus.length)%" class="thTop">@response.servNameStt.arrStatus(i)</th>
-                                                    }
-                                                    <th class="thTop">Total</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
+                                <div class="col-lg-6 col-sm-6 col-md-6">
+                                    <div class="x_panel tile" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Nerror By Service And Status <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái theo từng service quản lý và trạng thái"></i>
+                                            <div class="clearfix"></div>
                                         </div>
-                                        <div style="height: 226px;overflow: auto">
-                                            <table class="data table table-bordered tbScroll" id="tbOpview" style="margin-bottom: 0px">
-                                                <tbody >
-                                                </tbody>
+                                        <div class="x_content">
+                                            <div>
+                                                <table class="data table table-bordered" style="margin-bottom: 0px" id="tbOpsHead">
+                                                    <thead>
+                                                        <tr></tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                            <div style="height: 226px;overflow: auto">
+                                                <table class="data table table-bordered tbScroll" id="tbOpsview" style="margin-bottom: 0px">
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <table class="data table table-bordered" style="margin-bottom: 0px" id="tbOpsFoot">
+                                                <thead>
+                                                    <tr></tr>
+                                                </thead>
                                             </table>
                                         </div>
-                                        <table class="data table table-bordered" style="margin-bottom: 0px">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 50%">Total</th>
-                                                    @for(i <- 0 until response.servNameStt.arrStatus.length) {
-                                                        <th style="width: @(40/response.servNameStt.arrStatus.length)%" id="col-@i"></th>
-                                                    }
-                                                    <th id="ttColall"></th>
-                                                </tr>
-                                            </thead>
-                                        </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div role="tabpanel" class="tab-pane fade active in" id="tab_inf" aria-labelledby="inf-tab">
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Nerror By Time <i class="fa fa-info-circle toolTipText" title="Thống kê tổng số lỗi thiết bị Access theo giờ trong ngày và theo từng loại lỗi"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="heat_map" style="height: 300px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Signin and Logoff By Host <i class="fa fa-info-circle toolTipText" title="Thống kê hoạt động ra vào mạng theo thiết bị Access trong BRAS"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="line-host" style="height: 300px;"></div>
+                        <div class="tab-slider--body" id="tab_inf">
+                            <div class="col-xs-12" id="div_tab_inf">
+                                <div class="col-lg-6 col-sm-6 col-md-6">
+                                    <div class="x_panel tile" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Nerror By Time <i class="fa fa-info-circle toolTipText" title="Thống kê tổng số lỗi thiết bị Access theo giờ trong ngày và theo từng loại lỗi"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="heat_map" style="height: 300px;"></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        No. Of Alert By Switch And Status <i class="fa fa-info-circle toolTipText" title="Thống kê số cảnh báo theo từng Switch và trạng thái"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="col-service" style="height: 370px;"></div>
+                                <div class="col-lg-6 col-sm-6 col-md-6">
+                                    <div class="x_panel tile" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Signin and Logoff By Host <i class="fa fa-info-circle toolTipText" title="Thống kê hoạt động ra vào mạng theo thiết bị Access trong BRAS"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="line-host" style="height: 300px;"></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        No. Of Alert By Switch And Monitoring Service <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái theo từng Switch và service quản lý"></i>
-                                        <div class="clearfix"></div>
+                                <div class="col-lg-6 col-sm-6 col-md-6">
+                                    <div class="x_panel tile" style="padding: 0px;">
+                                        <div class="card-header">
+                                            No. Of Alert By Switch And Status <i class="fa fa-info-circle toolTipText" title="Thống kê số cảnh báo theo từng Switch và trạng thái"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="col-service" style="height: 370px;"></div>
+                                        </div>
                                     </div>
-                                    <div class="x_content">
-                                        @if(response.sankeyService.map(x=> x._1).distinct.length <= 4){
-                                            <div id="sankey-service" style="height: 370px;"></div>
-                                        }else{
+                                </div>
+                                <div class="col-lg-6 col-sm-6 col-md-6">
+                                    <div class="x_panel tile" style="padding: 0px;">
+                                        <div class="card-header">
+                                            No. Of Alert By Switch And Monitoring Service <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái theo từng Switch và service quản lý"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
                                             <div id="sankey-service" style="height: 570px;"></div>
-                                        }
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;">
-                                    <div class="card-header">
-                                        Nerror Of Power Devices By Service And Status <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái theo từng service quản lý và trạng thái của thiết bị Power"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div>
-                                            <table class="data table table-bordered" style="width: 100%;margin-bottom: 0px">
+                                <div class="col-lg-6 col-sm-6 col-md-6">
+                                    <div class="x_panel tile" style="padding: 0px;">
+                                        <div class="card-header">
+                                            Nerror Of Power Devices By Service And Status <i class="fa fa-info-circle toolTipText" title="Thống kê số thay đổi trạng thái theo từng service quản lý và trạng thái của thiết bị Power"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <div>
+                                                <table class="data table table-bordered" style="width: 100%;margin-bottom: 0px" id="tbInfHead">
+                                                    <thead>
+                                                        <tr>
+
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                            <div style="height: 226px;overflow: auto">
+                                                <table class="data table table-bordered tbScroll" id="tbInfSev" style="margin-bottom: 0px">
+                                                    <tbody >
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <table class="data table table-bordered" style="margin-bottom: 0px" id="tbInfFoot">
                                                 <thead>
                                                     <tr>
-                                                        <th style="width: 20%" class="thTop">Bras Id</th>
-                                                        <th style="width: 20%" class="thTop">Service Name</th>
-                                                        @for(i <- 0 until response.devNameStt.arrStatus.length) {
-                                                            <th style="width: @(45/response.devNameStt.arrStatus.length)%" class="thTop">@response.devNameStt.arrStatus(i)</th>
-                                                        }
-                                                        <th class="thTop" style="width: 15%">Total</th>
+
                                                     </tr>
                                                 </thead>
                                             </table>
                                         </div>
-                                        <div style="height: 226px;overflow: auto">
-                                            <table class="data table table-bordered tbScroll" id="tbInfSev" style="margin-bottom: 0px">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-sm-6 col-md-6">
+                                    <div class="x_panel tile" style="padding: 0px;height: 355px">
+                                        <div class="card-header">
+                                            Nerror By Host, Module And Error <i class="fa fa-info-circle toolTipText" title="Thống kê lỗi thiết bị Access theo từng thiết bị Access trong BRAS"></i>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <table class="data table table-bordered tbScroll" id="tbBras" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Host Id</th>
+                                                        <th>Module</th>
+                                                        <th>Sf</th>
+                                                        <th>Lofi</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tfoot>
+                                                    <tr>
+
+                                                    </tr>
+                                                </tfoot>
                                                 <tbody >
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <table class="data table table-bordered" style="margin-bottom: 0px">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 40%">Total</th>
-                                                    @for(i <- 0 until response.devNameStt.arrStatus.length) {
-                                                        <th class="infAll_@response.devNameStt.arrStatus(i)" style="width: @(45/response.devNameStt.arrStatus.length)%"></th>
-                                                    }
-                                                    <th id="ttColallDev" style="width: 15%"></th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-6 col-md-6">
-                                <div class="x_panel tile" style="padding: 0px;height: 355px">
-                                    <div class="card-header">
-                                        Nerror By Host, Module And Error <i class="fa fa-info-circle toolTipText" title="Thống kê lỗi thiết bị Access theo từng thiết bị Access trong BRAS"></i>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <table class="data table table-bordered tbScroll" id="tbBras" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Host Id</th>
-                                                    <th>Module</th>
-                                                    <th>Sf</th>
-                                                    <th>Lofi</th>
-                                                    <th>Total</th>
-                                                </tr>
-                                            </thead>
-                                            @if(response.infModuleBytime != null) {
-                                                <tfoot>
-                                                    <tr>
-                                                        <th colspan="2">Total</th>
-                                                        <th>@response.infModuleBytime.map(x => x._3).sum</th>
-                                                        <th>@response.infModuleBytime.map(x => x._4).sum</th>
-                                                        <th>@response.infModuleBytime.map(x => x._5).sum</th>
-                                                    </tr>
-                                                </tfoot>
-                                                <tbody >
-                                                @for(i <- 0 until response.infModuleBytime.length) {
-                                                    <tr>
-                                                        <td class="textGroup">@response.infModuleBytime(i)._1</td>
-                                                        <td class="textGroup">@response.infModuleBytime(i)._2</td>
-                                                        <td>@response.infModuleBytime(i)._3</td>
-                                                        <td>@response.infModuleBytime(i)._4</td>
-                                                        <th>@response.infModuleBytime(i)._5</th>
-                                                    </tr>
-                                                }
-                                                </tbody>
-                                            }
-                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -750,6 +712,7 @@
     <script src="../assets/javascripts/treemap.js"></script>
     <script src="../assets/javascripts/sankey.js"></script>
     <script src="../assets/javascripts/roadmap.js"></script>
+    <script src="../assets/javascripts/waitMe.js"></script>
         <!-- Counter number -->
     <script src="../assets/javascripts/jquery.counterup.min.js"></script>
     <script type="text/javascript" src="../assets/javascripts/vis.min.js"></script>
@@ -774,6 +737,37 @@
     <script src="../assets/javascripts/common.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
+                $(".tab-slider--body").hide();
+                // click tab INF-KIBANA-OPSVIEW
+                $("#myTab li").click(function() {
+                    var active = 0
+                    if($(this).hasClass('active')){
+                        active = 1
+                    }
+                    $(".tab-slider--body").hide()
+                    var activeTab = $(this).attr("name")
+                    $("#"+activeTab).fadeIn();
+                    $('#myTab li').removeClass('active')
+                    $('html, body').animate({scrollTop:$('#'+$(this).attr("name")).position().top}, 'slow');
+                    // tab Inf
+                    if($(this).attr("name") == "tab_inf"){
+                        $(this).addClass("active")
+                        if(active == 0 && $('#isClickedTab1').val()==0)
+                            callAjaxByTab($(this).attr("name"))
+                    }
+                    // tab Kibana
+                    else if($(this).attr("name") == "tab_kibana"){
+                        $(this).addClass("active")
+                       if(active == 0 && $('#isClickedTab2').val()==0)
+                            callAjaxByTab($(this).attr("name"))
+                    }
+                    // tab Opsview
+                    else {
+                        $(this).addClass("active")
+                        if(active == 0 && $('#isClickedTab3').val()==0)
+                            callAjaxByTab($(this).attr("name"))
+                    }
+                });
                 // radio button click
                 $('#radioBtn a').on('click', function(){
                     var sel = $(this).data('title');
@@ -840,7 +834,6 @@
                 function cb(start, end) {
                     $('#reportrange span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
                 }
-
 
                 function suggest(){
                     // autocomplete search contract
@@ -1219,19 +1212,6 @@
                         series: [{
                             name: 'Module',
                             data: getJsonBubleChart(@Html(Json.stringify(Json.toJson(rsInfhost.sigLogByModule))),0)
-                             /*[{
-                                name: 'Animals',
-                                x: 4, y: 5, z:10,
-                                drilldown: '1'
-                            }, {
-                                name: 'Fruits',
-                                x: 14, y: 20, z:20,
-                                drilldown: '2'
-                            }, {
-                                name: 'Cars',
-                                x: 8, y: 9, z:7,
-                                drilldown: '3'
-                            }]*/
                         }],
                         drilldown: {
                             drillUpButton: {
@@ -1253,32 +1233,6 @@
                                 }
                             },
                             series: getDrilldownBubleChart(@Html(Json.stringify(Json.toJson(rsInfhost.sigLogbyModuleIndex))),@Html(Json.stringify(Json.toJson(rsInfhost.sigLogByModule.map(x=>x._1)))))
-                           /* [{
-                                name: '1',
-                                id: '1',
-                                data: [
-                                    { name: 'Cats', x: 5, y: 9, z:7},
-                                    { name: 'Dogs', x: 8, y: 8, z:9},
-                                    { name: 'Cows', x: 1, y: 5, z:2},
-                                    { name: 'Sheep', x: 4, y: 7, z:2},
-                                    { name: 'Pigs', x: 4, y: 5, z:7}
-                                ]
-                            }, {
-                                name: '2',
-                                id: '2',
-                                data: [
-                                    { name: 'Apples', x: 2, y: 9, z:6},
-                                    { name: 'Oranges', x: 6, y: 5, z:1}
-                                ]
-                            }, {
-                                name: '3',
-                                id: '3',
-                                data: [
-                                    { name: 'Toyota', x: 2, y: 8, z:7},
-                                    { name: 'Opel', x: 8, y: 2, z:4},
-                                    { name: 'Volkswagen', x: 4, y: 4, z:4}
-                                ]
-                            }]*/
                         }
                     });
                   }
@@ -1286,14 +1240,6 @@
 
                 @if(response != null){
                 /* RESULT BRAS SEARCHING*/
-                $('#tbBras').DataTable( {
-                    "scrollY":        "200px",
-                    "scrollCollapse": true,
-                    "paging":         false,
-                    "info":     false,
-                    "searching":     false,
-                    "sort":     false
-                });
                 if(@response.ticketOutlier.length >0)
                 {
                     var events = parseTicketOut(@Html(Json.stringify(Json.toJson(response.ticketOutlier))))
@@ -1307,91 +1253,6 @@
                 }else{
                     $('#time-line-bras').hide()
                 }
-                // table opview service
-                @if(response != null && response.servNameStt != null){
-                    var mapService = @Html(Json.stringify(Json.toJson(response.servNameStt.arrService)))
-                    var arrName = @Html(Json.stringify(Json.toJson(response.servNameStt.arrName)))
-                    var arrStt = @Html(Json.stringify(Json.toJson(response.servNameStt.arrStatus)))
-                            $('#tbOpview tbody').append(getBodyService(mapService, arrName, arrStt))
-                    // set total all by col opview table
-                    var sumColAll = 0;
-                    $('.ttRow').each(function () {
-                        sumColAll += parseInt($(this).text());
-                    });
-                    $('#ttColall').text(sumColAll);
-                    // set total by col opview table
-                    for (var i = 0; i < arrStt.length; i++) {
-                        var sumCol = 0;
-                        $('.col-' + i).each(function () {
-                            sumCol += parseInt($(this).text());
-                        });
-                        $('#col-' + i).text(sumCol);
-                    }
-                }
-                // table inf service
-                @if(response != null && response.devNameStt != null){
-                    var devService = @Html(Json.stringify(Json.toJson(response.devNameStt.arrService)))
-                    var devName = @Html(Json.stringify(Json.toJson(response.devNameStt.arrName)))
-                    var devStt = @Html(Json.stringify(Json.toJson(response.devNameStt.arrStatus)))
-                    var devBras = @Html(Json.stringify(Json.toJson(response.devNameStt.arrBras)))
-                        $('#tbInfSev tbody').append(getBodyServiceHaveBras(devService, devBras, devName, devStt))
-                    // set total all by col inf table
-                    var sumDevColAll = 0;
-                    $('#tbInfSev .ttRow').each(function () {
-                        sumDevColAll += parseInt($(this).text());
-                    });
-                    $('#ttColallDev').text(sumDevColAll);
-                    // set total by col inf table
-                    for (var i = 0; i < devStt.length; i++) {
-                        var sumColDev = 0;
-                        $('#tbInfSev .' + devStt[i]).each(function () {
-                            sumColDev += parseInt($(this).text());
-                        });
-                        $('.infAll_' + devStt[i]).text(sumColDev);
-                    }
-                }
-                /* OPVIEW JS */
-                // Tree map status
-                @if( response.opServiceStt != null){
-                    Highcharts.chart('tree-map', {
-                        colorAxis: {
-                            minColor: '#FFFFFF',
-                            maxColor: Highcharts.getOptions().colors[8]
-                        },
-                        series: [{
-                            type: "treemap",
-                            layoutAlgorithm: 'strip',
-                            color: "#f1b53d",
-                            data: getJsonTreemap(@Html(Json.stringify(Json.toJson(response.opServiceStt))))
-                            /*[{
-                                name: 'A',
-                                value: 6
-                            }, {
-                                name: 'B',
-                                value: 6
-                            }, {
-                                name: 'C',
-                                value: 4
-                            }, {
-                                name: 'D',
-                                value: 3
-                            }, {
-                                name: 'E',
-                                value: 2
-                            }, {
-                                name: 'F',
-                                value: 2
-                            }, {
-                                name: 'G',
-                                value: 1
-                            }]*/
-                        }],
-                        title: {
-                            text: ''
-                        }
-                    });
-                }
-                /* END TREE MAP JS */
                 @if(response.linecardhost != null){
                     Highcharts.chart('buble-card', {
 
@@ -1460,7 +1321,7 @@
 
                     });
                 }
-                @if( response.kibanaOpviewBytime != null){
+                @if(response.kibanaOpviewBytime != null){
                 Highcharts.chart('int-col-hourly', {
                     chart: {
                         zoomType: 'xy'
@@ -1581,326 +1442,468 @@
                         }]
                 });
                 }
-                /* KIBANA JS */
-                // nerror by severity
-                Highcharts.chart('pie-severity', {
-                    chart: {
-                        type: 'pie'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    tooltip: {
-                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                    },
-                    plotOptions: {
-                        pie: {
-                            /*colors: [
-                                'rgba(255,99,132,1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],*/
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: true
-                            },
-                            showInLegend: true
-                        }
-                    },
-                    series: [{
-                        name: 'Percent error',
-                        innerSize: '40%',
-                        colorByPoint: true,
-                        data: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrSeverity)))
-                        /*[["warning", 12], ["alert", 25], ["infor", 53], ["notice", 15], ["error", 44]]*/
-                    }]
-                });
-                // nerror by facility
-                Highcharts.chart('pie-facility', {
-                    chart: {
-                        type: 'pie'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    tooltip: {
-                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                    },
-                    plotOptions: {
-                        pie: {
-                           /* colors: [
-                                'rgba(255,99,132,1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],*/
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: true
-                            },
-                            showInLegend: true
-                        }
-                    },
-                    series: [{
-                        name: 'Percent',
-                        innerSize: '40%',
-                        colorByPoint: true,
-                        data: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrFacility)))
-                        /*[["KERN", 53], ["PFE", 25], ["USER", 53], ["AUTHOR", 15], ["DAEMON", 44]]*/
-                    }]
-                });
-                // bar chart type error
-                Highcharts.chart('bar-error', {
-                    chart: {
-                        type: 'bar'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    xAxis: {
-                        categories: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrErrorType.map(x=> x._1))))
-                    },
-                    yAxis: {
-                        min: 0,
-                        title: {
-                            text: ''
-                        }
-                    },
-                    legend: {
-                        reversed: true
-                    },
-                    plotOptions: {
-                        series: {
-                            dataLabels: {
-                                enabled: true,
-                                inside: false,
-                                align: 'right'
-                            },
-                            color: 'rgba(255,99,132,1)'
-                        },
-                    },
-                    series: [{
-                        name: 'Nerror',
-                        data: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrErrorType.map(x=> x._2))))
-                    }]
-                });
-                // col chart ntime by ddos
-                Highcharts.chart('col-ddos', {
-                    chart: {
-                        type: 'column'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    xAxis: {
-                        categories: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrDdos.map(x=> x._1))))
-                    },
-                    yAxis: {
-                        min: 0,
-                        title: {
-                            text: ''
-                        }
-                    },
-                    legend: {
-                        reversed: true
-                    },
-                    plotOptions: {
-                        column: {
-                            dataLabels: {
-                                enabled: true,
-                                crop: false,
-                                overflow: 'none'
-                            }
-                        },
-                        series: {
-                            color: '#f60'
-                        }
-                    },
-                    series: [{
-                        name: 'Ntime',
-                        data: @Html(Json.stringify(Json.toJson(response.kibanaOverview.arrDdos.map(x=> x._2))))
-                    }]
-                });
-                /* END KIBANA JS */
-
-                /* INF JS */
-                // col service by status
-                @if(response.serviceByTime != null){
-                    Highcharts.chart('col-service', {
-                        chart: {
-                            type: 'bar'
-                        },
-                        title: {
-                            text: ''
-                        },
-                        xAxis: {
-                            categories: @Html(Json.stringify(Json.toJson(response.serviceByTime.map(x=> x._1).distinct)))
-                        },
-                        yAxis: {
-                            min: 0,
-                            title: {
-                                text: ''
-                            }
-                        },
-                        legend: {
-                            reversed: true
-                        },
-                        plotOptions: {
-                            series: {
-                                stacking: 'normal'
-                            },
-                        },
-                        series: getSeriesStackBar(@Html(Json.stringify(Json.toJson(response.serviceByTime))), @Html(Json.stringify(Json.toJson(response.serviceByTime.map(x=> x._2).distinct))), @Html(Json.stringify(Json.toJson(response.serviceByTime.map(x=> x._1).distinct))))
-                    });
-                }
-                @if(response.sankeyService != null){
-                    Highcharts.chart('sankey-service', {
-                        title: {
-                            text: ''
-                        },
-                        series: [{
-                            keys: ['from', 'to', 'weight'],
-                            data: @Html(Json.stringify(Json.toJson(response.sankeyService))),
-                            type: 'sankey',
-                            name: 'Switch And Monitoring'
-                        }]
-                    });
-                }
-                @if(response.siglogByhost != null){
-                    // line Sigin and logoff by host
-                    Highcharts.chart('line-host', {
-                        chart: {
-                            zoomType: 'xy'
-                        },
-                        title: {
-                            text: ''
-                        },
-                        subtitle: {
-                            text: ''
-                        },
-                        xAxis: [{
-                            categories: @Html(Json.stringify(Json.toJson(response.siglogByhost.arrCates))),
-                            crosshair: true,
-                            title: {
-                                text: '',
-                            }
-                        }],
-                        yAxis: [{ // Primary yAxis
-                            labels: {
-                                format: '{value}',
-                                style: {
-                                    color: "#1ABB9C"
-                                }
-                            },
-                            title: {
-                                //text: 'Size (MB)',
-                                style: {
-                                    color: "#1ABB9C"
-                                }
-                            }
-                        }, { // Secondary yAxis
-                            title: {
-                                //text: 'Duration (hours)',
-                                style: {
-                                    color: "#9B59B6"
-                                }
-                            },
-                            labels: {
-                                format: '{value}',
-                                style: {
-                                    color: "#9B59B6"
-                                }
-                            },
-                            opposite: true
-                        }],
-                        tooltip: {
-                            shared: true
-                        },
-
-                        series: [
-                            {
-                                type: 'column',
-                                name: 'Sigin',
-                                yAxis: 0,
-                                color: "#1ABB9C",
-                                data: @Html(Json.stringify(Json.toJson(response.siglogByhost.sumSig)))
-                            }, {
-                                name: 'Logoff',
-                                type: 'spline',
-                                yAxis: 1,
-                                color: "#9B59B6",
-                                data: @Html(Json.stringify(Json.toJson(response.siglogByhost.sumLog)))
-
-                            }]
-                    });
-                }
-                @if(response.infErrorBytime != null){
-                    // heat map inf nerror
-                    Highcharts.chart('heat_map', {
-                        chart: {/*
-                            backgroundColor: '#687582',*/
-                            type: 'heatmap',
-                            marginTop: 40,
-                            marginBottom: 80,
-                            plotBorderWidth: 1
-                        },
-
-                        title: {
-                            text: ''
-                        },
-                        xAxis: {
-                            categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
-                        },
-
-                        yAxis: {
-                            categories: ['Port PON down','Port INF down','SF Error','LOFI Error','Rogue ONT','Broken Lv2 Cable','SF Module'],
-                            title: null
-                        },
-
-                        colorAxis: {
-                            min: 0,
-                            minColor: '#FFFFFF',
-                            maxColor: 'rgba(54, 162, 235, 1)'
-                        },
-
-                        legend: {
-                            align: 'right',
-                            layout: 'vertical',
-                            margin: 0,
-                            verticalAlign: 'top',
-                            y: 25,
-                            symbolHeight: 280
-                        },
-
-                        tooltip: {
-                            formatter: function () {
-                                return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br> has <b>' +
-                                        this.point.value + '</b> <br><b>' + this.series.yAxis.categories[this.point.y] + '</b>';
-                            }
-                        },
-
-                        series: [{
-                            name: 'Logoff per card',
-                            borderWidth: 1,
-                            data: getErrorHourlyHeatmap(@Html(Json.stringify(Json.toJson(response.infErrorBytime)))),
-                            /*[[0, 0, 10], [1, 0, 92], [2, 0, 35], [3, 0, 72], [4, 0, 38], [5, 0, 88],  [6, 0, 13], [7, 0, 31], [8, 0, 85],  [9, 0, 47]],*/
-                            dataLabels: {
-                                enabled: true,
-                                color: '#000000'
-                            }
-                        }]
-
-                    });
-                }
                 }
              });
+
+            function callAjaxByTab(tabName){
+                $.ajax({
+                    url: "/search/callAjaxByTab",
+                    cache: false,
+                    data: {
+                        "bras": $('#bras').val(),
+                        "date": $('#date').val(),
+                        "tabName": tabName,
+                        "csrfToken"  : document.querySelector('input[name=csrfToken]').value
+                    },
+                    type: "POST",
+                    beforeSend: function () {
+                        if(tabName == "tab_inf"){
+                            $('#div_'+tabName).waitMe({
+                                effect: 'facebook',
+                                text: '',
+                                bg: 'rgba(255,255,255,0.7)',
+                                color: '#2A3F54',
+                                textPos: 'vertical'
+                            });
+                        }
+                    },
+                    success: function (dta) {
+                        if(dta == "Permission"){
+                            alert('401 Unauthorized! Access is denied due to invalid credentials.')
+                        }
+                        else if(dta == "Error"){
+                            alert('Error when execute query. Please check again your system!')
+                        }
+                        else {
+                            // tab Opsview
+                            if(tabName == "tab_opsview"){
+                                $('#isClickedTab3').val(1)
+                                // Nerror By Status
+                                Highcharts.chart('tree-map', {
+                                    colorAxis: {
+                                        minColor: '#FFFFFF',
+                                        maxColor: Highcharts.getOptions().colors[8]
+                                    },
+                                    series: [{
+                                        type: "treemap",
+                                        layoutAlgorithm: 'strip',
+                                        color: "#f1b53d",
+                                        data: getJsonTreemap(dta.opsview.objServiceName)
+                                    }],
+                                    title: {
+                                        text: ''
+                                    }
+                                });
+                                // Nerror By Service And Status
+                                /* tb Header */
+                                var contentHead = '<th style="width: 50%" class="thTop">Service name</th>'
+                                for(var i=0; i< dta.opsview.objServByStt.servStatus.length;i++){
+                                    contentHead += '<th style="width: '+Number(40/dta.opsview.objServByStt.servStatus.length)+'%" class="thTop">'+dta.opsview.objServByStt.servStatus[i]+'</th>'
+                                }
+                                contentHead += '<th class="thTop">Total</th>'
+                                $('#tbOpsHead thead tr').html("").append(contentHead)
+                                /* tb Footer */
+                                var contentFoot = '<th style="width: 50%">Total</th>'
+                                for(var i=0; i< dta.opsview.objServByStt.servStatus.length;i++){
+                                    contentFoot += '<th style="width: '+Number(40/dta.opsview.objServByStt.servStatus.length)+'%" id="col-'+i+'">'+dta.opsview.objServByStt.servStatus[i]+'</th>'
+                                }
+                                contentFoot += '<th id="ttColall"></th>'
+                                $('#tbOpsFoot thead tr').html("").append(contentFoot)
+                                /* tb Body */
+                                var mapService = dta.opsview.objServByStt.opServByStt
+                                var arrName = dta.opsview.objServByStt.servName
+                                var arrStt = dta.opsview.objServByStt.servStatus
+                                $('#tbOpsview tbody').html("").append(getBodyService(mapService, arrName, arrStt))
+                                // set total all by col opview table
+                                var sumColAll = 0;
+                                $('.ttRow').each(function () {
+                                    sumColAll += parseInt($(this).text());
+                                });
+                                $('#ttColall').text(sumColAll);
+                                // set total by col opview table
+                                for (var i = 0; i < arrStt.length; i++) {
+                                    var sumCol = 0;
+                                    $('.col-' + i).each(function () {
+                                        sumCol += parseInt($(this).text());
+                                    });
+                                    $('#col-' + i).text(sumCol);
+                                }
+                            }
+                            // tab Kibana
+                            else if(tabName == "tab_kibana"){
+                                $('#isClickedTab2').val(1)
+                                //  Nerror By Severity
+                                Highcharts.chart('pie-severity', {
+                                    chart: {
+                                        type: 'pie'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    tooltip: {
+                                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                    },
+                                    plotOptions: {
+                                        pie: {
+                                            allowPointSelect: true,
+                                            cursor: 'pointer',
+                                            dataLabels: {
+                                                enabled: true
+                                            },
+                                            showInLegend: true
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'Percent error',
+                                        innerSize: '40%',
+                                        colorByPoint: true,
+                                        data: dta.kibana.severity
+                                    }]
+                                });
+                                // nerror by facility
+                                Highcharts.chart('pie-facility', {
+                                    chart: {
+                                        type: 'pie'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    tooltip: {
+                                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                    },
+                                    plotOptions: {
+                                        pie: {
+                                            allowPointSelect: true,
+                                            cursor: 'pointer',
+                                            dataLabels: {
+                                                enabled: true
+                                            },
+                                            showInLegend: true
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'Percent',
+                                        innerSize: '40%',
+                                        colorByPoint: true,
+                                        data: dta.kibana.facility
+                                    }]
+                                });
+                                //  Nerror By Error Type
+                                Highcharts.chart('bar-error', {
+                                    chart: {
+                                        type: 'bar'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.kibana.errorType.cate
+                                    },
+                                    yAxis: {
+                                        min: 0,
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    legend: {
+                                        reversed: true
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            dataLabels: {
+                                                enabled: true,
+                                                inside: false,
+                                                align: 'right'
+                                            },
+                                            color: 'rgba(255,99,132,1)'
+                                        },
+                                    },
+                                    series: [{
+                                        name: 'Nerror',
+                                        data: dta.kibana.errorType.data
+                                    }]
+                                });
+                                //  Ntime By Ddos
+                                Highcharts.chart('col-ddos', {
+                                    chart: {
+                                        type: 'column'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.kibana.ddos.cate
+                                    },
+                                    yAxis: {
+                                        min: 0,
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    legend: {
+                                        reversed: true
+                                    },
+                                    plotOptions: {
+                                        column: {
+                                            dataLabels: {
+                                                enabled: true,
+                                                crop: false,
+                                                overflow: 'none'
+                                            }
+                                        },
+                                        series: {
+                                            color: '#f60'
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'Ntime',
+                                        data: dta.kibana.ddos.data
+                                    }]
+                                });
+                                //  Nerror By Error And Severity
+                                var tBody = ""
+                                for(var i=0; i< dta.kibana.severityValue.length;i++){
+                                    tBody += '<tr>'
+                                    tBody += '<td style="width: 10%">'+dta.kibana.severityValue[i][0]+'</td>'
+                                    tBody += '<td style="width: 18%">'+dta.kibana.severityValue[i][1]+'</td>'
+                                    tBody += '<td style="width: 60%">'+dta.kibana.severityValue[i][2]+'</td>'
+                                    tBody += '<td>'+dta.kibana.severityValue[i][3]+'</td>'
+                                    tBody += '</tr>'
+
+                                }
+                                $('#tbKibana tbody').html("").append(tBody)
+                            }
+                            // tab Inf
+                            else{
+                                $('#isClickedTab1').val(1)
+                                //  Nerror By Time
+                                Highcharts.chart('heat_map', {
+                                    chart: {
+                                        type: 'heatmap',
+                                        marginTop: 40,
+                                        marginBottom: 80,
+                                        plotBorderWidth: 1
+                                    },
+
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
+                                    },
+
+                                    yAxis: {
+                                        categories: ['Port PON down','Port INF down','SF Error','LOFI Error','Rogue ONT','Broken Lv2 Cable','SF Module'],
+                                        title: null
+                                    },
+
+                                    colorAxis: {
+                                        min: 0,
+                                        minColor: '#FFFFFF',
+                                        maxColor: 'rgba(54, 162, 235, 1)'
+                                    },
+
+                                    legend: {
+                                        align: 'right',
+                                        layout: 'vertical',
+                                        margin: 0,
+                                        verticalAlign: 'top',
+                                        y: 25,
+                                        symbolHeight: 280
+                                    },
+
+                                    tooltip: {
+                                        formatter: function () {
+                                            return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br> has <b>' +
+                                                    this.point.value + '</b> <br><b>' + this.series.yAxis.categories[this.point.y] + '</b>';
+                                        }
+                                    },
+
+                                    series: [{
+                                        name: 'Logoff per card',
+                                        borderWidth: 1,
+                                        data: getErrorHourlyHeatmap(dta.inf.infErrorBytime),
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000'
+                                        }
+                                    }]
+
+                                });
+                                // line Sigin and logoff by host
+                                Highcharts.chart('line-host', {
+                                    chart: {
+                                        zoomType: 'xy'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    subtitle: {
+                                        text: ''
+                                    },
+                                    xAxis: [{
+                                        categories:  dta.inf.objSiglogHost.cate,
+                                        crosshair: true,
+                                        title: {
+                                            text: '',
+                                        }
+                                    }],
+                                    yAxis: [{ // Primary yAxis
+                                        labels: {
+                                            format: '{value}',
+                                            style: {
+                                                color: "#1ABB9C"
+                                            }
+                                        },
+                                        title: {
+                                            //text: 'Size (MB)',
+                                            style: {
+                                                color: "#1ABB9C"
+                                            }
+                                        }
+                                    }, { // Secondary yAxis
+                                        title: {
+                                            //text: 'Duration (hours)',
+                                            style: {
+                                                color: "#9B59B6"
+                                            }
+                                        },
+                                        labels: {
+                                            format: '{value}',
+                                            style: {
+                                                color: "#9B59B6"
+                                            }
+                                        },
+                                        opposite: true
+                                    }],
+                                    tooltip: {
+                                        shared: true
+                                    },
+
+                                    series: [
+                                        {
+                                            type: 'column',
+                                            name: 'Sigin',
+                                            yAxis: 0,
+                                            color: "#1ABB9C",
+                                            data: dta.inf.objSiglogHost.signin
+                                        }, {
+                                            name: 'Logoff',
+                                            type: 'spline',
+                                            yAxis: 1,
+                                            color: "#9B59B6",
+                                            data:  dta.inf.objSiglogHost.logoff
+
+                                        }]
+                                });
+                                // No. Of Alert By Switch And Monitoring Service
+                                if(Number(dta.inf.objSankey.size) <= 4){
+                                    $('#sankey-service').attr('style','height: 370px')
+                                }
+                                Highcharts.chart('sankey-service', {
+                                    title: {
+                                        text: ''
+                                    },
+                                    series: [{
+                                        keys: ['from', 'to', 'weight'],
+                                        data: dta.inf.objSankey.data,
+                                        type: 'sankey',
+                                        name: 'Switch And Monitoring'
+                                    }]
+                                });
+                                // No. Of Alert By Switch And Status
+                                Highcharts.chart('col-service', {
+                                    chart: {
+                                        type: 'bar'
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.inf.objSerByTime.cate
+                                    },
+                                    yAxis: {
+                                        min: 0,
+                                        title: {
+                                            text: ''
+                                        }
+                                    },
+                                    legend: {
+                                        reversed: true
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            stacking: 'normal'
+                                        },
+                                    },
+                                    series: getSeriesStackBar(dta.inf.objSerByTime.data, dta.inf.objSerByTime.key, dta.inf.objSerByTime.cate)
+                                });
+                                //  Nerror By Host, Module And Error
+                                var tFootHost = '<th colspan="2">Total</th><th>'+dta.inf.objInfMudule.sumSf+'</th>' +
+                                        '<th>'+dta.inf.objInfMudule.sumLofi+'</th><th>'+dta.inf.objInfMudule.sumTotal+'</th>'
+                                $('#tbBras tfoot tr').html("").append(tFootHost)
+                                var tbodyHost = ""
+                                for(var i=0;i< dta.inf.objInfMudule.data.length;i++){
+                                    tbodyHost += '<tr><td class="textGroup">'+dta.inf.objInfMudule.data[i][0]+'</td>'
+                                    tbodyHost += '<td class="textGroup">'+dta.inf.objInfMudule.data[i][1]+'</td>'
+                                    tbodyHost += '<td>'+dta.inf.objInfMudule.data[i][2]+'</td>'
+                                    tbodyHost += '<td>'+dta.inf.objInfMudule.data[i][3]+'</td>'
+                                    tbodyHost += '<td>'+dta.inf.objInfMudule.data[i][4]+'</td></tr>'
+                                }
+                                $('#tbBras tbody').html("").append(tbodyHost)
+                                $('#tbBras').DataTable( {
+                                    "scrollY":        "200px",
+                                    "scrollCollapse": true,
+                                    "paging":         false,
+                                    "info":     false,
+                                    "searching":     false,
+                                    "sort":     false
+                                });
+                                // Nerror Of Power Devices By Service And Status
+                                /* tb Header*/
+                                var contentHead = '<th style="width: 20%" class="thTop">Bras Id</th><th style="width: 20%" class="thTop">Service Name</th>'
+                                for(var i=0; i< dta.inf.objDevServStt.arrStatus.length;i++){
+                                    contentHead += '<th style="width: '+Number(45/dta.inf.objDevServStt.arrStatus.length)+'%" class="thTop">'+dta.inf.objDevServStt.arrStatus[i]+'</th>'
+                                }
+                                contentHead += '<th class="thTop" style="width: 15%">Total</th>'
+                                $('#tbInfHead thead tr').html("").append(contentHead)
+                                /* tb Footer*/
+                                var contentFoot = '<th style="width: 40%">Total</th>'
+                                for(var i=0; i< dta.inf.objDevServStt.arrStatus.length;i++){
+                                    contentFoot += '<th class="infAll_'+dta.inf.objDevServStt.arrStatus[i]+'" style="width: '+Number(45/dta.inf.objDevServStt.arrStatus.length)+'%"></th>'
+                                }
+                                contentFoot += '<th id="ttColallDev" style="width: 15%"></th>'
+                                $('#tbInfFoot thead tr').html("").append(contentFoot)
+                                /* tb body*/
+                                var devService = dta.inf.objDevServStt.data
+                                var devName = dta.inf.objDevServStt.arrName
+                                var devStt = dta.inf.objDevServStt.arrStatus
+                                var devBras = dta.inf.objDevServStt.arrBras
+                                $('#tbInfSev tbody').append(getBodyServiceHaveBras(devService, devBras, devName, devStt))
+                                // set total all by col inf table
+                                var sumDevColAll = 0;
+                                $('#tbInfSev .ttRow').each(function () {
+                                    sumDevColAll += parseInt($(this).text());
+                                });
+                                $('#ttColallDev').text(sumDevColAll);
+                                // set total by col inf table
+                                for (var i = 0; i < devStt.length; i++) {
+                                    var sumColDev = 0;
+                                    $('#tbInfSev .' + devStt[i]).each(function () {
+                                        sumColDev += parseInt($(this).text());
+                                    });
+                                    $('.infAll_' + devStt[i]).text(sumColDev);
+                                }
+                            }
+                        }
+                    },
+                    complete: function () {
+                        if(tabName == "tab_inf") {
+                            $('#div_' + tabName).waitMe("hide");
+                        }
+                    }
+                });
+            }
 
             function getBodyService(dtaService,dtaName,dtaStatus){
                 var html = '';
@@ -2005,26 +2008,8 @@
 
             function getSeriesStackBar(dta, arrKey1, arrKey2){
                 var jsArray = []
-                var colors = [
-                    '#d9534f',
-                    '#73879C',
-                    '#1ABB9C',
-                    '#f1b53d',
-                    '#E74C3C',
-                    '#73879C',
-                    '#832d1d',
-                    '#0000cc',
-                    '#09006d',
-                    '#cccccc',
-                    '#669999',
-                    '#f2ccff',
-                    '#e6e600',
-                    '#132639',
-                    '#99cc00',
-                    '#466d6d',
-                    '#ffc6b3',
-                    '#666633',
-                    '#ffff00'];
+                var colors = ['#d9534f', '#73879C', '#1ABB9C', '#f1b53d', '#E74C3C', '#73879C', '#832d1d', '#0000cc', '#09006d', '#cccccc',
+                    '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'];
                 for(var i=0; i< arrKey1.length; i++ ){
                     var arrData = []
                     for(var j=0;j<arrKey2.length;j++ ) {
@@ -2080,26 +2065,8 @@
                 // _type=0: group single column
                 // _type=1: group multi columns
                 var colors = [
-                    '#dc5a78',
-                    '#3498DB',
-                    '#9B59B6',
-                    '#f1b53d',
-                    '#E74C3C',
-                    '#73879C',
-                    '#1ABB9C',
-                    '#832d1d',
-                    '#0000cc',
-                    '#09006d',
-                    '#cccccc',
-                    '#669999',
-                    '#f2ccff',
-                    '#e6e600',
-                    '#132639',
-                    '#99cc00',
-                    '#466d6d',
-                    '#ffc6b3',
-                    '#666633',
-                    '#ffff00'];
+                    '#dc5a78', '#3498DB', '#9B59B6', '#f1b53d', '#E74C3C', '#73879C', '#1ABB9C', '#832d1d', '#0000cc', '#09006d', '#cccccc', '#669999',
+                    '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'];
                 var jsonArr = [];
                 for(var i=0;i<dta.length;i++){
                     var sigin= Number(dta[i][1]),logoff=Number(dta[i][2]);

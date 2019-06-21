@@ -93,9 +93,10 @@ GET      /inf/confirmLabel             controllers.InfController.confirmLabel(ho
 ### ---END PAGE INF---
 
 ### ---PAGE SEARCH---
-GET      /searchBras                   controllers.DeviceController.search
-POST     /searchBrasHost               controllers.DeviceController.getFormBras
-GET      /suggest                      controllers.DeviceController.suggest(ct: String ?= "", _type: String ?= "")
+GET      /searchBras                   controllers.SearchController.search
+POST     /searchBrasHost               controllers.SearchController.getFormBras
+POST     /search/callAjaxByTab         controllers.SearchController.callAjaxByTab
+GET      /suggest                      controllers.SearchController.suggest(ct: String ?= "", _type: String ?= "")
 ### ---END PAGE SEARCH---
 
 ### ---PAGE EXPORT---
@@ -104,7 +105,7 @@ POST      /exportData                  controllers.ExportController.exportData
 ### ---END PAGE EXPORT---
 
 ### right click request
-GET      /fwdRequest                   controllers.DeviceController.fwdRequest(bras: String)
+GET      /fwdRequest                   controllers.SearchController.fwdRequest(bras: String)
 
 GET      /error/permission             controllers.ErrorController.index
 

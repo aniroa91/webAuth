@@ -59,37 +59,21 @@ object InfDAO {
   def getNoOutlierInfByHost(host: String,nowDay: String): Int = {
     val response = client.execute(
       search(s"infra_dwh_inf_module_*" / "docs")
-        query { must(termQuery("host.keyword",host),termQuery("label",1),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        query { must(termQuery("host.keyword",host),termQuery("label",1),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0)))
+        .lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         size 10000
     ).await
     response.hits.total
-
-    /*dbConfig.db.run(
-      sql"""select count(label)
-            from dwh_inf_module
-            where host= $host and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label =1
-            group by host
-                  """
-        .as[(Int)])*/
   }
 
   def getNoOutlierInfByBras(bras: String,nowDay: String): Int = {
-    val fromDay = nowDay.split("/")(0)
-    val nextDay = CommonService.getNextDay(nowDay.split("/")(1))
-
     val rs = client.execute(
       search(s"infra_dwh_inf_module_*" / "docs")
-        query { must(termQuery("bras_id.keyword",bras),termQuery("label",1),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        query { must(termQuery("bras_id.keyword",bras),termQuery("label",1),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0)))
+        .lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         size 1000
     ).await
     rs.totalHits
-    /*dbConfig.db.run(
-      sql"""select count(label)
-            from dwh_inf_module
-            where bras_id= $bras and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP and label =1
-            group by bras_id
-                  """
-        .as[(Int)])*/
   }
 
   def getSuyhaobyModule(host: String,nowDay: String): Future[Seq[(String,Double,Double,Double)]] = {
@@ -107,7 +91,8 @@ object InfDAO {
   def getErrorHostbyHourly(host: String,nowDay: String): Array[(Int,Int,Int,Int,Int,Int,Int,Int)] = {
     val res = client.execute(
       search(s"infra_dwh_inf_host_*" / "docs")
-        query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0))).lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
+        query { must(termQuery("host.keyword",host),rangeQuery("date_time").gte(CommonService.formatYYmmddToUTC(nowDay.split("/")(0)))
+        .lt(CommonService.formatYYmmddToUTC(CommonService.getNextDay(nowDay.split("/")(1))))) }
         aggregations (
         dateHistogramAggregation("hourly")
           .field("date_time")
@@ -127,15 +112,6 @@ object InfDAO {
     val arrHostHourly = CommonService.getAggregationsKeyStringAndMultiSum(res.aggregations.get("hourly")).map(x=> (CommonService.getHourFromES5(x._1),x._2,x._3,x._4,x._5,x._6,x._7,x._8))
     val errorRes = arrHostHourly.groupBy(_._1).map{case (k,v) => k -> (v.map(x=> x._2).sum,v.map(x=> x._3).sum,v.map(x=> x._4).sum,v.map(x=> x._5).sum,v.map(x=> x._6).sum,v.map(x=> x._7).sum,v.map(x=> x._7).sum)}
     errorRes.map(x=> (x._1,x._2._1,x._2._2,x._2._3,x._2._4,x._2._5,x._2._6,x._2._7)).toArray.sorted
-
-   /* dbConfig.db.run(
-      sql"""select  extract(hour from  date_time) as hourly,sum(user_down),sum(inf_down),sum(sf_error),sum(lofi_error),sum(rouge_error),sum(lost_signal)
-            from dwh_inf_host
-            where host= $host and date_time >= $fromDay::TIMESTAMP and date_time < $nextDay::TIMESTAMP
-            group by  extract(hour from  date_time)
-            order by hourly
-                  """
-        .as[(String,Int,Int,Int,Int,Int,Int)])*/
   }
 
   def getSigLogbyModuleIndex(host: String,day: String): Array[((String,String),String)] = {

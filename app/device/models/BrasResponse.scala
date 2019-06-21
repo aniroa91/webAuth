@@ -66,12 +66,6 @@ case class SigLogByTime(
                          sumLog: Array[Long]
                        )
 
-case class ServiceNameStatus(
-                         arrName: Seq[String],
-                         arrStatus: Seq[String],
-                         arrService: Seq[(String,String,Int)]
-                       )
-
 case class DeviceNameStatus(
                               arrBras: Seq[String],
                               arrName: Seq[String],
@@ -116,14 +110,5 @@ case class BrasResponse(
                             currentsInfo: BrasInfor,
                             kibanaOpviewBytime: KibanaOpviewByTime,
                             sigLogBytime: SigLogByTime,
-                            infErrorBytime: Array[(Int,Int, Int,Int, Int,Int,Int,Int)],
-                            serviceByTime: Seq[(String,String,Int)],
-                            infModuleBytime: Array[(String,String,Long,Long,Long)],
-                            opServiceStt: Seq[(String,Int)],
-                            servNameStt: ServiceNameStatus,
-                            linecardhost: Array[(String,String)],
-                            kibanaOverview: KibanaOverview,
-                            siglogByhost: SigLogByHost,
-                            sankeyService: Seq[(String,String,Int)],
-                            devNameStt: DeviceNameStatus
+                            linecardhost: Array[(String,String)]
                        )
