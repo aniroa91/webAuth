@@ -132,7 +132,7 @@ class SearchController @Inject()(cc: MessagesControllerComponents) extends Messa
             val rs = Json.obj(
               "kibana" -> kibana
             )
-            logger.info(s"Page: Search Bras($brasId)- Tab $tabName - User:$username  - Time Query:"+(System.currentTimeMillis() -t0))
+            logger.info(s"Page: Search Bras($brasId)- Tab $tabName - User:  - Time Query:"+(System.currentTimeMillis() -t0))
             Ok(Json.toJson(rs))
           }
           case "tab_inf" => {
@@ -199,7 +199,7 @@ class SearchController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def search =  withAuth {username => implicit request: Request[AnyContent] =>
+  def search = withAuth {username => implicit request: Request[AnyContent] =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""
@@ -281,7 +281,7 @@ class SearchController @Inject()(cc: MessagesControllerComponents) extends Messa
             val ticketOutlier = Await.result(HostService.getTicketOutlierByHost(brasId, day), Duration.Inf)
             logger.info("tTicket: " + (System.currentTimeMillis() - t7))
 
-            logger.info(s"Page: Search Host($brasId) - User: - Time Query:"+(System.currentTimeMillis() -t00))
+            logger.info(s"Page: Search Host($brasId) - User:$username - Time Query:"+(System.currentTimeMillis() -t00))
             Ok(device.views.html.search(form,username,province,HostResponse(ticketOutlier,noOutlierModule,errHost,errorHourly,sigLogModule,arrSiglogModuleIndex,suyhaoModule,sigLogByHourly,
               splitterByHost,ErrModuleIndex(arrModule,arrIndex,errModuleIndex),sfContract),null,day,brasId,"I",routes.SearchController.search))
           }
@@ -331,8 +331,8 @@ class SearchController @Inject()(cc: MessagesControllerComponents) extends Messa
             val ticketOutlier = Await.result(BrasService.getTicketOutlierByBrasId(brasId, day), Duration.Inf)
             logger.info("tTicket: " + (System.currentTimeMillis() - t5))
 
-            logger.info(s"Page: Search Bras($brasId) - User:  - Time Query:"+(System.currentTimeMillis() -timeStart))
-            Ok(device.views.html.search(form, username, province,null ,BrasResponse(ticketOutlier, BrasInfor(noOutlierByhost, numOutlier, (sigLog._1, sigLog._2),(sigLogClients._1,sigLogClients._2)),
+            logger.info(s"Page: Search Bras($brasId) - User:$username  - Time Query:"+(System.currentTimeMillis() -timeStart))
+            Ok(device.views.html.search(form, username,province,null ,BrasResponse(ticketOutlier, BrasInfor(noOutlierByhost, numOutlier, (sigLog._1, sigLog._2),(sigLogClients._1,sigLogClients._2)),
               KibanaOpviewByTime(kibanaBytime, opviewBytime), SigLogByTime(siginBytime, logoffBytime), linecardhost), day, brasId,_typeS,routes.SearchController.search))
           }
         }

@@ -94,13 +94,7 @@ case class SigLogClientsDaily(
 case class DailyResponse(
                         siglogRegion:  (Array[(String, Long, Long)], Array[(String, Long, Long)]),
                         errorsDevice:  Array[(String, Double)],
-                        noticeOpsview: Array[(String, String,String, Double)],
-                        kibanaOpsview:  (Array[(Int, Int)], Array[(Int, Int)]),
-                        sigLogByHourly:  SigLogClientsDaily,
-                        rsErrorsInf:   Array[(String, Double)],
-                        rsErrorHostDaily: Array[(String, Double, Double, Double, Double,Double,Double,Double)],
                         brasOutlier:   Array[(String, Int)],
-                        infOutlier :   Array[(String, Int)],
                         ticketIssue: (Seq[(String, String, String, Int)], Seq[(String, String, String, Int)]),
                         lstProBras: Array[(String, String,String)]
                         )

@@ -51,7 +51,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     formValidationResult.fold(errorFunction, successFunction)
   }
 
-  def getDaily =  withAuth { username => implicit request =>
+  def getDaily =  withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 3 chart: Total Outliers Access Device, Inf Errors By Location, Total Error By Time
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
@@ -68,60 +68,103 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
       val rsErrorsDevice  = if(province.equals("")) BrasService.getDeviceErrorsRegionDaily(day).map(x=> x._1 -> (x._2+x._3+x._4+x._5+x._6+x._7)) else Array[(String, Double)]()
       logger.info("t1:"+(System.currentTimeMillis() -t1))
       val t2 = System.currentTimeMillis()
-      // Service Monitor Notices
-      val rsNoticeOpsview = if(province.equals("")) BrasService.getServiceNoticeRegionDaily(day, "*") else Array[(String, String,String, Double)]()
-      logger.info("t2:"+(System.currentTimeMillis() -t2))
-      val t3 = System.currentTimeMillis()
-      // Inf Errors By Location
-      val rsErrorsInf     = BrasService.getInfErrorsDaily(day, "*", province).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sorted
-      logger.info("t3:"+(System.currentTimeMillis() -t3))
-      val t4 = System.currentTimeMillis()
-      // Nerror (kibana & opview) By Time
-      val arrOpsview      = BrasService.getOpviewBytimeResponse("*", day, 0)
-      val opviewBytime    = if(province.equals(""))  (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrOpsview, x)).toArray else Array[(Int, Int)]()
-      val arrKibana       = BrasService.getKibanaBytimeES("*", day).groupBy(_._1).mapValues(_.map(_._2).sum).toArray
-      val kibanaBytime    = if(province.equals("")) (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana, x)).toArray else Array[(Int, Int)]()
-      logger.info("t4:"+(System.currentTimeMillis() -t4))
-      val t5 = System.currentTimeMillis()
-      // Signin & Logoff By Time
-      val rsLogsigBytime  = if(province.equals("")) BrasService.getSigLogByDaily("*", day) else SigLogClientsDaily(Array[(Int, Long, Long)](), Array[(Int, Long, Long)]())
-      logger.info("t5:"+(System.currentTimeMillis() -t5))
-      val t6 = System.currentTimeMillis()
-      // Total Error By Time
-      val rsErrorHostDaily = Await.result(BrasService.getErrorHostdaily("*", day, province), Duration.Inf).toArray
-      logger.info("t6:"+(System.currentTimeMillis() -t6))
-      val t7 = System.currentTimeMillis()
       //  Total Outliers Bras Device
       val brasOutlier = if(province.equals("")) Await.result(BrasService.getBrasOutlierDaily(day), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
         .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
       else Array[(String, Int)]()
-      logger.info("t7:"+(System.currentTimeMillis() -t7))
-      val t8 = System.currentTimeMillis()
-      // Total Outliers Access Device
-      val infOutlier = Await.result(BrasService.getInfAccessOutlierDaily(day, province), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
-        .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._3)).toArray.sorted
-      logger.info("t8:"+(System.currentTimeMillis() -t8))
-      val t9 = System.currentTimeMillis()
+      logger.info("t2:"+(System.currentTimeMillis() -t2))
+      val t3 = System.currentTimeMillis()
       // Ticket at Core & Access Group
       val ticketIssues = Await.result(BrasService.getTicketIssue(day, province), Duration.Inf)
       val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (LocationUtils.getRegionByProvWorld(x._2),LocationUtils.getNameProvWorld(x._2), x._3, x._4)).sorted
                       else Seq[(String, String, String, Int)]()
       val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (LocationUtils.getRegionByProvWorld(x._2),LocationUtils.getNameProvWorld(x._2), x._3, x._4)).sorted
 
-      val lstProvBras = if(province.equals("")) rsNoticeOpsview.map(x=> (x._1, x._2, x._3))
-          else BrasService.getServiceNoticeRegionDaily(day, "*").filter(x=> request.session.get("location").get.indexOf(x._2) >=0).map(x=> (x._1, x._2, x._3))
+      // combobox Bras Province
+      val lstProvBras = if(province.equals("")) BrasService.getServiceNoticeRegionDaily(day, "*").map(x=> (x._1, x._2, x._3))
+                        else BrasService.getServiceNoticeRegionDaily(day, "*").filter(x=> request.session.get("location").get.indexOf(x._2) >=0).map(x=> (x._1, x._2, x._3))
 
-      logger.info("t9:"+(System.currentTimeMillis() -t9))
-      logger.info(s"Page: DAILY - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
+      logger.info("t3:"+(System.currentTimeMillis() -t3))
+      logger.info(s"Page: DAILY - User:$username  - Time Query:"+(System.currentTimeMillis() -t0))
       logger.info("======END SERVICE DAILY PAGE======")
-      Ok(device.views.html.daily(DailyResponse((rsSiglog._1, rsSiglog._2), rsErrorsDevice, rsNoticeOpsview,(kibanaBytime, opviewBytime), rsLogsigBytime, rsErrorsInf, rsErrorHostDaily, brasOutlier, infOutlier, (coreIssue, noneCoreIssue), lstProvBras), day, username, province))
+      Ok(device.views.html.daily(DailyResponse((rsSiglog._1, rsSiglog._2), rsErrorsDevice, brasOutlier, (coreIssue, noneCoreIssue), lstProvBras), day, username, province))
     }
     catch{
       case e : Exception => Ok(device.views.html.daily(null, CommonService.getCurrentDay(), username, province))
     }
   }
 
-  def drilldownBrasOutlier(id: String, day: String) = Action { implicit request =>
+  def loadJsonDaily(day: String) = withAuth {username => implicit request =>
+    val province = if(request.session.get("verifiedLocation").get.equals("1")){
+      // only show 3 chart: Total Outliers Access Device, Inf Errors By Location, Total Error By Time
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+    } else ""
+    try{
+      val t0 = System.currentTimeMillis()
+      // Total Outliers Access Device
+      val infOutlier = Await.result(BrasService.getInfAccessOutlierDaily(day, province), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
+        .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._3)).toArray.sorted
+      val objInfOutlier = Json.obj(
+        "cate" -> infOutlier.map(x=> x._1).distinct.sorted,
+        "data" -> infOutlier
+      )
+      logger.info("t0:"+(System.currentTimeMillis() -t0))
+      val t1 = System.currentTimeMillis()
+      // Service Monitor Notices
+      val rsNoticeOpsview = if(province.equals("")) BrasService.getServiceNoticeRegionDaily(day, "*") else Array[(String, String,String, Double)]()
+      val objNotice = Json.obj(
+        "cate" -> rsNoticeOpsview.map(x=> x._1).toSeq.distinct.sorted,
+        "data" -> rsNoticeOpsview
+      )
+      logger.info("t1:"+(System.currentTimeMillis() -t1))
+      val t2 = System.currentTimeMillis()
+      // Inf Errors By Location
+      val rsErrorsInf     = BrasService.getInfErrorsDaily(day, "*", province).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sorted
+      logger.info("t2:"+(System.currentTimeMillis() -t2))
+      val t3 = System.currentTimeMillis()
+      // Nerror (kibana & opview) By Time
+      val arrOpsview      = BrasService.getOpviewBytimeResponse("*", day, 0)
+      val opviewBytime    = if(province.equals(""))  (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrOpsview, x)).toArray else Array[(Int, Int)]()
+      val arrKibana       = BrasService.getKibanaBytimeES("*", day).groupBy(_._1).mapValues(_.map(_._2).sum).toArray
+      val kibanaBytime    = if(province.equals("")) (0 until 24).map(x => x -> CommonService.getIntValueByKey(arrKibana, x)).toArray else Array[(Int, Int)]()
+      val nErrorTime = Json.obj(
+        "kibana" -> kibanaBytime,
+        "opsview" -> opviewBytime
+      )
+      logger.info("t3:"+(System.currentTimeMillis() -t3))
+      val t4 = System.currentTimeMillis()
+      // Signin & Logoff By Time
+      val rsLogsigBytime  = if(province.equals("")) BrasService.getSigLogByDaily("*", day) else SigLogClientsDaily(Array[(Int, Long, Long)](), Array[(Int, Long, Long)]())
+      val objSigLogTime = Json.obj(
+        "signin" -> rsLogsigBytime.signin.map(x=> x._2),
+        "logoff" -> rsLogsigBytime.logoff.map(x=> x._2),
+        "signinCli" -> rsLogsigBytime.signin.map(x=> x._3),
+        "logoffCli" -> rsLogsigBytime.logoff.map(x=> x._3)
+      )
+      logger.info("t4:"+(System.currentTimeMillis() -t4))
+      val t5 = System.currentTimeMillis()
+      // Total Error By Time
+      val rsErrorHostDaily = Await.result(BrasService.getErrorHostdaily("*", day, province), Duration.Inf).toArray
+      logger.info("t5:"+(System.currentTimeMillis() -t5))
+      logger.info(s"Page: DAILY - User:$username  - Time Query:"+(System.currentTimeMillis() -t0))
+
+      val rs = Json.obj(
+        "infOutlier" -> objInfOutlier,
+        "objNotice"  -> objNotice,
+        "objErrorInf" -> rsErrorsInf,
+        "objSigLogTime" -> objSigLogTime,
+        "errHostByTime" -> rsErrorHostDaily,
+        "nErrorTime" -> nErrorTime,
+        "province" -> province
+      )
+      Ok(Json.toJson(rs))
+    }
+    catch {
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def drilldownBrasOutlier(id: String, day: String) = withAuth {username => implicit request =>
     try{
       val rs = id match {
         // get inf by All
@@ -164,7 +207,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-  def drilldownSigLogDaily(id: String,day: String) = Action {implicit  request =>
+  def drilldownSigLogDaily(id: String,day: String) = withAuth {username =>implicit request =>
     try{
       val rs = id match {
         // get inf by Region
@@ -212,7 +255,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-  def drilldownErrorDevice(id: String,day: String, err: String) = Action {implicit  request =>
+  def drilldownErrorDevice(id: String,day: String, err: String) = withAuth {username => implicit request =>
     try{
       val rs = id match {
         // get inf by Region
@@ -255,7 +298,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-  def drilldownInfOutlier(id: String, day: String, province: String) = Action {implicit  request =>
+  def drilldownInfOutlier(id: String, day: String, province: String) = withAuth {username => implicit request =>
     try{
       val rs = id match {
         // get inf by All
@@ -307,7 +350,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-  def drilldownInfErrorsDaily(id: String,day: String, err: String, province: String) = Action {implicit  request =>
+  def drilldownInfErrorsDaily(id: String,day: String, err: String, province: String) = withAuth {username => implicit request =>
     try{
       val rs = id match {
         // get inf by Region
@@ -334,7 +377,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-  def getErrInfHourly(_type: String, id: String, day: String, bras: String, province: String) = Action {implicit request =>
+  def getErrInfHourly(_type: String, id: String, day: String, bras: String, province: String) = withAuth {username => implicit request =>
     try{
       // _type: 0 hourly time
       // _type: 1 frame time
@@ -383,7 +426,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-  def getServNoticeByType(noti: String,day: String) = Action { implicit request =>
+  def getServNoticeByType(noti: String,day: String) = withAuth {username => implicit request =>
     try{
       val rs = BrasService.getServiceNoticeRegionDaily(day, noti)
       val json = Json.obj(
@@ -397,7 +440,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-  def getDailyByBrasLocation(id: String, day: String, province: String, _type: String) = Action { implicit request =>
+  def getDailyByBrasLocation(id: String, day: String, province: String, _type: String) = withAuth {username => implicit request =>
     try{
       val bras_id = if(id.equals("All")) "*" else id
       val daystr  = if(id.equals("All")) day else day+"/"+day

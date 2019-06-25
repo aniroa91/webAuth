@@ -64,7 +64,7 @@
             <input type="hidden" id="bras" value="*">
             @if(province == ""){
                 <div class="row top_tiles">
-                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6" id="div1">
                     @if(response.ticketIssue._1.length >0) {
                         <div class="x_panel tile">
                             <div class="x_title">
@@ -79,7 +79,7 @@
                         </div>
                     }
                     </div>
-                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6" id="div2">
                     @if(response.ticketIssue._2.length >0) {
                         <div class="x_panel tile">
                             <div class="x_title">
@@ -96,8 +96,8 @@
                     </div>
 
                 </div>
-                <div class="row top_tiles">
-                    <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
+                <div class="row top_tiles" id="sectionLast">
+                    <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3" id="div3">
                         <div class="x_panel tile">
                             <div class="x_title">
                                 <h2 style="font-weight: 500;
@@ -117,7 +117,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4" id="div4">
                         <div class="x_panel tile">
                             <input type="hidden" id="regionSigLog">
                             <input type="hidden" id="isRegionSigLog">
@@ -138,7 +138,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
+                    <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5" id="div5">
                         <div class="x_panel tile">
                             <input type="hidden" id="regionDeviceErr">
                             <input type="hidden" id="isRegionDeviceErr">
@@ -206,7 +206,7 @@
                     }
 
                 } else{
-                <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3">
+                <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3"id="div6" style="display: none">
                 }
                     <div class="x_panel tile">
                         <div class="x_title">
@@ -219,16 +219,12 @@
                             <input type="hidden" id="textInfOutlier">
                             <input type="hidden" id="isRegionInfOutlier">
                             <input type="hidden" id="isProvinceInfOutlier">
-                            @if(response.infOutlier.length >0) {
                             <div id="inf-outlier" style="height: 375px;"></div>
-                        }else{
-                            <span style="font-size: 13px">Not find data on @day</span>
-                        }
                         </div>
                     </div>
                 </div>
                 @if(province == ""){
-                <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4" id="div7" style="display: none">
                     <div class="x_panel tile">
                         <input type="hidden" id="regionServiceNotice">
                         <input type="hidden" id="isRegionServiceNotice">
@@ -239,7 +235,6 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="text-align: center">
-                        @if(response.noticeOpsview.length >0){
                             <div id="bar-service" style="height: 350px;"></div>
                             <form id="frmServNotice" style="text-align: center">
                                 <label class="radio-inline radioText">
@@ -258,13 +253,10 @@
                                     <input type="radio" value="crit" name="optradio">Crit
                                 </label>
                             </form>
-                        }else{
-                            <span style="font-size: 13px">Not find data on @day</span>
-                        }
                         </div>
                     </div>
                 </div>
-                    <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5">
+                    <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5" id="div8" style="display: none">
                 } else{
                     @if(response.ticketIssue._2.length >0) {
                        <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
@@ -283,7 +275,6 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="text-align: center">
-                        @if(response.rsErrorsInf.length >0 ) {
                             <div id="region-inf" style="height: 350px;"></div>
                             <form id="frmInfErrordaily" style="text-align: center;font-size: 12px">
                                 <input type="hidden" id="typeInfErr" value="*">
@@ -309,15 +300,12 @@
                                     <input type="radio" value="lost_signal" name="optradio">Broken Lv2 Cable
                                 </label>
                             </form>
-                        }else{
-                            <span style="font-size: 13px">Not find data on @day</span>
-                        }
                         </div>
                     </div>
                 </div>
             </div>
                 <div class="row top_tiles">
-                    <div class="col-xs-12" style="margin-bottom: 10px">
+                    <div class="col-xs-12" id="div12" style="display: none;margin-bottom: 10px">
                     @if(response.lstProBras.length > 0) {
                         <span class="hvr-pulse titDropdown">Bras:</span>
                         <ul class="slBras">
@@ -343,7 +331,7 @@
                 </div>
             @if(province == "") {
                 <div class="row top_tiles">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-md-12 col-sm-12 col-xs-12" id="div9" style="display: none">
                         <div class="x_panel tile">
                             <div class="x_title">
                                 <h2 style="font-weight: 500;
@@ -352,18 +340,14 @@
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content" style="text-align: center">
-                            @if(response.sigLogByHourly.signin.length >0 || response.sigLogByHourly.logoff.length >0) {
                                 <div id="col-lineSigLog" style="height: 250px;"></div>
-                            }else{
-                                <span style="font-size: 13px">Not find data on @day</span>
-                            }
                             </div>
                         </div>
                     </div>
                 </div>
             }
             <div class="row top_tiles">
-                <div class="col-xs-12">
+                <div class="col-xs-12" id="div10" style="display: none">
                     <div class="x_panel tile">
                         <div class="x_title">
                             <h2 style="font-weight: 500;font-size: 24px"> Total Error By Time</h2>
@@ -371,7 +355,6 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="text-align: center">
-                        @if(response.rsErrorHostDaily.length >0) {
                             <div class="container">
                                 <ul class="nav nav-pills nav-stacked col-md-2" id="frameTime" style="margin-top: 40px">
                                     <li name="0" style="cursor: pointer" class="active"><a data-toggle="pill" style="width: 50%">HOURLY</a></li>
@@ -379,18 +362,15 @@
                                 </ul>
                                 <div class="tab-content col-md-10">
                                     <div id="heat_mapInfTab" style="height: 250px"></div>
-                                </div><!-- tab content -->
-                            </div><!-- end of container -->
-                        }else{
-                            <span style="font-size: 13px">Not find data on @day</span>
-                        }
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
                 @if(province == "") {
                     <div class="row top_tiles">
-                        <div class="col-xs-12">
+                        <div class="col-xs-12" id="div11" style="display: none">
                             <div class="x_panel tile">
                                 <div class="x_title">
                                     <h2 style="font-weight: 500;
@@ -399,11 +379,7 @@
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content" style="text-align: center">
-                                @if(response.kibanaOpsview._1.length > 0 || response.kibanaOpsview._1.length > 0) {
                                     <div id="int-col-hourly" style="height: 250px;"></div>
-                                } else {
-                                    <span style="font-size: 13px">Not find data on @day</span>
-                                }
                                 </div>
                             </div>
                         </div>
@@ -452,6 +428,490 @@
     <script src="../assets/datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
+                //  Total Error By Time
+                var heat_mapInfTab = Highcharts.chart('heat_mapInfTab', {
+                    chart: {
+                        type: 'heatmap',
+                        marginTop: 40,
+                        marginBottom: 80,
+                        plotBorderWidth: 1
+                    },
+
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
+                    },
+
+                    yAxis: {
+                        categories: ['Port PON down','Port INF down','SF Error','LOFI Error','Rogue ONT','Broken Lv2 Cable','SF Module'],
+                        title: null
+                    },
+
+                    legend: {
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        y: 10,
+                        x:40
+                    },
+
+                    colorAxis: {
+                        min: 0,
+                        minColor: '#FFFFFF',
+                        maxColor: '#d9534f'
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br> has <b>' +
+                                    this.point.value + ' <b>' + this.series.yAxis.categories[this.point.y] + '</b>';
+                        }
+                    },
+
+                    series: [{
+                        name: 'Errors',
+                        borderWidth: 1,
+                        data: [],
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000'
+                        }
+                    }]
+
+                });
+                @if(province == "") {
+                    // Nerror (kibana & opview) By Time
+                    var kiba_opsv_hourly = Highcharts.chart('int-col-hourly', {
+                        chart: {
+                            zoomType: 'xy'
+                        },
+                        title: {
+                            text: ''
+                        },
+                        subtitle: {
+                            text: ''
+                        },
+                        xAxis: [{
+                            categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"],
+                            crosshair: true,
+                            title: {
+                                text: '',
+                            }
+                        }],
+                        yAxis: [{ // Primary yAxis
+                            labels: {
+                                format: '{value}',
+                                style: {
+                                    color: "#5A738E"
+                                }
+                            },
+                            title: {
+                                text: 'Kibana (errors)',
+                                style: {
+                                    color: "#5A738E"
+                                }
+                            }
+                        }, { // Secondary yAxis
+                            title: {
+                                text: 'Opview (errors)',
+                                style: {
+                                    color: "#d9534f"
+                                }
+                            },
+                            labels: {
+                                format: '{value}',
+                                style: {
+                                    color: "#d9534f"
+                                }
+                            },
+                            opposite: true
+                        }],
+                        tooltip: {
+                            shared: true
+                        },
+
+                        series: [
+                            {
+                                type: 'column',
+                                name: 'Nerror',
+                                yAxis: 0,
+                                color: "#5A738E",
+                                data: []
+                            }, {
+                                name: 'Ntime',
+                                type: 'spline',
+                                yAxis: 1,
+                                color: "#d9534f",
+                                data: []
+
+                            }]
+                    });
+                    // Signin & Logoff By Time
+                    var line_siglog = Highcharts.chart('col-lineSigLog', {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    plotOptions: {
+                        column: {
+                            colorByPoint: true
+                        }
+                    },
+                    colors: [
+                        '#09006d', '#d9534f','#9B59B6','#f1b53d'
+                    ],
+                    xAxis: {
+                        categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
+                    },
+                    yAxis: {
+                        title: {
+                            text: "Values"
+                        }
+
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 4,
+                                lineColor: '#666666',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: [{
+                        type: 'spline',
+                        name: 'Signin',
+                        data: []
+                    },
+                        {
+                            type: 'spline',
+                            name: 'Logoff',
+                            data: []
+                        },
+                        {
+                            type: 'column',
+                            name: 'Signin Clients',
+                            data: []
+                        },
+                        {
+                            type: 'column',
+                            name: 'Logoff Clients',
+                            data: []
+                        }
+                    ]
+                });
+                }
+                // Inf Errors By Location
+                var errors_inf = Highcharts.chart('region-inf', {
+                    chart: {
+                        type: 'funnel'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    colors: [
+                        '#9B59B6', '#f1b53d', '#E74C3C', '#73879C', '#1ABB9C', '#832d1d', '#0000cc', '#dc5a78', '#f2ccff', '#09006d', '#cccccc',
+                        '#669999', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00', '#3498DB'],
+                    plotOptions: {
+                        series: {
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b> ({point.y:,.0f})',
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+                                softConnector: true
+                            },
+                            center: ['40%', '50%'],
+                            neckWidth: '30%',
+                            neckHeight: '25%',
+                            width: '80%',
+                            cursor: 'pointer',
+                            events: {
+                                click: function (event) {
+                                    callDrillDownInfErrors(event.point.name, 'drilldown')
+                                }
+                            }
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Errors',
+                        data: []
+                    }]
+                });
+
+                /* AUTHORIZATION */
+                @if(!province.equals("")){
+                    $.ajax({
+                        type: "GET",
+                        url: "/daily/loadDaily?day="+$('#day').val(),
+                        cache: false,
+                        success: function (dta) {
+                            if (dta != "Error") {
+                                $('#div10').show()
+                                $('#div12').show()
+                                // Total Outliers Access Device
+                                Highcharts.chart('inf-outlier', {
+                                    chart: {
+                                        type: 'heatmap',
+                                        marginTop: 10,
+                                        marginBottom: 60,
+                                        plotBorderWidth: 1
+                                    },
+
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: ["Outliers"]
+                                    },
+
+                                    yAxis: {
+                                        categories: dta.infOutlier.cate,
+                                        title: null,
+                                        labels: {
+                                            style: {
+                                                'min-width': '125px'
+                                            },
+                                            useHTML : true
+                                        }
+                                    },
+
+                                    legend: {
+                                        align: 'center',
+                                        verticalAlign: 'bottom',
+                                        y: 20,
+                                        x: 50
+                                    },
+
+                                    colorAxis: {
+                                        min: 0,
+                                        minColor: '#FFFFFF',
+                                        maxColor: '#d9534f'
+                                    },
+
+                                    tooltip: {
+                                        formatter: function () {
+                                            return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                    this.point.value + ' outliers</b> ';
+                                        }
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            events: {
+                                                click: function (event) {
+                                                    callDrilldownInfOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
+                                                }
+                                            },
+                                            dataLabels:{
+                                                formatter:function(){
+                                                    var nf = new Intl.NumberFormat();
+                                                    return nf.format(this.point.value);
+                                                }
+                                            },
+                                            cursor: 'pointer'
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'Outliers',
+                                        borderWidth: 1,
+                                        data: getHeatmapBrasOutlier(dta.infOutlier.data,dta.infOutlier.cate),
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000'
+                                        }
+                                    }]
+
+                                });
+                                // Inf Errors By Location
+                                errors_inf.series[0].setData(dta.objErrorInf)
+                                // Total Error By Time
+                                heat_mapInfTab.series[0].setData(getErrorHourlyHeatmap(dta.errHostByTime), true,true,false)
+                            }
+                            else {
+                                console.log("Error when execute query. Please check again your system!")
+                            }
+                        }
+                    });
+                }
+                // auto scroll loading data
+                $(window).scroll(function () {
+                    if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+                        var itemId = $('div[id^=div]:visible:last').attr('id')
+                        if(itemId == "div5") {
+                            $.ajax({
+                                type: "GET",
+                                url: "/daily/loadDaily?day="+$('#day').val(),
+                                cache: false,
+                                beforeSend: function () {
+                                    $('#sectionLast').waitMe({
+                                        effect: 'facebook',
+                                        text: '',
+                                        bg: 'rgba(255,255,255,0.7)',
+                                        color: '#2A3F54',
+                                        textPos: 'vertical'
+                                    });
+                                },
+                                success: function (dta) {
+                                    if (dta != "Error") {
+                                        $('div[id^=div]').show()
+                                        // Total Outliers Access Device
+                                        Highcharts.chart('inf-outlier', {
+                                            chart: {
+                                                type: 'heatmap',
+                                                marginTop: 10,
+                                                marginBottom: 60,
+                                                plotBorderWidth: 1
+                                            },
+
+                                            title: {
+                                                text: ''
+                                            },
+                                            xAxis: {
+                                                categories: ["Outliers"]
+                                            },
+
+                                            yAxis: {
+                                                categories: dta.infOutlier.cate,
+                                                title: null,
+                                                labels: {
+                                                    style: {
+                                                        'min-width': '125px'
+                                                    },
+                                                    useHTML : true
+                                                }
+                                            },
+
+                                            legend: {
+                                                align: 'center',
+                                                verticalAlign: 'bottom',
+                                                y: 20,
+                                                x: 50
+                                            },
+
+                                            colorAxis: {
+                                                min: 0,
+                                                minColor: '#FFFFFF',
+                                                maxColor: '#d9534f'
+                                            },
+
+                                            tooltip: {
+                                                formatter: function () {
+                                                    return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                            this.point.value + ' outliers</b> ';
+                                                }
+                                            },
+                                            plotOptions: {
+                                                series: {
+                                                    events: {
+                                                        click: function (event) {
+                                                            callDrilldownInfOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
+                                                        }
+                                                    },
+                                                    dataLabels:{
+                                                        formatter:function(){
+                                                            var nf = new Intl.NumberFormat();
+                                                            return nf.format(this.point.value);
+                                                        }
+                                                    },
+                                                    cursor: 'pointer'
+                                                }
+                                            },
+                                            series: [{
+                                                name: 'Outliers',
+                                                borderWidth: 1,
+                                                data: getHeatmapBrasOutlier(dta.infOutlier.data,dta.infOutlier.cate),
+                                                dataLabels: {
+                                                    enabled: true,
+                                                    color: '#000000'
+                                                }
+                                            }]
+
+                                        });
+                                        //  Service Monitor Notices
+                                        fntRightClick()
+                                        Highcharts.chart('bar-service', {
+                                            chart: {
+                                                type: 'bar'
+                                            },
+                                            title: {
+                                                text: ''
+                                            },
+                                            xAxis: {
+                                                type:'category'
+                                            },
+                                            yAxis: {
+                                                min: 0,
+                                                title: {
+                                                    text: ''
+                                                }
+                                            },
+                                            colors: ['#1ABB9C'],
+                                            legend: {
+                                                reversed: true
+                                            },
+                                            plotOptions: {
+                                                series: {
+                                                    stacking: 'normal',
+                                                    point:{
+                                                        events: {
+                                                            contextmenu: function (e) {
+                                                                if(e.target.point.name.indexOf('-') >=0)
+                                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            series: getDrildownStackBar(dta.objNotice.data,dta.objNotice.cate),
+                                            drilldown: {
+                                                drillUpButton: {
+                                                    relativeTo: 'spacingBox',
+                                                    position: {
+                                                        align: "right",
+                                                        verticalAlign: "top",
+                                                        x: 10,
+                                                        y: -10
+                                                    }
+                                                },
+                                                series: getDrillDown2Level(dta.objNotice.data,dta.objNotice.cate)
+                                            }
+                                        });
+                                        // Inf Errors By Location
+                                        errors_inf.series[0].setData(dta.objErrorInf)
+                                        // Signin & Logoff By Time
+                                        line_siglog.series[0].setData(dta.objSigLogTime.signin)
+                                        line_siglog.series[1].setData(dta.objSigLogTime.logoff)
+                                        line_siglog.series[2].setData(dta.objSigLogTime.signinCli)
+                                        line_siglog.series[3].setData(dta.objSigLogTime.logoffCli)
+                                        // Total Error By Time
+                                        heat_mapInfTab.series[0].setData(getErrorHourlyHeatmap(dta.errHostByTime), true,true,false)
+                                        // Nerror (kibana & opview) By Time
+                                        kiba_opsv_hourly.series[0].setData(dta.nErrorTime.kibana)
+                                        kiba_opsv_hourly.series[1].setData(dta.nErrorTime.opsview)
+                                    }
+                                    else {
+                                        console.log("Error when execute query. Please check again your system!")
+                                    }
+                                },
+                                complete: function () {
+                                    $('#sectionLast').waitMe("hide");
+                                }
+                            });
+                        }
+                    }
+                });
                 $('.slBras').dropdown();
                 $('#day').datepicker({
                     autoclose: true,
@@ -537,132 +997,6 @@
 
                         });
                     }
-                    @if(response.infOutlier.length >0){
-                        var heat_inf_outlier = Highcharts.chart('inf-outlier', {
-                            chart: {
-                                type: 'heatmap',
-                                marginTop: 10,
-                                marginBottom: 60,
-                                plotBorderWidth: 1
-                            },
-
-                            title: {
-                                text: ''
-                            },
-                            xAxis: {
-                                categories: ["Outliers"]
-                            },
-
-                            yAxis: {
-                                categories: @Html(Json.stringify(Json.toJson(response.infOutlier.map(x=> x._1).distinct.sorted))),
-                                title: null,
-                                labels: {
-                                    style: {
-                                        'min-width': '125px'
-                                    },
-                                    useHTML : true
-                                }
-                            },
-
-                            legend: {
-                                align: 'center',
-                                verticalAlign: 'bottom',
-                                y: 20,
-                                x: 50
-                            },
-
-                            colorAxis: {
-                                min: 0,
-                                minColor: '#FFFFFF',
-                                maxColor: '#d9534f'
-                            },
-
-                            tooltip: {
-                                formatter: function () {
-                                    return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
-                                            this.point.value + ' outliers</b> ';
-                                }
-                            },
-                            plotOptions: {
-                                series: {
-                                    events: {
-                                        click: function (event) {
-                                            callDrilldownInfOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown')
-                                        }
-                                    },
-                                    dataLabels:{
-                                        formatter:function(){
-                                            var nf = new Intl.NumberFormat();
-                                            return nf.format(this.point.value);
-                                        }
-                                    },
-                                    cursor: 'pointer'
-                                }
-                            },
-                            series: [{
-                                name: 'Outliers',
-                                borderWidth: 1,
-                                data: getHeatmapBrasOutlier(@Html(Json.stringify(Json.toJson(response.infOutlier))), @Html(Json.stringify(Json.toJson(response.infOutlier.map(x=> x._1).distinct.sorted)))),
-                                dataLabels: {
-                                    enabled: true,
-                                    color: '#000000'
-                                }
-                            }]
-
-                        });
-                    }
-                    @if(response.rsErrorHostDaily.length >0){
-                        var heat_mapInfTab = Highcharts.chart('heat_mapInfTab', {
-                            chart: {
-                                type: 'heatmap',
-                                marginTop: 40,
-                                marginBottom: 80,
-                                plotBorderWidth: 1
-                            },
-
-                            title: {
-                                text: ''
-                            },
-                            xAxis: {
-                                categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
-                            },
-
-                            yAxis: {
-                                categories: ['Port PON down','Port INF down','SF Error','LOFI Error','Rogue ONT','Broken Lv2 Cable','SF Module'],
-                                title: null
-                            },
-
-                            legend: {
-                                align: 'center',
-                                verticalAlign: 'bottom',
-                                y: 10,
-                                x:40
-                            },
-
-                            colorAxis: {
-                                min: 0,
-                                minColor: '#FFFFFF',
-                                maxColor: '#d9534f'
-                            },
-
-                            tooltip: {
-                                formatter: function () {
-                                    return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br> has <b>' +
-                                            this.point.value + ' <b>' + this.series.yAxis.categories[this.point.y] + '</b>';
-                                }
-                            },
-
-                            series: [{
-                                name: 'Errors',
-                                borderWidth: 1,
-                                data: getErrorHourlyHeatmap(@Html(Json.stringify(Json.toJson(response.rsErrorHostDaily)))),
-                                dataLabels: {
-                                    enabled: true,
-                                    color: '#000000'
-                                }
-                            }]
-
-                        });
 
                         // click group time tab
                         $('.nav-pills li').click( function () {
@@ -683,196 +1017,7 @@
                                 }
                             })
                         })
-                    }
-                    @if(response.rsErrorsInf.length >0 ){
-                        var errors_inf = Highcharts.chart('region-inf', {
-                            chart: {
-                                type: 'funnel'
-                            },
-                            title: {
-                                text: ''
-                            },
-                            colors: [
-                                '#9B59B6',
-                                '#f1b53d',
-                                '#E74C3C',
-                                '#73879C',
-                                '#1ABB9C',
-                                '#832d1d',
-                                '#0000cc',
-                                '#dc5a78',
-                                '#f2ccff',
-                                '#09006d',
-                                '#cccccc',
-                                '#669999',
-                                '#e6e600',
-                                '#132639',
-                                '#99cc00',
-                                '#466d6d',
-                                '#ffc6b3',
-                                '#666633',
-                                '#ffff00',
-                                '#3498DB',],
-                            plotOptions: {
-                                series: {
-                                    dataLabels: {
-                                        enabled: true,
-                                        format: '<b>{point.name}</b> ({point.y:,.0f})',
-                                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
-                                        softConnector: true
-                                    },
-                                    center: ['40%', '50%'],
-                                    neckWidth: '30%',
-                                    neckHeight: '25%',
-                                    width: '80%',
-                                    cursor: 'pointer',
-                                    events: {
-                                        click: function (event) {
-                                            callDrillDownInfErrors(event.point.name, 'drilldown')
-                                        }
-                                    }
-                                }
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            series: [{
-                                name: 'Errors',
-                                data: @Html(Json.stringify(Json.toJson(response.rsErrorsInf)))
-                            }]
-                        });
-                    }
-                    @if(response.sigLogByHourly.signin.length >0 || response.sigLogByHourly.logoff.length >0){
-                        var line_siglog = Highcharts.chart('col-lineSigLog', {
-                            chart: {
-                                type: 'column'
-                            },
-                            title: {
-                                text: ''
-                            },
-                            subtitle: {
-                                text: ''
-                            },
-                            plotOptions: {
-                                column: {
-                                    colorByPoint: true
-                                }
-                            },
-                            colors: [
-                                '#09006d', '#d9534f','#9B59B6','#f1b53d'
-                            ],
-                            xAxis: {
-                                categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"]
-                            },
-                            yAxis: {
-                                title: {
-                                    text: "Values"
-                                }
 
-                            },
-                            tooltip: {
-                                crosshairs: true,
-                                shared: true
-                            },
-                            plotOptions: {
-                                spline: {
-                                    marker: {
-                                        radius: 4,
-                                        lineColor: '#666666',
-                                        lineWidth: 1
-                                    }
-                                }
-                            },
-                            series: [{
-                                type: 'spline',
-                                name: 'Signin',
-                                data: @Html(Json.stringify(Json.toJson(response.sigLogByHourly.signin.map(x=> x._2))))
-                            },
-                                {
-                                    type: 'spline',
-                                    name: 'Logoff',
-                                    data: @Html(Json.stringify(Json.toJson(response.sigLogByHourly.logoff.map(x=> x._2))))
-                                },
-                                {
-                                    type: 'column',
-                                    name: 'Signin Clients',
-                                    data: @Html(Json.stringify(Json.toJson(response.sigLogByHourly.signin.map(x=> x._3))))
-                                },
-                                {
-                                    type: 'column',
-                                    name: 'Logoff Clients',
-                                    data: @Html(Json.stringify(Json.toJson(response.sigLogByHourly.logoff.map(x=> x._3))))
-                                }
-                            ]
-                        });
-                    }
-                    @if(response.kibanaOpsview._1.length > 0 || response.kibanaOpsview._2.length >0){
-                        var kiba_opsv_hourly = Highcharts.chart('int-col-hourly', {
-                            chart: {
-                                zoomType: 'xy'
-                            },
-                            title: {
-                                text: ''
-                            },
-                            subtitle: {
-                                text: ''
-                            },
-                            xAxis: [{
-                                categories: ["0h", "1h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h", "22h", "23h"],
-                                crosshair: true,
-                                title: {
-                                    text: '',
-                                }
-                            }],
-                            yAxis: [{ // Primary yAxis
-                                labels: {
-                                    format: '{value}',
-                                    style: {
-                                        color: "#5A738E"
-                                    }
-                                },
-                                title: {
-                                    text: 'Kibana (errors)',
-                                    style: {
-                                        color: "#5A738E"
-                                    }
-                                }
-                            }, { // Secondary yAxis
-                                title: {
-                                    text: 'Opview (errors)',
-                                    style: {
-                                        color: "#d9534f"
-                                    }
-                                },
-                                labels: {
-                                    format: '{value}',
-                                    style: {
-                                        color: "#d9534f"
-                                    }
-                                },
-                                opposite: true
-                            }],
-                            tooltip: {
-                                shared: true
-                            },
-
-                            series: [
-                                {
-                                    type: 'column',
-                                    name: 'Nerror',
-                                    yAxis: 0,
-                                    color: "#5A738E",
-                                    data: @Html(Json.stringify(Json.toJson(response.kibanaOpsview._1.map(x=> x._2))))
-                                }, {
-                                    name: 'Ntime',
-                                    type: 'spline',
-                                    yAxis: 1,
-                                    color: "#d9534f",
-                                    data: @Html(Json.stringify(Json.toJson(response.kibanaOpsview._2.map(x=> x._2))))
-
-                                }]
-                        });
-                    }
                     @if(response.siglogRegion._1.length >0 || response.siglogRegion._2.length >0){
                         // Bar Logoff and Signin
                         var categoriesSigLog = @Html(Json.stringify(Json.toJson(response.siglogRegion._1.map(x=> x._1))))
@@ -959,28 +1104,6 @@
                                 layoutAlgorithm: 'strip',
                                 color: "#f1b53d",
                                 data: getJsonTreemap(@Html(Json.stringify(Json.toJson(response.errorsDevice))))
-                                /*[{
-                                    name: 'A',
-                                    value: 6
-                                }, {
-                                    name: 'B',
-                                    value: 6
-                                }, {
-                                    name: 'C',
-                                    value: 4
-                                }, {
-                                    name: 'D',
-                                    value: 3
-                                }, {
-                                    name: 'E',
-                                    value: 2
-                                }, {
-                                    name: 'F',
-                                    value: 2
-                                }, {
-                                    name: 'G',
-                                    value: 1
-                                }]*/
                             }],
                             title: {
                                 text: ''
@@ -989,7 +1112,7 @@
                     }
 
                     @if(response.ticketIssue._1.length > 0){
-                        var core_issue = Highcharts.chart('col-core', {
+                        Highcharts.chart('col-core', {
                             chart: {
                                 type: 'column'
                             },
@@ -1038,7 +1161,7 @@
                         });
                     }
                     @if(response.ticketIssue._2.length > 0){
-                        var noneCoreIssue = Highcharts.chart('col-noneCore', {
+                        Highcharts.chart('col-noneCore', {
                             chart: {
                                 type: 'column'
                             },
@@ -1083,57 +1206,6 @@
                                     }
                                 },
                                 series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.ticketIssue._2))),@Html(Json.stringify(Json.toJson(response.ticketIssue._2.map(x=> x._1).toSeq.distinct.sorted))))
-                            }
-                        });
-                    }
-                    @if(response.noticeOpsview.length > 0){
-                        // right click event
-                        fntRightClick()
-                        var bar_notice = Highcharts.chart('bar-service', {
-                            chart: {
-                                type: 'bar'
-                            },
-                            title: {
-                                text: ''
-                            },
-                            xAxis: {
-                                type:'category'
-                            },
-                            yAxis: {
-                                min: 0,
-                                title: {
-                                    text: ''
-                                }
-                            },
-                            colors: ['#1ABB9C'],
-                            legend: {
-                                reversed: true
-                            },
-                            plotOptions: {
-                                series: {
-                                    stacking: 'normal',
-                                    point:{
-                                        events: {
-                                            contextmenu: function (e) {
-                                                if(e.target.point.name.indexOf('-') >=0)
-                                                    window.open("/fwdRequest?bras=" + e.target.point.name, "_blank")
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            series: getDrildownStackBar(@Html(Json.stringify(Json.toJson(response.noticeOpsview))),@Html(Json.stringify(Json.toJson(response.noticeOpsview.map(x=> x._1).toSeq.distinct.sorted)))),
-                            drilldown: {
-                                drillUpButton: {
-                                    relativeTo: 'spacingBox',
-                                    position: {
-                                        align: "right",
-                                        verticalAlign: "top",
-                                        x: 10,
-                                        y: -10
-                                    }
-                                },
-                                series: getDrillDown2Level(@Html(Json.stringify(Json.toJson(response.noticeOpsview))),@Html(Json.stringify(Json.toJson(response.noticeOpsview.map(x=> x._1).toSeq.distinct.sorted))))
                             }
                         });
                     }

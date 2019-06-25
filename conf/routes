@@ -54,6 +54,7 @@ GET      /monthly/getTrend             controllers.DeviceController.trendByMonth
 
 ## PAGE DAILY
 GET      /daily                        controllers.DailyController.getDaily
+GET      /daily/loadDaily              controllers.DailyController.loadJsonDaily(day: String ?= "")
 POST     /daily                        controllers.DailyController.getFormDayPicker
 GET      /daily/ddBrasOutlier          controllers.DailyController.drilldownBrasOutlier(id: String ?= "",day: String ?= "")
 GET      /daily/ddSigLogDaily          controllers.DailyController.drilldownSigLogDaily(id: String ?= "",day: String ?= "")
