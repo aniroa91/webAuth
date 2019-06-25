@@ -56,12 +56,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   // index page Dashboard Device Monthly
-  def overview =  Action {implicit request =>
-    /*val province = if(request.session.get("verifiedLocation").get.equals("1")){
+  def overview =  withAuth {username => implicit request =>
+    val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
-    } else ""*/
-    val province = ""
-    val username = ""
+    } else ""
     try {
       val t0 = System.currentTimeMillis()
       val minMaxMonth = Await.result(BrasService.getMinMaxMonth(), Duration.Inf)
@@ -105,14 +103,12 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def loadJsonMonthly(month: String) = Action {implicit request =>
-    /*val province = if(request.session.get("verifiedLocation").get.equals("1")){
+  def loadJsonMonthly(month: String) = withAuth {username => implicit request =>
+    val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 3 chart: Total Outliers Access Device, Inf Errors By Location, Total Error By Time
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
-    } else ""*/
-    val username = ""
-    val province = ""
-    //try{
+    } else ""
+    try{
       val t0 = System.currentTimeMillis()
       val fromMonth = month.split("/")(0)+"-01"
       val toMonth = month.split("/")(1)+"-01"
@@ -190,10 +186,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "objInfType" -> objInfType
       )
       Ok(Json.toJson(rs))
-    /*}
+    }
     catch {
       case e: Exception => Ok("Error")
-    }*/
+    }
   }
 
   def drilldownOutlierMonth(id: String, fromMonth: String, toMonth: String, db: String) = withAuth {username => implicit  request =>
@@ -760,7 +756,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   // Tab TOP N
-  def topNJson(monthStr: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = Action {implicit request =>
+  def topNJson(monthStr: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = withAuth {username => implicit request =>
     /*val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""*/
