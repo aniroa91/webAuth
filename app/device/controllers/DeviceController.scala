@@ -56,10 +56,12 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   // index page Dashboard Device Monthly
-  def overview =  withAuth {username => implicit request =>
-    val province = if(request.session.get("verifiedLocation").get.equals("1")){
+  def overview =  Action {implicit request =>
+    /*val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
-    } else ""
+    } else ""*/
+    val province = ""
+    val username = ""
     try {
       val t0 = System.currentTimeMillis()
       val minMaxMonth = Await.result(BrasService.getMinMaxMonth(), Duration.Inf)
@@ -68,25 +70,62 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val toMonth = if(request.flash.get("endMonth").toString != "None") request.flash.get("endMonth").get+"-01" else threeMonth(0)
       val rangeMonth = CommonService.getAllMonthfromRange(fromMonth,toMonth)
 
-      // get Total INF Errors By Months
-      val mapProvinceTotalInf = Await.result(BrasService.getProvinceTotalInf(fromMonth,toMonth, province), Duration.Inf)
-      val totalInf = mapProvinceTotalInf.map(x=> (x._1,LocationUtils.getRegion(x._2.trim),x._3)).groupBy(x=> (x._1,x._2)).mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
-      // get Total Service Monitor Notices By Months
+      // get Total Service Monitor Notices
       val mapProvinceOpsview = if(province.equals("")) Await.result(BrasService.getProvinceOpsview(fromMonth,toMonth), Duration.Inf) else Seq[(String,String,String,Int)]()
       val opsview = mapProvinceOpsview.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3)).toArray
       // get Total Device Errors By Months
       val mapProvinceKibana = if(province.equals("")) Await.result(BrasService.getProvinceKibana(fromMonth,toMonth), Duration.Inf) else Seq[(String,String,String,Int)]()
       val kibana = mapProvinceKibana.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3)).toArray
-      // get Total SuyHao Not Pass By Months
-      val mapSuyhao = Await.result(BrasService.getProvinceSuyhao(fromMonth,toMonth,province), Duration.Inf)
-      val suyhao = mapSuyhao.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3,x._5)).toArray
+      // get Statistic Of Connections By CPE Signal (Access)
+      val mapContract = Await.result(BrasService.getProvinceContract(fromMonth,toMonth,province), Duration.Inf)
+      val contracts = mapContract.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
+      // Ticket monthly
+      val ticketIssues = Await.result(BrasService.getTicketMonthly(fromMonth+"/"+toMonth, province), Duration.Inf)
+      val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (x._2,LocationUtils.getRegionByProvWorld(x._3),LocationUtils.getNameProvWorld(x._3), x._4, x._5, x._6)).sorted
+                      else Seq[(String, String, String, String, String, Int)]()
+      val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (x._2,LocationUtils.getRegionByProvWorld(x._3),LocationUtils.getNameProvWorld(x._3), x._4, x._5, x._6)).sorted
       // get Total SignIn & LogOff By Months
       val mapSiglog = rangeMonth.map(x => if(province.equals("")) x -> Await.result(BrasService.getSigLogByRegion(x+"-01"), Duration.Inf).map(x=> (LocationUtils.getRegion(x._1.trim),x._2,x._3,x._4,x._5))
-                      else x -> Seq[(String, Int, Int, Int, Int)]())
+      else x -> Seq[(String, Int, Int, Int, Int)]())
       val signIn = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> -x._2).toArray)
       val logoff = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> x._2).toArray)
       val signIn_clients = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.map(x=> -x._2).toArray)
       val logoff_clients = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._5).sum).toSeq.sorted.map(x=> x._2).toArray)
+      // get Total SuyHao Not Pass By Months
+      val mapSuyhao = Await.result(BrasService.getProvinceSuyhao(fromMonth,toMonth,province), Duration.Inf)
+      val suyhao = mapSuyhao.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim), x._4,x._3,x._5)).toArray
+
+      logger.info(s"Page: Monthly - User: ${username}  - Time Query:"+(System.currentTimeMillis() -t0))
+      Ok(device.views.html.monthly.overview(username,province,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),
+        minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),
+        toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),contracts, (coreIssue, noneCoreIssue))))
+    }
+    catch{
+      case e: Exception => Ok(device.views.html.monthly.overview(username,province,null))
+    }
+  }
+
+  def loadJsonMonthly(month: String) = Action {implicit request =>
+    /*val province = if(request.session.get("verifiedLocation").get.equals("1")){
+      // only show 3 chart: Total Outliers Access Device, Inf Errors By Location, Total Error By Time
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+    } else ""*/
+    val username = ""
+    val province = ""
+    //try{
+      val t0 = System.currentTimeMillis()
+      val fromMonth = month.split("/")(0)+"-01"
+      val toMonth = month.split("/")(1)+"-01"
+      // get Total INF Errors By Months
+      val mapProvinceTotalInf = Await.result(BrasService.getProvinceTotalInf(fromMonth,toMonth, province), Duration.Inf)
+      val totalInf = mapProvinceTotalInf.map(x=> (x._1,LocationUtils.getRegion(x._2.trim),x._3)).groupBy(x=> (x._1,x._2)).
+        mapValues(_.map(_._3).sum).toSeq.sorted.toArray.map(x=> (x._1._1,x._1._2,x._2))
+      val objTotalInf = Json.obj(
+        "cateX" -> totalInf.map(x=>x._2).toSeq.distinct.sorted,
+        "cateY" -> totalInf.map(x=>x._1.substring(0,x._1.lastIndexOf("-"))).toSeq.distinct.sorted,
+        "month" -> totalInf.map(x=>x._1).toSeq.distinct.sorted,
+        "data" -> totalInf
+      )
       // get Total Device Errors By Severity
       val mapCount = if(province.equals("")) Await.result(BrasService.getProvinceCount(fromMonth+"/"+toMonth), Duration.Inf) else Seq[(String,String,Int,Int,Int,Int,Int,Int)]()
       val alertCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
@@ -96,9 +135,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val errCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._7)).toArray
       val emergCount = mapCount.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._8)).toArray
       val nocCount = NocCount(alertCount,critCount,warningCount,noticeCount,errCount,emergCount)
-      // get Statistic Of Connections By CPE Signal (Access)
-      val mapContract = Await.result(BrasService.getProvinceContract(fromMonth,toMonth,province), Duration.Inf)
-      val contracts = mapContract.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
+      val objNocCount = Json.obj(
+        "alertGroup" -> nocCount.alertCount.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+        "alertData" -> nocCount.alertCount,
+        "alertCate" -> nocCount.alertCount.map(x=> x._1).toSeq.distinct.sorted
+      )
       // get Total Notices By Status
       val mapOpsviewType = if(province.equals("")) Await.result(BrasService.getProvinceOpsviewType(fromMonth+"/"+toMonth), Duration.Inf) else Seq[(String,Int,Int,Int,Int)]()
       val opsviewType = mapOpsviewType.map(x=> (LocationUtils.getRegion(x._1),x._2,x._3,x._4,x._5)).toArray
@@ -107,6 +148,10 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val unknown_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.toArray
       val crit_opsview = opsviewType.groupBy(_._1).mapValues(_.map(_._5).sum).toSeq.sorted.toArray
       val heatmapOpsview = (ok_opsview++warning_opsview++unknown_opsview++crit_opsview).groupBy(_._1).map{case (k,v) => k -> v.map(x=> x._2.toString).mkString("_")}.toSeq.sorted.toArray
+      val objOpsviewType = Json.obj(
+        "cate" -> heatmapOpsview.map(x=> x._1),
+        "data" -> heatmapOpsview
+      )
       // get Total INF Errors By Type
       val mapInfType = Await.result(BrasService.getProvinceInfDownError(fromMonth+"/"+toMonth, province), Duration.Inf)
       val infDown = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._3)).toArray
@@ -114,27 +159,41 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val rougeError = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._5)).toArray
       val lostSignal = mapInfType.map(x=> (LocationUtils.getRegion(x._1.trim),LocationUtils.getNameProvincebyCode(x._1),x._2,x._6)).toArray
       val infTypeError = InfTypeError(infDown,userDown,rougeError,lostSignal)
+      val objInfType = Json.obj(
+        "infTypeGroup" -> infTypeError.infDown.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted,
+        "infTypeCate" -> infTypeError.infDown.map(x=> x._1).toSeq.distinct.sorted,
+        "infTypeData" -> infTypeError.infDown
+      )
       //  Total Outliers Bras Device
       val brasOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth, toMonth,"bras", province), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
         .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
+      val objBrasOut = Json.obj(
+        "cate" -> brasOutlier.map(x=> x._1).distinct.sorted,
+        "data" -> brasOutlier
+      )
       //  Total Outliers Inf Device
       val infOutlier = Await.result(BrasService.getOutlierMonthly(fromMonth, toMonth,"inf", province), Duration.Inf).filter(x=> x._1 != "" && x._1.split("-").length == 4 && x._1.split("-")(0).length == 3)
         .map(x=> (LocationUtils.getRegion(x._1.split("-")(0)), x._2)).toArray.sorted
+      val objInfOut = Json.obj(
+        "cate" -> infOutlier.map(x=> x._1).distinct.sorted,
+        "data" -> infOutlier
+      )
+      logger.info(s"Page: monthly Overview - User:$username  - Time Query:"+(System.currentTimeMillis() -t0))
 
-      // Ticket monthly
-      val ticketIssues = Await.result(BrasService.getTicketMonthly(fromMonth+"/"+toMonth, province), Duration.Inf)
-      val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (x._2,LocationUtils.getRegionByProvWorld(x._3),LocationUtils.getNameProvWorld(x._3), x._4, x._5, x._6)).sorted
-                      else Seq[(String, String, String, String, String, Int)]()
-      val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (x._2,LocationUtils.getRegionByProvWorld(x._3),LocationUtils.getNameProvWorld(x._3), x._4, x._5, x._6)).sorted
-
-      logger.info(s"Page: Monthly - User: ${username}  - Time Query:"+(System.currentTimeMillis() -t0))
-      Ok(device.views.html.monthly.overview(username,province,RegionOverview(TimePicker(minMaxMonth(0)._1.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),minMaxMonth(0)._2.substring(0,minMaxMonth(0)._1.lastIndexOf("-")),fromMonth.substring(0,fromMonth.lastIndexOf("-")),
-        toMonth.substring(0,toMonth.lastIndexOf("-")),rangeMonth),opsview,kibana,suyhao,SigLogRegion(signIn,logoff,signIn_clients,logoff_clients),
-        nocCount,contracts,heatmapOpsview,infTypeError,totalInf,brasOutlier,infOutlier, (coreIssue, noneCoreIssue))))
-    }
-    catch{
-      case e: Exception => Ok(device.views.html.monthly.overview(username,province,null))
-    }
+      val rs = Json.obj(
+        "province" -> province,
+        "objBrasOut" -> objBrasOut,
+        "objInfOut" -> objInfOut,
+        "objTotalInf" -> objTotalInf,
+        "objOpsviewType" -> objOpsviewType,
+        "objNocCount" -> objNocCount,
+        "objInfType" -> objInfType
+      )
+      Ok(Json.toJson(rs))
+    /*}
+    catch {
+      case e: Exception => Ok("Error")
+    }*/
   }
 
   def drilldownOutlierMonth(id: String, fromMonth: String, toMonth: String, db: String) = withAuth {username => implicit  request =>
@@ -701,10 +760,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   // Tab TOP N
-  def topNJson(monthStr: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = withAuth {username => implicit request =>
-    val province = if(request.session.get("verifiedLocation").get.equals("1")){
+  def topNJson(monthStr: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = Action {implicit request =>
+    /*val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
-    } else ""
+    } else ""*/
+    val province = ""
     try{
       val time = System.currentTimeMillis()
       val month = if(monthStr.equals("")) CommonService.getPreviousMonth() else monthStr
@@ -815,7 +875,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "topCoreObj" -> coreTicketObj,
         "topNoneCoreObj" -> noneCoreTicketObj
       )
-      logger.info(s"Page: topN - User: ${username}  - Time Query:"+(System.currentTimeMillis() -time))
+      logger.info(s"Page: topN - User:   - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{

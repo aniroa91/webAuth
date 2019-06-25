@@ -6,13 +6,7 @@ case class RegionOverview(
                          kibana: Array[(String,String,String,Int,String)],
                          suyhao: Array[(String,String,String,Int,String,Int)],
                          sigLogRegion: SigLogRegion,
-                         nocCount : NocCount,
                          contracts: Array[(String,String,String,String,Int,Int,Int)],
-                         opsviewType: Array[(String,String)],
-                         infTypeError: InfTypeError,
-                         totalInf: Array[(String,String,Double)],
-                         brasOutlier:   Array[(String, Int)],
-                         infOutlier :   Array[(String, Int)],
                          ticketIssue: (Seq[(String, String, String, String, String, Int)], Seq[(String, String, String, String, String, Int)])
                          )
 case class TimePicker(

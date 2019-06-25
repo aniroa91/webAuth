@@ -31,6 +31,7 @@ GET     /centralLogout               controllers.CentralLogoutController.logout(
 POST     /searchMonthOverview          controllers.DeviceController.getFormMonthPicker
 GET      /searchMonthOverview          controllers.DeviceController.overview
 GET      /monthly                      controllers.DeviceController.overview
+GET      /monthly/loadMonthly          controllers.DeviceController.loadJsonMonthly(month: String ?= "")
 GET      /monthly/region-countType     controllers.DeviceController.getcountType(id: String ?= "",month: String ?= "")
 GET      /monthly/region-errorType     controllers.DeviceController.geterrorType(id: String ?= "",month: String ?= "")
 GET      /monthly/groupRegionByMonth   controllers.DeviceController.groupRegionByMonth(month: String ?= "",_typeNoc: String ?= "",_typeError: String ?= "")
