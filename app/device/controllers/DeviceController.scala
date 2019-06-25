@@ -757,10 +757,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   // Tab TOP N
   def topNJson(monthStr: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = withAuth {username => implicit request =>
-    /*val province = if(request.session.get("verifiedLocation").get.equals("1")){
+    val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
-    } else ""*/
-    val province = ""
+    } else ""
     try{
       val time = System.currentTimeMillis()
       val month = if(monthStr.equals("")) CommonService.getPreviousMonth() else monthStr
@@ -871,7 +870,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
         "topCoreObj" -> coreTicketObj,
         "topNoneCoreObj" -> noneCoreTicketObj
       )
-      logger.info(s"Page: topN - User:   - Time Query:"+(System.currentTimeMillis() -time))
+      logger.info(s"Page: topN - User:$username - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{
