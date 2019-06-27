@@ -33,6 +33,10 @@ class ExportController @Inject()(cc: ControllerComponents) extends AbstractContr
     Ok(device.views.html.export.index(username, province, controllers.routes.ExportController.index()))
   }
 
+  def document = withAuth {username => implicit request =>
+    Ok(device.views.html.export.docs(username, controllers.routes.ExportController.document()))
+  }
+
   def exportData() = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,

@@ -111,4 +111,7 @@ GET      /fwdRequest                   controllers.SearchController.fwdRequest(b
 
 GET      /error/permission             controllers.ErrorController.index
 
+### DOCUMENT
+GET      /document                     controllers.ExportController.document
+
 #######################################################################
