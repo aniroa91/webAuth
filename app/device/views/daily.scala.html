@@ -68,8 +68,7 @@
                     @if(response.ticketIssue._1.length >0) {
                         <div class="x_panel tile">
                             <div class="x_title">
-                                <h2 style="font-weight: 500;
-                                    font-size: 24px"> Ticket at Core Group</h2>
+                                <span class="elipse"> Ticket at Core Group</span>
                                 <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống core theo ngày, vị trí địa lý và loại sự cố"></i>
                                 <div class="clearfix"></div>
                             </div>
@@ -83,8 +82,7 @@
                     @if(response.ticketIssue._2.length >0) {
                         <div class="x_panel tile">
                             <div class="x_title">
-                                <h2 style="font-weight: 500;
-                                    font-size: 24px"> Ticket at Access Group</h2>
+                                <span class="elipse"> Ticket at Access Group</span>
                                 <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống access và ngoại vị theo ngày, vị trí địa lý và loại sự cố"></i>
                                 <div class="clearfix"></div>
                             </div>
@@ -97,11 +95,10 @@
 
                 </div>
                 <div class="row top_tiles" id="sectionLast">
-                    <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3" id="div3">
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-4" id="div3">
                         <div class="x_panel tile">
                             <div class="x_title">
-                                <h2 style="font-weight: 500;
-                                    font-size: 24px"> Total Outliers Bras Device</h2>
+                                <span class="elipse"> Total Outliers Bras Device</span>
                                 <i class="fa fa-info-circle toolTipText" title="Thống kê số lượng bất thường nhận diện được từ hoạt động kết nối của KHG trên BRAS theo ngày và vị trí địa lý"></i>
                                 <div class="clearfix"></div>
                             </div>
@@ -117,14 +114,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4" id="div4">
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-lg-4" id="div4">
                         <div class="x_panel tile">
                             <input type="hidden" id="regionSigLog">
                             <input type="hidden" id="isRegionSigLog">
                             <input type="hidden" id="isProvinceSigLog">
                             <div class="x_title">
-                                <h2 style="font-weight: 500;
-                                    font-size: 24px"> Total SignIn & LogOff Daily</h2>
+                                <span class="elipse"> Total SignIn & LogOff Daily</span>
                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần ra/vào mạng của người dùng, đi kèm là số lượng người dùng tương ứng, theo ngày và vị trí địa lý"></i>
                                 <a class="btn btn-success" id="backSigLog" style="display: none;float: right"></a>
                                 <div class="clearfix"></div>
@@ -138,13 +134,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5" id="div5">
+                    <div class="col-xs-12 col-lg-4" id="div5">
                         <div class="x_panel tile">
                             <input type="hidden" id="regionDeviceErr">
                             <input type="hidden" id="isRegionDeviceErr">
                             <input type="hidden" id="isProvinceDeviceErr">
                             <div class="x_title">
-                                <h2 style="font-weight: 500;font-size: 24px"> Device Errors By Location</h2>
+                                <span class="elipse"> Device Errors By Location</span>
                                 <a class="btn btn-success" id="backDeviceErr" style="display: none;float: right"></a>
                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi trên thiết bị BRAS theo ngày và vị trí địa lý"></i>
                                 <div class="clearfix"></div>
@@ -187,11 +183,10 @@
             <div class="row top_tiles">
                 @if(province != ""){
                     @if(response.ticketIssue._2.length >0) {
-                        <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-4">
                             <div class="x_panel tile">
                                 <div class="x_title">
-                                    <h2 style="font-weight: 500;
-                                        font-size: 24px"> Ticket at Access Group</h2>
+                                    <span class="elipse"> Ticket at Access Group</span>
                                     <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống access và ngoại vị theo ngày, vị trí địa lý và loại sự cố"></i>
                                     <div class="clearfix"></div>
                                 </div>
@@ -200,18 +195,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-4">
                     } else {
                         <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                     }
 
                 } else{
-                <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3"id="div6" style="display: none">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-4"id="div6" style="display: none">
                 }
                     <div class="x_panel tile">
                         <div class="x_title">
-                            <h2 style="font-weight: 500;
-                                font-size: 24px"> Total Outliers Access Device</h2>
+                            <span class="elipse"> Total Outliers Access Device</span>
                             <i class="fa fa-info-circle toolTipText" title="Thống kê số lượng bất thường nhận diện được từ lỗi thiết bị Access theo ngày và vị trí địa lý"></i>
                             <div class="clearfix"></div>
                         </div>
@@ -224,13 +218,13 @@
                     </div>
                 </div>
                 @if(province == ""){
-                <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4" id="div7" style="display: none">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-lg-4" id="div7" style="display: none">
                     <div class="x_panel tile">
                         <input type="hidden" id="regionServiceNotice">
                         <input type="hidden" id="isRegionServiceNotice">
                         <input type="hidden" id="isProvinceServiceNotice">
                         <div class="x_title">
-                            <h2 style="font-weight: 500;font-size: 24px"> Service Monitor Notices</h2>
+                            <span class="elipse"> Service Monitor Notices</span>
                             <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần thay đổi trạng thái của các service quản lý thiết bị BRAS (hệ thống Opsview) theo ngày và vị trí địa lý"></i>
                             <div class="clearfix"></div>
                         </div>
@@ -256,12 +250,12 @@
                         </div>
                     </div>
                 </div>
-                    <div class="col-md-5 col-sm-5 col-xs-12 col-lg-5" id="div8" style="display: none">
+                    <div class="col-xs-12 col-lg-4" id="div8" style="display: none">
                 } else{
                     @if(response.ticketIssue._2.length >0) {
-                       <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
+                       <div class="col-xs-12 col-lg-4">
                     } else {
-                        <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
+                        <div class="col-xs-12 col-lg-6">
                     }
                 }
                     <div class="x_panel tile">
@@ -269,7 +263,7 @@
                         <input type="hidden" id="isRegionInfErr">
                         <input type="hidden" id="isProvinceInfErr">
                         <div class="x_title">
-                            <h2 style="font-weight: 500;font-size: 24px"> Inf Errors By Location</h2>
+                            <span class="elipse"> Inf Errors By Location</span>
                             <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi tại thiết bị Access theo ngày và vị trí địa lý"></i>
                             <a class="btn btn-success" id="backInfErr" style="display: none;float: right"></a>
                             <div class="clearfix"></div>
@@ -334,8 +328,7 @@
                     <div class="col-md-12 col-sm-12 col-xs-12" id="div9" style="display: none">
                         <div class="x_panel tile">
                             <div class="x_title">
-                                <h2 style="font-weight: 500;
-                                    font-size: 24px">  Signin & Logoff By Time</h2>
+                                <span class="elipse">  Signin & Logoff By Time</span>
                                 <i class="fa fa-info-circle toolTipText" title="Thống kê hoạt động kết nối ra vào mạng của KHG theo từng BRAS, ngày và vị trí địa lý"></i>
                                 <div class="clearfix"></div>
                             </div>
@@ -350,17 +343,17 @@
                 <div class="col-xs-12" id="div10" style="display: none">
                     <div class="x_panel tile">
                         <div class="x_title">
-                            <h2 style="font-weight: 500;font-size: 24px"> Total Error By Time</h2>
+                            <span class="elipse"> Total Error By Time</span>
                             <i class="fa fa-info-circle toolTipText" title="Thống kê số lần lỗi thiết bị Access trên từng BRAS theo ngày giờ hoặc theo khung giờ trong ngày"></i>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content" style="text-align: center">
-                            <div class="container">
-                                <ul class="nav nav-pills nav-stacked col-md-2" id="frameTime" style="margin-top: 40px">
-                                    <li name="0" style="cursor: pointer" class="active"><a data-toggle="pill" style="width: 50%">HOURLY</a></li>
-                                    <li name="1" style="cursor: pointer"><a data-toggle="pill" style="width: 50%">FRAME TIME</a></li>
+                            <div class="container row">
+                                <ul class="nav nav-pills nav-stacked col-md-2 col-xs-12" id="frameTime" style="margin-top: 10px">
+                                    <li name="0" style="cursor: pointer" class="active"><a data-toggle="pill" style="width: 115px">HOURLY</a></li>
+                                    <li name="1" style="cursor: pointer"><a data-toggle="pill" style="width: 115px">FRAME TIME</a></li>
                                 </ul>
-                                <div class="tab-content col-md-10">
+                                <div class="tab-content col-md-10 col-xs-12">
                                     <div id="heat_mapInfTab" style="height: 250px"></div>
                                 </div>
                             </div>
@@ -373,8 +366,7 @@
                         <div class="col-xs-12" id="div11" style="display: none">
                             <div class="x_panel tile">
                                 <div class="x_title">
-                                    <h2 style="font-weight: 500;
-                                        font-size: 24px"> Nerror (kibana & opview) By Time</h2>
+                                    <span class="elipse"> Nerror (kibana & opview) By Time</span>
                                     <i class="fa fa-info-circle toolTipText" title="Thống kê số lần lỗi thiết bị BRAS (kibana) và số lần thay đổi trạng thái của các service quản lý (opsview) trên từng BRAS theo ngày giờ"></i>
                                     <div class="clearfix"></div>
                                 </div>
@@ -432,7 +424,7 @@
                 var heat_mapInfTab = Highcharts.chart('heat_mapInfTab', {
                     chart: {
                         type: 'heatmap',
-                        marginTop: 40,
+                        marginTop: 10,
                         marginBottom: 80,
                         plotBorderWidth: 1
                     },
@@ -651,16 +643,16 @@
                     }]
                 });
 
-                /* AUTHORIZATION */
-                @if(!province.equals("")){
+                    /* AUTHORIZATION */
+                    @if(!province.equals("")){
                     $.ajax({
                         type: "GET",
                         url: "/daily/loadDaily?day="+$('#day').val(),
                         cache: false,
                         success: function (dta) {
                             if (dta != "Error") {
-                                $('#div10').show()
-                                $('#div12').show()
+                                    $('#div10').show()
+                                    $('#div12').show()
                                 // Total Outliers Access Device
                                 Highcharts.chart('inf-outlier', {
                                     chart: {

@@ -59,13 +59,13 @@
                 @for(i <- 0 until response.weekly.length) {
                     @if(i == 0) {
                         <div class="item activeBox">
-                            <span><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
-                            <h5>@response.weekly(i)._2</h5>
+                            <span class="txtTit"><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
+                            <span class="txtDes">@response.weekly(i)._2</span>
                         </div>
                     }else{
                         <div class="item">
-                            <span><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
-                            <h5>@response.weekly(i)._2</h5>
+                            <span class="txtTit"><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
+                            <span class="txtDes">@response.weekly(i)._2</span>
                         </div>
                     }
                 }

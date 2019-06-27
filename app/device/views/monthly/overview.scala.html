@@ -4,7 +4,7 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
             <!-- Meta, title, CSS, favicons, etc. -->
@@ -100,7 +100,7 @@
                                     <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4" id="frame1">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Total Service Monitor Notices (Bras)</h2>
+                                                <span class="elipse"> Total Service Monitor Notices (Bras)</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần thay đổi trạng thái của các service quản lý thiết bị BRAS (hệ thống Opsview) theo từng tháng và vị trí địa lý"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -112,7 +112,7 @@
                                     <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4" id="frame2">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Total Device Errors (Bras)</h2>
+                                                <span class="elipse"> Total Device Errors (Bras)</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi trên thiết bị BRAS theo từng tháng và vị trí địa lý"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -125,7 +125,7 @@
                                     <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4" id="frame3">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 19px"> Statistic Of Connections By CPE Signal (Access)</h2>
+                                                <span class="elipse"> Statistic Of Connections By CPE Signal (Access)</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số hợp đồng có kết nối tín hiệu CPE, đi kèm số lượng thiết bị kết nối và số lần kết nối kém (< -70) tại thiết bị Access theo từng tháng và vị trí địa lý"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -139,7 +139,7 @@
                                         <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6" id="frame4">
                                             <div class="x_panel tile">
                                                 <div class="x_title">
-                                                    <h2 style="font-weight: 500;font-size: 24px">Ticket at Core Group</h2>
+                                                    <span class="elipse">Ticket at Core Group</span>
                                                     <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống core theo ngày, vị trí địa lý và loại sự cố"></i>
                                                     <div class="clearfix"></div>
                                                 </div>
@@ -155,7 +155,7 @@
 
                                             <div class="x_panel tile">
                                                 <div class="x_title">
-                                                    <h2 style="font-weight: 500;font-size: 24px">Ticket at Access Group</h2>
+                                                    <span class="elipse">Ticket at Access Group</span>
                                                     <i class="fa fa-info-circle toolTipText" title="Thống kê số ticket tại hệ thống access và ngoại vị theo ngày, vị trí địa lý và loại sự cố"></i>
                                                     <div class="clearfix"></div>
                                                 </div>
@@ -172,8 +172,7 @@
                                             <input type="hidden" id="isRegionSigLog">
                                             <input type="hidden" id="isProvinceSigLog">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total SignIn & LogOff By Months</h2>
+                                                <span class="elipse"> Total SignIn & LogOff By Months</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần ra/vào mạng của người dùng, đi kèm là số lượng người dùng tương ứng, theo từng tháng và vị trí địa lý"></i>
                                                 <a class="btn btn-warning" id="backSigLog" onclick="backSigLogmonth()" style="display: none;float: right"></a>
                                                 <div class="clearfix"></div>
@@ -191,9 +190,9 @@
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                             @if(province.equals("")) {
-                                                <h2 style="font-weight: 500;font-size: 24px"> Total SuyHao Not Pass By Months (Access)</h2>
+                                                <span class="elipse"> Total SuyHao Not Pass By Months (Access)</span>
                                             } else{
-                                                <h2 style="font-weight: 500;font-size: 22px"> Total SuyHao Not Pass By Months (Access)</h2>
+                                                <span class="elipse"> Total SuyHao Not Pass By Months (Access)</span>
                                             }
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần đo được tín hiệu suy hao không đạt chuẩn (rx > -24, 1 < tx <= 3), đi kèm là số lượng người dùng tương ứng, tại thiết bị Access theo tháng và vị trí"></i>
                                                 <div class="clearfix"></div>
@@ -209,8 +208,7 @@
                                     <div class="col-md-3 col-sm-3 col-xs-12 col-lg-3" id="frame8" style="display: none">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total Outliers Bras Device</h2>
+                                                <span class="elipse"> Total Outliers Bras Device</span>
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content" style="text-align: center">
@@ -229,7 +227,7 @@
                                             <input type="hidden" id="isProvince">
 
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Total INF Errors By Months</h2>
+                                                <span class="elipse"> Total INF Errors By Months</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lần phát sinh lỗi tại thiết bị Access theo từng tháng và vị trí địa lý"></i>
                                                 <a class="btn btn-warning" id="backInfTotal" onclick="backInfTotal()" style="display: none;float: right"></a>
                                                 <div class="clearfix"></div>
@@ -246,8 +244,7 @@
                                     }
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total Outliers Inf Device</h2>
+                                                <span class="elipse"> Total Outliers Inf Device</span>
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content" style="text-align: center">
@@ -259,7 +256,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-12" id="frame11" style="display: none">
+                                <div class="col-lg-12 col-xs-12" id="frame11" style="display: none">
                                     <div id="divallMonth">
                                         <input type="hidden" id="monthGroup" value="@response.time.fromDate/@response.time.toDate">
                                         <a onclick="groupRegionByMonth(this,0)" type="button" class="btn btnDefault month"><i class="fa fa-refresh" aria-hidden="true"></i></a>
@@ -269,15 +266,14 @@
                                     </div>
                                 </div>
                                 @if(province.equals("")){
-                                <div class="col-lg-12" style="padding:0px;">
+                                <div class="col-lg-12 col-xs-12" style="padding:0px;">
                                     <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12" id="frame12" style="display: none">
                                         <div class="x_panel tile">
                                             <input type="hidden" id="regionNoticeStt">
                                             <input type="hidden" id="isRegionStt">
                                             <input type="hidden" id="isProvinceStt">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total Notices By Status (Bras)</h2>
+                                                <span class="elipse"> Total Notices By Status (Bras)</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin chi tiết số lần thay đổi trạng thái của các service quản lý thiết bị BRAS (hệ thống Opsview) theo từng trạng thái (status) và vị trí địa lý
 "></i>
                                                 <a class="btn btn-warning" id="backNoticeStt" onclick="backNoticeStatus()" style="display: none;float: right"></a>
@@ -296,8 +292,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6" id="frame13" style="display: none">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total Device Errors By Severity (Bras)</h2>
+                                                <span class="elipse"> Total Device Errors By Severity (Bras)</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lỗi phát sinh trên thiết bị BRAS theo từng mức độ lỗi (severity) và vị trí địa lý"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -333,8 +328,7 @@
                                     }
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Total INF Errors By Type</h2>
+                                                <span class="elipse"> Total INF Errors By Type</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Thống kê thông tin số lỗi phát sinh trên thiết bị Access theo từng loại lỗi và vị trí địa lý"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -374,8 +368,7 @@
                                         <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                             <div class="x_panel tile">
                                                 <div class="x_title">
-                                                    <h2 style="font-weight: 500;
-                                                        font-size: 24px">Top 10 Province By Ticket at Core Group</h2>
+                                                    <span class="elipse">Top 10 Province By Ticket at Core Group</span>
                                                     <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số ticket core issue nhiều nhất"></i>
                                                     <div class="clearfix"></div>
                                                 </div>
@@ -391,9 +384,9 @@
                                         <div class="x_panel tile">
                                             <div class="x_title">
                                                 @if(province.equals("")){
-                                                    <h2 style="font-weight: 500;font-size: 24px">Top 10 Province By Ticket at Access Group</h2>
+                                                    <span class="elipse">Top 10 Province By Ticket at Access Group</span>
                                                 } else{
-                                                    <h2 style="font-weight: 500;font-size: 21px">Top 10 Province By Ticket at Access Group</h2>
+                                                    <span class="elipse">Top 10 Province By Ticket at Access Group</span>
                                                 }
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số ticket access issue nhiều nhất"></i>
                                                 <div class="clearfix"></div>
@@ -407,8 +400,7 @@
                                         <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                             <div class="x_panel tile">
                                                 <div class="x_title">
-                                                    <h2 style="font-weight: 500;
-                                                        font-size: 24px">Top 10 Province By Outliers Bras Device</h2>
+                                                    <span class="elipse">Top 10 Province By Outliers Bras Device</span>
                                                     <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần bất thường tại thiết bị BRAS nhiều nhất"></i>
                                                     <div class="clearfix"></div>
                                                 </div>
@@ -423,8 +415,7 @@
                                     }
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px">Top 10 Province By Outliers Inf Device</h2>
+                                                <span class="elipse">Top 10 Province By Outliers Inf Device</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần bất thường tại thiết bị Access nhiều nhất"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -437,7 +428,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px">Top 10 Province By SignIn</h2>
+                                                <span class="elipse">Top 10 Province By SignIn</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần vào mạng nhiều nhất theo thời gian, đi kèm số lượng người dùng tương ứng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -449,8 +440,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px">Top 10 Province By LogOff</h2>
+                                                <span class="elipse">Top 10 Province By LogOff</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần ra mạng nhiều nhất theo thời gian, đi kèm số lượng người dùng tương ứng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -462,7 +452,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 Province By Device Errors</h2>
+                                                <span class="elipse"> Top 10 Province By Device Errors</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần phát sinh lỗi trên thiết bị BRAS nhiều nhất theo từng mức độ lỗi và theo thời gian"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -495,8 +485,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Top 10 Province By Service Monitor Notices</h2>
+                                                <span class="elipse"> Top 10 Province By Service Monitor Notices</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần thay đổi trạng thái của các service quản lý thiết bị BRAS (hệ thống Opsview) nhiều nhất theo từng trạng thái và theo thời gian"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -526,7 +515,7 @@
                                     }
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Top 20 Province By INF Errors</h2>
+                                                <span class="elipse"> Top 20 Province By INF Errors</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Top 20 tỉnh thành có số lần phát sinh lỗi trên thiết bị Access nhiều nhất theo từng loại lỗi và theo thời gian "></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -562,7 +551,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Top 10 Province By SuyHao Not Pass</h2>
+                                                <span class="elipse"> Top 10 Province By SuyHao Not Pass</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có số lần tín hiệu suy hao không đạt chuẩn nhiều nhất (rx > -24, 1 < tx <= 3) theo thời gian, đi kèm số lượng người dùng tương ứng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -574,8 +563,7 @@
                                     <div class="col-md-6 col-sm-6 col-xs-12 col-lg-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Top 10 Province By Connections</h2>
+                                                <span class="elipse"> Top 10 Province By Connections</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Top 10 tỉnh thành có thông tin kết nối theo hợp đồng, số thiết bị, số lần kết nối nhiều nhất và theo thời gian"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -602,9 +590,9 @@
                         <div id="tabCompare" class="tab-slider--body">
                             <div class="col-xs-12" id="divTabCpe">
                                 <div class="col-xs-12">
-                                    <div class="col-lg-2 col-xs-12 col-md-2 col-sm-2">
+                                    <div class="col-lg-2 col-xs-12 col-md-12 col-sm-12">
                                         @if(province.equals("")) {
-                                            <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
+                                            <div class="col-md-6 col-sm-6 col-xs-12 panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
                                                 <div class="panel-heading noborder" id="divSignin">
                                                     <div class="panel-icon" style="color: #43A047"><i class="fa fa-sign-in" aria-hidden="true"></i>
                                                     </div>
@@ -626,7 +614,7 @@
 
                                                 </div><!-- panel-body -->
                                             </div>
-                                            <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #fe7096, #ffbf96)">
+                                            <div class="col-md-6 col-sm-6 col-xs-12 panel panel-success-alt noborder" style="background: linear-gradient(to right, #fe7096, #ffbf96)">
                                                 <div class="panel-heading noborder" id="divLogoff">
                                                     <div class="panel-icon" style="color: #fe7096"><i class="fa fa-sign-out" aria-hidden="true"></i>
                                                     </div>
@@ -649,7 +637,7 @@
                                                 </div><!-- panel-body -->
                                             </div>
                                         }
-                                        <div class="panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
+                                        <div class="col-md-6 col-sm-6 col-xs-12 panel panel-success-alt noborder" style="background: linear-gradient(to right, #84d9d2, #1b8090)">
                                             <div class="panel-heading noborder" id="divSuy">
                                                 <div class="panel-icon" style="color: #43A047"><i class="fa fa-cogs" aria-hidden="true"></i>
                                                 </div>
@@ -671,7 +659,7 @@
 
                                             </div><!-- panel-body -->
                                         </div>
-                                        <div class="panel panel-success-alt noborder"style="background: linear-gradient(to right, #fe7096, #ffbf96)">
+                                        <div class="col-md-6 col-sm-6 col-xs-12 panel panel-success-alt noborder"style="background: linear-gradient(to right, #fe7096, #ffbf96)">
                                             <div class="panel-heading noborder" id="divNotsuy">
                                                 <div class="panel-icon" style="width: 45px;color: #fe7096"><i class="fa fa-fire" aria-hidden="true"></i>
                                                 </div>
@@ -694,7 +682,7 @@
                                             </div><!-- panel-body -->
                                         </div>
                                     </div>
-                                    <div class="col-lg-10 col-xs-12 col-md-10 col-sm-10">
+                                    <div class="col-lg-10 col-xs-12 col-md-12 col-sm-12 tbRight">
                                         <div class="col-xs-12">
                                             @if(province.equals("")) {
                                                 <div class="col-xs-12">
@@ -821,7 +809,7 @@
                                     </div>
                                 </div>
                                 <div class="col-xs-12">
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                                         <div class="x-content">
                                             <div class="profile-title">
                                                 <div class="col-xs-12">
@@ -885,7 +873,7 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 col-xs-12 col-md-6 col-sm-6">
+                                    <div class="col-lg-6 col-xs-12 col-md-12 col-sm-12">
                                         <div class="col-xs-12">
                                             <div class="x-content">
                                                 <div class="profile-title">
@@ -970,8 +958,7 @@
                                     <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Outliers Of BRAS By Month</h2>
+                                                <span class="elipseTrend"> Outliers Of BRAS By Month</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Xu hướng sự cố bất thường tại thiết bị BRAS theo từng tháng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -983,7 +970,7 @@
                                     <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;font-size: 24px"> Connectivity By Month</h2>
+                                                <span class="elipseTrend"> Connectivity By Month</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Xu hướng hoạt động kết nối của KHG theo từng tháng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -996,8 +983,7 @@
                                 <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                     <div class="x_panel tile">
                                         <div class="x_title">
-                                            <h2 style="font-weight: 500;
-                                                font-size: 24px"> Outliers Of OLT By Month</h2>
+                                            <span class="elipseTrend"> Outliers Of OLT By Month</span>
                                             <i class="fa fa-info-circle toolTipText" title="Xu hướng sự cố bất thường tại thiết bị OLT theo từng tháng"></i>
                                             <div class="clearfix"></div>
                                         </div>
@@ -1009,7 +995,7 @@
                                 <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                     <div class="x_panel tile">
                                         <div class="x_title">
-                                            <h2 style="font-weight: 500;font-size: 24px"> INF Error By Month</h2>
+                                            <span class="elipseTrend"> INF Error By Month</span>
                                             <i class="fa fa-info-circle toolTipText" title="Xu hướng lỗi tại thiết bị OLT theo từng tháng"></i>
                                             <div class="clearfix"></div>
                                         </div>
@@ -1022,8 +1008,7 @@
                                     <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> BRAS Error By Month</h2>
+                                                <span class="elipseTrend"> BRAS Error By Month</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Xu hướng lỗi tại thiết bị BRAS theo từng tháng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -1035,8 +1020,7 @@
                                     <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Service Monitoring By Month</h2>
+                                                <span class="elipseTrend"> Service Monitoring By Month</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Xu hướng cảnh báo service theo từng tháng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -1048,8 +1032,7 @@
                                     <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Severity Of BRAS Error By Month</h2>
+                                                <span class="elipseTrend"> Severity Of BRAS Error By Month</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Xu hướng chi tiết của từng mức độ lỗi tại thiết bị BRAS theo từng tháng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -1107,8 +1090,7 @@
                                     <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                         <div class="x_panel tile">
                                             <div class="x_title">
-                                                <h2 style="font-weight: 500;
-                                                    font-size: 24px"> Status Of Service Monitoring By Month</h2>
+                                                <span class="elipseTrend"> Status Of Service Monitoring By Month</span>
                                                 <i class="fa fa-info-circle toolTipText" title="Xu hướng chi tiết của từng mức độ cảnh báo service theo từng tháng"></i>
                                                 <div class="clearfix"></div>
                                             </div>
@@ -1153,7 +1135,7 @@
                                 <div class="col-lg-4 col-xs-12 col-md-6 col-sm-6">
                                     <div class="x_panel tile">
                                         <div class="x_title">
-                                            <h2 style="font-weight: 500;font-size: 24px"> Detail Of INF Error By Month</h2>
+                                            <span class="elipseTrend"> Detail Of INF Error By Month</span>
                                             <i class="fa fa-info-circle toolTipText" title="Xu hướng chi tiết của từng lỗi tại thiết bị OLT theo từng tháng"></i>
                                             <div class="clearfix"></div>
                                         </div>

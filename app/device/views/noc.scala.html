@@ -219,7 +219,7 @@
         </div>
         <br>
         <div class="row" id="hostBras" style="display: none">
-            <div class="col-lg-5 col-sm-5 col-md-5 col-xs-12">
+            <div class="col-lg-5 col-sm-12 col-md-5 col-xs-12">
                 <div class="card-header">
                     <span style="font-size: 16px;font-weight: 600" id="lbHost"></span> <i class="fa fa-info-circle toolTipText" title="Data hosts of bras is loaded in 30 minutes ago."></i>
                 </div>
@@ -227,10 +227,10 @@
                     <div id="host" style="height: 415px;background: #fff"></div>
                 </div>
             </div>
-            <div class="col-lg-7 col-sm-7 col-md-7 col-xs-12">
+            <div class="col-lg-7 col-sm-12 col-md-7 col-xs-12">
                @* <a id="btnCSV" class="btn btn-success"><i class="fa fa-download" style="margin-right: 2px"></i><span>CSV</span></a>*@
                 <div class="tbScroll">
-                    <table class="table no-margin border table-fixed"style="margin-bottom: 0px;font-weight: 700">
+                    <table class="table no-margin border table-fixed" style="margin-bottom: 0px;font-weight: 700">
                         <thead>
                             <tr style="color: white;background: #4980b5;font-size: 16px">
                                 <th colspan="11">List Of OLT Get Error <i class="fa fa-info-circle toolTipText" title="Danh sách thiết bị OLT và module tương ứng bị lỗi trong khoảng thời gian 30 phút trước khi xảy ra bất thường"></i></th>
@@ -306,11 +306,12 @@
     <script src="../assets/javascripts/timeline.min.js"></script>
     <script type="text/javascript">
             $(document).ready(function () {
+                var itemPerPage = ($(window).width() <1200)? 4:8
                 timeline(document.querySelectorAll('.timeline'), {
                     forceVerticalMode: 700,
                     mode: 'horizontal',
                     verticalStartPosition: 'left',
-                    visibleItems: 8
+                    visibleItems: itemPerPage
                 });
                 setInterval(function () {
                     $.ajax({
@@ -765,7 +766,7 @@
                                     else{
                                         //$('#btnCSV').show();
                                         $('#divHost').attr('style','max-height: 380px;overflow: auto');
-                                        $('.tbScroll').attr('style','height: 460px');
+                                        $('.tbScroll').attr('style','height: 500px');
                                         $('#tbHost tbody').attr('style','color: #f5f10d;background: #190e0e');
                                         $('#tbHost tbody').html('');
                                         $('#tbHost tbody').append(html);

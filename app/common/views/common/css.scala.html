@@ -24,12 +24,26 @@
     <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
 
     <style type="text/css">
-            .titLb{
-                position: relative;
-                margin: 0 0 0 10px;
-                z-index: 5;
-                padding: 0;
-                font-size: 24px;
+            @@media (max-width: 1199px){
+                .titLb{
+                    position: relative;
+                    margin: 0 0 0 10px;
+                    z-index: 5;
+                    padding: 0;
+                    font-size: 20px;
+                }
+            }
+            @@media (min-width: 1200px){
+                #divTotal .boxCss{
+                    width: 20%!important;
+                }
+                .titLb{
+                    position: relative;
+                    margin: 0 0 0 10px;
+                    z-index: 5;
+                    padding: 0;
+                    font-size: 24px;
+                }
             }
             .boxCss{
                 text-align: center;
@@ -244,6 +258,22 @@
     <link href="../assets/vendors/datatables.net-buttons/css/buttons.dataTables.min.css" rel="stylesheet">
 
     <style type="text/css">
+            @@media (max-width: 1199px){
+                .divTotal .boxCss{
+                  width: auto;
+                }
+                .divCircle {
+                    padding-left: 0px;
+                }
+            }
+            @@media (min-width: 1200px){
+                .divCircle {
+                    padding-left: 100px;
+                }
+                .divTotal .boxCss{
+                    width: 20%!important;
+                }
+            }
             .top_nav .navbar-right {
                 width: auto;
             }
@@ -266,9 +296,6 @@
             }
             .scrollTB{
                 margin-bottom: 0px!important;
-            }
-            .divCircle{
-                padding-left: 100px;
             }
             .circle {
                 /* circle styles */
@@ -474,6 +501,57 @@
     <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
 
     <style type="text/css">
+            @@media (min-width: 1200px){
+                .tbRight{
+                    padding-left: 80px;
+                }
+                .panel {
+                    width: 245px!important;
+                }
+                .panel-icon{
+                    width: 45px!important;
+                    margin-right: 5px!important;
+                }
+                .panel-icon .fa{
+                    font-size: 23px!important;
+                }
+            }
+            @@media (max-width: 767px){
+                .controls li a{
+                    font-size: 13px!important;
+                }
+            }
+            @@media (max-width: 1439px){
+                .controls{
+                    width: auto;
+                    margin-bottom: 10px;
+                }
+            }
+            @@media (min-width: 1440px){
+                .controls{
+                    width: 50%;
+                    margin: 0;
+                }
+            }
+            .x_title span {
+                color: #73879C;
+            }
+            .panel {
+                margin-bottom: 20px;
+                color: #fff;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+                box-shadow: 0 1px 1px rgba(0,0,0,.05);
+            }
+            .elipse{
+                font-weight: 500!important;
+                font-size: 20px!important;
+            }
+            .elipseTrend{
+                font-weight: 500!important;
+                font-size: 18px!important;
+            }
             .top_nav .navbar-right {
                 width: auto;
             }
@@ -580,7 +658,7 @@
                 display: flex;
             }
             .service-title {
-                font-size: 20px;
+                font-size: 18px;
                 font-weight: bold;
                 line-height: 2;
             }
@@ -644,22 +722,11 @@
                 border: 0;
                 border-top: 1px solid #eee;
             }
-            .panel {
-                margin-bottom: 20px;
-                width: 245px;
-                color: #fff;
-                border: 1px solid transparent;
-                border-radius: 4px;
-                -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
-                box-shadow: 0 1px 1px rgba(0,0,0,.05);
-            }
             .controls {
-                width: 50%;
                 float: left;
                 overflow-x: auto;
                 overflow-y: hidden;
                 padding: 0;
-                margin: 0;
                 white-space: nowrap;
                 text-align: center;
                 position: relative;
@@ -740,6 +807,13 @@
     <style type="text/css">
             .top_nav .navbar-right {
                 width: auto;
+            }
+            .x_title span {
+                color: #73879C;
+            }
+            .elipse{
+                font-weight: 500!important;
+                font-size: 21px!important;
             }
             .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover{
                 background-color: #e02d57;
@@ -937,6 +1011,24 @@
         <link href="../assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
         <link href="../assets/custom/css/roadmap.min.css" rel="stylesheet">
         <style type="text/css">
+                @@media (max-width: 1439px){
+                    .titLb{
+                        position: relative;
+                        margin: 0 0 0 10px;
+                        z-index: 5;
+                        padding: 0;
+                        font-size: 18px;
+                    }
+                }
+                @@media (min-width: 1440px){
+                    .titLb{
+                        position: relative;
+                        margin: 0 0 0 10px;
+                        z-index: 5;
+                        padding: 0;
+                        font-size: 23px;
+                    }
+                }
                 .top_nav .navbar-right {
                     width: auto;
                 }
@@ -1007,13 +1099,6 @@
                 }
                 .activeHref{
                     cursor: pointer;font-weight: 600;
-                }
-                .titLb{
-                    position: relative;
-                    margin: 0 0 0 10px;
-                    z-index: 5;
-                    padding: 0;
-                    font-size: 24px;
                 }
                 .boxCss{
                     text-align: center;
@@ -1157,6 +1242,22 @@
     <link href="../assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
     <link href="../assets/custom/css/jsTree.css" rel="stylesheet">
     <style type="text/css">
+        @@media (max-width: 1199px){
+           .txtTit{
+             font-size: 18px;
+           }
+           .txtDes{
+             font-size: 11px;
+           }
+        }
+        @@media (min-width: 1200px){
+            .txtTit{
+                font-size: 22px;
+            }
+            .txtDes{
+                font-size: 14px;
+            }
+        }
             .top_nav .navbar-right {
                 width: auto;
             }
@@ -1197,7 +1298,6 @@
                 cursor: pointer;
             }
             .item span{
-                font-size: 22px;
                 font-weight: 400;
                 margin-top: 0rem;
                 color: #3c763d;
@@ -1339,6 +1439,22 @@
         <link href="../assets/custom/css/jsTree.css" rel="stylesheet">
         <link href="../assets/custom/css/iziModal.min.css" rel="stylesheet">
         <style type="text/css">
+                @@media (max-width: 1199px){
+                    .txtTit{
+                        font-size: 18px;
+                    }
+                    .txtDes{
+                        font-size: 11px;
+                    }
+                }
+                @@media (min-width: 1200px){
+                    .txtTit{
+                        font-size: 22px;
+                    }
+                    .txtDes{
+                        font-size: 14px;
+                    }
+                }
                 .top_nav .navbar-right {
                     width: auto;
                 }
@@ -1370,7 +1486,6 @@
                     cursor: pointer;
                 }
                 .item span{
-                    font-size: 22px;
                     font-weight: 400;
                     margin-top: 0rem;
                     color: #3c763d;
