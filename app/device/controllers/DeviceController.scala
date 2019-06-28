@@ -192,7 +192,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def drilldownOutlierMonth(id: String, fromMonth: String, toMonth: String, db: String) = withAuth {username => implicit  request =>
+  def drilldownOutlierMonth(id: String, fromMonth: String, toMonth: String, db: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""
@@ -228,6 +228,13 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
             "data" -> brasOutlier,
             "key"   -> brasOutlier.map(x=> x._1).distinct.sorted,
             "location" -> "province"
+          )
+        }
+        case _ => {
+          Json.obj(
+            "data" -> "",
+            "key"   -> "empty",
+            "location" -> ""
           )
         }
       }
@@ -940,7 +947,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def drilldownSigLogMonth(id: String,month: String) = withAuth {username => implicit  request =>
+  def drilldownSigLogMonth(id: String,month: String) = withAuth {username => implicit request =>
     try{
       val rangeMonth = CommonService.getAllMonthfromRange(month.split("/")(0)+"-01",month.split("/")(1)+"-01")
       val rs = id match {

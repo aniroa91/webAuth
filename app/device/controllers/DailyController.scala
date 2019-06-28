@@ -199,6 +199,13 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
             "location" -> "province"
           )
         }
+        case _ => {
+          Json.obj(
+            "data" -> "",
+            "key"   -> "empty",
+            "location" -> ""
+          )
+        }
       }
       Ok(Json.toJson(rs))
     }
@@ -207,7 +214,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-  def drilldownSigLogDaily(id: String,day: String) = withAuth {username =>implicit request =>
+  def drilldownSigLogDaily(id: String,day: String) = withAuth {username => implicit request =>
     try{
       val rs = id match {
         // get inf by Region
@@ -290,6 +297,11 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
             "data"   -> data.asInstanceOf[Array[(String, Double)]]
           )
         }
+        case _ => {
+          Json.obj(
+            "data" -> "empty"
+          )
+        }
       }
       Ok(Json.toJson(rs))
     }
@@ -342,6 +354,13 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
             "location" -> "bras"
           )
         }
+        case _ => {
+          Json.obj(
+            "data" -> "",
+            "key"   -> "empty",
+            "location" -> ""
+          )
+        }
       }
       Ok(Json.toJson(rs))
     }
@@ -368,6 +387,9 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
         // get inf by Bras
         case id if(!id.substring(id.indexOf(" ")+1).matches("^\\d+$") && id.indexOf("-")>=0) =>{
           BrasService.getInfErrorsDaily(day, err, province).filter(x=> x._3 == id).groupBy(x=> x._4).map(x=> x._1 -> x._2.map(x=> x._5).sum).toArray.sortWith((x, y)=> x._2>y._2).slice(0,10)
+        }
+        case _ => {
+          Array[(String, Double)]()
         }
       }
       Ok(Json.toJson(Json.obj("data" -> rs)))

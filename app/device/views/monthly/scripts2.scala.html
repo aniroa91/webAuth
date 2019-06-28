@@ -2333,276 +2333,283 @@
 
         //drilldown heat map Inf Outliers
         function callDrilldownOutlier(cates, _type, db){
-            $.ajax({
-                url: "/monthly/ddOutlierByMonth?id=" + cates+"&fromMonth="+$('#startMonth').val()+"&toMonth="+$('#endMonth').val()+"&db="+db,
-                cache: false,
-                success: function (dta) {
-                    if(dta != "Error" && dta.data.length >0){
-                        if(db == "inf") {
-                            var vlMarTop1 = 40
-                            if (cates == "*") vlMarTop1 = 10
-                            Highcharts.chart('inf-outlier', {
-                                chart: {
-                                    type: 'heatmap',
-                                    marginTop: vlMarTop1,
-                                    marginBottom: 60,
-                                    plotBorderWidth: 1
-                                },
-
-                                title: {
-                                    text: ''
-                                },
-                                xAxis: {
-                                    categories: ["Outliers"]
-                                },
-
-                                yAxis: {
-                                    categories: dta.key,
-                                    title: null,
-                                    labels: {
-                                        style: {
-                                            'min-width': ($(window).width() <= 1280)?'40px':'125px'
+            if(isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0 && cates.length>=10 && cates.indexOf(" ")<0) {
+                console.log('do not drilldown host')
+            }
+            else {
+                $.ajax({
+                    url: "/monthly/ddOutlierByMonth?id=" + cates + "&fromMonth=" + $('#startMonth').val() + "&toMonth=" + $('#endMonth').val() + "&db=" + db,
+                    cache: false,
+                    success: function (dta) {
+                        if (dta != "Error") {
+                            if(dta.key != "empty" && dta.data.length > 0) {
+                                if (db == "inf") {
+                                    var vlMarTop1 = 40
+                                    if (cates == "*") vlMarTop1 = 10
+                                    Highcharts.chart('inf-outlier', {
+                                        chart: {
+                                            type: 'heatmap',
+                                            marginTop: vlMarTop1,
+                                            marginBottom: 60,
+                                            plotBorderWidth: 1
                                         },
-                                        useHTML: true
-                                    }
-                                },
 
-                                legend: {
-                                    align: 'center',
-                                    verticalAlign: 'bottom',
-                                    y: 20,
-                                    x: 40
-                                },
+                                        title: {
+                                            text: ''
+                                        },
+                                        xAxis: {
+                                            categories: ["Outliers"]
+                                        },
 
-                                colorAxis: {
-                                    min: 0,
-                                    minColor: '#FFFFFF',
-                                    maxColor: '#1194a9'
-                                },
-
-                                tooltip: {
-                                    formatter: function () {
-                                        return '<b>' + this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
-                                                this.point.value + ' outliers</b> ';
-                                    }
-                                },
-                                plotOptions: {
-                                    series: {
-                                        events: {
-                                            click: function (event) {
-                                                callDrilldownOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown', 'inf')
+                                        yAxis: {
+                                            categories: dta.key,
+                                            title: null,
+                                            labels: {
+                                                style: {
+                                                    'min-width': ($(window).width() <= 1280) ? '40px' : '125px'
+                                                },
+                                                useHTML: true
                                             }
                                         },
-                                        dataLabels: {
+
+                                        legend: {
+                                            align: 'center',
+                                            verticalAlign: 'bottom',
+                                            y: 20,
+                                            x: 40
+                                        },
+
+                                        colorAxis: {
+                                            min: 0,
+                                            minColor: '#FFFFFF',
+                                            maxColor: '#1194a9'
+                                        },
+
+                                        tooltip: {
                                             formatter: function () {
-                                                var nf = new Intl.NumberFormat();
-                                                return nf.format(this.point.value);
+                                                return '<b>' + this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                        this.point.value + ' outliers</b> ';
                                             }
                                         },
-                                        cursor: 'pointer'
-                                    }
-                                },
-                                exporting: {
-                                    buttons: [{
-                                        text: 'Back to ' + dta.location,
-                                        onclick: function (e) {
-                                            var id = "*"
-                                            var tit = "back"
-                                            if ($('#textInfOutlier').val() == "Back to province") {
-                                                tit = "drilldown"
-                                                id = $('#isRegionInfOutlier').val()
-                                                $('#textInfOutlier').val('Back to region')
+                                        plotOptions: {
+                                            series: {
+                                                events: {
+                                                    click: function (event) {
+                                                        callDrilldownOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown', 'inf')
+                                                    }
+                                                },
+                                                dataLabels: {
+                                                    formatter: function () {
+                                                        var nf = new Intl.NumberFormat();
+                                                        return nf.format(this.point.value);
+                                                    }
+                                                },
+                                                cursor: 'pointer'
                                             }
-                                            if ($('#textInfOutlier').val() == "Back to bras") {
-                                                tit = "drilldown"
-                                                id = $('#isProvinceInfOutlier').val()
-                                                $('#textInfOutlier').val('Back to province')
-                                            }
-                                            callDrilldownOutlier(id, tit, 'inf')
                                         },
-                                        theme: {
-                                            fill: '#1ABB9C',
-                                            'stroke-width': 1,
-                                            stroke: '#169F85',
-                                            color: '#fff',
-                                            states: {
-                                                hover: {
-                                                    fill: '#1ABB9C'
+                                        exporting: {
+                                            buttons: [{
+                                                text: 'Back to ' + dta.location,
+                                                onclick: function (e) {
+                                                    var id = "*"
+                                                    var tit = "back"
+                                                    if ($('#textInfOutlier').val() == "Back to province") {
+                                                        tit = "drilldown"
+                                                        id = $('#isRegionInfOutlier').val()
+                                                        $('#textInfOutlier').val('Back to region')
+                                                    }
+                                                    if ($('#textInfOutlier').val() == "Back to bras") {
+                                                        tit = "drilldown"
+                                                        id = $('#isProvinceInfOutlier').val()
+                                                        $('#textInfOutlier').val('Back to province')
+                                                    }
+                                                    callDrilldownOutlier(id, tit, 'inf')
+                                                },
+                                                theme: {
+                                                    fill: '#1ABB9C',
+                                                    'stroke-width': 1,
+                                                    stroke: '#169F85',
+                                                    color: '#fff',
+                                                    states: {
+                                                        hover: {
+                                                            fill: '#1ABB9C'
+                                                        }
+                                                    }
                                                 }
+                                            }]
+                                        },
+                                        series: [{
+                                            name: 'Outliers',
+                                            borderWidth: 1,
+                                            data: getHeatmapBrasOutlier(dta.data, dta.key),
+                                            dataLabels: {
+                                                enabled: true,
+                                                color: '#000000'
                                             }
-                                        }
-                                    }]
-                                },
-                                series: [{
-                                    name: 'Outliers',
-                                    borderWidth: 1,
-                                    data: getHeatmapBrasOutlier(dta.data, dta.key),
-                                    dataLabels: {
-                                        enabled: true,
-                                        color: '#000000'
-                                    }
-                                }]
+                                        }]
 
-                            });
-                            if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
-                                $('#isRegionInfOutlier').val(cates)
-                                $('#textInfOutlier').val("Back to region")
-                            }
-                            if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
-                                $('#isProvinceInfOutlier').val(cates)
-                                $('#textInfOutlier').val("Back to province")
-                            }
-                            else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
-                                $('#textInfOutlier').val("Back to bras")
-                            }
-                            // Apply for button back
-                            if (_type == 'drilldown') {
-                                $('#inf-outlier .highcharts-button').show()
-                                $('.highcharts-contextbutton').hide()
-                            }
-                            else {
-                                $('#inf-outlier .highcharts-button').hide()
+                                    });
+                                    if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                        $('#isRegionInfOutlier').val(cates)
+                                        $('#textInfOutlier').val("Back to region")
+                                    }
+                                    if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                        $('#isProvinceInfOutlier').val(cates)
+                                        $('#textInfOutlier').val("Back to province")
+                                    }
+                                    else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
+                                        $('#textInfOutlier').val("Back to bras")
+                                    }
+                                    // Apply for button back
+                                    if (_type == 'drilldown') {
+                                        $('#inf-outlier .highcharts-button').show()
+                                        $('.highcharts-contextbutton').hide()
+                                    }
+                                    else {
+                                        $('#inf-outlier .highcharts-button').hide()
+                                    }
+                                }
+                                else {
+                                    var vlMarTop = 40
+                                    if (cates == "*") vlMarTop = 10
+                                    Highcharts.chart('bras-outlier', {
+                                        chart: {
+                                            type: 'heatmap',
+                                            marginTop: vlMarTop,
+                                            marginBottom: 60,
+                                            plotBorderWidth: 1
+                                        },
+
+                                        title: {
+                                            text: ''
+                                        },
+                                        xAxis: {
+                                            categories: ["Outliers"]
+                                        },
+
+                                        yAxis: {
+                                            categories: dta.key,
+                                            title: null,
+                                            labels: {
+                                                style: {
+                                                    'min-width': ($(window).width() <= 1280) ? '20px' : '125px'
+                                                },
+                                                useHTML: true
+                                            }
+                                        },
+
+                                        legend: {
+                                            align: 'center',
+                                            verticalAlign: 'bottom',
+                                            y: 20,
+                                            x: 40
+                                        },
+
+                                        colorAxis: {
+                                            min: 0,
+                                            minColor: '#FFFFFF',
+                                            maxColor: '#1ABB9C'
+                                        },
+
+                                        tooltip: {
+                                            formatter: function () {
+                                                return '<b>' + this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
+                                                        this.point.value + ' outliers</b> ';
+                                            }
+                                        },
+                                        plotOptions: {
+                                            series: {
+                                                events: {
+                                                    click: function (event) {
+                                                        callDrilldownOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown', 'bras')
+                                                    }
+                                                },
+                                                dataLabels: {
+                                                    formatter: function () {
+                                                        var nf = new Intl.NumberFormat();
+                                                        return nf.format(this.point.value);
+                                                    }
+                                                },
+                                                cursor: 'pointer'
+                                            }
+                                        },
+                                        exporting: {
+                                            buttons: [{
+                                                text: 'Back to ' + dta.location,
+                                                onclick: function (e) {
+                                                    var id = "*"
+                                                    var tit = "back"
+                                                    if ($('#textBrasOutlier').val() == "Back to province") {
+                                                        tit = "drilldown"
+                                                        id = $('#isRegionBrasOutlier').val()
+                                                        $('#textBrasOutlier').val('Back to region')
+                                                    }
+                                                    if ($('#textBrasOutlier').val() == "Back to bras") {
+                                                        tit = "drilldown"
+                                                        id = $('#isProvinceBrasOutlier').val()
+                                                        $('#textBrasOutlier').val('Back to province')
+                                                    }
+                                                    callDrilldownOutlier(id, tit, 'bras')
+                                                },
+                                                theme: {
+                                                    fill: '#1ABB9C',
+                                                    'stroke-width': 1,
+                                                    stroke: '#169F85',
+                                                    color: '#fff',
+                                                    states: {
+                                                        hover: {
+                                                            fill: '#1ABB9C'
+                                                        }
+                                                    }
+                                                }
+                                            }]
+                                        },
+                                        series: [{
+                                            name: 'Outliers',
+                                            borderWidth: 1,
+                                            data: getHeatmapBrasOutlier(dta.data, dta.key),
+                                            dataLabels: {
+                                                enabled: true,
+                                                color: '#000000'
+                                            }
+                                        }]
+
+                                    });
+                                    if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
+                                        $('#isRegionBrasOutlier').val(cates)
+                                        $('#textBrasOutlier').val("Back to region")
+                                    }
+                                    if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
+                                        $('#isProvinceBrasOutlier').val(cates)
+                                        $('#textBrasOutlier').val("Back to province")
+                                    }
+                                    else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
+                                        $('#textBrasOutlier').val("Back to bras")
+                                    }
+                                    // Apply for button back
+                                    if (_type == 'drilldown') {
+                                        $('#bras-outlier .highcharts-button').show()
+                                        $('.highcharts-contextbutton').hide()
+                                    }
+                                    else {
+                                        $('#bras-outlier .highcharts-button').hide()
+                                    }
+                                }
+                                // right click yAxis
+                                $('#' + db + '-outlier .highcharts-yaxis-labels span').mousedown(function (e) {
+                                    if (e.which == 3 && e.target.innerHTML.indexOf('-') >= 0) {
+                                        window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
+                                    }
+                                    return false;
+                                });
                             }
                         }
-                        else{
-                            var vlMarTop = 40
-                            if(cates == "*") vlMarTop = 10
-                            Highcharts.chart('bras-outlier', {
-                                chart: {
-                                    type: 'heatmap',
-                                    marginTop: vlMarTop,
-                                    marginBottom: 60,
-                                    plotBorderWidth: 1
-                                },
-
-                                title: {
-                                    text: ''
-                                },
-                                xAxis: {
-                                    categories: ["Outliers"]
-                                },
-
-                                yAxis: {
-                                    categories: dta.key,
-                                    title: null,
-                                    labels: {
-                                        style: {
-                                            'min-width': ($(window).width() <= 1280)?'20px':'125px'
-                                        },
-                                        useHTML : true
-                                    }
-                                },
-
-                                legend: {
-                                    align: 'center',
-                                    verticalAlign: 'bottom',
-                                    y: 20,
-                                    x: 40
-                                },
-
-                                colorAxis: {
-                                    min: 0,
-                                    minColor: '#FFFFFF',
-                                    maxColor: '#1ABB9C'
-                                },
-
-                                tooltip: {
-                                    formatter: function () {
-                                        return '<b>'+ this.series.yAxis.categories[this.point.y] + '</b> has <br><b>' +
-                                                this.point.value + ' outliers</b> ';
-                                    }
-                                },
-                                plotOptions: {
-                                    series: {
-                                        events: {
-                                            click: function (event) {
-                                                callDrilldownOutlier(event.point.series.yAxis.categories[event.point.y], 'drilldown','bras')
-                                            }
-                                        },
-                                        dataLabels:{
-                                            formatter:function(){
-                                                var nf = new Intl.NumberFormat();
-                                                return nf.format(this.point.value);
-                                            }
-                                        },
-                                        cursor: 'pointer'
-                                    }
-                                },
-                                exporting: {
-                                    buttons: [{
-                                        text: 'Back to '+dta.location,
-                                        onclick: function (e) {
-                                            var id = "*"
-                                            var tit = "back"
-                                            if($('#textBrasOutlier').val() == "Back to province"){
-                                                tit = "drilldown"
-                                                id = $('#isRegionBrasOutlier').val()
-                                                $('#textBrasOutlier').val('Back to region')
-                                            }
-                                            if($('#textBrasOutlier').val() == "Back to bras") {
-                                                tit = "drilldown"
-                                                id = $('#isProvinceBrasOutlier').val()
-                                                $('#textBrasOutlier').val('Back to province')
-                                            }
-                                            callDrilldownOutlier(id, tit,'bras')
-                                        },
-                                        theme: {
-                                            fill: '#1ABB9C',
-                                            'stroke-width': 1,
-                                            stroke: '#169F85',
-                                            color:'#fff',
-                                            states: {
-                                                hover: {
-                                                    fill: '#1ABB9C'
-                                                }
-                                            }
-                                        }
-                                    }]
-                                },
-                                series: [{
-                                    name: 'Outliers',
-                                    borderWidth: 1,
-                                    data: getHeatmapBrasOutlier(dta.data, dta.key),
-                                    dataLabels: {
-                                        enabled: true,
-                                        color: '#000000'
-                                    }
-                                }]
-
-                            });
-                            if (!isNaN(cates.substring(cates.indexOf(" ") + 1))) {
-                                $('#isRegionBrasOutlier').val(cates)
-                                $('#textBrasOutlier').val("Back to region")
-                            }
-                            if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") < 0) {
-                                $('#isProvinceBrasOutlier').val(cates)
-                                $('#textBrasOutlier').val("Back to province")
-                            }
-                            else if (isNaN(cates.substring(cates.indexOf(" ") + 1)) && cates.indexOf("-") >= 0) {
-                                $('#textBrasOutlier').val("Back to bras")
-                            }
-                            // Apply for button back
-                            if(_type == 'drilldown') {
-                                $('#bras-outlier .highcharts-button').show()
-                                $('.highcharts-contextbutton').hide()
-                            }
-                            else{
-                                $('#bras-outlier .highcharts-button').hide()
-                            }
+                        else {
+                            alert("Error when execute query. Please check again your system!")
                         }
-                        // right click yAxis
-                        $('#'+db+'-outlier .highcharts-yaxis-labels span').mousedown(function(e) {
-                            if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
-                                window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
-                            }
-                            return false;
-                        });
                     }
-                    else{
-                        alert("Error when execute query. Please check again your system!")
-                    }
-                }
-            })
+                })
+            }
         }
 
         function getSeries3LevelStackBar(dta,arrKey,arrMonth){

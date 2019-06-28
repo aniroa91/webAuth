@@ -1675,87 +1675,92 @@
         }
 
         function callDrilldownSigLog(id){
-                $.ajax({
-                        url: "/monthly/ddownSigLogMonth?id=" + id+"&month="+$('#monthGroup').val(),
-                        cache: false,
-                        success: function (dta) {
-                                if(dta != "Error"){
-                                        // Apply for button back
-                                        $('#regionSigLog').val(id)
-                                        if(!isNaN(id.substring(id.indexOf(" ")+1))){
-                                                $('#backSigLog').text("Back to region")
-                                                $('#isRegionSigLog').val(id)
-                                        }
-                                        else if(isNaN(id.substring(id.indexOf(" ")+1)) && id.indexOf("-")<0){
-                                                $('#backSigLog').text("Back to province")
-                                                $('#isProvinceSigLog').val(id)
-                                        }
-                                        else if(isNaN(id.substring(id.indexOf(" ")+1)) && id.indexOf("-")>=0){
-                                                $('#backSigLog').text("Back to bras")
-                                        }
-                                        $('#backSigLog').show()
-                                        Highcharts.chart('region-siglog-bar', {
-                                                chart: {
-                                                        type: 'bar'
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                subtitle: {
-                                                        text: ''
-                                                },
-                                                xAxis: [{
-                                                        categories: dta.categories[0],
-                                                        reversed: false,
-                                                }, { // mirror axis on right side
-                                                        opposite: true,
-                                                        reversed: false,
-                                                        categories: dta.categories[0],
-                                                        linkedTo: 0,
-                                                }],
-                                                yAxis: {
+                if(isNaN(id.substring(id.indexOf(" ") + 1)) && id.indexOf("-") < 0 && id.length>=10 && id.indexOf(" ")<0) {
+                        console.log('do not drilldown host')
+                }
+                else {
+                        $.ajax({
+                                url: "/monthly/ddownSigLogMonth?id=" + id + "&month=" + $('#monthGroup').val(),
+                                cache: false,
+                                success: function (dta) {
+                                        if (dta != "Error") {
+                                                // Apply for button back
+                                                $('#regionSigLog').val(id)
+                                                if (!isNaN(id.substring(id.indexOf(" ") + 1))) {
+                                                        $('#backSigLog').text("Back to region")
+                                                        $('#isRegionSigLog').val(id)
+                                                }
+                                                else if (isNaN(id.substring(id.indexOf(" ") + 1)) && id.indexOf("-") < 0) {
+                                                        $('#backSigLog').text("Back to province")
+                                                        $('#isProvinceSigLog').val(id)
+                                                }
+                                                else if (isNaN(id.substring(id.indexOf(" ") + 1)) && id.indexOf("-") >= 0) {
+                                                        $('#backSigLog').text("Back to bras")
+                                                }
+                                                $('#backSigLog').show()
+                                                Highcharts.chart('region-siglog-bar', {
+                                                        chart: {
+                                                                type: 'bar'
+                                                        },
                                                         title: {
-                                                                text: null
+                                                                text: ''
                                                         },
-                                                        labels: {
-                                                                formatter: function () {
-                                                                        return Math.abs(this.value);
-                                                                }
+                                                        subtitle: {
+                                                                text: ''
                                                         },
-                                                },
-
-                                                plotOptions: {
-                                                        series: {
-                                                                events: {
-                                                                        click: function (event) {
-                                                                                callDrilldownSigLog(event.point.category)
+                                                        xAxis: [{
+                                                                categories: dta.categories[0],
+                                                                reversed: false,
+                                                        }, { // mirror axis on right side
+                                                                opposite: true,
+                                                                reversed: false,
+                                                                categories: dta.categories[0],
+                                                                linkedTo: 0,
+                                                        }],
+                                                        yAxis: {
+                                                                title: {
+                                                                        text: null
+                                                                },
+                                                                labels: {
+                                                                        formatter: function () {
+                                                                                return Math.abs(this.value);
                                                                         }
                                                                 },
-                                                                cursor: 'pointer',
-                                                                stacking: 'normal'
+                                                        },
+
+                                                        plotOptions: {
+                                                                series: {
+                                                                        events: {
+                                                                                click: function (event) {
+                                                                                        callDrilldownSigLog(event.point.category)
+                                                                                }
+                                                                        },
+                                                                        cursor: 'pointer',
+                                                                        stacking: 'normal'
+                                                                }
+                                                        },
+
+                                                        tooltip: {
+                                                                formatter: function () {
+                                                                        return '<b>' + this.series.name + '</b><br/><b>' + this.point.category + '</b><br/>'
+                                                                                + '<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0) + '</b><br/>Total clients: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0);
+                                                                }
+                                                        },
+
+                                                        series: getSigLogByRegionStacked(dta.signin, dta.logoff, dta.signin_clients, dta.logoff_clients, dta.categories[0])
+
+                                                });
+                                                // right click yAxis
+                                                $('#region-siglog-bar .highcharts-xaxis-labels text').mousedown(function (e) {
+                                                        if (e.which == 3 && e.target.innerHTML.indexOf('-') >= 0) {
+                                                                window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
                                                         }
-                                                },
-
-                                                tooltip: {
-                                                        formatter: function () {
-                                                                return '<b>' + this.series.name + '</b><br/><b>' + this.point.category + '</b><br/>'
-                                                                        +'<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b><br/>Total clients: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0);
-                                                        }
-                                                },
-
-                                                series: getSigLogByRegionStacked(dta.signin,dta.logoff,dta.signin_clients,dta.logoff_clients,dta.categories[0])
-
-                                        });
-                                        // right click yAxis
-                                        $('#region-siglog-bar .highcharts-xaxis-labels text').mousedown(function(e) {
-                                                if(e.which == 3 && e.target.innerHTML.indexOf('-') >=0){
-                                                        window.open("/fwdRequest?bras=" + e.target.innerHTML, "_blank")
-                                                }
-                                                return false;
-                                        });
+                                                        return false;
+                                                });
+                                        }
                                 }
-                        }
-                })
+                        })
+                }
         }
 
         function getDataHeatMapForDrilldownInferror(dta,arrRegion,arrMonth){
