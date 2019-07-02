@@ -55,13 +55,13 @@
                     @for(i <- 0 until response.weekly.length) {
                         @if(i == 0) {
                             <div class="item activeBox">
-                                <span class="txtTit"><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
-                                <span class="txtDes">@response.weekly(i)._2</span>
+                                <p class="txtTit"><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</p>
+                                <p class="txtDes">@response.weekly(i)._2</p>
                             </div>
                         }else{
                             <div class="item">
-                                <span class="txtTit"><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</span>
-                                <span class="txtDes">@response.weekly(i)._2</span>
+                                <p class="txtTit"><i class="fa fa-calendar" aria-hidden="true"></i> @response.weekly(i)._1</p>
+                                <p class="txtDes">@response.weekly(i)._2</p>
                             </div>
                         }
                     }
@@ -143,7 +143,7 @@
                     responsiveClass: true,
                     responsive: {
                         0: {
-                            items: 7,
+                            items: ($(window).width() >1280)? 7: 4,
                             nav: true
                         }
                     }
@@ -294,7 +294,7 @@
                 })
                 // click box weekly
                 $('.owl-item').click(function () {
-                    var date = $(this).find('.item h5').text()
+                    var date = $(this).find('.item .txtDes').text()
                     $('.owl-item').find('.item').removeClass('activeBox')
                     $(this).find('.item').addClass('activeBox')
                     $('#date').val(date)
