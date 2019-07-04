@@ -863,7 +863,7 @@
                         $('#divTopN').show();
                         $('#monthTab1').hide()
                         $(this).addClass("active")
-                        if(active == 0 && $('#isClickedTab2').val()==0)
+                        if(active == 0 && ($('#isClickedTab2').val()== 0 || $('#monthTop').val() != $('#monthCp').val()))
                                 callAjaxTopN($('#month').val())
                 }
                 // for tab Overview
@@ -877,7 +877,7 @@
                         $('#divTopN').show();
                         $('#monthTab1').hide()
                         $(this).addClass("active")
-                        if(active == 0 && $('#isClickedTab3').val()==0)
+                        if(active == 0 && ($('#isClickedTab3').val()== 0 || $('#monthTop').val() != $('#monthCp').val()))
                                 callAjaxCompare($('#month').val())
                 }
                 // tab Trend

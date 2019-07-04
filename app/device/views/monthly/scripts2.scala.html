@@ -1418,6 +1418,7 @@
                         var currMonth = dta.currMonth
                         $("#monthPickerTop").datepicker("update", currMonth)
                         $('#isClickedTab3').val(1)
+                        $('#monthCp').val(currMonth)
                         if(dta.province == ""){
                             /* BOX SIGNIN */
                             $('#divSignin .signin').text(Number(dta.signin.currSignin).toLocaleString())
@@ -1618,6 +1619,7 @@
                         var monthStr = dta.month
                         $("#monthPickerTop").datepicker("update", monthStr)
                         $('#isClickedTab2').val(1)
+                        $('#monthTop').val(monthStr)
                         // right click event
                         fntRightClick()
                         if(dta.province == "") {
