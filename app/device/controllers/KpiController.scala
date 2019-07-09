@@ -34,7 +34,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val t0 = System.currentTimeMillis()
       val weekly = Await.result(ProblemService.listWeekly(), Duration.Inf)
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(weekly(0)._2, if(province.equals("All")) "" else province), Duration.Inf)
-      val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
+      val location = lstProvince.map(x=> LocationUtils.getRegion(x._1) -> LocationUtils.getNameProvincebyCode(x._1)).filter(x=> x._1 != "").distinct.sorted
       val kpi = Await.result(KpiService.listKpi(weekly(0)._2, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2),
         CommonService.format2DecimalDouble(x._3), CommonService.percentDouble(x._2, x._3)))
 
@@ -50,7 +50,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
     try{
       val time = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
-      var province = LocationUtils.getCodeProvWorld(request.body.asFormUrlEncoded.get("province").head)
+      var province = LocationUtils.getCodeProvincebyName(request.body.asFormUrlEncoded.get("province").head)
       if(province == "BRU") province = "BRA"
       val kpi = Await.result(KpiService.listKpi(date, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2), CommonService.format2DecimalDouble(x._3),
             CommonService.percentDouble(x._2, x._3), CommonUtils.getTitleIndex(x._1), CommonUtils.getDescriptIndex(x._1))).toArray.sorted
@@ -59,7 +59,7 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val rs = Json.obj(
         "kpi" -> rsKpi
       )
-      logger.info(s"Page: KPI - User: ${username} - Choose Province: ${LocationUtils.getNameProvWorld(province)}, Date: $date - Time Query:"+(System.currentTimeMillis() -time))
+      logger.info(s"Page: KPI - User: ${username} - Choose Province: ${LocationUtils.getNameProvincebyCode(province)}, Date: $date - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{
@@ -72,14 +72,14 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val time = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
       val index = request.body.asFormUrlEncoded.get("index").head
-      var province = LocationUtils.getCodeProvWorld(request.body.asFormUrlEncoded.get("province").head)
+      var province = LocationUtils.getCodeProvincebyName(request.body.asFormUrlEncoded.get("province").head)
       if(province == "BRU") province = "BRA"
       val kpiWeekly = Await.result(KpiService.listKpiTimeSeries(date, province, index), Duration.Inf)
       val rs = Json.obj(
         "cate" -> kpiWeekly.map(x=> CommonService.formatStringYYMMDD(x._1)),
         "data" -> kpiWeekly.map(x=> CommonService.format2Decimal(x._2))
       )
-      logger.info(s"Page: KPI - User: ${username} - Choose Province: ${LocationUtils.getNameProvWorld(province)}, Date: $date - Time Query:"+(System.currentTimeMillis() -time))
+      logger.info(s"Page: KPI - User: ${username} - Choose Province: ${LocationUtils.getNameProvincebyCode(province)}, Date: $date - Time Query:"+(System.currentTimeMillis() -time))
       Ok(Json.toJson(rs))
     }
     catch{

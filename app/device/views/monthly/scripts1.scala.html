@@ -593,6 +593,14 @@
                                 legend: {
                                         reversed: true
                                 },
+                                tooltip: {
+                                        formatter: function () {
+                                                return '<b>' + this.series.name + '</b><br/><b>' + this.point.name + '</b><br/>'
+                                                        + '<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0) + '</b><br/>'
+                                                        +'Total cus_qt: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0)+ '</b><br/>'
+                                                        +'Total paytv_qt: ' + Highcharts.numberFormat(Math.abs(this.point.l), 0);
+                                        }
+                                },
                                 plotOptions: {
                                         series: {
                                                 stacking: 'normal',
@@ -746,6 +754,14 @@
                                                         }
                                                 }
                                         }
+                                }
+                        },
+                        tooltip: {
+                                formatter: function () {
+                                        return '<b>' + this.series.name + '</b><br/><b>' + this.point.name + '</b><br/>'
+                                                + '<b>Total: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0) + '</b><br/>'
+                                                +'Total cus_qt: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0)+ '</b><br/>'
+                                                +'Total paytv_qt: ' + Highcharts.numberFormat(Math.abs(this.point.l), 0);
                                 }
                         },
                         series: getSeries3LevelStackBar(@Html(Json.stringify(Json.toJson(response.ticketIssue._2))),@Html(Json.stringify(Json.toJson(response.ticketIssue._2.map(x=> x._2).toSeq.distinct.sorted))),@Html(Json.stringify(Json.toJson(response.ticketIssue._2.map(x=> x._1).toSeq.distinct.sortWith(_>_))))),

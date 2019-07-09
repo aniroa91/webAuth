@@ -7,7 +7,7 @@ case class RegionOverview(
                          suyhao: Array[(String,String,String,Int,String,Int)],
                          sigLogRegion: SigLogRegion,
                          contracts: Array[(String,String,String,String,Int,Int,Int)],
-                         ticketIssue: (Seq[(String, String, String, String, String, Int)], Seq[(String, String, String, String, String, Int)])
+                         ticketIssue: (Seq[(String, String, String, String, String, Int,Int,Int)], Seq[(String, String, String, String, String, Int,Int,Int)])
                          )
 case class TimePicker(
                      startMonth: String,
@@ -89,7 +89,7 @@ case class DailyResponse(
                         siglogRegion:  (Array[(String, Long, Long)], Array[(String, Long, Long)]),
                         errorsDevice:  Array[(String, Double)],
                         brasOutlier:   Array[(String, Int)],
-                        ticketIssue: (Seq[(String, String, String, Int)], Seq[(String, String, String, Int)]),
+                        ticketIssue: (Seq[(String, String, String, Int, Int, Int)], Seq[(String, String, String, Int, Int, Int)]),
                         lstProBras: Array[(String, String,String)]
                         )
 

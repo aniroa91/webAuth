@@ -34,7 +34,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val t0 = System.currentTimeMillis()
       val weekly = Await.result(ProblemService.listWeekly(), Duration.Inf)
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(weekly(0)._2, province), Duration.Inf)
-      val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
+      val location = lstProvince.map(x=> LocationUtils.getRegion(x._1) -> LocationUtils.getNameProvincebyCode(x._1)).filter(x=> x._1 != "").distinct.sorted
       var deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
       if(!province.equals("")) deviceType= deviceType.filter(x=> x._1 == "switch" ||  x._1 == "host" || x._1 == "power")
 
@@ -72,10 +72,10 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val date = request.body.asFormUrlEncoded.get("date").head
       val province = request.body.asFormUrlEncoded.get("province").head
 
-      var arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvWorld(x))
+      var arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvincebyName(x))
       if(arrProv.indexOf("BRU") >= 0) arrProv :+= "BRA"
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(date, ""), Duration.Inf).filter(x=> arrProv.indexOf(x._1) >=0)
-      val location = lstProvince.map(x=> LocationUtils.getRegionByProvWorld(x._1) -> LocationUtils.getNameProvWorld(x._1)).filter(x=> x._1 != "").distinct.sorted
+      val location = lstProvince.map(x=> LocationUtils.getRegion(x._1) -> LocationUtils.getNameProvincebyCode(x._1)).filter(x=> x._1 != "").distinct.sorted
       var deviceType = lstProvince.map(x=> x._2 -> x._3).groupBy(x=> x._1).map(y=> y._1 -> y._2.map(x=> x._2).sum).toArray
       if(!verifiedLocation.equals("")) deviceType = deviceType.filter(x=> x._1 == "switch" ||  x._1 == "host" || x._1 == "power")
 
@@ -151,7 +151,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val province = request.body.asFormUrlEncoded.get("province").head
       val devType = request.body.asFormUrlEncoded.get("devType").head
 
-      var arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvWorld(x))
+      var arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvincebyName(x))
       if(arrProv.indexOf("BRU") >= 0) arrProv :+= "BRA"
       val probError = Await.result(ProblemService.listProbError(date, arrProv, devType), Duration.Inf)
       val probWarn = Await.result(ProblemService.listProbWarning(date, arrProv, devType), Duration.Inf)

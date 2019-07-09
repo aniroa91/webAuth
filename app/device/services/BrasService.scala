@@ -153,7 +153,7 @@ object BrasService extends AbstractService{
     BrasDAO.getProvinceInfDownError(month,province)
   }
 
-  def getTicketMonthly(month: String,province: String): Future[Seq[(String,String,String,String,String,Int)]]   ={
+  def getTicketMonthly(month: String,province: String): Future[Seq[(String,String,String,String,String,Int, Int, Int)]]   ={
     BrasDAO.getTicketMonthly(month,province)
   }
 
@@ -572,9 +572,9 @@ object BrasService extends AbstractService{
 
   def getSigLogBrasDaily(day: String, provinceCode: String) = {
     val rs = getSigLogdaily(day, "")
-    val logoff = rs._1.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> ( x._1 , x._2, x._3)).filter(x=> x._1.substring(0,3) == provinceCode.toLowerCase() ).map(x=> (x._1, x._2, x._3))
+    val logoff = rs._1.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> ( x._1 , x._2, x._3)).filter(x=> provinceCode.toLowerCase().indexOf(x._1.substring(0,3)) >= 0).map(x=> (x._1, x._2, x._3))
       .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum)).toArray.sorted
-    val signin = rs._2.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> ( x._1, x._2, x._3)).filter(x=> x._1.substring(0,3) == provinceCode.toLowerCase() ).map(x=> (x._1, x._2, x._3))
+    val signin = rs._2.filter(x=> x._1.indexOf("-")>=0).filter(x=> x._1.split("-").length == 4 && x._1.split("-")(0).length == 3).map(x=> ( x._1, x._2, x._3)).filter(x=> provinceCode.toLowerCase().indexOf(x._1.substring(0,3)) >= 0).map(x=> (x._1, x._2, x._3))
       .groupBy(x=> x._1).map(x=> (x._1, x._2.map(x=> x._2).sum, x._2.map(x=> x._3).sum)).map(x=> (x._1, -x._2, x._3)).toArray.sorted
     (logoff, signin)
   }

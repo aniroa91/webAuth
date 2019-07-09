@@ -76,9 +76,9 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
       val t3 = System.currentTimeMillis()
       // Ticket at Core & Access Group
       val ticketIssues = Await.result(BrasService.getTicketIssue(day, province), Duration.Inf)
-      val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (LocationUtils.getRegionByProvWorld(x._2),LocationUtils.getNameProvWorld(x._2), x._3, x._4)).sorted
-                      else Seq[(String, String, String, Int)]()
-      val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (LocationUtils.getRegionByProvWorld(x._2),LocationUtils.getNameProvWorld(x._2), x._3, x._4)).sorted
+      val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (LocationUtils.getRegion(x._2),LocationUtils.getNameProvincebyCode(x._2), x._3, x._4, x._5, x._6)).sorted
+                      else Seq[(String, String, String, Int, Int, Int)]()
+      val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (LocationUtils.getRegion(x._2),LocationUtils.getNameProvincebyCode(x._2), x._3, x._4, x._5, x._6)).sorted
 
       // combobox Bras Province
       val lstProvBras = if(province.equals("")) BrasService.getServiceNoticeRegionDaily(day, "*").map(x=> (x._1, x._2, x._3))

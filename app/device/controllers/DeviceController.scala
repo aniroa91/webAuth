@@ -56,7 +56,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   // index page Dashboard Device Monthly
-  def overview =  withAuth {username => implicit request =>
+  def overview = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
     } else ""
@@ -79,12 +79,12 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
       val contracts = mapContract.map(x=> (x._1,LocationUtils.getNameProvincebyCode(x._2),LocationUtils.getRegion(x._2.trim),x._3,x._4,x._5,x._6)).toArray
       // Ticket monthly
       val ticketIssues = Await.result(BrasService.getTicketMonthly(fromMonth+"/"+toMonth, province), Duration.Inf)
-      val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (x._2,LocationUtils.getRegionByProvWorld(x._3),LocationUtils.getNameProvWorld(x._3), x._4, x._5, x._6)).sorted
-                      else Seq[(String, String, String, String, String, Int)]()
-      val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (x._2,LocationUtils.getRegionByProvWorld(x._3),LocationUtils.getNameProvWorld(x._3), x._4, x._5, x._6)).sorted
+      val coreIssue = if(province.equals("")) ticketIssues.filter(x=> x._1 == "Hệ thống Core IP").map(x=> (x._2,LocationUtils.getRegion(x._3),LocationUtils.getNameProvincebyCode(x._3), x._4, x._5, x._6, x._7, x._8)).sorted
+                      else Seq[(String, String, String, String, String, Int, Int, Int)]()
+      val noneCoreIssue = ticketIssues.filter(x=> x._1 == "Hệ Thống Access" || x._1== "Hệ thống Ngoại vi").map(x=> (x._2,LocationUtils.getRegion(x._3),LocationUtils.getNameProvincebyCode(x._3), x._4, x._5, x._6, x._7, x._8)).sorted
       // get Total SignIn & LogOff By Months
       val mapSiglog = rangeMonth.map(x => if(province.equals("")) x -> Await.result(BrasService.getSigLogByRegion(x+"-01"), Duration.Inf).map(x=> (LocationUtils.getRegion(x._1.trim),x._2,x._3,x._4,x._5))
-      else x -> Seq[(String, Int, Int, Int, Int)]())
+                                          else x -> Seq[(String, Int, Int, Int, Int)]())
       val signIn = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._2).sum).toSeq.sorted.map(x=> -x._2).toArray)
       val logoff = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._3).sum).toSeq.sorted.map(x=> x._2).toArray)
       val signIn_clients = mapSiglog.map(x=>x._1-> x._2.groupBy(_._1).mapValues(_.map(_._4).sum).toSeq.sorted.map(x=> -x._2).toArray)

@@ -1123,6 +1123,14 @@
                             legend: {
                                 reversed: true
                             },
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>'+this.point.name + '</b><br/>'
+                                            +'<b>Total ticket: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b><br/>'
+                                            +'Total cus_qty: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0)+'</b><br/>'
+                                            +'Total paytv_qty: ' + Highcharts.numberFormat(Math.abs(this.point.l), 0);
+                                }
+                            },
                             plotOptions: {
                                 series: {
                                     stacking: 'normal',
@@ -1171,6 +1179,14 @@
                             colors: ['#dc5a78'],
                             legend: {
                                 reversed: true
+                            },
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>'+this.point.name + '</b><br/>'
+                                            +'<b>Total ticket: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0)+'</b><br/>'
+                                            +'Total cus_qty: ' + Highcharts.numberFormat(Math.abs(this.point.k), 0)+'</b><br/>'
+                                            +'Total paytv_qty: ' + Highcharts.numberFormat(Math.abs(this.point.l), 0);
+                                }
                             },
                             plotOptions: {
                                 series: {
@@ -1796,86 +1812,83 @@
                 }
             });
 
-            function getDrillDown2Level(dta, arrRegion) {
+            function getDrillDown2Level(dta, arrRegion){
                 var jsArray = []
                 for(var region=0;region< arrRegion.length;region++ ){
-                    // get array provinces and bras by month&region
-                    var arrProvinceBras = [], dtaRegion = []
-                    for(var i=0;i< dta.length;i++){
-                        if (arrRegion[region] == dta[i][0]){
-                            arrProvinceBras.push({
-                                province:dta[i][1],
-                                bras: dta[i][2],
-                                value:dta[i][3]
-                            })
+                        var rsProvince = [], rsBras = [], rsHost = []
+                        // get array provinces and bras by month&region
+                        var arr2Level = []
+                        for (var i = 0; i < dta.length; i++) {
+                            if (arrRegion[region] == dta[i][0]) {
+                                arr2Level.push({
+                                    province: dta[i][1],
+                                    bras: dta[i][2],
+                                    value: dta[i][3],
+                                    cus: dta[i][4],
+                                    paytv: dta[i][5]
+                                })
+                            }
                         }
-                    }
-                    // set array data by province
-                    var nameOld = arrProvinceBras[0].province, sumOld= 0,
-                            isMoreProv =0,dtaProvince = [],sumPoorconn =0,
-                            sumNodevice =0
-                    for(var k=0;k<arrProvinceBras.length;k++){
-                        if(k==(arrProvinceBras.length -1) || nameOld != arrProvinceBras[k].province){
-                            if(k==(arrProvinceBras.length -1)) sumOld += arrProvinceBras[k].value
-                            dtaRegion.push({
-                                name: nameOld,
-                                y: sumOld,
-                                drilldown:nameOld
+                        var resultProvinces = []
+                        // level province
+                        arr2Level.reduce(function (res, value) {
+                            if (!res[value.province]) {
+                                res[value.province] = {province: value.province, value: 0, cus: 0, paytv: 0};
+                                resultProvinces.push(res[value.province])
+                            }
+                            res[value.province].value += value.value;
+                            res[value.province].cus += value.cus;
+                            res[value.province].paytv += value.paytv;
+                            return res;
+                        }, {});
+                        resultProvinces.forEach(function (item) {
+                            var resultBras = []
+                            // level bras
+                            var arrBrasLevel = []
+                            arrBrasLevel.push(arr2Level.filter(function (o) {
+                                return o.province === item.province;
+                            }));
+                            arrBrasLevel[0].reduce(function (res, value) {
+                                if (!res[value.bras]) {
+                                    res[value.bras] = {bras: value.bras, value: 0, cus: 0, paytv: 0};
+                                    resultBras.push(res[value.bras])
+                                }
+                                res[value.bras].value += value.value;
+                                res[value.bras].cus += value.cus;
+                                res[value.bras].paytv += value.paytv;
+                                return res;
+                            }, {});
+                            resultBras.forEach(function (itemBras) {
+                                rsBras.push({
+                                    name: itemBras.bras,
+                                    y: itemBras.value,
+                                    k: itemBras.cus,
+                                    l: itemBras.paytv
+                                })
                             })
                             // set series province& bras
-                            //console.log(sortObjectsArray(dtaProvince,'y').slice(0,10))
-                            var top10Prov = sortObjectsArray(dtaProvince,'name').slice(0,10)
                             jsArray.push({
-                                id: nameOld,
-                                name: nameOld,
-                                data: top10Prov
+                                id: item.province,
+                                name: item.province,
+                                data: rsBras
                             })
-                            dtaProvince = []
-                            nameOld = arrProvinceBras[k].province
-                            sumOld = arrProvinceBras[k].value
-                            sumNodevice = 0
-                            sumPoorconn = 0
-                            isMoreProv =1
-                        }
-                        else{
-                            sumOld += Number(arrProvinceBras[k].value)
-                            sumNodevice += Number(arrProvinceBras[k].noDevice)
-                            sumPoorconn += Number(arrProvinceBras[k].poorconn)
-                        }
-                        dtaProvince.push({
-                            name: arrProvinceBras[k].bras,
-                            y:Number(arrProvinceBras[k].value),
-                            z:'No device: '+Number(arrProvinceBras[k].noDevice),
-                            k:'Poor conn: '+Number(arrProvinceBras[k].poorconn)
-                        })
-                        if(arrProvinceBras.length == 1){
-                            jsArray.push({
-                                id: nameOld,
-                                name: nameOld,
-                                data: dtaProvince
+                            rsBras = []
+                            rsProvince.push({
+                                name: item.province,
+                                y: item.value,
+                                k: item.cus,
+                                l: item.paytv,
+                                drilldown: item.province
                             })
-                        }
-                    }
-                    if(isMoreProv ==0){
-                        dtaRegion.push({
-                            name: nameOld,
-                            y: Number(sumOld),
-                            drilldown:nameOld
-                        })
-                        // set series province& bras
+                        });
+                        // set series region & province
                         jsArray.push({
-                            id: nameOld,
-                            name: nameOld,
-                            data: sortObjectsArray(dtaProvince,'name').slice(0,9)
+                            id: arrRegion[region],
+                            name: arrRegion[region],
+                            data: rsProvince
                         })
-                    }
+                        rsProvince = []
 
-                    // set series regions& province
-                    jsArray.push({
-                        id: arrRegion[region],
-                        name: arrRegion[region],
-                        data: dtaRegion
-                    })
                 }
                 return jsArray
             }
@@ -1883,15 +1896,19 @@
             function getDrildownStackBar(dta,arrKey){
                 var jsArray = [], data= []
                 for(var key=0;key<arrKey.length;key++ ) {
-                    var sumVl = 0
+                    var sumVl = 0, sumCus = 0, sumPay =0
                     for (var i = 0; i < dta.length; i++) {
                         if (arrKey[key] == dta[i][0]){
                             sumVl += dta[i][3]
+                            sumCus += dta[i][4]
+                            sumPay += dta[i][5]
                         }
                     }
                     data.push({
                         name: arrKey[key],
                         y: sumVl,
+                        k: sumCus,
+                        l: sumPay,
                         drilldown: arrKey[key]
                     })
                 }

@@ -2621,15 +2621,19 @@
             for(var month=0;month< arrMonth.length;month++ ){
                 var arrData = []
                 for(var key=0;key<arrKey.length;key++ ) {
-                    var sumVl =0
+                    var sumVl =0, sumCus =0, sumPaytv =0
                     for (var i = 0; i < dta.length; i++) {
                         if (arrMonth[month] == dta[i][0] && arrKey[key] == dta[i][1]){
                             sumVl += dta[i][5]
+                            sumCus += dta[i][6]
+                            sumPaytv += dta[i][7]
                         }
                     }
                     arrData.push({
                         name: arrKey[key],
                         y: sumVl,
+                        k: sumCus,
+                        l: sumPaytv,
                         drilldown: arrKey[key]+'-'+arrMonth[month].substring(0,arrMonth[month].lastIndexOf("-"))
                     })
                 }
@@ -2656,7 +2660,9 @@
                                 province: dta[i][2],
                                 bras: dta[i][3],
                                 host: dta[i][4],
-                                value: dta[i][5]
+                                value: dta[i][5],
+                                cus: dta[i][6],
+                                paytv: dta[i][7]
                             })
                         }
                     }
@@ -2664,10 +2670,12 @@
                     // level province
                     arr3Level.reduce(function (res, value) {
                         if (!res[value.province]) {
-                            res[value.province] = {province: value.province, value: 0};
+                            res[value.province] = {province: value.province, value: 0, cus: 0, paytv: 0};
                             resultProvinces.push(res[value.province])
                         }
                         res[value.province].value += value.value;
+                        res[value.province].cus += value.cus;
+                        res[value.province].paytv += value.paytv;
                         return res;
                     }, {});
                     resultProvinces.forEach(function (item) {
@@ -2679,10 +2687,12 @@
                         }));
                         arrBrasLevel[0].reduce(function (res, value) {
                             if (!res[value.bras]) {
-                                res[value.bras] = {bras: value.bras, value: 0};
+                                res[value.bras] = {bras: value.bras, value: 0, cus: 0, paytv: 0};
                                 resultBras.push(res[value.bras])
                             }
                             res[value.bras].value += value.value;
+                            res[value.bras].cus += value.cus;
+                            res[value.bras].paytv += value.paytv;
                             return res;
                         }, {});
                         resultBras.forEach(function (itemBras) {
@@ -2694,16 +2704,20 @@
                             }));
                             arrHostLevel[0].reduce(function (res, value) {
                                 if (!res[value.host]) {
-                                    res[value.host] = {host: value.host, value: 0};
+                                    res[value.host] = {host: value.host, value: 0, cus: 0, paytv: 0};
                                     resultHost.push(res[value.host])
                                 }
                                 res[value.host].value += value.value;
+                                res[value.host].cus += value.cus;
+                                res[value.host].paytv += value.paytv;
                                 return res;
                             }, {});
                             resultHost.forEach(function (itemHost) {
                                 rsHost.push({
                                     name: itemHost.host,
-                                    y: itemHost.value
+                                    y: itemHost.value,
+                                    k: itemHost.cus,
+                                    l: itemHost.paytv
                                 })
                             })
                             // set series bras& host
@@ -2716,6 +2730,8 @@
                             rsBras.push({
                                 name: itemBras.bras,
                                 y: itemBras.value,
+                                k: itemBras.cus,
+                                l: itemBras.paytv,
                                 drilldown: item.province + '-'+itemBras.bras + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-"))
                             })
                         })
@@ -2729,6 +2745,8 @@
                         rsProvince.push({
                             name: item.province,
                             y: item.value,
+                            k: item.cus,
+                            l: item.paytv,
                             drilldown: item.province + '-' + arrMonth[month].substring(0, arrMonth[month].lastIndexOf("-"))
                         })
                     });

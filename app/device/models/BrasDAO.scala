@@ -295,13 +295,14 @@ object BrasDAO {
   }
 
   def getSigLogByProvince(month: String,province: String,lastMonth: String): Future[Seq[(String,Int,Int,Int,Int)]] = {
+    val arrName = province.split(",").map("'" + _ + "'").mkString(",")
     dbConfig.db.run(
       sql"""select bras_id,sum(signin) as signin, sum(logoff) as logoff,sum(signin_clients) as signin_clients, sum(logoff_clients) as logoff_clients
               from dmt_overview_conn
-              where month = $month::TIMESTAMP and province = $province and bras_id IN(
+              where month = $month::TIMESTAMP and province IN(#$arrName) and bras_id IN(
                  select bras_id
                  from dmt_overview_conn
-                 where month = $lastMonth::TIMESTAMP and province = $province
+                 where month = $lastMonth::TIMESTAMP and province IN(#$arrName)
                  group by bras_id
               )
               group by bras_id
@@ -579,13 +580,13 @@ object BrasDAO {
 
   def getTicketIssue(day: String, province: String) = {
     dbConfig.db.run(
-      sql"""select issue_group, province, issue, count(*)
+      sql"""select issue_group, province, issue, count(*) ticket, sum(cus_qty) cus_qty, sum(paytv_qty) paytv_qty
             from dwh_ticket
             where date_trunc('day', created_date) = $day::TIMESTAMP and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access') and province ~* $province and province <> ''
             group by issue_group, province, issue
             order by issue_group, province, issue
             """
-        .as[(String, String, String, Int)]
+        .as[(String, String, String, Int, Int, Int)]
     )
   }
 
@@ -743,6 +744,7 @@ object BrasDAO {
   }
 
   def getBrasOpsviewType(month: String,province: String): Future[Seq[(String,Int,Int,Int,Int)]] = {
+    val arrName = province.split(",").map("'" + _ + "'").mkString(",")
     if(month.indexOf("/")>=0) {
       val fromMonth = month.split("/")(0)
       val toMonth = month.split("/")(1)
@@ -750,7 +752,7 @@ object BrasDAO {
         sql"""select bras_id,sum(ok_opsview) as ok_opsview,sum(warn_opsview) as warn_opsview,sum(unknown_opsview) as unknown_opsview,
                       sum(crit_opsview) as crit_opsview
               from dmt_overview_noc
-              where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP and province = $province
+              where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP and province IN(#$arrName)
               group by bras_id
                   """
           .as[(String,Int,Int,Int,Int)])
@@ -760,7 +762,7 @@ object BrasDAO {
         sql"""select bras_id,sum(ok_opsview) as ok_opsview,sum(warn_opsview) as warn_opsview,sum(unknown_opsview) as unknown_opsview,
                       sum(crit_opsview) as crit_opsview
               from dmt_overview_noc
-              where month = $query::TIMESTAMP and province = $province
+              where month = $query::TIMESTAMP and province IN(#$arrName)
               group by bras_id
                   """
           .as[(String,Int,Int,Int,Int)])
@@ -792,31 +794,31 @@ object BrasDAO {
     }
   }
 
-  def getTicketMonthly(month: String,province:String): Future[Seq[(String,String,String,String,String,Int)]] = {
+  def getTicketMonthly(month: String,province:String)= {
     if(month.indexOf("/")>=0) {
       val fromMonth = month.split("/")(0)
       val toMonth = month.split("/")(1)
       dbConfig.db.run(
-        sql"""select issue_group, month, province, issue, reason_name, sum(no_ticket)
+        sql"""select issue_group, month, province, issue, reason_name, sum(no_ticket), sum(cus_qty), sum(paytv_qty)
               from dmt_overview_ticket
               where month >= $fromMonth::TIMESTAMP and month <= $toMonth::TIMESTAMP AND province ~* $province and province <> ''
               and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access')
               group by issue_group, month, province, issue, reason_name
               order by issue_group, month, province, issue, reason_name
                   """
-          .as[(String,String,String,String,String,Int)])
+          .as[(String,String,String,String,String,Int, Int, Int)])
     }
     else{
       val query = month + "-01"
       dbConfig.db.run(
-        sql"""select issue_group, month, province, issue, reason_name, sum(no_ticket)
+        sql"""select issue_group, month, province, issue, reason_name, sum(no_ticket), sum(cus_qty), sum(paytv_qty)
               from dmt_overview_ticket
               where month = $query::TIMESTAMP and province ~* $province and province <> ''
               and issue_group in ('Hệ thống Ngoại vi', 'Hệ thống Core IP', 'Hệ Thống Access')
               group by issue_group, month, province, issue, reason_name
               order by issue_group, month, province, issue, reason_name
                   """
-          .as[(String,String,String,String, String,Int)])
+          .as[(String,String,String,String, String,Int,Int, Int)])
     }
   }
 
