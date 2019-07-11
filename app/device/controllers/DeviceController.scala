@@ -39,7 +39,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     )(MonthPicker.apply)(MonthPicker.unapply)
   )
   // This will be the action that handles our form post
-  def getFormMonthPicker = withAuth { username => implicit request: Request[AnyContent] =>
+  def getFormMonthPicker = withAuth {username => implicit request: Request[AnyContent] =>
 
     val errorFunction = { formWithErrors: Form[controllers.MonthPicker] =>
       println("error")
@@ -58,7 +58,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   // index page Dashboard Device Monthly
   def overview = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try {
       val t0 = System.currentTimeMillis()
@@ -106,7 +106,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   def loadJsonMonthly(month: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 3 chart: Total Outliers Access Device, Inf Errors By Location, Total Error By Time
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val t0 = System.currentTimeMillis()
@@ -194,7 +194,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def drilldownOutlierMonth(id: String, fromMonth: String, toMonth: String, db: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val rs = id match {
@@ -310,7 +310,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def geterrorType(id: String,month: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val monthRange = if(month.indexOf("/")>=0) month.split("/")(0)+"-01/"+month.split("/")(1)+"-01" else month
@@ -392,7 +392,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def getOltPoorconn(_typeOlt: String,month: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       // get Top opsview status
@@ -411,7 +411,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def getInfTopErr(_typeInf: String,month: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       // get Top total Inf
@@ -430,7 +430,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   // tab trending
   def trendByMonth() = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val time = System.currentTimeMillis()
@@ -541,9 +541,9 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   }
 
   // Tab Compare
-  def compareByMonth(month: String) = withAuth{username => implicit request =>
+  def compareByMonth(month: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val time = System.currentTimeMillis()
@@ -765,7 +765,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
   // Tab TOP N
   def topNJson(monthStr: String,_typeError: String,_typeService: String,_typeOLTpoor: String,_typeInferr: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val time = System.currentTimeMillis()
@@ -887,7 +887,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def groupRegionByMonth(month: String,_typeNoc: String,_typeError: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val monthRange = if(month.indexOf("/")>=0) month.split("/")(0)+"-01/"+month.split("/")(1)+"-01" else month
@@ -1034,11 +1034,11 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
   }
 
-  def drilldownTotalInf(id: String,month: String) = withAuth { username => implicit  request =>
+  def drilldownTotalInf(id: String,month: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
-      try{
+    try{
       val rangeMonth = CommonService.getAllMonthfromRange(month.split("/")(0)+"-01",month.split("/")(1)+"-01")
       val jsInf = id match {
           // get inf by Region
@@ -1094,7 +1094,7 @@ class DeviceController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def drillUpTotalInf(id: String,month: String) = withAuth {username => implicit request  =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val rangeMonth = CommonService.getAllMonthfromRange(month.split("/")(0)+"-01",month.split("/")(1)+"-01")

@@ -54,7 +54,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
   def getDaily =  withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 3 chart: Total Outliers Access Device, Inf Errors By Location, Total Error By Time
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       logger.info("======START SERVICE DAILY PAGE======")
@@ -82,7 +82,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
 
       // combobox Bras Province
       val lstProvBras = if(province.equals("")) BrasService.getServiceNoticeRegionDaily(day, "*").map(x=> (x._1, x._2, x._3))
-                        else BrasService.getServiceNoticeRegionDaily(day, "*").filter(x=> request.session.get("location").get.indexOf(x._2) >=0).map(x=> (x._1, x._2, x._3))
+                        else BrasService.getServiceNoticeRegionDaily(day, "*").filter(x=> "Lam Dong".indexOf(x._2) >=0).map(x=> (x._1, x._2, x._3))
 
       logger.info("t3:"+(System.currentTimeMillis() -t3))
       logger.info(s"Page: DAILY - User:$username  - Time Query:"+(System.currentTimeMillis() -t0))
@@ -97,7 +97,7 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
   def loadJsonDaily(day: String) = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 3 chart: Total Outliers Access Device, Inf Errors By Location, Total Error By Time
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val t0 = System.currentTimeMillis()

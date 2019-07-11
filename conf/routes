@@ -28,8 +28,7 @@ GET     /centralLogout               controllers.CentralLogoutController.logout(
 #######################################################################
 ### ---DASHBOARD---
 ## tab Monthly-Overview
-POST     /searchMonthOverview          controllers.DeviceController.getFormMonthPicker
-GET      /searchMonthOverview          controllers.DeviceController.overview
+POST     /monthly                      controllers.DeviceController.getFormMonthPicker
 GET      /monthly                      controllers.DeviceController.overview
 GET      /monthly/loadMonthly          controllers.DeviceController.loadJsonMonthly(month: String ?= "")
 GET      /monthly/region-countType     controllers.DeviceController.getcountType(id: String ?= "",month: String ?= "")

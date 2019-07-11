@@ -28,7 +28,7 @@ class ExportController @Inject()(cc: ControllerComponents) extends AbstractContr
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
       // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     Ok(device.views.html.export.index(username, province, controllers.routes.ExportController.index()))
   }
@@ -41,7 +41,7 @@ class ExportController @Inject()(cc: ControllerComponents) extends AbstractContr
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
       // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try{
       val time = System.currentTimeMillis()

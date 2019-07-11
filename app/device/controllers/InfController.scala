@@ -26,10 +26,10 @@ import scala.concurrent.duration.Duration
 class InfController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
   val logger: Logger = Logger(this.getClass())
 
-  def inf(id: String) =  withAuth { username => implicit request =>
+  def inf(id: String) =  withAuth {username => implicit request =>
     try {
       val province = if(request.session.get("verifiedLocation").get.equals("1")){
-        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
       } else ""
       val t01 = System.currentTimeMillis()
       val infDown = Await.result(BrasService.getInfDownMudule(province),Duration.Inf)
@@ -61,7 +61,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
   def getSigLogInfjson(id: String) = withAuth {username => implicit request =>
     try{
       val province = if(request.session.get("verifiedLocation").get.equals("1")){
-        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
       } else ""
       val resSiglog = BrasService.getSigLogInfjson(id.trim())
       val resError =  Await.result(BrasService.getErrorHistory(id.trim(), province),Duration.Inf)
@@ -89,7 +89,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
   def exportCSV(date: String) = withAuth {username => implicit request =>
     try{
       val province = if(request.session.get("verifiedLocation").get.equals("1")){
-        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
       } else ""
       val t0 = System.currentTimeMillis()
       val sfLofi = Await.result(BrasService.getSflofiMudule(date, province), Duration.Inf)
@@ -110,7 +110,7 @@ class InfController @Inject()(cc: ControllerComponents) extends AbstractControll
       val province = if(request.session.get("verifiedLocation").get.equals("1")){
         // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
         // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
-        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+        request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
       } else ""
       if(province.equals("") || host.substring(0,3).equals(province)) {
         val t0 = System.currentTimeMillis()

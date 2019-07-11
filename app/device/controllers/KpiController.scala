@@ -24,11 +24,11 @@ import services.domain.CommonService
 class KpiController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
   val logger: Logger = Logger(this.getClass())
 
-  def index =  withAuth { username => implicit request =>
+  def index =  withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
       // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else "All"
     try {
       val t0 = System.currentTimeMillis()
@@ -50,8 +50,12 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
     try{
       val time = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
-      var province = LocationUtils.getCodeProvincebyName(request.body.asFormUrlEncoded.get("province").head)
-      if(province == "BRU") province = "BRA"
+      val prov = request.body.asFormUrlEncoded.get("province").head
+      val province = prov match {
+        case prov if(prov == "All" || prov == "International" || (prov.split(" ").length>1 && prov.split(" ")(1).matches("^\\d+$"))) => prov
+        case _ => LocationUtils.getCodeProvincebyName(prov)
+      }
+
       val kpi = Await.result(KpiService.listKpi(date, province), Duration.Inf).map(x=> (x._1, CommonService.format2DecimalDouble(x._2), CommonService.format2DecimalDouble(x._3),
             CommonService.percentDouble(x._2, x._3), CommonUtils.getTitleIndex(x._1), CommonUtils.getDescriptIndex(x._1))).toArray.sorted
       val rsKpi = if(request.body.asFormUrlEncoded.get("isAuthor").head == "1") kpi.filter(x=> CommonUtils.checkExistIndex(x._1) != "") else kpi
@@ -72,8 +76,11 @@ class KpiController @Inject()(cc: ControllerComponents) extends AbstractControll
       val time = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
       val index = request.body.asFormUrlEncoded.get("index").head
-      var province = LocationUtils.getCodeProvincebyName(request.body.asFormUrlEncoded.get("province").head)
-      if(province == "BRU") province = "BRA"
+      val prov = request.body.asFormUrlEncoded.get("province").head
+      val province = prov match {
+        case prov if(prov == "All" || prov == "International" || (prov.split(" ").length>1 && prov.split(" ")(1).matches("^\\d+$"))) => prov
+        case _ => LocationUtils.getCodeProvincebyName(prov)
+      }
       val kpiWeekly = Await.result(KpiService.listKpiTimeSeries(date, province, index), Duration.Inf)
       val rs = Json.obj(
         "cate" -> kpiWeekly.map(x=> CommonService.formatStringYYMMDD(x._1)),

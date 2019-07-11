@@ -67,7 +67,7 @@ class SearchController @Inject()(cc: MessagesControllerComponents) extends Messa
 
   def callAjaxByTab() = withAuth {username => implicit request: Request[AnyContent] =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
-      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString("|")
+      request.session.get("location").get.split(",").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",")
     } else ""
     try {
       val t0 = System.currentTimeMillis()

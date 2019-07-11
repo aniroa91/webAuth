@@ -71,7 +71,7 @@
 
                         <div id="monthTab1" style="float: right">
                         @if(response != null) {
-                            <form action="/searchMonthOverview" class="disInline" method="POST" id="ctSearch">
+                            <form action="/monthly" class="disInline" method="POST" id="ctSearch">
                                 @helper.CSRF.formField
                                 <label class="titPicker">From</label>
                                 <input class="form-control picker" type="text" id="startMonth" name="startMonth" readonly="true" value="@response.time.fromDate"/>

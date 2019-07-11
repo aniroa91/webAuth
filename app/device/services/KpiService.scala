@@ -23,15 +23,29 @@ object KpiService extends AbstractService{
 
   def listKpi(week: String, prov: String): Future[Seq[(String, Double, Double)]] = {
     val startDate = week.split("->")(0).trim
-    dbConfig.db.run(
-      sql"""select  week.kpi_index, week.vlWeek, quarter.vlQuarter
-            from (select kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP AND province = $prov
+    if(prov == ""){
+      dbConfig.db.run(
+        sql"""select  week.kpi_index, week.vlWeek, quarter.vlQuarter
+            from (select kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP
             group by kpi_index) week
-            join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date) AND province = $prov
+            join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date)
             group by kpi_index) quarter on week.kpi_index = quarter.kpi_index
             order by week.kpi_index
             """
-        .as[(String, Double, Double)])
+          .as[(String, Double, Double)])
+    }
+    else{
+      val arrName = prov.split(",").map("'" + _ + "'").mkString(",")
+      dbConfig.db.run(
+        sql"""select  week.kpi_index, week.vlWeek, quarter.vlQuarter
+            from (select kpi_index, sum(value) vlWeek from dmt_weekly_kpi where week = $startDate::TIMESTAMP AND province IN(#$arrName)
+            group by kpi_index) week
+            join (select kpi_index, sum(value) vlQuarter from dmt_weekly_kpi_thres where quarter = cast(date_trunc('quarter', $startDate::date) as date) AND province IN(#$arrName)
+            group by kpi_index) quarter on week.kpi_index = quarter.kpi_index
+            order by week.kpi_index
+            """
+          .as[(String, Double, Double)])
+    }
   }
 
   /*def listKpiJson(week: String, prov: String): Future[Seq[(String, Double, Double)]] = {
@@ -48,9 +62,19 @@ object KpiService extends AbstractService{
 
   def listKpiTimeSeries(week: String, prov: String, index: String): Future[Seq[(String, Double)]] = {
     val startDate = week.split("->")(0).trim
-    dbConfig.db.run(
-      sql"""select week, value from dmt_weekly_kpi where week <= $startDate::TIMESTAMP AND province = $prov AND kpi_index = $index order by week
+    if(prov == ""){
+      dbConfig.db.run(
+        sql"""select week, value from dmt_weekly_kpi where week <= $startDate::TIMESTAMP AND kpi_index = $index order by week
             """
-        .as[(String, Double)])
+          .as[(String, Double)])
+    }
+    else{
+      val arrName = prov.split(",").map("'" + _ + "'").mkString(",")
+      dbConfig.db.run(
+        sql"""select week, value from dmt_weekly_kpi where week <= $startDate::TIMESTAMP AND province IN(#$arrName) AND kpi_index = $index order by week
+            """
+          .as[(String, Double)])
+    }
   }
+
 }
