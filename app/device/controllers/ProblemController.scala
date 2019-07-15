@@ -24,7 +24,7 @@ import services.domain.CommonService
 class ProblemController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with Secured{
   val logger: Logger = Logger(this.getClass())
 
-  def index =  withAuth {username => implicit request =>
+  def index = withAuth {username => implicit request =>
     val province = if(request.session.get("verifiedLocation").get.equals("1")){
       // only show 5 chart: Devices Get Problem With Critical Alert, Devices Get Problem With Warn Alert, Devices Get Problem With Broken Cable,
       // Devices Get Problem With Suy Hao Index, Devices Get Problem With OLT Error
@@ -54,10 +54,11 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
                 .map(x=> (x._1, x._2, CommonService.formatPattern(x._3), CommonService.formatPattern(x._4), CommonService.formatPattern(x._5),
                   CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
       logger.info(s"Page: Problem - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
-      Ok(device.views.html.weekly.problem(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts), username,province, controllers.routes.ProblemController.index()))
+      Ok(device.views.html.weekly.problem(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts),
+        username, request.session.get("location").getOrElse(""), controllers.routes.ProblemController.index()))
     }
     catch{
-      case e: Exception => Ok(device.views.html.weekly.problem(null, username,province, controllers.routes.ProblemController.index()))
+      case e: Exception => Ok(device.views.html.weekly.problem(null, username, request.session.get("location").getOrElse(""), controllers.routes.ProblemController.index()))
     }
   }
 
@@ -71,7 +72,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val t0 = System.currentTimeMillis()
       val date = request.body.asFormUrlEncoded.get("date").head
       val province = request.body.asFormUrlEncoded.get("province").head
-      val arrProv = province.split(",").filter(x=> x != "All").map(x=> if(!verifiedLocation.equals("")) x else LocationUtils.getCodeProvincebyName(x)).mkString(",").split(",")
+      val arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",").split(",")
 
       val lstProvince = Await.result(ProblemService.listProvinceByWeek(date, ""), Duration.Inf).filter(x=> arrProv.indexOf(x._1) >=0)
       val location = lstProvince.map(x=> LocationUtils.getRegion(x._1) -> LocationUtils.getNameProvincebyCode(x._1)).filter(x=> x._1 != "").distinct.sorted

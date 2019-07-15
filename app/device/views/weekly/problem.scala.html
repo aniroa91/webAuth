@@ -652,25 +652,35 @@
                                 if($('#checkProvince').val() == "") {
                                     // update series charts Connect
                                     chartConn.xAxis[0].update({categories: dta.probConn.cates})
+                                    if(Number(dta.probConn.cates.length) <= 10) chartConn.xAxis[0].update({scrollbar:{enabled: false}})
                                     updateChartStack(chartConn, getJsonStackSeries(dta.probConn, 0))
                                     chartConn.xAxis[0].setExtremes(0, Number(dta.probConn.cates.length) > 10 ? 10 : Number(dta.probConn.cates.length) - 1)
+                                    if(Number(dta.probConn.cates.length) > 10) chartConn.xAxis[0].update({scrollbar:{enabled: true}})
                                     // update series charts Error
                                     chartError.xAxis[0].update({categories: dta.probErr.cates})
+                                    if(Number(dta.probErr.cates.length) <= 10) chartError.xAxis[0].update({scrollbar:{enabled: false}})
                                     updateChartStack(chartError, getJsonStackSeries(dta.probErr, 1))
-                                    chartError.xAxis[0].setExtremes(0, Number(dta.probErr.cates.length) > 10 ? 10 : Number(dta.probErr.cates.length) - 1);
+                                    chartError.xAxis[0].setExtremes(0, Number(dta.probErr.cates.length) > 10 ? 10 : Number(dta.probErr.cates.length) - 1)
+                                    if(Number(dta.probErr.cates.length) > 10) chartError.xAxis[0].update({scrollbar:{enabled: true}})
                                     // update series charts Warn
                                     chartWarn.xAxis[0].update({categories: dta.probWarn.cates})
+                                    if(Number(dta.probWarn.cates.length) <= 10) chartWarn.xAxis[0].update({scrollbar:{enabled: false}})
                                     updateChartStack(chartWarn, getJsonStackSeries(dta.probWarn, 1))
-                                    chartWarn.xAxis[0].setExtremes(0, Number(dta.probWarn.cates.length) > 10 ? 10 : Number(dta.probWarn.cates.length) - 1);
+                                    chartWarn.xAxis[0].setExtremes(0, Number(dta.probWarn.cates.length) > 10 ? 10 : Number(dta.probWarn.cates.length) - 1)
+                                    if(Number(dta.probWarn.cates.length) > 10) chartWarn.xAxis[0].update({scrollbar:{enabled: true}})
                                 }
                                 // update series charts Crit Alerts
                                 chartCrit.xAxis[0].update({categories: dta.probCrit.cates})
+                                if(Number(dta.probCrit.cates.length) <= 10) chartCrit.xAxis[0].update({scrollbar:{enabled: false}})
                                 updateChartStack(chartCrit, getJsonStackSeries(dta.probCrit, 1))
-                                chartCrit.xAxis[0].setExtremes(0, Number(dta.probCrit.cates.length) > 10 ? 10 : Number(dta.probCrit.cates.length) -1);
+                                chartCrit.xAxis[0].setExtremes(0, Number(dta.probCrit.cates.length) > 10 ? 10 : Number(dta.probCrit.cates.length) -1)
+                                if(Number(dta.probCrit.cates.length) > 10) chartCrit.xAxis[0].update({scrollbar:{enabled: true}})
                                 // update series charts Warn Alerts
                                 chartWarnAlert.xAxis[0].update({categories: dta.probWarnAlert.cates})
+                                if(Number(dta.probWarnAlert.cates.length) <= 10) chartWarnAlert.xAxis[0].update({scrollbar:{enabled: false}})
                                 updateChartStack(chartWarnAlert, getJsonStackSeries(dta.probWarnAlert, 1))
-                                chartWarnAlert.xAxis[0].setExtremes(0, Number(dta.probWarnAlert.cates.length) > 10 ? 10 : Number(dta.probWarnAlert.cates.length) -1);
+                                chartWarnAlert.xAxis[0].setExtremes(0, Number(dta.probWarnAlert.cates.length) > 10 ? 10 : Number(dta.probWarnAlert.cates.length) -1)
+                                if(Number(dta.probWarnAlert.cates.length) > 10) chartWarnAlert.xAxis[0].update({scrollbar:{enabled: true}})
                                 //update chart pie broken
                                 pieBroken.series[0].setData(parsePieJson(dta.broken), true)
                                 // update table suyhao

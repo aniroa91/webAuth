@@ -78,17 +78,84 @@
                     } else {
                     <div class="col-lg-12 col-md-10 col-sm-12 col-xs-12" id="boxIndex">
                     }
-                @for(i <- 0 until response.kpi.length) {
-                    <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">
-                        <div class="itemBox itemGreen" name="@CommonUtils.getTitleIndex(response.kpi(i)._1)" id="@response.kpi(i)._1">
-                            <p>@CommonUtils.getTitleIndex(response.kpi(i)._1) <i class="fa fa-info-circle" title="@CommonUtils.getDescriptIndex(response.kpi(i)._1)"></i></p>
-                            <span>@response.kpi(i)._2</span>
-                            @if(response.kpi(i)._4 >0){
-                                <h5>Goal: @response.kpi(i)._3 (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i> @response.kpi(i)._4 %</b>)</h5>
-                            }else{
-                                <h5>Goal: @response.kpi(i)._3 (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i> @response.kpi(i)._4 %</b>)</h5>
-                            }
-                        </div>
+                @if(response.kpi._1.length > 0) {
+                    <div class="row" id="boxConnect">
+                        <h3 class="groupIndex">Connectivity</h3>
+                        @for(i <- 0 until response.kpi._1.length) {
+                            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">
+                                <div class="itemBox itemGreen" name="@CommonUtils.getTitleIndex(response.kpi._1(i)._1)" id="@response.kpi._1(i)._1">
+                                    <p>@CommonUtils.getTitleIndex(response.kpi._1(i)._1) <i class="fa fa-info-circle" title="@CommonUtils.getDescriptIndex(response.kpi._1(i)._1)"></i></p>
+                                    <span>@response.kpi._1(i)._2</span>
+                                    @if(response.kpi._1(i)._4 > 0) {
+                                        <h5>Goal: @response.kpi._1(i)._3 (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i> @response.kpi._1(i)._4
+                                            %</b>)</h5>
+                                    } else {
+                                        <h5>Goal: @response.kpi._1(i)._3 (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i> @response.kpi._1(i)._4
+                                            %</b>)</h5>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if(response.kpi._2.length > 0) {
+                    <div class="row" id="boxDevice">
+                        <h3 class="groupIndex">Device Error</h3>
+                        @for(i <- 0 until response.kpi._2.length) {
+                            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">
+                                <div class="itemBox itemGreen" name="@CommonUtils.getTitleIndex(response.kpi._2(i)._1)" id="@response.kpi._2(i)._1">
+                                    <p>@CommonUtils.getTitleIndex(response.kpi._2(i)._1) <i class="fa fa-info-circle" title="@CommonUtils.getDescriptIndex(response.kpi._2(i)._1)"></i></p>
+                                    <span>@response.kpi._2(i)._2</span>
+                                    @if(response.kpi._2(i)._4 > 0) {
+                                        <h5>Goal: @response.kpi._2(i)._3 (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i> @response.kpi._2(i)._4
+                                            %</b>)</h5>
+                                    } else {
+                                        <h5>Goal: @response.kpi._2(i)._3 (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i> @response.kpi._2(i)._4
+                                            %</b>)</h5>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if(response.kpi._3.length > 0) {
+                    <div class="row" id="boxService">
+                        <h3 class="groupIndex">Service Monitor</h3>
+                        @for(i <- 0 until response.kpi._3.length) {
+                            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">
+                                <div class="itemBox itemGreen" name="@CommonUtils.getTitleIndex(response.kpi._3(i)._1)" id="@response.kpi._3(i)._1">
+                                    <p>@CommonUtils.getTitleIndex(response.kpi._3(i)._1) <i class="fa fa-info-circle" title="@CommonUtils.getDescriptIndex(response.kpi._3(i)._1)"></i></p>
+                                    <span>@response.kpi._3(i)._2</span>
+                                    @if(response.kpi._3(i)._4 > 0) {
+                                        <h5>Goal: @response.kpi._3(i)._3 (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i> @response.kpi._3(i)._4
+                                            %</b>)</h5>
+                                    } else {
+                                        <h5>Goal: @response.kpi._3(i)._3 (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i> @response.kpi._3(i)._4
+                                            %</b>)</h5>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if(response.kpi._4.length > 0) {
+                    <div class="row" id="boxClient">
+                        <h3 class="groupIndex">Client Error</h3>
+                        @for(i <- 0 until response.kpi._4.length) {
+                            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">
+                                <div class="itemBox itemGreen" name="@CommonUtils.getTitleIndex(response.kpi._4(i)._1)" id="@response.kpi._4(i)._1">
+                                    <p>@CommonUtils.getTitleIndex(response.kpi._4(i)._1) <i class="fa fa-info-circle" title="@CommonUtils.getDescriptIndex(response.kpi._4(i)._1)"></i></p>
+                                    <span>@response.kpi._4(i)._2</span>
+                                    @if(response.kpi._4(i)._4 > 0) {
+                                        <h5>Goal: @response.kpi._4(i)._3 (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i> @response.kpi._4(i)._4
+                                            %</b>)</h5>
+                                    } else {
+                                        <h5>Goal: @response.kpi._4(i)._3 (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i> @response.kpi._4(i)._4
+                                            %</b>)</h5>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                 }
             </div>
@@ -325,24 +392,18 @@
                                     $('.region').jstree(true).refresh();
                                 }*/
                                 // update content kpi index
-                                $('#boxIndex').html("")
                                 if(dta.kpi.length <= 0){
+                                    $('#boxClient').html("").hide()
+                                    $('#boxService').html("").hide()
+                                    $('#boxConnect').html("").hide()
+                                    $('#boxDevice').html("").hide()
                                     $('#boxIndex').append('<p class="nullData">Not found data. Please choose other location</p>')
                                 }
                                 else{
-                                    var indexs = ""
-                                    for(var i=0; i< dta.kpi.length; i++){
-                                        indexs += '<div class="col-lg-2 col-md-4 col-sm-4 col-xs-12"><div class="itemBox itemGreen" name="'+dta.kpi[i][4]+'" id="'+dta.kpi[i][0]+'">'
-                                        indexs += '<p>'+dta.kpi[i][4]+' <i class="fa fa-info-circle" title="'+dta.kpi[i][5]+'"></i></p>'
-                                        indexs += '<span>'+dta.kpi[i][1]+'</span>'
-                                        if(dta.kpi[i][3] >0){
-                                            indexs += '<h5>Goal: '+dta.kpi[i][2]+' (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i>'+dta.kpi[i][3]+' %</b>)</h5></div></div>'
-                                        }
-                                        else{
-                                            indexs += '<h5>Goal: '+dta.kpi[i][2]+' (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i>'+dta.kpi[i][3]+' %</b>)</h5></div></div>'
-                                        }
-                                    }
-                                    $('#boxIndex').append(indexs)
+                                    parseIndexBox(dta.connect, 'boxConnect', 'Connectivity')
+                                    parseIndexBox(dta.service, 'boxService', 'Service Monitor')
+                                    parseIndexBox(dta.device, 'boxDevice', 'Device Error')
+                                    parseIndexBox(dta.client, 'boxClient', 'Client Error')
                                 }
                             }
                             else{
@@ -355,6 +416,28 @@
                     });
                 }
             });
+
+            function parseIndexBox(data, id, title) {
+                if(data.length >0){
+                    var indexs = ""
+                    $('#'+id).html("<h3 class='groupIndex'>"+title+"</h3>")
+                    for(var i=0; i< data.length; i++){
+                        indexs += '<div class="col-lg-2 col-md-4 col-sm-4 col-xs-12"><div class="itemBox itemGreen" name="'+data[i][4]+'" id="'+data[i][0]+'">'
+                        indexs += '<p>'+data[i][4]+' <i class="fa fa-info-circle" title="'+data[i][5]+'"></i></p>'
+                        indexs += '<span>'+data[i][1]+'</span>'
+                        if(data[i][3] >0){
+                            indexs += '<h5>Goal: '+data[i][2]+' (<b style="color: red"><i class="fa fa-arrow-up" aria-hidden="true"></i>'+data[i][3]+' %</b>)</h5></div></div>'
+                        }
+                        else{
+                            indexs += '<h5>Goal: '+data[i][2]+' (<b style="color: green"><i class="fa fa-arrow-down" aria-hidden="true"></i>'+data[i][3]+' %</b>)</h5></div></div>'
+                        }
+                    }
+                    $('#'+id).append(indexs).show()
+                }
+                else{
+                    $('#'+id).hide()
+                }
+            }
 
             function getParamFields(token){
                 var obj = {

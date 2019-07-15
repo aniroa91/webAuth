@@ -64,14 +64,18 @@ object KpiService extends AbstractService{
     val startDate = week.split("->")(0).trim
     if(prov == ""){
       dbConfig.db.run(
-        sql"""select week, value from dmt_weekly_kpi where week <= $startDate::TIMESTAMP AND kpi_index = $index order by week
+        sql"""select week, sum(value) from dmt_weekly_kpi where week <= $startDate::TIMESTAMP AND kpi_index = $index
+              group by week
+              order by week
             """
           .as[(String, Double)])
     }
     else{
       val arrName = prov.split(",").map("'" + _ + "'").mkString(",")
       dbConfig.db.run(
-        sql"""select week, value from dmt_weekly_kpi where week <= $startDate::TIMESTAMP AND province IN(#$arrName) AND kpi_index = $index order by week
+        sql"""select week, sum(value) from dmt_weekly_kpi where week <= $startDate::TIMESTAMP AND province IN(#$arrName) AND kpi_index = $index
+              group by week
+              order by week
             """
           .as[(String, Double)])
     }
