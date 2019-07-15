@@ -55,10 +55,10 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
                   CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
       logger.info(s"Page: Problem - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.weekly.problem(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts),
-        username, province, controllers.routes.ProblemController.index()))
+        username, if(province == "") "" else request.session.get("location").getOrElse(""), controllers.routes.ProblemController.index()))
     }
     catch{
-      case e: Exception => Ok(device.views.html.weekly.problem(null, username, province, controllers.routes.ProblemController.index()))
+      case e: Exception => Ok(device.views.html.weekly.problem(null, username, if(province == "") "" else request.session.get("location").getOrElse(""), controllers.routes.ProblemController.index()))
     }
   }
 
@@ -151,8 +151,7 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
       val province = request.body.asFormUrlEncoded.get("province").head
       val devType = request.body.asFormUrlEncoded.get("devType").head
 
-      var arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvincebyName(x))
-      if(arrProv.indexOf("BRU") >= 0) arrProv :+= "BRA"
+      val arrProv = province.split(",").filter(x=> x != "All").map(x=> LocationUtils.getCodeProvincebyName(x)).mkString(",").split(",")
       val probError = Await.result(ProblemService.listProbError(date, arrProv, devType), Duration.Inf)
       val probWarn = Await.result(ProblemService.listProbWarning(date, arrProv, devType), Duration.Inf)
       val critAlert = Await.result(ProblemService.listCritAlerts(date, arrProv, devType), Duration.Inf)
