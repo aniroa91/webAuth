@@ -55,10 +55,10 @@ class ProblemController @Inject()(cc: ControllerComponents) extends AbstractCont
                   CommonService.formatPattern(x._6), CommonService.formatPattern(x._7), CommonService.formatPattern(x._8)))
       logger.info(s"Page: Problem - User: ${username} - Time Query:"+(System.currentTimeMillis() -t0))
       Ok(device.views.html.weekly.problem(ProblemResponse(weekly, location, deviceType, probConnectivity, probError, probWarn, critAlert, warnAlert, suyhao, broken, olts),
-        username, request.session.get("location").getOrElse(""), controllers.routes.ProblemController.index()))
+        username, province, controllers.routes.ProblemController.index()))
     }
     catch{
-      case e: Exception => Ok(device.views.html.weekly.problem(null, username, request.session.get("location").getOrElse(""), controllers.routes.ProblemController.index()))
+      case e: Exception => Ok(device.views.html.weekly.problem(null, username, province, controllers.routes.ProblemController.index()))
     }
   }
 
