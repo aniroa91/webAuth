@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import services.Configure;
 
 public class SecurityModule extends AbstractModule {
 
@@ -41,7 +40,7 @@ public class SecurityModule extends AbstractModule {
 
 //        String env_host = System.getenv(Configure.SVC_USER_HOST());
 
-        String env_host = Configure.SVC_USER_HOST();
+        String env_host = "192.11.127.151";
         System.setProperty("http.nonProxyHosts", "127.0.0.1|10.0.0.0/8|172.16.0.0/12|192.168.0.0/16|*.cluster.local|*.local|172.27.11.151|"+env_host);
 //        System.setProperty("http.nonProxyHosts", "127.0.0.1|10.0.0.0/8|172.16.0.0/12|192.168.0.0/16|*.cluster.local|*.local|172.27.11.151|");
         try {

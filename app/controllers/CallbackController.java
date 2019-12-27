@@ -15,7 +15,6 @@ import javax.inject.Inject;
 
 import static org.pac4j.core.util.CommonHelper.assertNotNull;
 import org.pac4j.play.PlayWebContext;
-import services.Configure;
 
 /**
  * <p>This filter finishes the login process for an indirect client, based on the {@link #callbackLogic}.</p>

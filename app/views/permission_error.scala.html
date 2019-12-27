@@ -12,10 +12,52 @@
 
         <title>Dashboard Admin </title>
 
-            <!-- Bootstrap -->
-        @common.views.html.common.css("Export")
+        <link href="../assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+            <!-- Font Awesome -->
+        <link href="../assets/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+            <!-- Custom Theme Style -->
+        <link href="../assets/custom/css/custom.min.css" rel="stylesheet">
+
+        <style type="text/css">
+                .top_nav .navbar-right {
+                    width: auto;
+                }
+                .navTop{
+                    margin-left: -41px;
+                }
+                section{
+                    margin:100px auto;
+                    height:1000px;
+                }
+                .right_col{
+                    min-height: inherit!important;
+                }
+        </style>
         </head>
-    @common.views.html.common.top()
+    <body class="nav-md">
+        <div class="container body">
+            <div class="main_container">
+                <div class="col-md-3 left_col">
+                    <div class="left_col scroll-view">
+                        <div class="navbar nav_title" style="border: 0;">
+                            <ul class="navTop">
+                                <li>
+                                    <a href="/daily" class="site_title curSor">
+                                        <i class="fa fa-server"></i> Device
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br />
+                            <!-- sidebar menu -->
+                        <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                            <div class="menu_section">
+                            </div>
+                        </div>
+                            <!-- /sidebar menu -->
+                    </div>
+                </div>
         <!-- top navigation -->
     <div class="top_nav">
         <div class="nav_menu">
@@ -54,19 +96,17 @@
         <!-- footer content -->
     <footer>
         <div class="pull-right">
-            Dashboard Monitor 2018
+            Dashboard 2019
         </div>
         <div class="clearfix"></div>
     </footer>
         <!-- /footer content -->
     </div>
     </div>
-
-        <!-- jQuery -->
-    <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
-        <!-- Bootstrap -->
-    <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-        <!-- Custom Theme Scripts -->
-    <script src="../assets/custom/js/custom.min.js"></script>
+        <script src="../assets/jquery/dist/jquery.min.js"></script>
+            <!-- Bootstrap -->
+        <script src="../assets/bootstrap/dist/js/bootstrap.min.js"></script>
+            <!-- Custom Theme Scripts -->
+        <script src="../assets/custom/js/custom.min.js"></script>
     </body>
 </html>

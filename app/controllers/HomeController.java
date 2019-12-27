@@ -18,7 +18,6 @@ import modules.SecurityModule;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import common.services.AuthorUtil;
-import services.Configure;
 
 public class HomeController extends Controller {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -30,12 +29,12 @@ public class HomeController extends Controller {
         return ok(version);
     }
 
-    public Result adminLogin(String username) {
-
+    public Result adminLogin(String user) {
+        String username = "hoangnh";
         session("username", username);
-        session("role", AuthorUtil.getRole(username, "regex"));
-        session("location", AuthorUtil.getRole(username, "location"));
-        session("verifiedLocation", AuthorUtil.getRole(username, "verifiedLocation"));
+        session("role", "*");
+        session("location", "");
+        session("verifiedLocation", "");
 
         return redirect("/");
     }
@@ -52,15 +51,16 @@ public class HomeController extends Controller {
         String username = "";
         if(m.find()){
             username = m.group(1);
+            logger.info(username);
             session("username", username);
-            session("role", AuthorUtil.getRole(username, "regex"));
-            session("location", AuthorUtil.getRole(username, "location"));
-            session("verifiedLocation", AuthorUtil.getRole(username, "verifiedLocation"));
+            session("role", "*");
+            session("location", "");
+            session("verifiedLocation", "");
         }
         session("username", username);
-        session("role", AuthorUtil.getRole(username, "regex"));
-        session("location", AuthorUtil.getRole(username, "location"));
-        session("verifiedLocation", AuthorUtil.getRole(username, "verifiedLocation"));
+        session("role", "*");
+        session("location", "");
+        session("verifiedLocation", "");
 
         return redirect("/");
     }
