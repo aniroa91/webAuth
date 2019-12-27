@@ -13,7 +13,7 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
   def index = Action { implicit request =>
     val ssId = request.session.get("username").toString
     if(ssId != "None") {
-      Redirect("/daily")
+      Redirect("/home")
     }
     else
       Ok(views.html.login(request.flash.get("login").getOrElse("None")))

@@ -1,4 +1,4 @@
-@(day: String)(implicit request: RequestHeader)
+@(day: String, mgs: String, postUrl: Call)(implicit request: RequestHeader)
 @import play.api.libs.json.Json
 @import play.api.libs.json.Json
 
@@ -73,7 +73,24 @@
                 <!-- /top navigation -->
                 <!-- page content -->
                 <div class="right_col" role="main">
-                    <div class="row"><h2 class="noData-title">Not enough data. Please enter on text search.</h2></div>
+                    <div class="row">
+                        <input id="message" value="@mgs" type="hidden">
+                        <div class="col-lg-12">
+                            <form action="/importFile" method="POST" enctype="multipart/form-data">
+                                @helper.CSRF.formField
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Import Json File</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <input class="form-control" type="file" name="fileUpload" accept=".json" required>
+                                </div>
+                                <div class="modal-footer" style="padding: 5px">
+                                    <button type="submit" class="btn btn-orange btn-sm">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
                 <!-- /page content -->
                 <!-- footer content -->
@@ -92,5 +109,11 @@
         <script src="../assets/bootstrap/dist/js/bootstrap.min.js"></script>
             <!-- Custom Theme Scripts -->
         <script src="../assets/custom/js/custom.min.js"></script>
+        <script type="text/javascript">
+                $(document).ready(function () {
+                  if($('#message').val() == "ok")
+                      alert("You uploaded file success!")
+                })
+        </script>
     </body>
 </html>

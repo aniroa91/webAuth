@@ -11,13 +11,13 @@ class ErrorHandle extends HttpErrorHandler {
 
   def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
     Future.successful(
-      Redirect("/daily")
+      Redirect("/home")
     )
   }
 
   def onServerError(request: RequestHeader, exception: Throwable) = {
     Future.successful(
-      Redirect("/daily")
+      Redirect("/home")
     )
   }
 }
