@@ -1,8 +1,6 @@
 package controllers
 
-import java.io.File
 import java.nio.file.Paths
-
 import common.services.Configure
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,11 +23,11 @@ class DailyController @Inject()(cc: ControllerComponents) extends AbstractContro
     val success = request.flash.get("success").getOrElse("not")
     Ok(home.views.html.index(CommonService.getCurrentDay(), success, controllers.routes.DailyController.index()))
   }
-
   def importFile() = Action(parse.multipartFormData) { implicit request =>
     try {
-      request.body.file("fileUpload").map { picture =>
-        picture.ref.moveTo(Paths.get(Configure.FILE_PATH + "/" + picture.filename).toFile, replace = true)
+      val files = request.body.files.toArray
+      files.foreach{
+        file => file.ref.moveTo(Paths.get(Configure.FILE_PATH + "/" + file.filename).toFile, replace = true)
       }
       Redirect(controllers.routes.DailyController.index).flashing("success" -> "ok")
     }
